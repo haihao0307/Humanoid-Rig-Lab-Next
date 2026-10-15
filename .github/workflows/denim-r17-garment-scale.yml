@@ -1,0 +1,58 @@
+name: Denim R17 Garment Scale
+on:
+  push:
+    branches: [feature/denim-r17-garment-scale-20261015]
+    paths:
+      - 'denim-workshop/r17-scale/**'
+      - '.github/workflows/denim-r17-garment-scale.yml'
+permissions:
+  contents: read
+jobs:
+  physical-scale-and-public-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      ROOT: denim-workshop/r17-scale
+      BASE_SHA: 6ccb6162dfd55a14add177c91155ccb78d5704f6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Enforce isolated R17 addition and physical scale tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --name-only "$BASE_SHA" "$GITHUB_SHA" >/tmp/denim-r17-scope.txt
+          cat /tmp/denim-r17-scope.txt
+          if grep -Ev '^(denim-workshop/r17-scale/|\.github/workflows/denim-r17-garment-scale\.yml$)' /tmp/denim-r17-scope.txt; then
+            echo 'Change outside isolated R17 scope'; exit 1
+          fi
+          node --check "$ROOT/runtime.js"
+          node --test "$ROOT/tests/core.mjs"
+      - name: Install pinned browser dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/denim-r17-deps" --ignore-scripts --no-audit --no-fund playwright@1.55.1 pngjs@7.0.0
+          ln -s "$RUNNER_TEMP/denim-r17-deps/node_modules" "$ROOT/node_modules"
+          "$ROOT/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Real local and immutable public browser checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 8765 --directory "$ROOT" >/tmp/denim-r17-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER" 2>/dev/null || true' EXIT
+          (cd "$ROOT" && node tests/browser.mjs http://127.0.0.1:8765/index.html local)
+          RAW="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$GITHUB_SHA/$ROOT/index.html"
+          PUBLIC="https://htmlpreview.github.io/?$RAW"
+          curl --fail --location --retry 5 --retry-delay 2 "$RAW" -o /tmp/denim-r17-public.html
+          cmp "$ROOT/index.html" /tmp/denim-r17-public.html
+          (cd "$ROOT" && node tests/browser.mjs "$PUBLIC" public)
+          echo "PUBLIC_URL=$PUBLIC"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: denim-r17-garment-scale-evidence
+          path: denim-workshop/r17-scale/evidence
+          if-no-files-found: warn
