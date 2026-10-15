@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const VERSION='DENIM-R17-GARMENT-SCALE';
+const VERSION='DENIM-R17-GARMENT-SCALE';const PI=Math.PI;
 const canvas=document.getElementById('gl'),stage=document.getElementById('stage');
 const gl=canvas.getContext('webgl2',{antialias:true,alpha:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});
 const errors=[];if(!gl){document.getElementById('status').textContent='需要 WebGL2';throw Error('WebGL2 unavailable');}
