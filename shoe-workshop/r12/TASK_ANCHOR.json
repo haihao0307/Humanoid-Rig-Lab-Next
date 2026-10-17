@@ -3,7 +3,7 @@
   "taskId": "SHOE-FOUR-STYLES-R12-20261017",
   "dispatchDate": "2026-10-17",
   "timezone": "Asia/Shanghai",
-  "status": "EXECUTE_PENDING_VERIFICATION",
+  "status": "DELIVERED_PUBLIC_VERIFIED",
   "target": "shoe-workshop/r12",
   "primaryDefect": "鞋履工作台只有一种基础鞋型，缺少四种结构成立且可选择的不同鞋款",
   "userRequest": "找到 GitHub 鞋履工作台，先学习科学研究与现实鞋型，再新增四种不同鞋子款式",
@@ -26,34 +26,69 @@
     {
       "id": "penny_loafer",
       "label": "Penny loafer / 便士乐福鞋",
-      "requiredFeatures": ["低帮套入鞋口", "鞋面围缝", "有开口的横向鞍带"],
-      "confusionSet": ["去掉鞋带的普通系带鞋", "无鞍带平口便鞋"],
-      "currentLargestDeviation": "PENDING_INDEPENDENT_INSPECTION",
-      "referenceUrl": "https://us.crockettandjones.com/products/boston-black-calf"
+      "requiredFeatures": [
+        "低帮套入鞋口",
+        "鞋面围缝",
+        "有开口的横向鞍带"
+      ],
+      "confusionSet": [
+        "去掉鞋带的普通系带鞋",
+        "无鞍带平口便鞋"
+      ],
+      "currentLargestDeviation": "NO_KNOWN_BLOCKER_IN_REVIEWED_VIEWS; commercial last dimensions and manufacturing parameters are unmeasured",
+      "referenceUrl": "https://us.crockettandjones.com/products/boston-black-calf",
+      "independentReview": "ACCEPTED_SOURCE4; see evidence/VISUAL_REVIEW.json for inspected views and limits"
     },
     {
       "id": "chelsea",
       "label": "Chelsea / 切尔西短靴",
-      "requiredFeatures": ["踝部靴筒", "左右独立弹力插片", "后提环", "连续前帮"],
-      "confusionSet": ["系带工作靴", "低帮鞋整体拉高"],
-      "currentLargestDeviation": "PENDING_INDEPENDENT_INSPECTION",
-      "referenceUrl": "https://www.crockettandjones.com/blogs/the-article/the-icons-chelsea-8"
+      "requiredFeatures": [
+        "踝部靴筒",
+        "左右独立弹力插片",
+        "后提环",
+        "连续前帮"
+      ],
+      "confusionSet": [
+        "系带工作靴",
+        "低帮鞋整体拉高"
+      ],
+      "currentLargestDeviation": "NO_KNOWN_BLOCKER_IN_REVIEWED_VIEWS; commercial last dimensions and manufacturing parameters are unmeasured",
+      "referenceUrl": "https://www.crockettandjones.com/blogs/the-article/the-icons-chelsea-8",
+      "independentReview": "ACCEPTED_SOURCE4; see evidence/VISUAL_REVIEW.json for inspected views and limits"
     },
     {
       "id": "double_monk",
       "label": "Double monk / 双扣孟克鞋",
-      "requiredFeatures": ["跨脚背搭片", "两条带", "两枚扣具及连接", "直线鞋头盖缝"],
-      "confusionSet": ["单扣孟克鞋", "只有装饰扣的系带鞋"],
-      "currentLargestDeviation": "PENDING_INDEPENDENT_INSPECTION",
-      "referenceUrl": "https://www.crockettandjones.com/products/lowndes-black-calf"
+      "requiredFeatures": [
+        "跨脚背搭片",
+        "两条带",
+        "两枚扣具及连接",
+        "直线鞋头盖缝"
+      ],
+      "confusionSet": [
+        "单扣孟克鞋",
+        "只有装饰扣的系带鞋"
+      ],
+      "currentLargestDeviation": "NO_KNOWN_BLOCKER_IN_REVIEWED_VIEWS; commercial last dimensions and manufacturing parameters are unmeasured",
+      "referenceUrl": "https://www.crockettandjones.com/products/lowndes-black-calf",
+      "independentReview": "ACCEPTED_SOURCE4; see evidence/VISUAL_REVIEW.json for inspected views and limits"
     },
     {
       "id": "canvas_tennis",
       "label": "Low canvas tennis shoe / 低帮帆布网球鞋",
-      "requiredFeatures": ["低帮帆布裁片", "独立鞋舌与鞋眼", "系带开口", "橡胶围边与外底"],
-      "confusionSet": ["皮鞋换成帆布颜色", "带橡胶包头的另一鞋型"],
-      "currentLargestDeviation": "PENDING_INDEPENDENT_INSPECTION",
-      "referenceUrl": "https://www.superga.com/products/le-superga-unisex-2750-cotu-classic-black-s000010-999"
+      "requiredFeatures": [
+        "低帮帆布裁片",
+        "独立鞋舌与鞋眼",
+        "系带开口",
+        "橡胶围边与外底"
+      ],
+      "confusionSet": [
+        "皮鞋换成帆布颜色",
+        "带橡胶包头的另一鞋型"
+      ],
+      "currentLargestDeviation": "NO_KNOWN_BLOCKER_IN_REVIEWED_VIEWS; commercial last dimensions and manufacturing parameters are unmeasured",
+      "referenceUrl": "https://www.superga.com/products/le-superga-unisex-2750-cotu-classic-black-s000010-999",
+      "independentReview": "ACCEPTED_SOURCE4; see evidence/VISUAL_REVIEW.json for inspected views and limits"
     }
   ],
   "referenceSet": {
@@ -61,9 +96,10 @@
     "science": [
       "https://research.tudelft.nl/en/publications/a-landmark-based-3d-parametric-foot-model-for-footwear-customisat/",
       "https://docs.mcneel.com/rhino/7mac/help/en-us/commands/squish.htm",
-      "https://pmc.ncbi.nlm.nih.gov/articles/PMC9331295/",
+      "https://www.mdpi.com/1996-1944/15/15/5107",
       "https://link.springer.com/article/10.1186/1757-1146-7-20",
-      "https://www.satra.com/bulletin/article.php?id=1964"
+      "https://www.satra.com/bulletin/article.php?id=1964",
+      "https://www.satra.com/bulletin/article.php?id=1135"
     ],
     "researchNotes": "RESEARCH.md",
     "checkedOn": "2026-10-17",
@@ -91,23 +127,92 @@
     "未经本轮新授权合并、强推或改写历史"
   ],
   "acceptanceGates": [
-    {"id": "contract", "status": "PENDING", "criterion": "R10 保留，四种指定新鞋型齐全，生产源码确有当前任务增量"},
-    {"id": "freshness", "status": "PENDING", "criterion": "构建、测试和交付链接绑定当前任务新提交；旧成果只作 baseline"},
-    {"id": "reference_fidelity", "status": "PENDING", "criterion": "逐款核对原厂身份特征与三维候选；有原厂来源入口，不声称商业型号精确复制"},
-    {"id": "geometry", "status": "PENDING", "criterion": "四款三维形态和部件关系不同；有限顶点、合理边界、实体厚度、帮底连续且无明显穿模"},
-    {"id": "interaction", "status": "PENDING", "criterion": "款式切换、镜头和所提供参数控制实际运行；无虚假按钮"},
-    {"id": "machine", "status": "PENDING", "criterion": "实际构建和目标相关文件/数值检查通过，证据对应当前 head"},
-    {"id": "delivery", "status": "PENDING", "criterion": "固定公网 HTTPS 内容与版本经真实浏览器验证；提供自包含 HTML 配套并验证核心无外部资源依赖"},
-    {"id": "independent_review", "status": "PENDING", "criterion": "独立检查者依据本 Anchor 记录实际通过项、偏差和未测范围；Producer 不自批"}
+    {
+      "id": "contract",
+      "status": "PASSED",
+      "criterion": "R10 保留，四种指定新鞋型齐全，生产源码确有当前任务增量",
+      "evidence": "GEOMETRY.json: four new procedural structures plus R10; 22 R10 files and two embedded payloads preserved"
+    },
+    {
+      "id": "freshness",
+      "status": "PASSED",
+      "criterion": "构建、测试和交付链接绑定当前任务新提交；旧成果只作 baseline",
+      "evidence": "BUILD_MANIFEST.json source 7fd5527f475908d615db4f1fd36357f47e68ce46; RELEASE_RECEIPT.json build d27ef0f200257741fa67f1c6291418cf771443e9; later commits only add publication evidence and documentation"
+    },
+    {
+      "id": "reference_fidelity",
+      "status": "PASSED",
+      "criterion": "逐款核对原厂身份特征与三维候选；有原厂来源入口，不声称商业型号精确复制",
+      "evidence": "RESEARCH.md and VISUAL_REVIEW.json: source-linked archetype features accepted by independent AI reviewer; exact commercial dimensions are not claimed"
+    },
+    {
+      "id": "geometry",
+      "status": "PASSED",
+      "criterion": "四款三维形态和部件关系不同；有限顶点、合理边界、实体厚度、帮底连续且无明显穿模",
+      "evidence": "GEOMETRY.json: 114/114 checks; 100 parameter cases and 104 generated models; VISUAL_REVIEW.json: accepted Source4 in inspected views"
+    },
+    {
+      "id": "interaction",
+      "status": "PASSED",
+      "criterion": "款式切换、镜头和所提供参数控制实际运行；无虚假按钮",
+      "evidence": "evidence/browser/QA.json and evidence/public/QA.json: eight real Chromium/WebGL groups each, including controls, cameras, parts, paired view and recipe state"
+    },
+    {
+      "id": "machine",
+      "status": "PASSED",
+      "criterion": "实际构建和目标相关文件/数值检查通过，证据对应当前 head",
+      "evidence": "Candidate run 39018660835 succeeded for source 7fd5527f475908d615db4f1fd36357f47e68ce46; same source hashes preserved after evidence/documentation commits"
+    },
+    {
+      "id": "delivery",
+      "status": "PASSED",
+      "criterion": "固定公网 HTTPS 内容与版本经真实浏览器验证；提供自包含 HTML 配套并验证核心无外部资源依赖",
+      "evidence": "Public run 39019151742 succeeded; immutable URL, 13724240 runtime bytes and SHA-256 match accepted candidate; file-mode core made no external HTTP requests"
+    },
+    {
+      "id": "independent_review",
+      "status": "PASSED",
+      "criterion": "独立检查者依据本 Anchor 记录实际通过项、偏差和未测范围；Producer 不自批",
+      "evidence": "evidence/VISUAL_REVIEW.json: independent AI acceptance and public verification; producer did not self-approve; human and user approval remain false"
+    }
   ],
   "agentsChecklist": [
-    {"text": "没有用生成图片代替真实三维实现", "status": "PENDING_FINAL_VERIFICATION"},
-    {"text": "已实际修改生产源码", "status": "PENDING_FINAL_VERIFICATION"},
-    {"text": "用户看到的是可交互三维工作台", "status": "PENDING_FINAL_VERIFICATION"},
-    {"text": "人物/动物几何、骨骼和动作来自真实运行时", "status": "PENDING_FINAL_VERIFICATION", "scopeNote": "本任务验收生成鞋几何；未完成的人体适配、骨骼或动作不宣称完成"},
-    {"text": "镜头、选择、动作或参数控制可以实际操作", "status": "PENDING_FINAL_VERIFICATION"},
-    {"text": "公网固定链接和真实浏览器已验证", "status": "PENDING_FINAL_VERIFICATION"},
-    {"text": "如果只有截图而没有工作台，本轮判定失败", "status": "PENDING_FINAL_VERIFICATION"}
+    {
+      "text": "没有用生成图片代替真实三维实现",
+      "status": "PASSED",
+      "evidence": "evidence/GEOMETRY.json; evidence/browser/QA.json; evidence/public/QA.json; evidence/VISUAL_REVIEW.json"
+    },
+    {
+      "text": "已实际修改生产源码",
+      "status": "PASSED",
+      "evidence": "evidence/GEOMETRY.json; evidence/browser/QA.json; evidence/public/QA.json; evidence/VISUAL_REVIEW.json"
+    },
+    {
+      "text": "用户看到的是可交互三维工作台",
+      "status": "PASSED",
+      "evidence": "evidence/GEOMETRY.json; evidence/browser/QA.json; evidence/public/QA.json; evidence/VISUAL_REVIEW.json"
+    },
+    {
+      "text": "人物/动物几何、骨骼和动作来自真实运行时",
+      "status": "NOT_APPLICABLE",
+      "scopeNote": "本任务验收生成鞋几何；未完成的人体适配、骨骼或动作不宣称完成",
+      "evidence": "This is a shoe geometry task; humanoid/bone/motion validation is outside scope"
+    },
+    {
+      "text": "镜头、选择、动作或参数控制可以实际操作",
+      "status": "PASSED",
+      "evidence": "evidence/GEOMETRY.json; evidence/browser/QA.json; evidence/public/QA.json; evidence/VISUAL_REVIEW.json"
+    },
+    {
+      "text": "公网固定链接和真实浏览器已验证",
+      "status": "PASSED",
+      "evidence": "evidence/GEOMETRY.json; evidence/browser/QA.json; evidence/public/QA.json; evidence/VISUAL_REVIEW.json"
+    },
+    {
+      "text": "如果只有截图而没有工作台，本轮判定失败",
+      "status": "PASSED",
+      "evidence": "evidence/GEOMETRY.json; evidence/browser/QA.json; evidence/public/QA.json; evidence/VISUAL_REVIEW.json"
+    }
   ],
   "limitations": {
     "designMillimetresMeasuredFromCommercialProduct": false,
@@ -118,5 +223,30 @@
     "comfortCertified": false,
     "note": "研究支持结构设计与验证方法，不是本工程精度、可制造性或医学舒适性的证书"
   },
-  "nextTaskPointer": "完成 r12 候选后按此 Anchor 执行独立源码、生成几何与真实浏览器验收"
+  "nextTaskPointer": "本轮四款新增结构与固定公网工作台已交付；继续开发时从已验收 sourceCommit 及发布回执读取基线。制造纸样、实测足楦、材料力学和人体适配仍为未完成的独立范围，不作为本轮通过项。",
+  "completedOn": "2026-10-17",
+  "verifiedDelivery": {
+    "sourceCommit": "7fd5527f475908d615db4f1fd36357f47e68ce46",
+    "buildCommit": "d27ef0f200257741fa67f1c6291418cf771443e9",
+    "receiptCommit": "8599e7c25e356c6ac1ad33e3bdb8c0c34d3e794c",
+    "publicUrl": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/d27ef0f200257741fa67f1c6291418cf771443e9/shoe-workshop/r12/public-lite.html",
+    "runtimeBytes": 13724240,
+    "runtimeSha256": "aaba719b65cbd4e53c19ffa74de335d90c81a8974ada4afa6460ada0a9d40a61",
+    "candidateRunId": 39018660835,
+    "publicRunId": 39019151742,
+    "geometryChecks": 114,
+    "parameterCases": 100,
+    "generatedModels": 104,
+    "browserGroupsEachPhase": 8,
+    "screenshotsEachPhase": 23,
+    "independentAiVisualReview": true,
+    "humanApproval": false,
+    "userApproval": false,
+    "realMobileDeviceTested": false,
+    "releaseReceipt": "RELEASE_RECEIPT.json",
+    "visualReview": "evidence/VISUAL_REVIEW.json",
+    "pullRequest": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/pull/88",
+    "pullRequestDraft": true,
+    "merged": false
+  }
 }

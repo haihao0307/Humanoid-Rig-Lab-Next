@@ -60,7 +60,7 @@
   "aiIndependentVisualApproved": true,
   "humanApproved": false,
   "userApproved": false,
-  "publicDeliveryStatus": "pending",
+  "publicDeliveryStatus": "verified",
   "acceptanceScope": "Independent AI visual acceptance of the final default rendered views and four-style comparison as an original parametric footwear design prototype. This record does not certify all parameter views, human approval, user approval, fit, materials, physics, manufacturing, or public delivery.",
   "observedConclusions": [
     {
@@ -463,6 +463,84 @@
     "physicalSimulationValidated": false,
     "wearerFitValidated": false,
     "manufacturingValidated": false,
-    "publicDeliveryVerified": false
+    "publicDeliveryVerified": true
+  },
+  "publicVerification": {
+    "decision": "pass",
+    "verifiedOn": "2026-10-17",
+    "reviewerType": "AI",
+    "method": "Verified the immutable public CI artifact, public HTTP body hash, all recorded screenshot hashes, and equality with the visually accepted candidate; directly inspected the one non-identical comparison image.",
+    "sourceCommit": "7fd5527f475908d615db4f1fd36357f47e68ce46",
+    "buildCommit": "d27ef0f200257741fa67f1c6291418cf771443e9",
+    "receiptCommit": "8599e7c25e356c6ac1ad33e3bdb8c0c34d3e794c",
+    "ciRunId": 39019151742,
+    "ciArtifactId": 12095997568,
+    "archiveSha256": "d061189d82181fc8985971d124690d1689135698e289f5a47b155a814f925f79",
+    "publicQaSha256": "15508b43ed0c1289ae0b9fb9b99ff99715f13db0303fd793eb2f7c8652b70c1b",
+    "url": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/d27ef0f200257741fa67f1c6291418cf771443e9/shoe-workshop/r12/public-lite.html",
+    "rawUrl": "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/d27ef0f200257741fa67f1c6291418cf771443e9/shoe-workshop/r12/public-lite.html",
+    "publicRuntime": {
+      "bytes": 13724240,
+      "sha256": "aaba719b65cbd4e53c19ffa74de335d90c81a8974ada4afa6460ada0a9d40a61",
+      "matchesAcceptedCandidate": true
+    },
+    "browserEvidence": {
+      "completed": true,
+      "passedGroups": 8,
+      "errors": 0,
+      "consoleErrors": 0,
+      "requestFailures": 0,
+      "environment": {
+        "browser": "Chromium",
+        "renderer": "SwiftShader",
+        "os": "Ubuntu CI",
+        "desktopViewport": [
+          1512,
+          1100
+        ],
+        "mobileViewport": [
+          390,
+          844
+        ],
+        "realMobileDevice": false
+      }
+    },
+    "screenshotVerification": {
+      "reportedScreenshotHashesVerified": 23,
+      "exactCandidateByteMatches": 22,
+      "exactMatchFiles": [
+        "desktop-first-frame.png",
+        "penny-hero.png",
+        "penny-side.png",
+        "penny-top.png",
+        "chelsea-hero.png",
+        "chelsea-side.png",
+        "chelsea-top.png",
+        "monk-hero.png",
+        "monk-side.png",
+        "monk-top.png",
+        "canvas-hero.png",
+        "canvas-side.png",
+        "canvas-top.png",
+        "monk-parameter-and-flex.png",
+        "canvas-pair.png",
+        "penny-exploded.png",
+        "penny-first-part.png",
+        "penny-section.png",
+        "chelsea-clay.png",
+        "retained-r10-original.png",
+        "retained-r10-p05.png",
+        "mobile-viewport.png"
+      ],
+      "directlyInspected": [
+        {
+          "path": "four-style-comparison.png",
+          "sha256": "898224a8073f366e4388facea8e03b6c68190bff41e8f37db4bbcf0bf69393be",
+          "conclusion": "The public comparison has no visible shape, material or layout regression against the accepted candidate; byte equality is not claimed for this image."
+        }
+      ]
+    },
+    "conclusion": "The published runtime and the inspected public results retain the accepted Source4 candidate. No new public visual blocker was observed.",
+    "scopeNote": "This appended verification supersedes the earlier pending public-delivery status. The earlier visual-only scope and all three rejection records are preserved; human/user approval, physics, fit and manufacturing validation remain false."
   }
 }
