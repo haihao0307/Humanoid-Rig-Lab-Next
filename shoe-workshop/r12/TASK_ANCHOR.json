@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "taskId": "SHOE-FOUR-STYLES-R12-20261017",
+  "dispatchDate": "2026-10-17",
+  "timezone": "Asia/Shanghai",
+  "status": "EXECUTE_PENDING_VERIFICATION",
+  "target": "shoe-workshop/r12",
+  "primaryDefect": "鞋履工作台只有一种基础鞋型，缺少四种结构成立且可选择的不同鞋款",
+  "userRequest": "找到 GitHub 鞋履工作台，先学习科学研究与现实鞋型，再新增四种不同鞋子款式",
+  "baseSha": "cafab0889b612ed6cbf461683dfe2851909df3be",
+  "branch": "feature/shoe-four-styles-r12-20261017",
+  "taskMode": "AUTHORIZED_ARCHETYPE_DESIGN",
+  "creativeAuthorization": true,
+  "authorizationScope": "用户授权新增四款参数化自有鞋设计；原厂资料用于鞋型结构学习，不是商业型号一比一复刻授权",
+  "acceptedBaseline": {
+    "path": "shoe-workshop/r10",
+    "sha": "cafab0889b612ed6cbf461683dfe2851909df3be",
+    "role": "PRESERVE_EXISTING_BASELINE",
+    "note": "本轮选定并保留 R10 原鞋；此字段不构成对旧版视觉质量的新批准",
+    "excludedAsVisualBase": {
+      "version": "r11",
+      "reason": "协调线程核对的人体适配仍未完成，不作为本轮视觉基础"
+    }
+  },
+  "archetypes": [
+    {
+      "id": "penny_loafer",
+      "label": "Penny loafer / 便士乐福鞋",
+      "requiredFeatures": ["低帮套入鞋口", "鞋面围缝", "有开口的横向鞍带"],
+      "confusionSet": ["去掉鞋带的普通系带鞋", "无鞍带平口便鞋"],
+      "currentLargestDeviation": "PENDING_INDEPENDENT_INSPECTION",
+      "referenceUrl": "https://us.crockettandjones.com/products/boston-black-calf"
+    },
+    {
+      "id": "chelsea",
+      "label": "Chelsea / 切尔西短靴",
+      "requiredFeatures": ["踝部靴筒", "左右独立弹力插片", "后提环", "连续前帮"],
+      "confusionSet": ["系带工作靴", "低帮鞋整体拉高"],
+      "currentLargestDeviation": "PENDING_INDEPENDENT_INSPECTION",
+      "referenceUrl": "https://www.crockettandjones.com/blogs/the-article/the-icons-chelsea-8"
+    },
+    {
+      "id": "double_monk",
+      "label": "Double monk / 双扣孟克鞋",
+      "requiredFeatures": ["跨脚背搭片", "两条带", "两枚扣具及连接", "直线鞋头盖缝"],
+      "confusionSet": ["单扣孟克鞋", "只有装饰扣的系带鞋"],
+      "currentLargestDeviation": "PENDING_INDEPENDENT_INSPECTION",
+      "referenceUrl": "https://www.crockettandjones.com/products/lowndes-black-calf"
+    },
+    {
+      "id": "canvas_tennis",
+      "label": "Low canvas tennis shoe / 低帮帆布网球鞋",
+      "requiredFeatures": ["低帮帆布裁片", "独立鞋舌与鞋眼", "系带开口", "橡胶围边与外底"],
+      "confusionSet": ["皮鞋换成帆布颜色", "带橡胶包头的另一鞋型"],
+      "currentLargestDeviation": "PENDING_INDEPENDENT_INSPECTION",
+      "referenceUrl": "https://www.superga.com/products/le-superga-unisex-2750-cotu-classic-black-s000010-999"
+    }
+  ],
+  "referenceSet": {
+    "styleGuide": "https://www.crockettandjones.com/pages/style-guide",
+    "science": [
+      "https://research.tudelft.nl/en/publications/a-landmark-based-3d-parametric-foot-model-for-footwear-customisat/",
+      "https://docs.mcneel.com/rhino/7mac/help/en-us/commands/squish.htm",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC9331295/",
+      "https://link.springer.com/article/10.1186/1757-1146-7-20",
+      "https://www.satra.com/bulletin/article.php?id=1964"
+    ],
+    "researchNotes": "RESEARCH.md",
+    "checkedOn": "2026-10-17",
+    "commercialImagesCopied": false,
+    "noChineseWebsitesUsed": true,
+    "scope": "原厂文字与结构身份参考；不包含实物测量、商业纸样或授权商业图片副本"
+  },
+  "protectedInvariants": [
+    "保留 R10 原鞋和旧入口，新增工作只进入 r12",
+    "至少五款可选：一个保留原鞋加四种新增结构鞋型",
+    "参数化自有几何与程序材质；无商业鞋网格、商标或图片贴图复制",
+    "鞋面厚度、内外侧、开口和帮底连接有独立结构语义",
+    "不以 r11 未完成的人体适配冒充当前成果",
+    "本轮设计毫米值未实测；验收量最终世界空间几何",
+    "未通过独立验证前不称视觉达标、生产就绪或交付完成",
+    "研究先于生产修改，来源和推断保持可追溯"
+  ],
+  "forbiddenRoutes": [
+    "生成图片、截图、视频、Canvas 假画面或占位页替代真实三维",
+    "四种新增鞋仅用换色或同一鞋壳整体缩放实现",
+    "任意曲面展开直接宣称制造纸样有效",
+    "几何接触、弯折动画或程序约束宣称物理认证、舒适性认证",
+    "导入商业鞋网格、原厂图片副本或商标贴图",
+    "搜索或引用中国网站",
+    "未经本轮新授权合并、强推或改写历史"
+  ],
+  "acceptanceGates": [
+    {"id": "contract", "status": "PENDING", "criterion": "R10 保留，四种指定新鞋型齐全，生产源码确有当前任务增量"},
+    {"id": "freshness", "status": "PENDING", "criterion": "构建、测试和交付链接绑定当前任务新提交；旧成果只作 baseline"},
+    {"id": "reference_fidelity", "status": "PENDING", "criterion": "逐款核对原厂身份特征与三维候选；有原厂来源入口，不声称商业型号精确复制"},
+    {"id": "geometry", "status": "PENDING", "criterion": "四款三维形态和部件关系不同；有限顶点、合理边界、实体厚度、帮底连续且无明显穿模"},
+    {"id": "interaction", "status": "PENDING", "criterion": "款式切换、镜头和所提供参数控制实际运行；无虚假按钮"},
+    {"id": "machine", "status": "PENDING", "criterion": "实际构建和目标相关文件/数值检查通过，证据对应当前 head"},
+    {"id": "delivery", "status": "PENDING", "criterion": "固定公网 HTTPS 内容与版本经真实浏览器验证；提供自包含 HTML 配套并验证核心无外部资源依赖"},
+    {"id": "independent_review", "status": "PENDING", "criterion": "独立检查者依据本 Anchor 记录实际通过项、偏差和未测范围；Producer 不自批"}
+  ],
+  "agentsChecklist": [
+    {"text": "没有用生成图片代替真实三维实现", "status": "PENDING_FINAL_VERIFICATION"},
+    {"text": "已实际修改生产源码", "status": "PENDING_FINAL_VERIFICATION"},
+    {"text": "用户看到的是可交互三维工作台", "status": "PENDING_FINAL_VERIFICATION"},
+    {"text": "人物/动物几何、骨骼和动作来自真实运行时", "status": "PENDING_FINAL_VERIFICATION", "scopeNote": "本任务验收生成鞋几何；未完成的人体适配、骨骼或动作不宣称完成"},
+    {"text": "镜头、选择、动作或参数控制可以实际操作", "status": "PENDING_FINAL_VERIFICATION"},
+    {"text": "公网固定链接和真实浏览器已验证", "status": "PENDING_FINAL_VERIFICATION"},
+    {"text": "如果只有截图而没有工作台，本轮判定失败", "status": "PENDING_FINAL_VERIFICATION"}
+  ],
+  "limitations": {
+    "designMillimetresMeasuredFromCommercialProduct": false,
+    "materialCalibrated": false,
+    "manufacturingValidated": false,
+    "wearerFitValidated": false,
+    "physicsCertified": false,
+    "comfortCertified": false,
+    "note": "研究支持结构设计与验证方法，不是本工程精度、可制造性或医学舒适性的证书"
+  },
+  "nextTaskPointer": "完成 r12 候选后按此 Anchor 执行独立源码、生成几何与真实浏览器验收"
+}
