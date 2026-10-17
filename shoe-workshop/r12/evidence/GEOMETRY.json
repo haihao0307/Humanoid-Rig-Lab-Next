@@ -1,0 +1,228 @@
+{
+  "suite": "SHOE-R12-INDEPENDENT-GEOMETRY",
+  "taskId": "SHOE-FOUR-STYLES-R12-20261017",
+  "sourceCommit": "7fd5527f475908d615db4f1fd36357f47e68ce46",
+  "success": true,
+  "passed": 114,
+  "failed": 0,
+  "generatedCases": 104,
+  "validatedParameterCases": 100,
+  "extremeCornersPerStyle": 16,
+  "baseline": "cafab0889b612ed6cbf461683dfe2851909df3be",
+  "failures": [],
+  "measuredResponses": [
+    {
+      "name": "penny/measured parameter response",
+      "passed": true,
+      "detail": {
+        "lengthChangeMm": 56,
+        "widthChangeMm": 27.59362030029297,
+        "upperInstepRaiseMm": 10.5552978515625,
+        "thicknessRatio": 2.3333332224288323
+      }
+    },
+    {
+      "name": "chelsea/measured parameter response",
+      "passed": true,
+      "detail": {
+        "lengthChangeMm": 57.20001220703125,
+        "widthChangeMm": 27.320411682128906,
+        "upperInstepRaiseMm": 11.720664978027344,
+        "thicknessRatio": 2.333333253675059
+      }
+    },
+    {
+      "name": "monk/measured parameter response",
+      "passed": true,
+      "detail": {
+        "lengthChangeMm": 57.79998779296875,
+        "widthChangeMm": 27.04721450805664,
+        "upperInstepRaiseMm": 12.999900817871094,
+        "thicknessRatio": 2.33333331269797
+      }
+    },
+    {
+      "name": "canvas/measured parameter response",
+      "passed": true,
+      "detail": {
+        "lengthChangeMm": 55.79998779296875,
+        "widthChangeMm": 28.413230895996094,
+        "upperInstepRaiseMm": 3.965839385986328,
+        "thicknessRatio": 2.3333333722005913
+      }
+    }
+  ],
+  "meridianContinuity": {
+    "name": "chelsea/front and rear meridian continuity",
+    "passed": true,
+    "detail": {
+      "parameterCases": 3,
+      "meridians": [
+        "front",
+        "rear"
+      ],
+      "angularStepRadians": 0.00001,
+      "comparisons": 108,
+      "maxDistanceMm": 0.007081373340364905,
+      "limitMm": 0.1
+    }
+  },
+  "toeCoverage": {
+    "name": "chelsea/toe cover follows last roof",
+    "passed": true,
+    "detail": {
+      "method": "ray intersection with actual upper and insole triangles",
+      "limitMm": 3,
+      "maxRoofErrorMm": 1.5300064188651739,
+      "samples": [
+        {
+          "backFromToeMm": 3,
+          "actualY": 23.378658798268887,
+          "lastRoofY": 24.90866521713406,
+          "roofErrorMm": 1.5300064188651739
+        },
+        {
+          "backFromToeMm": 6,
+          "actualY": 29.25166236454193,
+          "lastRoofY": 29.533703868747153,
+          "roofErrorMm": 0.28204150420522467
+        },
+        {
+          "backFromToeMm": 9,
+          "actualY": 32.932114616639,
+          "lastRoofY": 33.05258740988157,
+          "roofErrorMm": 0.12047279324256976
+        },
+        {
+          "backFromToeMm": 13,
+          "actualY": 35.53620354009617,
+          "lastRoofY": 35.54291080209896,
+          "roofErrorMm": 0.006707262002791481
+        },
+        {
+          "backFromToeMm": 20,
+          "actualY": 37.25033298489845,
+          "lastRoofY": 37.30201998231455,
+          "roofErrorMm": 0.05168699741609828
+        }
+      ],
+      "winding": {
+        "regionFromToeMm": [
+          0,
+          35
+        ],
+        "triangles": 261,
+        "minimumMeanNormalDot": 0.9535082719278062
+      }
+    }
+  },
+  "preservation": [
+    {
+      "name": "R10 files unchanged against fixed Git baseline",
+      "passed": true,
+      "detail": {
+        "fileCount": 22,
+        "baseline": "cafab0889b612ed6cbf461683dfe2851909df3be",
+        "method": "exact Git blob bytes, not geometry similarity"
+      }
+    },
+    {
+      "name": "R12 retains exact original R10 shoe and scan payloads",
+      "passed": true,
+      "detail": {
+        "method": "exact embedded payload equality against unchanged R10",
+        "payloads": {
+          "shoe-data": {
+            "bytes": 8537894,
+            "sha256": "cdc486a8dd1a58af8eb6e04ca7596cb70c2935e09f5f030de0178cd479c61e04"
+          },
+          "scan-data": {
+            "bytes": 1274856,
+            "sha256": "0ef8c11c7328e20492ef33aadd2c9ac874161b871be04016f3ea109dced8ab1e"
+          }
+        }
+      }
+    }
+  ],
+  "defaults": [
+    {
+      "style": "penny",
+      "case": "default",
+      "parts": 18,
+      "triangles": 86792,
+      "dimensionsMm": [
+        108.33946228027344,
+        77.95091092586517,
+        280
+      ]
+    },
+    {
+      "style": "chelsea",
+      "case": "default",
+      "parts": 20,
+      "triangles": 95212,
+      "dimensionsMm": [
+        107.32759094238281,
+        187.00000607967377,
+        286.52130126953125
+      ]
+    },
+    {
+      "style": "monk",
+      "case": "default",
+      "parts": 32,
+      "triangles": 72704,
+      "dimensionsMm": [
+        106.31571960449219,
+        95.14343869686127,
+        291.7168731689453
+      ]
+    },
+    {
+      "style": "canvas",
+      "case": "default",
+      "parts": 41,
+      "triangles": 86844,
+      "dimensionsMm": [
+        114.1882438659668,
+        85.76275479793549,
+        280.4513244628906
+      ]
+    }
+  ],
+  "testedSourceFiles": [
+    {
+      "path": "src/kernel.mjs",
+      "sha256": "17054230c46172172ac5ff2226d33bbbe8fd32490d5f54dd2be17a677bb911d5"
+    },
+    {
+      "path": "src/penny-chelsea.mjs",
+      "sha256": "7343b8fecffb62dc3c8e58e506a5d500b028765d7e352fd278ae548b376d0ec4"
+    },
+    {
+      "path": "src/monk-canvas.mjs",
+      "sha256": "adac7924c187a215f33cf8cd7f26d73d391e59a65b1127544871f70d0babb647"
+    },
+    {
+      "path": "src/soles.mjs",
+      "sha256": "b7a3602232c31271cf0f37c28e26ff81b455026d0799a7895b11a7d97c3e7230"
+    },
+    {
+      "path": "src/model.mjs",
+      "sha256": "d34f8b825f45667f8da384a198284ee2c4755568851d6a87a420a429db7b1e14"
+    },
+    {
+      "path": "tests/geometry.mjs",
+      "sha256": "cdd127e2e27b4b07faa1b42c82d0b2530d9318e2bb5998a3a2b09039549000d0"
+    }
+  ],
+  "scope": {
+    "numericGeometry": true,
+    "rendered": false,
+    "visualApproved": false,
+    "wearerFit": false,
+    "physicalSolver": false,
+    "manufacturing": false,
+    "publicLinkVerified": false
+  }
+}
