@@ -31,7 +31,11 @@ export function bootSurface(last){
   const spread=.03+.65*t,boundaryRatio=sin/Math.sqrt(sin*sin+spread*spread);
   const ratio=mix(boundaryRatio,Math.sin(side*last.collarAngle(sInner)),t),theta=Math.asin(clamp(ratio,-1,1));
   const x=last.center(s)+last.width(s)*asym(s)*ratio;
-  const y=last.soleTop(s)+last.height(s)*Math.pow(Math.max(0,Math.cos(theta)),.72)*smooth(0,.16,t);
+  // The heel needs a lasting return; the narrow toe already has its rise in
+  // the last roof. Using the heel's long return there flattened the first
+  // 25 mm and exposed a lining wedge above the welt in the second render.
+  const returnDepth=mix(.16,.018,smooth(.88,.985,cs));
+  const y=last.soleTop(s)+last.height(s)*Math.pow(Math.max(0,Math.cos(theta)),.72)*smooth(0,returnDepth,t);
   return V(x,y,last.L*(s-.5));
  };
  function point(u,v){

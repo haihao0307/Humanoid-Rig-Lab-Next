@@ -276,6 +276,23 @@ for (const { id } of STYLES) {
       measurements.set(scenario.name, { ...metric, outerY: scenario.name.startsWith('instep-') ? Float32Array.from({ length: upper.geometry.userData.surfaceVertices }, (_, i) => upper.geometry.attributes.position.getY(i)) : null });
       caseMetrics.push({ style: id, case: scenario.name, parts: metric.parts, triangles: metric.triangles, dimensionsMm: metric.dimensions });
     });
+    if (id === 'chelsea' && scenario.name === 'default') check('chelsea/toe cover follows last roof', () => {
+      assert.ok(model, 'default Chelsea model unavailable');
+      // Probe rendered triangles in physical millimetres behind the toe. The
+      // rejected second candidate sank about 13.5 mm and exposed its insole.
+      // The tolerance allows discretization; it is not a fit/measurement claim.
+      const targets = meshes([part(model, 'chelsea-whole-vamp'), part(model, 'insole')]), samples = [], limitMm = 3;
+      for (const backFromToeMm of [3, 6, 9, 13, 20]) {
+        const s = 1 - backFromToeMm / model.last.L, roof = model.last.point(s, 0);
+        const origin = new T.Vector3(model.last.center(s), roof.y + 100, model.last.L * (s - .5));
+        const hits = new T.Raycaster(origin, new T.Vector3(0, -1, 0), 0, 200).intersectObjects(targets, false);
+        assert.equal(hits[0]?.object.name, 'chelsea-whole-vamp', `Chelsea toe ${backFromToeMm} mm: insole exposed or upper missing`);
+        const actualY = hits[0].point.y, roofErrorMm = Math.abs(roof.y - actualY);
+        assert.ok(roofErrorMm <= limitMm, `Chelsea toe ${backFromToeMm} mm: actual mesh differs from last roof by ${roofErrorMm} mm`);
+        samples.push({ backFromToeMm, actualY, lastRoofY: roof.y, roofErrorMm });
+      }
+      return { method: 'ray intersection with actual upper and insole triangles', limitMm, maxRoofErrorMm: Math.max(...samples.map(s => s.roofErrorMm)), samples };
+    });
     if (model) for (const p of model.parts) p.geometry.dispose();
   }
   check(id + '/measured parameter response', () => {
@@ -366,6 +383,7 @@ const report = {
   baseline: anchor.baseSha, failures,
   measuredResponses: results.filter(r => r.name.includes('parameter response')),
   meridianContinuity: results.find(r => r.name === 'chelsea/front and rear meridian continuity'),
+  toeCoverage: results.find(r => r.name === 'chelsea/toe cover follows last roof'),
   preservation: results.filter(r => r.name.startsWith('R10 ') || r.name.startsWith('R12 retains')),
   defaults: caseMetrics.filter(m => m.case === 'default'),
   testedSourceFiles: ['src/kernel.mjs', 'src/penny-chelsea.mjs', 'src/monk-canvas.mjs', 'src/soles.mjs', 'src/model.mjs', 'tests/geometry.mjs'].map(relative => ({ path: relative, sha256: createHash('sha256').update(fs.readFileSync(path.join(root, relative))).digest('hex') })),
