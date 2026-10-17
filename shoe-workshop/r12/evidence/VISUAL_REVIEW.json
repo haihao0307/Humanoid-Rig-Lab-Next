@@ -1,0 +1,468 @@
+{
+  "schema": "kaopu/independent-visual-review@1",
+  "taskId": "SHOE-FOUR-STYLES-R12-20261017",
+  "reviewer": {
+    "type": "AI",
+    "agent": "/root/footwear_science",
+    "productionImplementationEdited": false
+  },
+  "reviewedOn": "2026-10-17",
+  "sourceCommit": "7fd5527f475908d615db4f1fd36357f47e68ce46",
+  "ciRunId": 39018660835,
+  "ciArtifactId": 12094814672,
+  "artifacts": {
+    "runtime": {
+      "path": "public-lite.html",
+      "bytes": 13724240,
+      "sha256": "aaba719b65cbd4e53c19ffa74de335d90c81a8974ada4afa6460ada0a9d40a61"
+    },
+    "manifest": {
+      "path": "BUILD_MANIFEST.json",
+      "sha256": "e4b2790f8ecad0028a9c2510b5b3fefdcbf6aad8f6a1af3eaba0a949a9f3b817"
+    },
+    "geometry": {
+      "path": "evidence/GEOMETRY.json",
+      "sha256": "5c2048246836d59e36421ddee2c70aef388de2d8dbc3ac3207d363bde8d79f43"
+    },
+    "browserQa": {
+      "path": "evidence/browser/QA.json",
+      "sha256": "9353f53a86e0b1967fc3d275e5f20d02cb4d5e8f6a91e4fe94186f50ef4e9ed7"
+    },
+    "inspectedScreenshots": [
+      {
+        "path": "evidence/browser/chelsea-hero.png",
+        "sha256": "b48749a881294ce1029160cf26fa02cba65cf625b6336210939a5cda0c07c03c"
+      },
+      {
+        "path": "evidence/browser/chelsea-clay.png",
+        "sha256": "7f34cd3899d1d6090eb69134250715b9386bee2ee202591292425cabe75515b8"
+      },
+      {
+        "path": "evidence/browser/chelsea-side.png",
+        "sha256": "f642a4fa4c93f233d614e6f10922313a52b3813333d4bc1c409083bb4c01f244"
+      },
+      {
+        "path": "evidence/browser/chelsea-top.png",
+        "sha256": "7800b6af8f90718b7f9e54126b8d3497bd4f82c4c4552b7d02f8d415f1a86701"
+      },
+      {
+        "path": "evidence/browser/four-style-comparison.png",
+        "sha256": "f265bb327ebb531b7e6aa6f7f78024842bd1c56aad39f2c608b7432e34bc8a9f"
+      }
+    ],
+    "downloadedArchive": {
+      "filename": "shoe-r12-ci4.zip",
+      "bytes": 13414485,
+      "sha256": "a5087d7455d72a6a7c906df939bcbe69b1a1c54f5679c35e26315aa767b515b9"
+    }
+  },
+  "decision": "accept",
+  "aiIndependentVisualApproved": true,
+  "humanApproved": false,
+  "userApproved": false,
+  "publicDeliveryStatus": "pending",
+  "acceptanceScope": "Independent AI visual acceptance of the final default rendered views and four-style comparison as an original parametric footwear design prototype. This record does not certify all parameter views, human approval, user approval, fit, materials, physics, manufacturing, or public delivery.",
+  "observedConclusions": [
+    {
+      "id": "chelsea-inward-toe-triangle",
+      "status": "resolved",
+      "evidence": [
+        "evidence/browser/chelsea-hero.png",
+        "evidence/browser/chelsea-clay.png"
+      ],
+      "observation": "The previously isolated gray inward triangle above the front welt is absent in both material and clay views. The local toe surface is visually continuous."
+    },
+    {
+      "id": "chelsea-toe-collapse-and-exposed-light-wedge",
+      "status": "resolved",
+      "evidence": [
+        "evidence/browser/chelsea-side.png",
+        "evidence/browser/chelsea-hero.png"
+      ],
+      "observation": "The rounded toe profile is retained. The concave toe step and protruding light wedge seen in Source2 are absent."
+    },
+    {
+      "id": "chelsea-front-centre-slit",
+      "status": "resolved",
+      "evidence": [
+        "evidence/browser/chelsea-hero.png",
+        "evidence/browser/chelsea-top.png",
+        "evidence/browser/chelsea-clay.png"
+      ],
+      "observation": "Front vamp and shaft remain continuous, without the original light slit or zipper-like clay edge."
+    },
+    {
+      "id": "four-style-comparison",
+      "status": "accepted",
+      "evidence": [
+        "evidence/browser/four-style-comparison.png"
+      ],
+      "observation": "The four structural families remain distinguishable, with no new obstructed or visibly broken silhouette."
+    },
+    {
+      "id": "other-three-styles-retained",
+      "status": "accepted",
+      "observation": "Penny and monk hero/side/top PNGs are byte-identical to their accepted Source1 views. Canvas hero/side/top/pair PNGs are byte-identical to their accepted Source2 views."
+    }
+  ],
+  "styleDecisions": {
+    "penny": {
+      "decision": "accept",
+      "method": "Previously inspected default hero/side/top; exact final screenshot byte equality."
+    },
+    "chelsea": {
+      "decision": "accept",
+      "method": "Direct final hero/side/top/clay inspection against prior rejected candidates and the previously inspected manufacturer structural reference."
+    },
+    "monk": {
+      "decision": "accept",
+      "method": "Previously inspected default hero/side/top; exact final screenshot byte equality."
+    },
+    "canvas": {
+      "decision": "accept",
+      "method": "Previously inspected corrected default hero/side/top/pair; exact final screenshot byte equality."
+    }
+  },
+  "retainedReviewedScreenshots": [
+    {
+      "path": "evidence/browser/penny-hero.png",
+      "sha256": "a89ea74cf9ea7a5865df87eac5b9369756362b2bb28e13a0871bf3a709081e4b",
+      "previouslyInspectedSourceCommit": "5f52c41c2be646ce560d5589db82b4119c8c2e18",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    },
+    {
+      "path": "evidence/browser/penny-side.png",
+      "sha256": "733cb2cafff1e5524cf585ac7f78b0a62aa2bfeaf7554d8444ecead3daf04f25",
+      "previouslyInspectedSourceCommit": "5f52c41c2be646ce560d5589db82b4119c8c2e18",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    },
+    {
+      "path": "evidence/browser/penny-top.png",
+      "sha256": "d968a7d3797c5b3323840edbe52b39d1161b0dc7c55bd251cfd6fd5ad22313cc",
+      "previouslyInspectedSourceCommit": "5f52c41c2be646ce560d5589db82b4119c8c2e18",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    },
+    {
+      "path": "evidence/browser/monk-hero.png",
+      "sha256": "9d98955bbb1e539b9e36e0cb84a1292c40e9a41d06baaa2cc721de1945bf8b39",
+      "previouslyInspectedSourceCommit": "5f52c41c2be646ce560d5589db82b4119c8c2e18",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    },
+    {
+      "path": "evidence/browser/monk-side.png",
+      "sha256": "9e578adeb2a163f703ef64ec969e86121976ac55b03e071816353059f4c6f812",
+      "previouslyInspectedSourceCommit": "5f52c41c2be646ce560d5589db82b4119c8c2e18",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    },
+    {
+      "path": "evidence/browser/monk-top.png",
+      "sha256": "13da32e77680076847805704e216a5af94cf556f654b7890cc7f1fd660eb5498",
+      "previouslyInspectedSourceCommit": "5f52c41c2be646ce560d5589db82b4119c8c2e18",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    },
+    {
+      "path": "evidence/browser/canvas-hero.png",
+      "sha256": "ce8c43cfc02bb3d62c0f946e049b97a538e6dc63d417b0b4d6e9611202a21427",
+      "previouslyInspectedSourceCommit": "883a02cad2da5cd687ce5ec741b002ab9bc6aa7a",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    },
+    {
+      "path": "evidence/browser/canvas-side.png",
+      "sha256": "294aa42077c00b84143bf00c4f919a201860baba910241b017dc55a8b9a56dac",
+      "previouslyInspectedSourceCommit": "883a02cad2da5cd687ce5ec741b002ab9bc6aa7a",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    },
+    {
+      "path": "evidence/browser/canvas-top.png",
+      "sha256": "f993e8634f4e9fbb757962079bce4cb8432d80a0594e7be0c17058ee2479797c",
+      "previouslyInspectedSourceCommit": "883a02cad2da5cd687ce5ec741b002ab9bc6aa7a",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    },
+    {
+      "path": "evidence/browser/canvas-pair.png",
+      "sha256": "dc8e648e9d4f2dc538bc5ff71431ee6c654a9d58a0673399048903bc5c47f798",
+      "previouslyInspectedSourceCommit": "883a02cad2da5cd687ce5ec741b002ab9bc6aa7a",
+      "method": "Exact screenshot byte equality with the previously visually accepted view; not inferred from geometry similarity."
+    }
+  ],
+  "blockingFindings": [],
+  "acceptedLimitations": [
+    "The straight Chelsea shaft, level circular boot opening, relatively pointed rear outline and stylized material response remain within this design-prototype acceptance; no exact commercial-model reproduction is claimed.",
+    "This review distinguishes a visible opening and lining from proof of wearer fit or manufacturability.",
+    "Fine faceting, lighting and material calibration remain prototype limitations; no unresolved isolated reversed triangle, open front slit or exposed toe wedge was observed in the inspected final views."
+  ],
+  "manufacturerReferencePolicy": {
+    "purpose": "Structural archetype comparison, not a measured scan, exact commercial copy or performance baseline.",
+    "commercialImagesCopiedIntoRepository": false,
+    "references": [
+      {
+        "archetype": "chelsea",
+        "url": "https://www.crockettandjones.com/blogs/the-article/the-icons-chelsea-8",
+        "localReferenceSha256": "4ba1ff1a4abd47684479355ed78a17150b7d409512ee0d47cafd472d0cd6b40d"
+      },
+      {
+        "archetype": "canvas",
+        "url": "https://www.superga.com/products/le-superga-unisex-2750-cotu-classic-black-s000010-999",
+        "localReferenceSha256": "6a725eba9a79d066f9eda53344d8e0ce40ff151339caf2c07958f01474bed7ee"
+      }
+    ]
+  },
+  "ciEvidenceObserved": {
+    "geometryPassed": 114,
+    "geometryFailed": 0,
+    "browserGroups": 8,
+    "browserAllPassed": true,
+    "toeWinding": {
+      "regionFromToeMm": [
+        0,
+        35
+      ],
+      "triangles": 261,
+      "minimumMeanNormalDot": 0.9535082719278062
+    },
+    "numericResultsDoNotSubstituteForVisualReview": true
+  },
+  "history": [
+    {
+      "sourceCommit": "5f52c41c2be646ce560d5589db82b4119c8c2e18",
+      "ciRunId": 39015986451,
+      "artifacts": {
+        "runtime": {
+          "path": "public-lite.html",
+          "bytes": 13722204,
+          "sha256": "d53b540192d3a1293d65a311c9082af2aa331ef782fba2651ea2a0a6c0ced535"
+        },
+        "manifest": {
+          "path": "BUILD_MANIFEST.json",
+          "sha256": "5b9e47f5287389bab767ae2dccbe9f1ca791ae6b05268133370367cade69a518"
+        },
+        "geometry": {
+          "path": "evidence/GEOMETRY.json",
+          "sha256": "a1e28f5c75fa63ae193b488d30cc92727c2a2e1c3a920d92f99037929ee2a8fa"
+        },
+        "browserQa": {
+          "path": "evidence/browser/QA.json",
+          "sha256": "c46d0a04bbf0dd9859d122e3352b6bb73baacfeba6ef4381d6c3f46e4856ec03"
+        },
+        "inspectedScreenshots": [
+          {
+            "path": "evidence/browser/chelsea-hero.png",
+            "sha256": "263048dd0c94eed5c91f32859fb54ddf8aec94cf12ce2308c8be7a5f8a998e21"
+          },
+          {
+            "path": "evidence/browser/chelsea-top.png",
+            "sha256": "c78e9d519cd2dc68f625ae2749235ce073caf3ccbd65db6952590e87d84b4624"
+          },
+          {
+            "path": "evidence/browser/chelsea-clay.png",
+            "sha256": "6239f46454576d4e26a7b3b3b11f3f8acab2b31ddc2102713fb2c55ef7af3955"
+          },
+          {
+            "path": "evidence/browser/canvas-hero.png",
+            "sha256": "5a2712c1f276b680b67ed60b9ed6670f5cd4dcce752fe1d75ee3481217f2b642"
+          },
+          {
+            "path": "evidence/browser/canvas-side.png",
+            "sha256": "2fd950d0466e0c5893e717508ee84da89631d475680ffbf1f925bf04323f5bdf"
+          }
+        ],
+        "downloadedArchive": {
+          "filename": "shoe-r12-ci1.zip",
+          "bytes": 13446700,
+          "sha256": "c5361001d539bc6ce29a88af49a0cfa85db5978edd128fd1310f71bf916a6f46"
+        }
+      },
+      "round": 1,
+      "decision": "reject",
+      "blockingFindings": [
+        {
+          "id": "chelsea-front-centre-slit",
+          "observation": "Front shaft showed a light centre slit in hero/top and a zipper-like discontinuity in clay."
+        },
+        {
+          "id": "canvas-repeated-high-lace-bridges",
+          "observation": "Repeated rigid high arches across the lace rows, most conspicuous in side view."
+        },
+        {
+          "id": "canvas-foxing-stripes-and-quarter-ghost-lines",
+          "observation": "Repeated bright vertical foxing strips and isolated dotted quarter lines."
+        }
+      ],
+      "resolvedInSourceCommit": "883a02cad2da5cd687ce5ec741b002ab9bc6aa7a"
+    },
+    {
+      "sourceCommit": "883a02cad2da5cd687ce5ec741b002ab9bc6aa7a",
+      "ciRunId": 39017145063,
+      "artifacts": {
+        "runtime": {
+          "path": "public-lite.html",
+          "bytes": 13724194,
+          "sha256": "7e5780d0c13f6acb96c641d4fc95f02e2ac96d9ca16474b80a714dc6784fc572"
+        },
+        "manifest": {
+          "path": "BUILD_MANIFEST.json",
+          "sha256": "69a6cc25885564950ea7295f9acbadc9e4fb3a3099f55771e80da8715269fe31"
+        },
+        "geometry": {
+          "path": "evidence/GEOMETRY.json",
+          "sha256": "fd272ee975b41ef7fe57dc9bad7c69a2ca801d412ea4d95110848d37d548e3f2"
+        },
+        "browserQa": {
+          "path": "evidence/browser/QA.json",
+          "sha256": "3a33697e315b82e17d3c9ec0fabe722bc85f901e697d163cf2fb4572b4a0ecdc"
+        },
+        "inspectedScreenshots": [
+          {
+            "path": "evidence/browser/chelsea-hero.png",
+            "sha256": "04a76ce1f7b665f10ce9ab3aaab4f77600723fbf1d9809fd03fe23544d0ac946"
+          },
+          {
+            "path": "evidence/browser/chelsea-side.png",
+            "sha256": "7911e717a9d8b1a3d7bee4ff78115c4d71ec6a2e3d5f3c4778329b851063b115"
+          },
+          {
+            "path": "evidence/browser/chelsea-top.png",
+            "sha256": "e03b815cc1e3b3ba93d0dbf138747b6402e6dfbd8ddfc7a8648e7e01c14752f5"
+          },
+          {
+            "path": "evidence/browser/chelsea-clay.png",
+            "sha256": "1dbbe97fcbd0fef660dc2360950ef06b6200e3a007366cc2928d55c9efb429fd"
+          },
+          {
+            "path": "evidence/browser/canvas-hero.png",
+            "sha256": "ce8c43cfc02bb3d62c0f946e049b97a538e6dc63d417b0b4d6e9611202a21427"
+          },
+          {
+            "path": "evidence/browser/canvas-side.png",
+            "sha256": "294aa42077c00b84143bf00c4f919a201860baba910241b017dc55a8b9a56dac"
+          },
+          {
+            "path": "evidence/browser/canvas-top.png",
+            "sha256": "f993e8634f4e9fbb757962079bce4cb8432d80a0594e7be0c17058ee2479797c"
+          },
+          {
+            "path": "evidence/browser/canvas-pair.png",
+            "sha256": "dc8e648e9d4f2dc538bc5ff71431ee6c654a9d58a0673399048903bc5c47f798"
+          },
+          {
+            "path": "evidence/browser/four-style-comparison.png",
+            "sha256": "dfa06a5c36243908c35c6501fa4452e6f3b6b8c70ad2407aacf4cbba41111b36"
+          }
+        ],
+        "downloadedArchive": {
+          "filename": "shoe-r12-ci2.zip",
+          "bytes": 13419065,
+          "sha256": "2095f49543fdb8282f701cb9056d9bd6b38b174454c0fd04bf477db22ff3b9a0"
+        }
+      },
+      "round": 2,
+      "decision": "reject",
+      "resolvedPriorFindings": [
+        "chelsea-front-centre-slit",
+        "canvas-repeated-high-lace-bridges",
+        "canvas-foxing-stripes-and-quarter-ghost-lines"
+      ],
+      "acceptedStyles": [
+        "canvas"
+      ],
+      "blockingFindings": [
+        {
+          "id": "chelsea-toe-collapse-and-exposed-light-wedge",
+          "observation": "Toe dropped into a concave step with a light triangular wedge above the welt; hero also showed a flattened front edge."
+        }
+      ],
+      "resolvedInSourceCommit": "096b17b4f180d3fb75290cf1a146dd06ef5b4be9"
+    },
+    {
+      "sourceCommit": "096b17b4f180d3fb75290cf1a146dd06ef5b4be9",
+      "ciRunId": 39017947029,
+      "ciArtifactId": 12095294026,
+      "artifacts": {
+        "runtime": {
+          "path": "public-lite.html",
+          "bytes": 13724222,
+          "sha256": "58c3a29dab5cd7acd4d57a12860c8705e077f5bee86d80ce4aa0678e048d3a69"
+        },
+        "manifest": {
+          "path": "BUILD_MANIFEST.json",
+          "sha256": "3b7088f1a98119dc001239b89787d2514637f1aba8da3a394a7a904d8e01fc81"
+        },
+        "geometry": {
+          "path": "evidence/GEOMETRY.json",
+          "sha256": "e3d77610c615fae48e37e9325fc72ebb009f12e701109925f7ae3194a0f52a2d"
+        },
+        "browserQa": {
+          "path": "evidence/browser/QA.json",
+          "sha256": "89122c9ce4cbd4b9d0fcbb9c9df856eda2716ca0999d7c778a5161faa1dc52eb"
+        },
+        "inspectedScreenshots": [
+          {
+            "path": "evidence/browser/chelsea-hero.png",
+            "sha256": "59cf347743036b137335f2632e9856d4e3e426c205056f49a87468302607ea9d"
+          },
+          {
+            "path": "evidence/browser/chelsea-clay.png",
+            "sha256": "cabfb410d8ddc4861cce395bce20e4ff7178642bff805bd8ad047504aca39b25"
+          },
+          {
+            "path": "evidence/browser/chelsea-side.png",
+            "sha256": "ad3e3be2e237560b788df6e9453e8791d9722d1283e5ac514cb1d88e758e02ed"
+          },
+          {
+            "path": "evidence/browser/chelsea-top.png",
+            "sha256": "f91f080d992e7a5becf84e54d093226099b7812fd278a32a6f4dd46a63f644c8"
+          },
+          {
+            "path": "evidence/browser/four-style-comparison.png",
+            "sha256": "4e9f6a09c397d895d44607f5c95b411be243274c92fb434b8a74c57390ff89bf"
+          },
+          {
+            "path": "evidence/browser/canvas-side.png",
+            "sha256": "294aa42077c00b84143bf00c4f919a201860baba910241b017dc55a8b9a56dac"
+          },
+          {
+            "path": "evidence/browser/canvas-pair.png",
+            "sha256": "dc8e648e9d4f2dc538bc5ff71431ee6c654a9d58a0673399048903bc5c47f798"
+          }
+        ],
+        "downloadedArchive": {
+          "filename": "shoe-r12-ci3.zip",
+          "bytes": 13417906,
+          "sha256": "fc5b2e5c1303c7fb615db4c4c84367028fbf106421f395abbb2ec921c86d22ff"
+        }
+      },
+      "round": 3,
+      "decision": "reject",
+      "resolvedPriorFindings": [
+        "chelsea-toe-collapse-and-exposed-light-wedge"
+      ],
+      "blockingFindings": [
+        {
+          "id": "chelsea-inward-toe-triangle",
+          "observation": "A discrete gray triangle remained above the front welt in hero/clay near image coordinates x350-380,y614-630. Independent mesh inspection and coordinator pixel raycasts confirmed inward exterior triangles; it was not dismissed as ordinary leather shading.",
+          "localGeometryDiagnostic": {
+            "regionFromToeMm": [
+              0,
+              35
+            ],
+            "triangles": 261,
+            "negativeMeanNormalFaces": 6,
+            "minimumMeanNormalDot": -0.9007759928383713
+          }
+        }
+      ],
+      "resolvedInSourceCommit": "7fd5527f475908d615db4f1fd36357f47e68ce46"
+    }
+  ],
+  "scope": {
+    "actualBrowserScreenshotsInspected": true,
+    "aiIndependentVisualReview": true,
+    "humanApproval": false,
+    "userApproval": false,
+    "allParameterViewsVisuallyInspected": false,
+    "physicalSimulationValidated": false,
+    "wearerFitValidated": false,
+    "manufacturingValidated": false,
+    "publicDeliveryVerified": false
+  }
+}
