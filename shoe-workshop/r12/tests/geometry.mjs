@@ -281,7 +281,8 @@ for (const { id } of STYLES) {
       // Probe rendered triangles in physical millimetres behind the toe. The
       // rejected second candidate sank about 13.5 mm and exposed its insole.
       // The tolerance allows discretization; it is not a fit/measurement claim.
-      const targets = meshes([part(model, 'chelsea-whole-vamp'), part(model, 'insole')]), samples = [], limitMm = 3;
+      const upper = part(model, 'chelsea-whole-vamp');
+      const targets = meshes([upper, part(model, 'insole')]), samples = [], limitMm = 3;
       for (const backFromToeMm of [3, 6, 9, 13, 20]) {
         const s = 1 - backFromToeMm / model.last.L, roof = model.last.point(s, 0);
         const origin = new T.Vector3(model.last.center(s), roof.y + 100, model.last.L * (s - .5));
@@ -291,7 +292,22 @@ for (const { id } of STYLES) {
         assert.ok(roofErrorMm <= limitMm, `Chelsea toe ${backFromToeMm} mm: actual mesh differs from last roof by ${roofErrorMm} mm`);
         samples.push({ backFromToeMm, actualY, lastRoofY: roof.y, roofErrorMm });
       }
-      return { method: 'ray intersection with actual upper and insole triangles', limitMm, maxRoofErrorMm: Math.max(...samples.map(s => s.roofErrorMm)), samples };
+      // A later toe correction exposed an inward triangle above the welt.
+      // Check the actual exterior within 35 mm of the tip, without face IDs.
+      const g = upper.geometry, I = g.index.array, exterior = g.groups[0];
+      let windingTriangles = 0, minimumMeanNormalDot = 1;
+      for (let i = exterior.start; i < exterior.start + exterior.count; i += 3) {
+        const a = vertex(g, I[i]), b = vertex(g, I[i + 1]), c = vertex(g, I[i + 2]);
+        const backFromToeMm = model.last.L / 2 - (a.z + b.z + c.z) / 3;
+        if (backFromToeMm < 0 || backFromToeMm > 35) continue;
+        const faceNormal = b.clone().sub(a).cross(c.clone().sub(a)).normalize();
+        const meanNormal = normal(g, I[i]).add(normal(g, I[i + 1])).add(normal(g, I[i + 2])).normalize();
+        const alignment = faceNormal.dot(meanNormal);
+        assert.ok(alignment > 0, `Chelsea toe exterior triangle ${i / 3}: inward winding relative to mean surface normal (${alignment})`);
+        windingTriangles++; minimumMeanNormalDot = Math.min(minimumMeanNormalDot, alignment);
+      }
+      assert.ok(windingTriangles > 0, 'Chelsea toe winding region is empty');
+      return { method: 'ray intersection with actual upper and insole triangles', limitMm, maxRoofErrorMm: Math.max(...samples.map(s => s.roofErrorMm)), samples, winding: { regionFromToeMm: [0, 35], triangles: windingTriangles, minimumMeanNormalDot } };
     });
     if (model) for (const p of model.parts) p.geometry.dispose();
   }

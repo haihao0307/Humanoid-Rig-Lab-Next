@@ -35,7 +35,11 @@ export function bootSurface(last){
   // the last roof. Using the heel's long return there flattened the first
   // 25 mm and exposed a lining wedge above the welt in the second render.
   const returnDepth=mix(.16,.018,smooth(.88,.985,cs));
-  const y=last.soleTop(s)+last.height(s)*Math.pow(Math.max(0,Math.cos(theta)),.72)*smooth(0,returnDepth,t);
+  // A positive rise tangent at the lasting boundary keeps the outward
+  // normal well-defined. A zero-tangent S-curve reversed several first-row
+  // triangles where the sole's toe spring descended faster than the upper.
+  const returnRise=1-Math.pow(1-clamp(t/returnDepth),2);
+  const y=last.soleTop(s)+last.height(s)*Math.pow(Math.max(0,Math.cos(theta)),.72)*returnRise;
   return V(x,y,last.L*(s-.5));
  };
  function point(u,v){
