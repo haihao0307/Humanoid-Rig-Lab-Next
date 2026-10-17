@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import * as T from 'three';
 import { buildStyle, STYLES } from '../src/model.mjs';
+import { makeLast } from '../src/kernel.mjs';
+import { bootSurface } from '../src/penny-chelsea.mjs';
 
 // Independent CPU geometry checks against TASK_ANCHOR. This does not render,
 // simulate material forces, certify fit, or turn design millimetres into measurements.
@@ -236,6 +238,30 @@ for (let bits = 0; bits < 16; bits++) scenarios.push({
 });
 for (const [key, values] of Object.entries(ranges)) for (const [i, value] of values.entries()) scenarios.push({ name: key + (i ? '-high' : '-low'), params: { [key]: value }, structure: false });
 
+check('chelsea/front and rear meridian continuity', () => {
+  // The first rendered candidate exposed a front-centre slit: a tiny angular
+  // step jumped about 43 mm. Compare actual positions with the exact meridian,
+  // as well as across it; no formula or expected shape is copied from the fix.
+  const style = STYLES.find(s => s.id === 'chelsea'), step = 1e-5, limitMm = .1;
+  const parameters = [{}, scenarios[1].params, scenarios[16].params];
+  let comparisons = 0, maxDistanceMm = 0;
+  for (const [caseIndex, params] of parameters.entries()) {
+    const surface = bootSurface(makeLast(style, params));
+    for (const [label, u] of [['front', 0], ['rear', Math.PI]]) {
+      for (const v of [.02, .1, .33, .48, .72, 1]) {
+        const points = [-step, 0, step].map(offset => surface.point(u + offset, v));
+        assert.ok(points.every(p => p.toArray().every(Number.isFinite)), `${label} meridian: non-finite point`);
+        for (const [a, b] of [[0, 1], [1, 2], [0, 2]]) {
+          const distanceMm = points[a].distanceTo(points[b]);
+          assert.ok(distanceMm <= limitMm, `Chelsea ${label} meridian discontinuity: case ${caseIndex}, v=${v}, samples ${a}/${b}, jump ${distanceMm} mm`);
+          maxDistanceMm = Math.max(maxDistanceMm, distanceMm); comparisons++;
+        }
+      }
+    }
+  }
+  return { parameterCases: parameters.length, meridians: ['front', 'rear'], angularStepRadians: step, comparisons, maxDistanceMm, limitMm };
+});
+
 for (const { id } of STYLES) {
   const measurements = new Map();
   for (const scenario of scenarios) {
@@ -339,6 +365,7 @@ const report = {
   generatedCases, validatedParameterCases: caseMetrics.length, extremeCornersPerStyle: 16,
   baseline: anchor.baseSha, failures,
   measuredResponses: results.filter(r => r.name.includes('parameter response')),
+  meridianContinuity: results.find(r => r.name === 'chelsea/front and rear meridian continuity'),
   preservation: results.filter(r => r.name.startsWith('R10 ') || r.name.startsWith('R12 retains')),
   defaults: caseMetrics.filter(m => m.case === 'default'),
   testedSourceFiles: ['src/kernel.mjs', 'src/penny-chelsea.mjs', 'src/monk-canvas.mjs', 'src/soles.mjs', 'src/model.mjs', 'tests/geometry.mjs'].map(relative => ({ path: relative, sha256: createHash('sha256').update(fs.readFileSync(path.join(root, relative))).digest('hex') })),

@@ -22,7 +22,18 @@ export function buildPenny(last){
 
 export function bootSurface(last){
  const [a,b]=last.style.collar,center=last.L*(.235-.5),height=last.style.shaft+last.style.heel*.35;
- const lower=(u,t)=>{const cs=(1+Math.cos(u))*.5,outer=cs,s=mix(outer,mix(a,b,cs),t),side=Math.sign(Math.sin(u)),theta=side*mix(Math.PI/2,last.collarAngle(mix(a,b,cs)),t);return last.at(s,theta);};
+ const lower=(u,t)=>{
+  const cs=(1+Math.cos(u))*.5,sInner=mix(a,b,cs),s=mix(cs,sInner,t),sin=Math.sin(u),side=sin<0?-1:1;
+  const asym=q=>1+(side<0?.028:-.016)*smooth(.28,.65,q);
+  // Interpolate continuous normalized plan coordinates from the lasting
+  // boundary to the collar, then sample the same last roof. Signed half-angles
+  // made the front meridian jump by 43 mm in the rejected first candidate.
+  const spread=.03+.65*t,boundaryRatio=sin/Math.sqrt(sin*sin+spread*spread);
+  const ratio=mix(boundaryRatio,Math.sin(side*last.collarAngle(sInner)),t),theta=Math.asin(clamp(ratio,-1,1));
+  const x=last.center(s)+last.width(s)*asym(s)*ratio;
+  const y=last.soleTop(s)+last.height(s)*Math.pow(Math.max(0,Math.cos(theta)),.72)*smooth(0,.16,t);
+  return V(x,y,last.L*(s-.5));
+ };
  function point(u,v){
   if(v<=.48)return lower(u,v/.48);
   const t=(v-.48)/.52,B=lower(u,1),C=V(Math.sin(u)*31.5,last.style.shaft+last.style.heel*.35+2*Math.cos(u),center+36*Math.cos(u));

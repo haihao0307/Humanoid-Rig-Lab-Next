@@ -28,8 +28,8 @@ export function buildSoles(last){
   }
  }else{
   for(const side of[-1,1]){
-   out.push(panel('foxing-'+side,[patch((u,v)=>{const s=u,w=last.width(s)+2.9*Math.pow(Math.sin(Math.PI*s),.3);return V(last.center(s)+side*w,last.soleTop(s)-mix(-3,11,v),last.L*(s-.5));},112,10,{normal:()=>V(side,0,0),uv:(u,v)=>[u*last.L/100,v*.14]})],1.6,'rubber',{name:'硫化橡胶包边',kind:'connection',coversUpperBottom:true,explode:[side*18,-14,0]}));
-   out.push(descriptor('foxing-bead-'+side,pathGeometry(Array.from({length:145},(_,i)=>{const s=i/144;return V(last.center(s)+side*(last.width(s)+3.1*Math.pow(Math.sin(Math.PI*s),.3)),last.soleTop(s)+2.6,last.L*(s-.5));}),1.3,1.1),'rubber',{kind:'connection',name:'橡胶包边上沿',explode:[side*18,-10,0]}));
+   out.push(panel('foxing-'+side,[patch((u,v)=>{const s=u,w=last.width(s)+.85+2.9*Math.pow(Math.sin(Math.PI*s),.3);return V(last.center(s)+side*w,last.soleTop(s)-mix(-3,11,v),last.L*(s-.5));},144,10,{normal:()=>V(side,0,0),uv:(u,v)=>[u*last.L/100,v*.14]})],1.6,'rubber',{name:'硫化橡胶包边',kind:'connection',coversUpperBottom:true,explode:[side*18,-14,0]}));
+   out.push(descriptor('foxing-bead-'+side,pathGeometry(Array.from({length:181},(_,i)=>{const s=i/180;return V(last.center(s)+side*(last.width(s)+.85+3.1*Math.pow(Math.sin(Math.PI*s),.3)),last.soleTop(s)+2.6,last.L*(s-.5));}),1.3,1.1),'rubber',{kind:'connection',name:'橡胶包边上沿',explode:[side*18,-10,0]}));
   }
  }
  // Real low-relief rubber tread, kept clear of the unsupported midfoot.

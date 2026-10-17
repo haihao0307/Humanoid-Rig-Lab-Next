@@ -68,6 +68,40 @@ function thinPath(id, fn, width, depth, role, extra = {}, count = 40) {
     { kind: 'binding', forceSolved: false, ...extra });
 }
 
+// A flat cotton section stays tangent to the supporting upper as it changes
+// slope. Its broad-face normals use the ellipse gradient, not the long axis of
+// the section, which would shade a thin ribbon like a round cord.
+function flatLacePath(id, fn, count = 40) {
+  const width = 3.55, depth = .62, points = sample(fn, count), pos = [], nor = [], uv = [], idx = [];
+  const R = 9, arc = [0], section = [], perimeter = [0];
+  for (let j = 0; j < R; j++) {
+    const a = j / (R - 1) * PI * 2;
+    section.push(new T.Vector2(Math.cos(a) * width / 2, Math.sin(a) * depth / 2));
+    if (j) perimeter.push(perimeter[j - 1] + section[j].distanceTo(section[j - 1]));
+  }
+  for (let i = 1; i < points.length; i++) arc.push(arc[i - 1] + points[i].p.distanceTo(points[i - 1].p));
+  for (let i = 0; i < points.length; i++) {
+    const tangent = points[Math.min(points.length - 1, i + 1)].p.clone().sub(points[Math.max(0, i - 1)].p).normalize();
+    const across = points[i].n.clone().cross(tangent).normalize(), up = tangent.clone().cross(across).normalize();
+    for (let j = 0; j < R; j++) {
+      const a = j / (R - 1) * PI * 2;
+      pos.push(...points[i].p.clone().addScaledVector(across, section[j].x).addScaledVector(up, section[j].y).toArray());
+      nor.push(...across.clone().multiplyScalar(Math.cos(a) / width).addScaledVector(up, Math.sin(a) / depth).normalize().toArray());
+      uv.push(arc[i] / 100, perimeter[j] / 100);
+    }
+  }
+  for (let i = 0; i < points.length - 1; i++) for (let j = 0; j < R - 1; j++) {
+    const a = i * R + j, b = a + 1, c = (i + 1) * R + j, d = c + 1;
+    idx.push(a, b, c, b, d, c);
+  }
+  const g = new T.BufferGeometry();
+  g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+  g.setAttribute('normal', new T.Float32BufferAttribute(nor, 3));
+  g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeBoundingBox();
+  return descriptor(id, g, 'lace', { kind: 'lace', staticClosure: true, crossSection: 'flattened cotton', forceSolved: false, explode: [0, 40, 0] });
+}
+
 function roundedRectangle(shape, x, y, w, h, r) {
   shape.moveTo(x + r, y); shape.lineTo(x + w - r, y);
   shape.quadraticCurveTo(x + w, y, x + w, y + r);
@@ -227,10 +261,31 @@ export function buildCanvas(last) {
       const v = (eyeTheta(s) - throat(s)) / (HALF - throat(s));
       return { u: s / edgeFront(v), v, radius: 2.95 };
     });
-    const quarter = panel('canvas-quarter-' + side, perforatedStrip(point, quarterNormal, quarterHoles, {
-      around: 12, radial: hole => hole === 0 ? 18 : 6, linearCorners: true,
-      uv: (u, v) => { const [s, a] = domain(u, v); return [s * last.L / 100, a * 52 / 100]; }
-    }), t, 'canvas', { realHoleCount: 5, construction: 'canvas quarter with explicit eyelet underlay cut loops', explode: [side * 17, 18, -8] });
+    const quarterUv = (u, v) => { const [s, a] = domain(u, v); return [s * last.L / 100, a * 52 / 100]; };
+    // Keep the radial aperture tiles near the eyelets. Extending their thin fans
+    // down the whole quarter made its normal-map tangent basis visibly uneven.
+    // The regular lower/back panels share every boundary sample with this band;
+    // these are mesh subdivisions of one piece, with no extra cut or stitch line.
+    const bandHeight = .4, bandStart = quarterHoles[0].u - .11;
+    const bandDomain = (u, v) => [mix(bandStart, 1, u), v * bandHeight];
+    const bandHoles = quarterHoles.map(h => ({ ...h, u: (h.u - bandStart) / (1 - bandStart), v: h.v / bandHeight }));
+    const quarterPatches = perforatedStrip(
+      (u, v) => point(...bandDomain(u, v)), (u, v) => quarterNormal(...bandDomain(u, v)), bandHoles, {
+        around: 12, radial: 6, linearCorners: true, uv: (u, v) => quarterUv(...bandDomain(u, v))
+      });
+    const limits = [0, ...bandHoles.slice(1).map((h, i) => (h.u + bandHoles[i].u) / 2), 1];
+    for (let i = 0; i < limits.length - 1; i++) {
+      const lowerDomain = (u, v) => [mix(bandStart, 1, mix(limits[i], limits[i + 1], u)), mix(bandHeight, 1, v)];
+      quarterPatches.push(patch((u, v) => point(...lowerDomain(u, v)), 12, 18, {
+        normal: (u, v) => quarterNormal(...lowerDomain(u, v)), uv: (u, v) => quarterUv(...lowerDomain(u, v))
+      }));
+    }
+    quarterPatches.push(patch((u, v) => point(bandStart * u, v), 36, 30, {
+      normal: (u, v) => quarterNormal(bandStart * u, v), uv: (u, v) => quarterUv(bandStart * u, v)
+    }));
+    const quarter = panel('canvas-quarter-' + side, quarterPatches, t, 'canvas', {
+      realHoleCount: 5, construction: 'canvas quarter with explicit eyelet underlay cut loops', explode: [side * 17, 18, -8]
+    });
     quarter.geometry.userData.realHoleCount = 5;
     quarter.geometry.userData.apertures = quarterHoles.map(h => ({ centre: point(h.u, h.v).toArray(), axis: quarterNormal(h.u, h.v).toArray(), radiusMm: h.radius }));
     out.push(quarter);
@@ -275,24 +330,37 @@ export function buildCanvas(last) {
 
   // Flat static cotton lacing. Ends descend into the true eyelet bores. Alternate
   // crossovers have different heights, so the two flat laces do not interpenetrate.
-  const lace = (id, sA, sideA, sB, sideB, level) => {
+  const laceSupport = (s, a) => {
+    const fromThroat = Math.abs(a) - throat(s);
+    // Step smoothly up to each physical layer before reaching its exposed edge.
+    return mix(.10, baseOffset, smooth(-.07, 0, fromThroat))
+      + t * smooth(-.02, facingLow, fromThroat);
+  };
+  const lace = (id, sA, sideA, sB, sideB, crossoverLift = 0) => {
     const aA = sideA * eyeTheta(sA), aB = sideB * eyeTheta(sB);
+    const pA = last.point(sA, aA), pB = last.point(sB, aB);
     const fn = u => {
       const s = mix(sA, sB, u), a = mix(aA, aB, u);
-      const emerge = smooth(0, .15, u) * (1 - smooth(.85, 1, u));
-      return last.at(s, a, mix(facingOffset - .70, level, emerge));
+      const p = last.point(s, a), fromEye = Math.min(p.distanceTo(pA), p.distanceTo(pB));
+      const flange = .48 * (1 - smooth(3.2, 5.3, fromEye));
+      const support = laceSupport(s, a) + .48 + flange + crossoverLift * Math.sin(PI * u) ** 2;
+      const offset = mix(facingOffset - .70, support, smooth(0, 1.8, fromEye));
+      return { p: last.at(s, a, offset), n: last.normal(s, a) };
     };
-    return thinPath(id, fn, 3.55, .62, 'lace', { kind: 'lace', staticClosure: true, crossSection: 'flattened cotton', explode: [0, 40, 0] }, 34);
+    return flatLacePath(id, fn, 40);
   };
-  out.push(lace('canvas-lace-front-bar', rows.at(-1), -1, rows.at(-1), 1, 3.55));
+  out.push(lace('canvas-lace-front-bar', rows.at(-1), -1, rows.at(-1), 1));
   for (let i = 0; i < rows.length - 1; i++) {
-    out.push(lace('canvas-lace-cross-a-' + i, rows[i], -1, rows[i + 1], 1, 4.55));
-    out.push(lace('canvas-lace-cross-b-' + i, rows[i], 1, rows[i + 1], -1, 3.35));
+    out.push(lace('canvas-lace-cross-a-' + i, rows[i], -1, rows[i + 1], 1, .85));
+    out.push(lace('canvas-lace-cross-b-' + i, rows[i], 1, rows[i + 1], -1));
   }
   // The two short ends tuck inward; this archetype does not add an oversized bow.
-  for (const side of [-1, 1]) out.push(thinPath('canvas-lace-tucked-end-' + side, u => {
+  for (const side of [-1, 1]) out.push(flatLacePath('canvas-lace-tucked-end-' + side, u => {
     const s = rows[0] - .022 * u, a = side * mix(eyeTheta(rows[0]), .29, u);
-    return last.at(s, a, mix(facingOffset - .7, 3.7, smooth(0, .2, u)));
-  }, 3.55, .62, 'lace', { kind: 'lace', staticClosure: true, explode: [0, 40, 0] }, 20));
+    const fromEye = last.point(s, a).distanceTo(last.point(rows[0], side * eyeTheta(rows[0])));
+    const support = laceSupport(s, a) + .48 + .48 * (1 - smooth(3.2, 5.3, fromEye));
+    const offset = mix(facingOffset - .70, support, smooth(0, 1.8, fromEye));
+    return { p: last.at(s, a, offset), n: last.normal(s, a) };
+  }, 24));
   return out;
 }
