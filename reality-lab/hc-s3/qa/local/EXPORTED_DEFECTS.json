@@ -1,0 +1,223 @@
+{
+  "schema": "kaopu/reality-defect-bundle@1",
+  "version": "REALITY-HC-S3",
+  "generatedAt": "2026-10-18T08:12:50.167Z",
+  "repairAuthorized": false,
+  "verificationRequired": true,
+  "items": [
+    {
+      "id": "denim-version-unbound",
+      "code": "CROSS_VERSION_UNBOUND",
+      "status": "WARNING",
+      "owner": "denim-workshop",
+      "expected": "同一固定版本同时声明视觉尺度、材料坐标和物理参数",
+      "observed": "视觉尺度来自 R17.2，物理候选来自 R03/R15",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-denim-r17-2",
+      "family": "denim",
+      "source": {
+        "owner": "denim-workshop",
+        "visual": {
+          "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+          "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "path": "denim-workshop/r17-scale/scale.mjs",
+          "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/22cdb3f4c3bfd101bd86f0ffa246d255b561d915/denim-workshop/r17-scale/preview-v3.html"
+        },
+        "physics": {
+          "repository": "haihao0307/Human-Fabric-Workbench",
+          "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+          "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+          "path": "fabric-workbench/r03/evidence/public/REPORT.json"
+        }
+      }
+    },
+    {
+      "id": "denim-thread-proxy",
+      "code": "DISPLAY_PROXY_NOT_PHYSICAL",
+      "status": "WARNING",
+      "owner": "denim-workshop",
+      "expected": "显示宽度、几何直径和 Tex 分栏输出",
+      "observed": "当前只有 0.45 mm 显示代理，Tex 缺失",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-denim-r17-2",
+      "family": "denim",
+      "source": {
+        "owner": "denim-workshop",
+        "visual": {
+          "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+          "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "path": "denim-workshop/r17-scale/scale.mjs",
+          "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/22cdb3f4c3bfd101bd86f0ffa246d255b561d915/denim-workshop/r17-scale/preview-v3.html"
+        },
+        "physics": {
+          "repository": "haihao0307/Human-Fabric-Workbench",
+          "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+          "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+          "path": "fabric-workbench/r03/evidence/public/REPORT.json"
+        }
+      }
+    },
+    {
+      "id": "knit-control-unmapped",
+      "code": "NATIVE_CONTROL_DIMENSION_UNKNOWN",
+      "status": "UNKNOWN",
+      "owner": "knit-workbench",
+      "expected": "gauge、yarn-size、线径和 Tex 分别声明定义与单位",
+      "observed": "只有无量纲原生控件与工程估计",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-knit-r15",
+      "family": "knit",
+      "source": {
+        "owner": "knit-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=knit"
+      }
+    },
+    {
+      "id": "knit-contact-uncalibrated",
+      "code": "CONTACT_CALIBRATION_MISSING",
+      "status": "WARNING",
+      "owner": "knit-workbench",
+      "expected": "指定纱线与接触试验的标定记录",
+      "observed": "yarnContactCalibrated=false",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-knit-r15",
+      "family": "knit",
+      "source": {
+        "owner": "knit-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=knit"
+      }
+    },
+    {
+      "id": "leather-thickness-missing",
+      "code": "ABSOLUTE_THICKNESS_NOT_EXPORTED",
+      "status": "UNKNOWN",
+      "owner": "leather-workshop",
+      "expected": "按皮料与产品状态输出绝对厚度和测量条件",
+      "observed": "仅 thicknessScale=1",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-leather-r17",
+      "family": "leather",
+      "source": {
+        "owner": "leather-workshop",
+        "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+        "commit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+        "path": "leather-workshop/r17/public-lite.html",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=leather"
+      }
+    },
+    {
+      "id": "leather-thread-semantic",
+      "code": "THREAD_TEX_DIAMETER_UNBOUND",
+      "status": "WARNING",
+      "owner": "leather-workshop",
+      "expected": "Tex、数字几何直径和实际可见线宽分栏",
+      "observed": "只有 0.32 mm 数字几何配置",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-leather-r17",
+      "family": "leather",
+      "source": {
+        "owner": "leather-workshop",
+        "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+        "commit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+        "path": "leather-workshop/r17/public-lite.html",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=leather"
+      }
+    },
+    {
+      "id": "silk-construction-missing",
+      "code": "CONSTRUCTION_DENSITY_NOT_EXPORTED",
+      "status": "UNKNOWN",
+      "owner": "fabric-workbench",
+      "expected": "经纬纱间距、Denier 和材料轴声明",
+      "observed": "只有工程厚度/面密度与求解器参数",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-silk-r15",
+      "family": "silk",
+      "source": {
+        "owner": "fabric-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=silk"
+      }
+    },
+    {
+      "id": "cotton-scale-unmapped",
+      "code": "APPEARANCE_SCALE_UNMAPPED",
+      "status": "UNKNOWN",
+      "owner": "fabric-workbench",
+      "expected": "每米重复数、经纬间距和厚度声明",
+      "observed": "只有 scale=5 外观控件",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-cotton-r03",
+      "family": "cotton",
+      "source": {
+        "owner": "fabric-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=cotton"
+      }
+    },
+    {
+      "id": "acrylic-scale-unmapped",
+      "code": "APPEARANCE_SCALE_UNMAPPED",
+      "status": "UNKNOWN",
+      "owner": "fabric-workbench",
+      "expected": "线径、针目密度、厚度与 Tex 分别导出",
+      "observed": "只有 scale=5 外观控件",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-acrylic-r03",
+      "family": "acrylic",
+      "source": {
+        "owner": "fabric-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=acrylic"
+      }
+    },
+    {
+      "id": "linen-scale-unmapped",
+      "code": "APPEARANCE_SCALE_UNMAPPED",
+      "status": "UNKNOWN",
+      "owner": "fabric-workbench",
+      "expected": "经纬间距、线径和厚度分别导出",
+      "observed": "只有 scale=5 外观控件",
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "objectId": "fabric-linen-r03",
+      "family": "linen",
+      "source": {
+        "owner": "fabric-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=linen"
+      }
+    }
+  ]
+}
