@@ -73,4 +73,13 @@
 
 几何、真实浏览器功能、独立 AI 视觉审核及公网字节校验分别记录。源码候选阶段不能提前宣布公网通过。最终状态以 `VISUAL_REVIEW.json`、`RELEASE_RECEIPT.json` 和 `TASK_ANCHOR.json` 为准。
 
+### 最终交付证据
+
+- 最终源码：`8b05ebd8b0755216743792034e3cbb58b8d9ff54`；[源码 CI](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/39098015887)通过 157 项几何检查、100 组参数、66 个材料面片和 8 组真实浏览器操作。
+- 独立源码接受文件 `VISUAL_REVIEW.json` 的 SHA256 为 `f3650396a28dad389234069c97d1b1f5616eaa56fa15bf79890b6f610e63c294`。它区分 26 张有实际视觉结论的当前图、8 张已看旧版对照与另外 13 张仅哈希核验的当前图，没有宣称所有图都逐张目视。
+- 固定公开构建：`c979ae664e53cdc2f09bd33511be5be61415efce`；[公开工作台](https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/c979ae664e53cdc2f09bd33511be5be61415efce/shoe-workshop/r13/public-lite.html)。[发布与公网验收](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/39100486059)三个任务均通过，8 组公网浏览器操作通过，39 张公开截图与源码验收工件逐字节相同。
+- 单文件为 13,746,414 字节，SHA256 为 `7db6ec885c0d7d972b2fb0574039448d2115b98c6e8e428f297c7f989410535b`。独立审核者另行直接读取固定公开 URL，所得字节一致。源码接受记录保持冻结，公开复核另存 `PUBLIC_VISUAL_REVIEW.json`。
+
 本轮保留已有双搭扣扣针和带根方案，没有扩大为扣件力学重做。外观坐标在复杂双曲率区域仍有残余畸变，皮料和织物配方没有实物标定。没有实体打样、缝线拉断、屈挠耐久、受力仿真、穿着舒适度或真实手机验收；用户和人工批准均不由自动测试授予。
+
+视觉残余还包括 Chelsea 靴筒与前帮之间较规则的曲率过渡，以及部分外底最下沿的极细分面痕迹。它们没有被写成新的接缝开口或整圈包边穿出，也没有被描述为已经达到实鞋般的自然程度。
