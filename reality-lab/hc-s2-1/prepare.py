@@ -15,5 +15,5 @@ changed|=replace('app.js',"frame=iframe;frameGroup=group;$('native-wrap').replac
 changed|=replace('app.js',"select(selected);$('unload').disabled=false;status('共同协议、测量字典和适配器已就绪。请选择对象读取；布料与成衣保持登记状态。');", "select(selected);$('unload').disabled=true;status('共同协议、测量字典和适配器已就绪。请选择对象读取；布料与成衣保持登记状态。');")
 changed|=replace('tests/browser.py',"  check('public source has no access fragment', '#key=' not in page.content() and 'PRIVATE_ACCESS' not in page.content())", "  check('public startup contains no access credential',not s['keyPresent'] and page.locator('#access-key').input_value()=='' and 'PRIVATE_ACCESS.json' not in page.content())")
 build=(ROOT/'build.py').read_text()
-assert "public_inputs=" in build and "assert 'PRIVATE_ACCESS.json' not in public_source" in build,('build.py','privacy scan not finalized')
+assert "runtime_inputs=" in build and "assert 'PRIVATE_ACCESS.json' not in runtime_source" in build and 'credential_literals' in build,('build.py','runtime-only privacy guard not finalized')
 print('PREPARED' if changed else 'ALREADY_PREPARED')
