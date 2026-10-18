@@ -33,8 +33,8 @@ async function loadNative(){
   if(token!==generation)return;if(hash!==e.sha256)throw Error('原版 SHA-256 不符，拒绝执行；没有回退到其他版本');
   log('source-verified',{id:e.id,sha256:hash,bytes:bytes.byteLength});
   frame=document.createElement('iframe');frame.id='native-frame';frame.title=e.name+' 固定原版独立副本';frame.referrerPolicy='no-referrer';
-  /* Exact publicly published HTML. No injected script, source rewriting, or API patch. */
-  frame.srcdoc=new TextDecoder().decode(bytes);$('native-container').replaceChildren(frame);const started=performance.now();
+  /* Digest-verified native HTML; a removable head prelude isolates Web Storage. Original geometry/material APIs and original body bytes stay unchanged. */
+  frame.srcdoc=RealityIsolation.wrap(new TextDecoder().decode(bytes));$('native-container').replaceChildren(frame);const started=performance.now();
   while(token===generation&&!A.isReady(frame.contentWindow,e.id)){
    if(performance.now()-started>240000)throw Error('原生工作台未在 240 秒上限内就绪。未把空画布算通过；可关闭后重试。');
    await new Promise(r=>setTimeout(r,250));

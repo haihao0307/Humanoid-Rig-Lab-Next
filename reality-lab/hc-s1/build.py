@@ -3,7 +3,7 @@ import json,hashlib,subprocess,os,re
 ROOT=Path(__file__).resolve().parent
 sha=lambda b:hashlib.sha256(b).hexdigest()
 source=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
-files=['SCOPE_LOCK.json','catalog.json','core.js','adapters.js','lab.html','lab.js','tests/core.cjs','tests/browser.py','build.py']
+files=['SCOPE_LOCK.json','catalog.json','core.js','adapters.js','isolation.js','lab.html','lab.js','tests/core.cjs','tests/browser.py','build.py']
 records={name:sha((ROOT/name).read_bytes()) for name in files}
 lock=json.loads((ROOT/'SCOPE_LOCK.json').read_text());catalog=json.loads((ROOT/'catalog.json').read_text())
 assert lock['allowedDomains']==catalog['scope']
@@ -11,7 +11,7 @@ assert len(catalog['entries'])==5 and all(e['domain'] in lock['allowedDomains'] 
 assert all(re.fullmatch('[0-9a-f]{40}',e['commit']) for e in catalog['entries'])
 assert '#key=' not in json.dumps(catalog)
 header={'version':'REALITY-HC-S1','sourceCommit':source,'coreVersion':'0.1.0','sourceFiles':records,'scope':lock['allowedDomains'],'nativeRuntimeModified':False,'physicalCertification':False,'productionReady':False}
-js='const REALITY_CATALOG='+json.dumps(catalog,ensure_ascii=False)+';\nconst REALITY_BUILD='+json.dumps(header)+';\n'+'\n'.join((ROOT/n).read_text() for n in ['core.js','adapters.js','lab.js'])
+js='const REALITY_CATALOG='+json.dumps(catalog,ensure_ascii=False)+';\nconst REALITY_BUILD='+json.dumps(header)+';\n'+'\n'.join((ROOT/n).read_text() for n in ['core.js','adapters.js','isolation.js','lab.js'])
 assert '</script' not in js.lower(),'Do not silently rewrite authored JavaScript'
 check=Path('/tmp/reality-hc-s1-assembled.js');check.write_text(js)
 subprocess.run(['node','--check',str(check)],check=True)

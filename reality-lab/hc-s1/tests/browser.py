@@ -41,11 +41,13 @@ with sync_playwright() as p:
   report['calibrationScreenshot']=screenshot('01-calibration')
   for identity in ['pattern-short','fabric-r03','garment-review']:
    page.locator('[data-entry="'+identity+'"]').click();check(identity+' not falsely integrated',page.locator('#load-native').is_disabled() and state()['iframeCount']==0 and state()['document']['dimensions'] is None)
+  page.evaluate("localStorage.setItem('kaopu-shoe-r12','REALITY_PARENT_PRESERVED')")
   for identity in ['human-r07','shoe-r12']:
    page.locator('[data-entry="'+identity+'"]').click();page.locator('#load-native').click()
    page.wait_for_function('(id)=>window.__REALITY_LAB__?.report().loadedId===id||document.querySelector("#native-state").classList.contains("error")',arg=identity,timeout=270000)
    s=state();check(identity+' actual original ready',s['nativeReady'] and s['loadedId']==identity,page.locator('#native-state').inner_text())
    check(identity+' only one native iframe',s['iframeCount']==1)
+   check(identity+' volatile Web Storage is separate',page.frame_locator('#native-frame').locator('body').evaluate('(b)=>window.__REALITY_STORAGE_ISOLATION__?.webStorage === "per-frame-volatile"'))
    page.wait_for_timeout(1000);page.locator('#observe').click()
    page.wait_for_function('window.__REALITY_LAB__.report().document.dimensions!==null',timeout=20000)
    s=state();d=s['document'];validator.validate(d);report['nativeObservations'][identity]=d
@@ -61,6 +63,8 @@ with sync_playwright() as p:
    rendered=canvases.nth(idx).screenshot(timeout=120000);rgb=ImageStat.Stat(Image.open(io.BytesIO(rendered)).convert('RGB'));check(identity+' nonempty native rendering',max(rgb.stddev)>4,rgb.stddev)
    (OUT/(identity+'-canvas.png')).write_bytes(rendered);screenshot(identity+'-workbench')
    if identity=='shoe-r12':
+    page.frame_locator('#native-frame').locator('#save').click()
+    check('native Save does not overwrite parent original cache',page.evaluate("localStorage.getItem('kaopu-shoe-r12')")=='REALITY_PARENT_PRESERVED')
     check('shoe source mm and scene m explicitly separated',d['units']['geometry']=='mm' and d['units']['scene']=='m' and d['units']['geometryToScene']==.001)
     base_x=d['dimensions']['xyz'][0]
     width=page.frame_locator('#native-frame').locator('#width');width.focus();width.press('End');page.wait_for_timeout(1200);page.locator('#observe').click()
