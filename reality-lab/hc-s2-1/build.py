@@ -10,7 +10,9 @@ assert lock['version']==dictionary['version']=='0.2.0'
 assert lock['allowedDomains']==['human','footwear','pattern','garment','fabric']
 ids=[m['id'] for m in dictionary['measurements']];assert len(ids)==len(set(ids))
 assert all(m['domain'] in lock['allowedDomains'] for m in dictionary['measurements'])
-assert '#key=' not in json.dumps(dictionary) and 'Ko7gYO-' not in '\n'.join((ROOT/n).read_text(errors='ignore') for n in source_files)
+public_source='\n'.join((ROOT/n).read_text(errors='ignore') for n in source_files)
+assert '#key=' not in json.dumps(dictionary)
+assert 'PRIVATE_ACCESS.json' not in public_source
 build={'version':'REALITY-HC-S2.1','contractVersion':'0.2.0','sourceCommit':source,'baseCommit':lock['baseCommit'],'sourceFiles':records,'scope':lock['allowedDomains'],'activeObjects':lock['activeObjects'],'registeredOnly':lock['registeredOnly'],'sourceWorkbenchesModified':False,'automaticRepair':False,'publicBrowserVerified':False}
 js='const REALITY_DICTIONARY='+json.dumps(dictionary,ensure_ascii=False,separators=(',',':'))+';\nconst REALITY_BUILD='+json.dumps(build,ensure_ascii=False,separators=(',',':'))+';\n'+'\n'.join((ROOT/name).read_text() for name in ['protocol.js','adapters.js','app.js'])
 assert '</script' not in js.lower(),'Authored JavaScript unexpectedly contains a script terminator'

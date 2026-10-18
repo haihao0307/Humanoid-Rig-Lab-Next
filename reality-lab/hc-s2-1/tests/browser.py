@@ -27,7 +27,7 @@ with sync_playwright() as p:
   check('five scoped object entries',page.locator('[data-object]').count()==5)
   check('separate five-state counters',all(page.locator('#count-'+x).count()==1 for x in ['pass','fail','warning','unknown','na']))
   check('nothing heavyweight loaded at startup',s['iframeCount']==0 and not s['results'])
-  check('public source has no access fragment', '#key=' not in page.content() and 'PRIVATE_ACCESS' not in page.content())
+  check('public startup contains no access credential',not s['keyPresent'] and page.locator('#access-key').input_value()=='' and 'PRIVATE_ACCESS.json' not in page.content())
   page.locator('[data-object="fabric-s3"]').click();check('fabric registered only without fake adapter',page.locator('#load').is_disabled() and state()['selected']=='fabric-s3' and 'fabric-s3' not in state()['results'])
   page.locator('[data-object="garment-s5"]').click();check('garment registered only without fake adapter',page.locator('#load').is_disabled() and 'garment-s5' not in state()['results'])
   page.locator('[data-object="human-r07"]').click();started=time.monotonic();page.locator('#load').click();page.wait_for_function('window.__REALITY_FOUNDATION__.report().results["human-r07"]',timeout=300000);R['humanLoadMs']=(time.monotonic()-started)*1000
