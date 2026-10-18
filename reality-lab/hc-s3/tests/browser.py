@@ -30,7 +30,7 @@ with sync_playwright() as p:
   check('no shader lighting geometry physics changes',not any([s['shadersChanged'],s['lightingChanged'],s['geometryChanged'],s['physicsChanged']]))
   check('no physical manufacturing fit or production claims',not any([s['physicalCertification'],s['manufacturingCertification'],s['garmentFitVerified'],s['productionReady']]))
   check('denim millimetre scale is visible','0.4233 mm' in page.locator('#measurement-body').inner_text())
-  check('denim cross-version warning is visible','不同版本' in page.locator('#checks').inner_text())
+  check('denim cross-version warning is visible','DENIM_VISUAL_PHYSICS_VERSION_SPLIT' in page.locator('#checks').inner_text())
   check('denim Tex remains missing','Tex' in page.locator('#coverage-body').inner_text() and '未确认' in page.locator('#coverage-body').inner_text())
   report['screenshots']=[shot(page,'01-denim-standards')]
   expectations={
