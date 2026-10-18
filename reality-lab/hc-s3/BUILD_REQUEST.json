@@ -1,0 +1,57 @@
+{
+  "task": "REALITY-HC-S3-20261018",
+  "requestedAt": "2026-10-18",
+  "previousFoundation": {
+    "version": "REALITY-HC-S2.1",
+    "sourceCommit": "fe41a71b0d571af915512174fe98cbbd0bf6521d",
+    "publicCommit": "553eb76103068ae76cb39995eba227b5d7497c10",
+    "fixedURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/553eb76103068ae76cb39995eba227b5d7497c10/reality-lab/hc-s2-1/preview.html"
+  },
+  "sources": {
+    "fabricCollectionR03": {
+      "repository": "haihao0307/Human-Fabric-Workbench",
+      "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+      "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+      "publicRuntimeCommit": "fa5ad06ca9cc2e2fc61cecc304cab2a1e74f2776",
+      "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/",
+      "browserEvidenceRun": "38550549508",
+      "browserEvidenceArtifact": 11886618492,
+      "browserEvidenceArtifactSHA256": "d433a6fd52d2160d47c60bed5f39e79c12fc11aff28ec73ee348ceb82cfa391a"
+    },
+    "denimScaleR17_2": {
+      "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+      "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "path": "denim-workshop/r17-scale/preview-v3.html",
+      "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/22cdb3f4c3bfd101bd86f0ffa246d255b561d915/denim-workshop/r17-scale/preview-v3.html"
+    },
+    "leatherR17": {
+      "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+      "commit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "path": "leather-workshop/r17/public-lite.html"
+    }
+  },
+  "priority": ["denim", "knit", "leather", "silk", "cotton", "acrylic", "linen"],
+  "purpose": "Normalize existing declarations and retained browser evidence into the S2.1 common status, measurement and defect semantics. Preserve missing values instead of guessing.",
+  "nonGoals": [
+    "do not change material appearance",
+    "do not change original runtime performance",
+    "do not calibrate physical specimens",
+    "do not bind denim R17.2 visual scale and R15 physics as one runtime",
+    "do not repair S2 patterns",
+    "do not connect garment host yet"
+  ],
+  "failedBootstrapAttemptsRetained": [
+    {
+      "run": "39109684440",
+      "cause": "indented shell heredoc prevented source-bundle materialization"
+    },
+    {
+      "run": "39109797091",
+      "cause": "precomputed transfer digest did not match the Git-tracked bundle"
+    },
+    {
+      "run": "39109915758",
+      "cause": "the Git-tracked bootstrap decoded to a non-gzip byte stream; the corrupted bootstrap branch was abandoned without force-push"
+    }
+  ]
+}

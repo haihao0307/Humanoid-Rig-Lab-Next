@@ -1,0 +1,374 @@
+{
+  "schema": "kaopu/reality-material-object@1",
+  "version": "REALITY-HC-S3",
+  "object": {
+    "id": "fabric-denim-r17-2",
+    "family": "denim",
+    "name": "牛仔 · R17.2 现实尺度 + R15 物理候选",
+    "priority": 1,
+    "mode": "fixed-multi-source-snapshot",
+    "summary": "R17.2 提供毫米级织纹与针脚显示尺度；R03/R15 提供另一版本的物理候选。两者尚未绑定为同一运行时。",
+    "source": {
+      "owner": "denim-workshop",
+      "visual": {
+        "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+        "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+        "path": "denim-workshop/r17-scale/scale.mjs",
+        "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/22cdb3f4c3bfd101bd86f0ffa246d255b561d915/denim-workshop/r17-scale/preview-v3.html"
+      },
+      "physics": {
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json"
+      }
+    },
+    "measurements": [
+      {
+        "definitionId": "material.warp_spacing_m",
+        "label": "经纱中心间距",
+        "value": 0.0004233333333333333,
+        "unit": "m",
+        "status": "PASS",
+        "basis": "derived_from_declared_count",
+        "sourceRef": "R17.2: 60 ends/in",
+        "note": "25.4 mm / 60。是显示尺度声明的精确换算，不是本轮实物显微测量。"
+      },
+      {
+        "definitionId": "material.weft_spacing_m",
+        "label": "纬纱中心间距",
+        "value": 0.000635,
+        "unit": "m",
+        "status": "PASS",
+        "basis": "derived_from_declared_count",
+        "sourceRef": "R17.2: 40 picks/in",
+        "note": "25.4 mm / 40。是固定源码声明的换算。"
+      },
+      {
+        "definitionId": "material.twill_repeat_m",
+        "label": "3×1 斜纹重复尺度",
+        "value": 0.0016933333333333331,
+        "unit": "m",
+        "status": "PASS",
+        "basis": "derived_from_visual_contract",
+        "sourceRef": "R17.2 scale.mjs",
+        "note": "四个经纱节距的显示重复尺度。"
+      },
+      {
+        "definitionId": "material.stitch_pitch_m",
+        "label": "可见针脚节距",
+        "value": 0.0027272727272727275,
+        "unit": "m",
+        "status": "PASS",
+        "basis": "derived_from_visual_contract",
+        "sourceRef": "R17.2: 11 stitches / 30 mm",
+        "note": "用于视觉针脚节奏；没有制造工艺认证。"
+      },
+      {
+        "definitionId": "material.visible_thread_width_m",
+        "label": "可见缝线宽度代理",
+        "value": 0.00045,
+        "unit": "m",
+        "status": "WARNING",
+        "basis": "display_proxy",
+        "sourceRef": "R17.2 visible thread proxy",
+        "note": "显示代理，不是 Tex、纤维显微直径或实物缝线压扁后的测量。"
+      },
+      {
+        "definitionId": "material.thickness_m",
+        "label": "布料厚度候选",
+        "value": 0.0007,
+        "unit": "m",
+        "status": "WARNING",
+        "basis": "engineering_candidate",
+        "sourceRef": "R03/R15 denim physics snapshot",
+        "note": "来自不同版本的物理候选，未与 R17.2 视觉尺度绑定，也未实物标定。"
+      },
+      {
+        "definitionId": "material.areal_density_kg_m2",
+        "label": "面密度候选",
+        "value": 0.45,
+        "unit": "kg/m2",
+        "status": "WARNING",
+        "basis": "engineering_candidate",
+        "sourceRef": "R03/R15 denim physics snapshot",
+        "note": "工程候选，physicalCalibration=false。"
+      },
+      {
+        "definitionId": "material.linear_density_tex",
+        "label": "缝线或纱线 Tex",
+        "value": null,
+        "unit": "tex",
+        "status": "UNKNOWN",
+        "basis": "missing",
+        "sourceRef": null,
+        "note": "Tex 不能由 0.45 mm 显示代理直接反推。"
+      },
+      {
+        "definitionId": "material.material_axis_u",
+        "label": "材料 U 轴对应经/纬方向",
+        "value": null,
+        "unit": "axis",
+        "status": "UNKNOWN",
+        "basis": "not_exported",
+        "sourceRef": null,
+        "note": "当前固定证据没有一个跨服装裁片可复用的材料坐标声明。"
+      }
+    ],
+    "nativeParameters": [
+      {
+        "name": "warpEndsPerInch",
+        "value": 60,
+        "unit": "ends/in",
+        "semantic": "declared construction density"
+      },
+      {
+        "name": "weftPicksPerInch",
+        "value": 40,
+        "unit": "picks/in",
+        "semantic": "declared construction density"
+      },
+      {
+        "name": "visibleThreadProxy",
+        "value": 0.45,
+        "unit": "mm",
+        "semantic": "display proxy, not physical thread diameter"
+      }
+    ],
+    "checks": [
+      {
+        "code": "DENIM_SCALE_EXPLICIT",
+        "status": "PASS",
+        "message": "R17.2 的经纬节距和针脚节奏具有明确毫米换算。"
+      },
+      {
+        "code": "DENIM_VISUAL_PHYSICS_VERSION_SPLIT",
+        "status": "WARNING",
+        "message": "R17.2 视觉尺度与 R03/R15 物理来自不同固定版本，不能冒充同一已标定运行时。"
+      },
+      {
+        "code": "DENIM_PHYSICAL_CALIBRATION",
+        "status": "WARNING",
+        "message": "厚度与面密度仍是工程候选，没有实物标定证据。"
+      },
+      {
+        "code": "DENIM_TEX_DECLARATION",
+        "status": "UNKNOWN",
+        "message": "Tex/Denier 未声明，显示宽度不能替代线密度。"
+      }
+    ],
+    "defects": [
+      {
+        "id": "denim-version-unbound",
+        "code": "CROSS_VERSION_UNBOUND",
+        "status": "WARNING",
+        "owner": "denim-workshop",
+        "expected": "同一固定版本同时声明视觉尺度、材料坐标和物理参数",
+        "observed": "视觉尺度来自 R17.2，物理候选来自 R03/R15",
+        "repairAuthorized": false,
+        "verificationRequired": true
+      },
+      {
+        "id": "denim-thread-proxy",
+        "code": "DISPLAY_PROXY_NOT_PHYSICAL",
+        "status": "WARNING",
+        "owner": "denim-workshop",
+        "expected": "显示宽度、几何直径和 Tex 分栏输出",
+        "observed": "当前只有 0.45 mm 显示代理，Tex 缺失",
+        "repairAuthorized": false,
+        "verificationRequired": true
+      }
+    ]
+  },
+  "report": {
+    "id": "fabric-denim-r17-2",
+    "family": "denim",
+    "name": "牛仔 · R17.2 现实尺度 + R15 物理候选",
+    "mode": "fixed-multi-source-snapshot",
+    "statuses": {
+      "PASS": 5,
+      "FAIL": 0,
+      "WARNING": 5,
+      "UNKNOWN": 3,
+      "NOT_APPLICABLE": 0
+    },
+    "measurements": [
+      {
+        "definitionId": "material.warp_spacing_m",
+        "label": "经纱中心间距",
+        "value": 0.0004233333333333333,
+        "unit": "m",
+        "status": "PASS",
+        "basis": "derived_from_declared_count",
+        "sourceRef": "R17.2: 60 ends/in",
+        "note": "25.4 mm / 60。是显示尺度声明的精确换算，不是本轮实物显微测量。"
+      },
+      {
+        "definitionId": "material.weft_spacing_m",
+        "label": "纬纱中心间距",
+        "value": 0.000635,
+        "unit": "m",
+        "status": "PASS",
+        "basis": "derived_from_declared_count",
+        "sourceRef": "R17.2: 40 picks/in",
+        "note": "25.4 mm / 40。是固定源码声明的换算。"
+      },
+      {
+        "definitionId": "material.twill_repeat_m",
+        "label": "3×1 斜纹重复尺度",
+        "value": 0.0016933333333333331,
+        "unit": "m",
+        "status": "PASS",
+        "basis": "derived_from_visual_contract",
+        "sourceRef": "R17.2 scale.mjs",
+        "note": "四个经纱节距的显示重复尺度。"
+      },
+      {
+        "definitionId": "material.stitch_pitch_m",
+        "label": "可见针脚节距",
+        "value": 0.0027272727272727275,
+        "unit": "m",
+        "status": "PASS",
+        "basis": "derived_from_visual_contract",
+        "sourceRef": "R17.2: 11 stitches / 30 mm",
+        "note": "用于视觉针脚节奏；没有制造工艺认证。"
+      },
+      {
+        "definitionId": "material.visible_thread_width_m",
+        "label": "可见缝线宽度代理",
+        "value": 0.00045,
+        "unit": "m",
+        "status": "WARNING",
+        "basis": "display_proxy",
+        "sourceRef": "R17.2 visible thread proxy",
+        "note": "显示代理，不是 Tex、纤维显微直径或实物缝线压扁后的测量。"
+      },
+      {
+        "definitionId": "material.thickness_m",
+        "label": "布料厚度候选",
+        "value": 0.0007,
+        "unit": "m",
+        "status": "WARNING",
+        "basis": "engineering_candidate",
+        "sourceRef": "R03/R15 denim physics snapshot",
+        "note": "来自不同版本的物理候选，未与 R17.2 视觉尺度绑定，也未实物标定。"
+      },
+      {
+        "definitionId": "material.areal_density_kg_m2",
+        "label": "面密度候选",
+        "value": 0.45,
+        "unit": "kg/m2",
+        "status": "WARNING",
+        "basis": "engineering_candidate",
+        "sourceRef": "R03/R15 denim physics snapshot",
+        "note": "工程候选，physicalCalibration=false。"
+      },
+      {
+        "definitionId": "material.linear_density_tex",
+        "label": "缝线或纱线 Tex",
+        "value": null,
+        "unit": "tex",
+        "status": "UNKNOWN",
+        "basis": "missing",
+        "sourceRef": null,
+        "note": "Tex 不能由 0.45 mm 显示代理直接反推。"
+      },
+      {
+        "definitionId": "material.material_axis_u",
+        "label": "材料 U 轴对应经/纬方向",
+        "value": null,
+        "unit": "axis",
+        "status": "UNKNOWN",
+        "basis": "not_exported",
+        "sourceRef": null,
+        "note": "当前固定证据没有一个跨服装裁片可复用的材料坐标声明。"
+      }
+    ],
+    "checks": [
+      {
+        "code": "DENIM_SCALE_EXPLICIT",
+        "status": "PASS",
+        "message": "R17.2 的经纬节距和针脚节奏具有明确毫米换算。"
+      },
+      {
+        "code": "DENIM_VISUAL_PHYSICS_VERSION_SPLIT",
+        "status": "WARNING",
+        "message": "R17.2 视觉尺度与 R03/R15 物理来自不同固定版本，不能冒充同一已标定运行时。"
+      },
+      {
+        "code": "DENIM_PHYSICAL_CALIBRATION",
+        "status": "WARNING",
+        "message": "厚度与面密度仍是工程候选，没有实物标定证据。"
+      },
+      {
+        "code": "DENIM_TEX_DECLARATION",
+        "status": "UNKNOWN",
+        "message": "Tex/Denier 未声明，显示宽度不能替代线密度。"
+      }
+    ],
+    "defects": [
+      {
+        "id": "denim-version-unbound",
+        "code": "CROSS_VERSION_UNBOUND",
+        "status": "WARNING",
+        "owner": "denim-workshop",
+        "expected": "同一固定版本同时声明视觉尺度、材料坐标和物理参数",
+        "observed": "视觉尺度来自 R17.2，物理候选来自 R03/R15",
+        "repairAuthorized": false,
+        "verificationRequired": true
+      },
+      {
+        "id": "denim-thread-proxy",
+        "code": "DISPLAY_PROXY_NOT_PHYSICAL",
+        "status": "WARNING",
+        "owner": "denim-workshop",
+        "expected": "显示宽度、几何直径和 Tex 分栏输出",
+        "observed": "当前只有 0.45 mm 显示代理，Tex 缺失",
+        "repairAuthorized": false,
+        "verificationRequired": true
+      }
+    ],
+    "source": {
+      "owner": "denim-workshop",
+      "visual": {
+        "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+        "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+        "path": "denim-workshop/r17-scale/scale.mjs",
+        "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/22cdb3f4c3bfd101bd86f0ffa246d255b561d915/denim-workshop/r17-scale/preview-v3.html"
+      },
+      "physics": {
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json"
+      }
+    },
+    "nativeParameters": [
+      {
+        "name": "warpEndsPerInch",
+        "value": 60,
+        "unit": "ends/in",
+        "semantic": "declared construction density"
+      },
+      {
+        "name": "weftPicksPerInch",
+        "value": 40,
+        "unit": "picks/in",
+        "semantic": "declared construction density"
+      },
+      {
+        "name": "visibleThreadProxy",
+        "value": 0.45,
+        "unit": "mm",
+        "semantic": "display proxy, not physical thread diameter"
+      }
+    ],
+    "summary": "R17.2 提供毫米级织纹与针脚显示尺度；R03/R15 提供另一版本的物理候选。两者尚未绑定为同一运行时。",
+    "writeAPI": false,
+    "automaticRepair": false,
+    "physicalCertification": false,
+    "manufacturingCertification": false,
+    "aestheticAcceptance": false,
+    "productionReady": false
+  }
+}
