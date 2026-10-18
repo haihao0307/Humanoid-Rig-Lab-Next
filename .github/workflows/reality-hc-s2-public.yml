@@ -1,0 +1,25 @@
+name: Reality HC S2 sealed public publication
+on:
+  push:
+    branches: [feature/reality-contract-hc-s2-20261018]
+    paths: [reality-lab/hc-s2/PUBLISH_REQUEST.json]
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: reality-lab/hc-s2
+      - name: Verify sealed-only artifact and append immutable page
+        run: python reality-lab/hc-s2/publish.py
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: reality-s2-public-stage
+          path: /tmp/REALITY_S2_PUBLIC_STAGE.json
+          retention-days: 30
+          if-no-files-found: error
