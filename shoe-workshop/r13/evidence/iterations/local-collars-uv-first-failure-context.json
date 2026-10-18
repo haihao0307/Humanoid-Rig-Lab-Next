@@ -1,0 +1,46 @@
+{
+  "sourceCommit": "local-r13-collars-final-20261018",
+  "subsequentFrozenSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+  "failureReport": "evidence/iterations/local-collars-uv-first-failure.json",
+  "failureReportSha256": "e7d46fda7ee3bc0de89ef57a3ee47569b0eac07b30e38d24dacc05230b503090",
+  "originalAuditSha256": "9c1e1d404b42945d7dd61f4eba2685870288f80ed023cca6a1fdc42632d441e2",
+  "command": "SOURCE_COMMIT=local-r13-collars-final-20261018 node tests/material-coordinates-audit.mjs evidence/MATERIAL_COORDINATES.json",
+  "environment": {
+    "node": "v24.19.0",
+    "platform": "linux",
+    "arch": "x64",
+    "concurrentTask": "Separate Node process running the 157 geometry suite; no shared process or temporary seed directory"
+  },
+  "sourceHashes": [
+    {
+      "path": "src/kernel.mjs",
+      "sha256": "7156a5432fed1dd654905a967255f167e3c45bf7ed69fc674db25263de9dde06"
+    },
+    {
+      "path": "src/model.mjs",
+      "sha256": "d34f8b825f45667f8da384a198284ee2c4755568851d6a87a420a429db7b1e14"
+    },
+    {
+      "path": "src/penny-chelsea.mjs",
+      "sha256": "b02cbdd1525c143badec36b11371bb44277a94acf865a6040e0fa399cc7fa70d"
+    },
+    {
+      "path": "src/monk-canvas.mjs",
+      "sha256": "4a73df17527e247bcb863a852064ce12638a5a78190e587784b2d496f43b1524"
+    },
+    {
+      "path": "src/soles.mjs",
+      "sha256": "fcc5d6ccae4e38e099e94019803a8aff4ed6dd42abbd6c6992f284382d0308fa"
+    },
+    {
+      "path": "src/surface-coordinates.mjs",
+      "sha256": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970"
+    }
+  ],
+  "numericIssues": [
+    "default/monk-integral-vamp-tongue: producer after statistics absent or inconsistent with final buffers"
+  ],
+  "reproductionStatus": "First failure preserved; claimed field was not captured in the original comparator. Same final Float32 metrics in a later instrumented default-only diagnostic matched producer statistics. Root cause remains under independent read-only investigation.",
+  "thresholdsChanged": false,
+  "productionChangedForDiagnosis": false
+}

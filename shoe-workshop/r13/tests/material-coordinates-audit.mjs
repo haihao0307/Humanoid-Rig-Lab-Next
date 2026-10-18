@@ -29,6 +29,13 @@ function bytesEqual(a, b) {
   return a.constructor === b.constructor && a.byteLength === b.byteLength &&
     Buffer.from(a.buffer, a.byteOffset, a.byteLength).equals(Buffer.from(b.buffer, b.byteOffset, b.byteLength));
 }
+function freezeSnapshot(value) {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    for (const child of Object.values(value)) freezeSnapshot(child);
+    Object.freeze(value);
+  }
+  return value;
+}
 function quantiles(values) {
   values.sort((a, b) => a[0] - b[0]);
   const total = values.reduce((s, x) => s + x[1], 0);
@@ -76,12 +83,20 @@ function triangleMetrics(g, referenceUV) {
   for (const [name, key] of [['sigmaMin', 'lo'], ['sigmaMax', 'hi'], ['anisotropy', 'anisotropy'], ['u', 'u'], ['v', 'v']]) summary[name] = quantiles(values.map(v => [v[key], v.area]));
   return { values, summary };
 }
-function compareReport(actual, claimed) {
-  if (!claimed) return { present: false };
+function compareReport(actual, claimed, identity) {
+  if (!claimed) return { identity, present: false };
   const relative = (a, b) => Math.abs(a - b) / Math.max(Math.abs(a), Math.abs(b), 1e-12);
   let maximumRelativeDifference = relative(actual.logStretchRms, claimed.logStretchRms);
-  for (const field of ['sigmaMin', 'sigmaMax', 'anisotropy', 'u', 'v']) for (const q of ['min', 'p05', 'median', 'p95', 'max']) maximumRelativeDifference = Math.max(maximumRelativeDifference, relative(actual[field][q], claimed[field][q]));
-  return { present: true, maximumRelativeDifference, invalidCountsAgree: actual.invalidUVTriangles === claimed.invalidUVTriangles && actual.invalidSurfaceTriangles === claimed.invalidSurfaceTriangles,
+  let maximumDifference = { field: 'logStretchRms', actual: actual.logStretchRms, claimed: claimed.logStretchRms, relativeDifference: maximumRelativeDifference };
+  for (const field of ['sigmaMin', 'sigmaMax', 'anisotropy', 'u', 'v']) for (const q of ['min', 'p05', 'median', 'p95', 'max']) {
+    const difference = relative(actual[field][q], claimed[field][q]);
+    maximumRelativeDifference = Math.max(maximumRelativeDifference, difference);
+    if (difference > maximumDifference.relativeDifference) maximumDifference = {
+      field: field + '.' + q, actual: actual[field][q], claimed: claimed[field][q], relativeDifference: difference
+    };
+  }
+  return { identity, present: true, maximumRelativeDifference, invalidCountsAgree: actual.invalidUVTriangles === claimed.invalidUVTriangles && actual.invalidSurfaceTriangles === claimed.invalidSurfaceTriangles,
+    maximumDifference,
     note: 'Producer measures pre-Float32 doubles; this diagnostic measures the buffers submitted for rendering.' };
 }
 
@@ -95,8 +110,22 @@ try {
   const { buildStyle } = await import(pathToFileURL(path.join(root, 'src/model.mjs')));
   const { buildStyle: buildSeedStyle } = await import(pathToFileURL(path.join(seedRoot, 'model.mjs')));
   for (const [preset, params] of cases) for (const id of ['penny', 'chelsea', 'monk', 'canvas']) {
-    const started = performance.now(), model = buildStyle(id, params), seed = buildSeedStyle(id, params);
+    const started = performance.now(), model = buildStyle(id, params);
+    assert.equal(new Set(model.parts.map(p => p.id)).size, model.parts.length, 'producer statistics require unique part identities');
+    // Freeze each raw report immediately, before the seed model is built or
+    // any final-buffer measurement runs. Comparisons use this per-ID snapshot,
+    // never a later mutable report reference. All original scalars are retained.
+    const producerSnapshots = new Map(model.parts.map(p => [p.id, freezeSnapshot({
+      identity: { preset, style: id, partId: p.id },
+      statistics: structuredClone(p.geometry.userData.materialCoordinates?.stretchBeforeAfter ?? null)
+    })]));
+    const unchanged = stage => {
+      for (const p of model.parts) assert.deepEqual(p.geometry.userData.materialCoordinates?.stretchBeforeAfter ?? null,
+        producerSnapshots.get(p.id).statistics, `${preset}/${id}/${p.id}: producer statistics changed ${stage}`);
+    };
+    const seed = buildSeedStyle(id, params);
     try {
+      unchanged('during seed construction');
       assert.deepEqual(model.parts.map(p => p.id), seed.parts.map(p => p.id), 'diagnostic copy changed panel identity');
       for (let i = 0; i < model.parts.length; i++) {
         const p = model.parts[i], g = p.geometry, seedGeometry = seed.parts[i].geometry;
@@ -106,6 +135,9 @@ try {
         // producer's claim that a fit happened or its report of a good result.
         if (!g.userData.surfaceVertices || !['leather', 'canvas', 'elastic', 'webbing', 'lining'].includes(p.role) || p.kind === 'binding') continue;
         const before = triangleMetrics(seedGeometry), after = triangleMetrics(g, seedGeometry.attributes.uv), B = before.summary, A = after.summary;
+        const snapshot = producerSnapshots.get(p.id), snapshotSha256 = sha256(JSON.stringify(snapshot));
+        assert.deepEqual(g.userData.materialCoordinates?.stretchBeforeAfter ?? null, snapshot.statistics,
+          `${preset}/${id}/${p.id}: producer statistics changed during final-buffer measurement`);
         const tailArea = { aboveBeforeP95Scale: 0, belowBeforeP05Scale: 0, aboveBeforeP95Anisotropy: 0 };
         for (const t of after.values) {
           if (t.hi > B.sigmaMax.p95 * 1.005) tailArea.aboveBeforeP95Scale += t.area;
@@ -116,7 +148,11 @@ try {
         results.push({ preset, style: id, part: p.id, role: p.role, sourceGeometryIdentical: true, before: B, after: A,
           logStretchChange: A.logStretchRms - B.logStretchRms, tailAreaFraction: tailArea,
           extremaRatios: { maximumScale: A.sigmaMax.max / B.sigmaMax.max, minimumScale: A.sigmaMin.min / B.sigmaMin.min, maximumAnisotropy: A.anisotropy.max / B.anisotropy.max },
-          reportComparison: { before: compareReport(B, g.userData.materialCoordinates?.stretchBeforeAfter?.before), after: compareReport(A, g.userData.materialCoordinates?.stretchBeforeAfter?.after) },
+          producerSnapshot: { ...snapshot, sha256: snapshotSha256, capturedBeforeSeedBuild: true, rawStatisticsUnchanged: true },
+          reportComparison: {
+            before: compareReport(B, snapshot.statistics?.before, { ...snapshot.identity, phase: 'before', snapshotSha256 }),
+            after: compareReport(A, snapshot.statistics?.after, { ...snapshot.identity, phase: 'after', snapshotSha256 })
+          },
           residualTail: { areaFractionAnisotropyAbove5: after.values.filter(t => t.anisotropy > 5).reduce((s, t) => s + t.area, 0) / A.surfaceAreaMm2,
             areaFractionAnisotropyAbove10: after.values.filter(t => t.anisotropy > 10).reduce((s, t) => s + t.area, 0) / A.surfaceAreaMm2,
             worstFiveTriangles: [...after.values].sort((a, b) => b.anisotropy - a.anisotropy).slice(0, 5).map(t => ({ triangle: t.triangle,
@@ -124,6 +160,7 @@ try {
             note: 'Localized high distortion remains at small end-cap triangles. Bulk improvement does not establish an isometric or manufacturing chart.' },
           generatorSkipped: g.userData.materialCoordinates?.skipped, generatorReason: g.userData.materialCoordinates?.reason });
       }
+      unchanged('during the complete model measurement');
     } finally { model.parts.forEach(p => p.geometry.dispose()); seed.parts.forEach(p => p.geometry.dispose()); }
     console.log(JSON.stringify({ preset, style: id, elapsedMs: performance.now() - started, measuredPanels: results.filter(r => r.preset === preset && r.style === id).length }));
   }
@@ -139,8 +176,10 @@ try {
   });
   const report = { suite: 'R13-INDEPENDENT-FINAL-MATERIAL-COORDINATES-DIAGNOSTIC', taskId: 'SHOE-R13-SEAM-SHAPE-REVIEW-20261017',
     sourceCommit: process.env.GITHUB_SHA || process.env.SOURCE_COMMIT || null, sourceHashes, testSha256: sha256(fs.readFileSync(fileURLToPath(import.meta.url))),
+    environment: { node: process.version, v8: process.versions.v8, platform: process.platform, arch: process.arch, execArgv: process.execArgv },
     success: issues.length === 0, measuredPanels: results.length, acceptanceCriteria, numericIssues: issues, results,
     scope: { productionFilesChanged: false, sameSurfaceSeedComparison: true, finalFloat32Triangles: true, independentJacobianImplementation: true,
+      producerSnapshotsCapturedBeforeSeedBuild: true, producerStatisticsCheckedUnchanged: true, comparedPartIdentityRecorded: true,
       rendered: false, humanApproval: false, userApproval: false, physicalSolver: false, wearerFit: false, manufacturing: false,
       note: 'Appearance coordinate audit; not an isometry, manufacturing flattening or visual approval. Separate diagnostic; does not add or weaken geometry acceptance groups.' } };
   fs.writeFileSync(outputPath, JSON.stringify(report, null, 2) + '\n');
