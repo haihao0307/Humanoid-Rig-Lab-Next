@@ -1,0 +1,106 @@
+{
+  "schema": "kaopu/research-framework-registry@1",
+  "archiveVersion": "RF-HANDOFF-20261018-R1",
+  "recordedAt": "2026-10-18",
+  "purpose": "Preserve original ranked research directions and bounded cross-window implementation guides.",
+  "rankingOrigin": "Recovered historical discussion summary; detailed engineering guides were edited and source-checked in this documentation task.",
+  "verbatimOriginalTranscriptRecovered": false,
+  "rankingIsIndustryBenchmark": false,
+  "documentationOnly": true,
+  "runtimeChangesInThisTask": false,
+  "newFrameworkImplementationsVerifiedInThisTask": false,
+  "sourceBaselineCommit": "e7df669b97a13ca79ff9b780ea21d20da7acd1d0",
+  "entry": "../../RESEARCH_FRAMEWORKS_START_HERE.md",
+  "commonContext": "00_CONTEXT_AND_BOUNDARIES.md",
+  "acceptance": "08_DEPENDENCIES_AND_ACCEPTANCE.md",
+  "windowTasks": "09_WINDOW_TASKS.md",
+  "sources": "10_SOURCES.md",
+  "taskStateTemplate": "task-state.template.json",
+  "allowedDomains": ["human", "garment", "pattern", "fabric", "footwear"],
+  "excludedDomains": ["architecture", "aircraft", "terrain", "animals", "vegetation", "full-world"],
+  "executionPolicy": {
+    "userSelectsTaskBeforeImplementation": true,
+    "freshTargetRepositoryReadRequired": true,
+    "oneBoundedPilotPerTask": true,
+    "independentDraftBranch": true,
+    "mergeAuthorized": false,
+    "forcePushAuthorized": false,
+    "sourceRepairByObserverAuthorized": false,
+    "privateSourcePublicationAuthorized": false,
+    "fixedDistanceMeshSwapAccepted": false,
+    "newAnimationCacheInScope": false
+  },
+  "frameworks": [
+    {
+      "id": "RF01", "originalRank": 1,
+      "name": "现实世界契约与验证实验室 / 世界规范",
+      "status": "EXISTING_BOUNDED_STAGES_NOT_FULL_CERTIFICATION",
+      "currentStageAtArchive": "REALITY-HC-S3",
+      "guide": "00_CONTEXT_AND_BOUNDARIES.md",
+      "state": "../../reality-lab/hc-s3/TASK_STATE.json",
+      "nextTask": "RF01-S3.1",
+      "nextAction": "Verify active branches; develop explicit read-only material exports and semantic bridge when separately tasked.",
+      "requires": [], "sourceIds": ["P01", "P02", "P03"]
+    },
+    {
+      "id": "RF02", "originalRank": 2,
+      "name": "OpenUSD + MaterialX + OpenPBR资产材质",
+      "status": "DESIGN_ARCHIVED_INTEGRATION_UNVERIFIED",
+      "guide": "02_ASSET_MATERIAL_INTERCHANGE.md",
+      "firstTask": "RF02-P0",
+      "firstDeliverable": "Read-only loss-aware asset/material manifest round trip for one existing material and host binding.",
+      "requires": ["RF01_IDENTITY_AND_MEASUREMENT_SUBSET"],
+      "sourceIds": ["S01", "S02", "S03", "S04", "S05", "P02", "P03", "P04"]
+    },
+    {
+      "id": "RF03", "originalRank": 3,
+      "name": "因子图 + Ceres/GTSAM逆向求解",
+      "status": "DESIGN_ARCHIVED_INTEGRATION_UNVERIFIED",
+      "guide": "03_EVIDENCE_INVERSE_SOLVING.md",
+      "firstTask": "RF03-P0",
+      "firstDeliverable": "Small identifiable synthetic inverse problem with known truth, outliers and degeneracy tests; no source writeback.",
+      "requires": ["RF01_EVIDENCE_SUBSET", "CALIBRATED_OBSERVATION_FIXTURE"],
+      "sourceIds": ["S06", "S07", "S08", "P01"]
+    },
+    {
+      "id": "RF04", "originalRank": 4,
+      "name": "材质尺度空间",
+      "status": "LOCAL_DENIM_PRECEDENT_SHARED_INTEGRATION_UNVERIFIED",
+      "guide": "04_MATERIAL_SCALE_SPACE.md",
+      "firstTask": "RF04-P0",
+      "firstDeliverable": "Read-only material-space footprint diagnostics and fixed-camera baseline; one isolated continuous-filter candidate only after diagnosis.",
+      "requires": ["RF01_MATERIAL_SPACE_SUBSET", "FROZEN_CAMERA_AND_APPEARANCE_BASELINE"],
+      "sourceIds": ["S09", "S10", "P03", "P04"]
+    },
+    {
+      "id": "RF05", "originalRank": 5,
+      "name": "世界语义 / Affordance",
+      "status": "DESIGN_ARCHIVED_BEHAVIOR_LOOP_UNVERIFIED",
+      "guide": "05_SEMANTICS_AFFORDANCE.md",
+      "firstTask": "RF05-P0",
+      "firstDeliverable": "One read-only cloth-grasp precondition evaluator with explicit unknowns and blocked reasons.",
+      "requires": ["RF01_SEMANTIC_ANCHOR_SUBSET", "EXISTING_AGENT_AND_CONTACT_CAPABILITIES"],
+      "sourceIds": ["S11", "S12", "P01"]
+    },
+    {
+      "id": "RF06", "originalRank": 6,
+      "name": "XPBD统一约束物理",
+      "status": "INTERFACE_FIRST_NO_SOLVER_REPLACEMENT_AUTHORIZED",
+      "guide": "06_CONSTRAINT_PHYSICS_XPBD.md",
+      "firstTask": "RF06-P0",
+      "firstDeliverable": "Read-only existing-solver parameter/contact report and protected baseline; later isolated XPBD comparison requires task authorization.",
+      "requires": ["RF01_MECHANICAL_SEMANTICS_SUBSET", "EXISTING_SOLVER_REGRESSION_BASELINE"],
+      "sourceIds": ["S13", "S14", "S15", "P03", "P05"]
+    },
+    {
+      "id": "RF07", "originalRank": 7,
+      "name": "ECS / 流式加载大世界运行时",
+      "status": "FULL_WORLD_DEFERRED_HUMAN_CLOTHING_PROFILING_ONLY_FIRST",
+      "guide": "07_ECS_STREAMING_RUNTIME.md",
+      "firstTask": "RF07-P0",
+      "firstDeliverable": "Read-only timing and lifecycle attribution for one current person and garment; no full-world implementation.",
+      "requires": ["RF01_SOURCE_IDENTITY_SUBSET", "REAL_WORKLOAD_PERFORMANCE_BASELINE"],
+      "sourceIds": ["S01", "S16", "S17", "P01", "P06"]
+    }
+  ]
+}
