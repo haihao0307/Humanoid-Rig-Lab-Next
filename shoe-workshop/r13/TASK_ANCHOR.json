@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "taskId": "SHOE-R13-SEAM-SHAPE-REVIEW-20261017",
+  "dispatchDate": "2026-10-17",
+  "timezone": "Asia/Shanghai",
+  "target": "shoe-workshop/r13",
+  "status": "EXECUTE_PENDING_VERIFICATION",
+  "userRequest": "自己审核缝线、造型、布料拼接和整体形态，再进行下一轮调整",
+  "baseSha": "fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d",
+  "branch": "feature/shoe-r13-seam-shape-review-20261017",
+  "taskMode": "AUTHORIZED_REFINEMENT",
+  "creativeAuthorization": true,
+  "authorizationScope": "保留四种自有鞋型，对已证实的缝线、裁片、鞋口、包边和材料坐标缺陷做修整；不改成其他鞋型或宣称制造校准",
+  "primaryDefect": "缝线、裁片边界和材料坐标没有充分共用实际三维支承，造成针脚扭折、接缝露边、闭合尖角和纹理拉伸",
+  "acceptedBaseline": {
+    "path": "shoe-workshop/r12",
+    "sha": "fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d",
+    "publishedBuild": "d27ef0f200257741fa67f1c6291418cf771443e9",
+    "note": "前轮已交付与独立AI接受的结构候选；本轮补充检查发现原验收范围未覆盖的缺陷，不回写原验收历史"
+  },
+  "lanes": [
+    {
+      "id": "seams",
+      "producer": "root",
+      "defect": "针脚截面参考世界轴硬切换，沿条针路不在实际支承面上",
+      "files": [
+        "src/kernel.mjs",
+        "src/soles.mjs"
+      ]
+    },
+    {
+      "id": "shape_and_joins",
+      "producer": "shoe_archetypes",
+      "defect": "Penny前片尖V/断针路、Chelsea下部折返和拉环悬空",
+      "files": [
+        "src/penny-chelsea.mjs",
+        "src/monk-canvas.mjs"
+      ]
+    },
+    {
+      "id": "material_coordinates",
+      "producer": "shoe_materials",
+      "defect": "名义毫米UV局部拉伸，线/鞋带/内衬等角色表达混淆",
+      "files": [
+        "src/surface-coordinates.mjs",
+        "src/materials.mjs"
+      ]
+    }
+  ],
+  "referenceSet": {
+    "beforeScreens": "R12 public artifact 12095997568, source 7fd5527f475908d615db4f1fd36357f47e68ce46",
+    "styleReferences": [
+      "https://www.crockettandjones.com/products/boston-black-calf",
+      "https://www.crockettandjones.com/blogs/the-article/the-icons-chelsea-8",
+      "https://www.crockettandjones.com/products/lowndes-black-calf",
+      "https://www.superga.com/products/le-superga-unisex-2750-cotu-classic-black-s000010-999"
+    ],
+    "science": [
+      "https://www.satra.com/bulletin/article.php?id=2774",
+      "https://www.satra.com/test_methods/detail.php?id=140",
+      "https://us.crockettandjones.com/pages/in-the-making-closing",
+      "https://www.crockettandjones.com/blogs/the-article/a-guide-to-loafers",
+      "https://www.cs.jhu.edu/~misha/Fall09/Levy02.pdf"
+    ],
+    "noChineseWebsitesUsed": true,
+    "commercialDimensionsMeasured": false
+  },
+  "protectedInvariants": [
+    "R12、R10原目录和固定网址保留，R12按27文件精确hash检查",
+    "保留四种自有鞋型、五款选择和R10的12组配方",
+    "全部新鞋由程序几何生成；不导入商业鞋网格或新图片贴图",
+    "保留真实鞋口、鞍带/鞋眼/扣带贯穿孔与材料厚度",
+    "保持已有Chelsea鞋头法向和前后中线连续性",
+    "不把几何弯折或表面纹理坐标称为物理求解、适脚或制造纸样",
+    "不合并、不强推、不改写历史、不改其他人物或动物模块"
+  ],
+  "forbiddenRoutes": [
+    "翻法线或压暗衬里掩盖曲面折返",
+    "仅加粗提亮缝线掩盖脱离支承的针路",
+    "沿用旧截图声称本轮通过",
+    "只交截图/本地地址/ZIP而无实际固定公网工作台"
+  ],
+  "acceptanceGates": [
+    {
+      "id": "contract",
+      "status": "PENDING"
+    },
+    {
+      "id": "freshness",
+      "status": "PENDING"
+    },
+    {
+      "id": "geometry",
+      "status": "PENDING"
+    },
+    {
+      "id": "seam_support",
+      "status": "PENDING"
+    },
+    {
+      "id": "reference_fidelity",
+      "status": "PENDING"
+    },
+    {
+      "id": "interaction",
+      "status": "PENDING"
+    },
+    {
+      "id": "machine",
+      "status": "PENDING"
+    },
+    {
+      "id": "independent_review",
+      "status": "PENDING"
+    },
+    {
+      "id": "public_delivery",
+      "status": "PENDING"
+    }
+  ],
+  "agentsChecklist": [
+    {
+      "text": "没有用生成图片代替真实三维实现",
+      "status": "PENDING_FINAL_VERIFICATION"
+    },
+    {
+      "text": "已实际修改生产源码",
+      "status": "PENDING_FINAL_VERIFICATION"
+    },
+    {
+      "text": "用户看到的是可交互三维工作台",
+      "status": "PENDING_FINAL_VERIFICATION"
+    },
+    {
+      "text": "人物/动物几何、骨骼和动作来自真实运行时；本轮仅鞋几何，人体骨骼不适用",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "text": "镜头、选择、动作或参数控制可以实际操作",
+      "status": "PENDING_FINAL_VERIFICATION"
+    },
+    {
+      "text": "公网固定链接和真实浏览器已验证",
+      "status": "PENDING_FINAL_VERIFICATION"
+    },
+    {
+      "text": "如果只有截图而没有工作台，本轮判定失败",
+      "status": "PENDING_FINAL_VERIFICATION"
+    }
+  ],
+  "limitations": {
+    "physicalSolver": false,
+    "materialCalibrated": false,
+    "manufacturingValidated": false,
+    "wearerFitValidated": false,
+    "humanApproval": false,
+    "userApproval": false,
+    "realMobileDeviceTested": false
+  },
+  "recovery": {
+    "observedAt": "2026-10-18T03:16:54Z",
+    "event": "Executor restored an earlier uncommitted workspace snapshot",
+    "remoteBaselineUnchanged": true,
+    "patchesReplayed": true,
+    "acceptanceEvidenceRegenerated": false
+  },
+  "nextTaskPointer": "针对本Anchor的actual geometry和before/after近景完成独立验证，再发布绑定本轮源码的固定公网版本"
+}
