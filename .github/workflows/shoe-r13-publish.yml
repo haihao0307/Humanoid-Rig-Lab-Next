@@ -1,0 +1,447 @@
+name: Shoe R13 reviewed artifact promotion and public receipt
+
+'on':
+  push:
+    branches: [feature/shoe-r13-seam-shape-review-20261017]
+    paths: ['.github/workflows/shoe-r13-publish.yml']
+
+permissions: {}
+concurrency:
+  group: shoe-r13-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+# Publication remains locked until this exact source and candidate artifact
+# pass independent AI review of fresh renders, seam support and preserved R12.
+# Human and user approval are recorded separately and remain false.
+env:
+  PROMOTION_READY: 'true'
+  VISUAL_HUMAN_REVIEW: 'false'
+  REPOSITORY: haihao0307/Humanoid-Rig-Lab-Next
+  TARGET_BRANCH: feature/shoe-r13-seam-shape-review-20261017
+  MODULE: shoe-workshop/r13
+  VERIFY_WORKFLOW: .github/workflows/shoe-r13-verify.yml
+  EXPECTED_HEAD: ${{ github.sha }}
+  SOURCE_COMMIT: 8b05ebd8b0755216743792034e3cbb58b8d9ff54
+  BASE_COMMIT: fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d
+  CANDIDATE_RUN_ID: '39098015887'
+  CANDIDATE_ARTIFACT_ID: '12125268687'
+  CANDIDATE_ARTIFACT_NAME: shoe-r13-candidate-39098015887
+  CANDIDATE_ARTIFACT_DIGEST: sha256:a7e642a327057ee536abfa43c20de588c58300dbe380336ced1f126810faf23f
+  EXPECTED_RUNTIME_SHA256: 7db6ec885c0d7d972b2fb0574039448d2115b98c6e8e428f297c7f989410535b
+  EXPECTED_RUNTIME_BYTES: '13746414'
+  EXPECTED_MANIFEST_SHA256: 01af253afb2e3e04235bd93068300d8783e4c95c51b24d3260d1d22db94332fb
+  EXPECTED_MATERIAL_QA_SHA256: a1da07c7c7f7bf8bd2c9d18a7cd13e5d091617446b5b8c4eccafb4d0870a1a1f
+  EXPECTED_MATERIAL_TEST_SHA256: 085553c814f73c1ca7443e99a6469bbfc1bb5dedecffef65d3cb518ca5692014
+  EXPECTED_GEOMETRY_SHA256: 92948c4863c4e40736ce4625829e3ddfe45ae084080966f15fef12e0b8cd0e4c
+  EXPECTED_QA_SHA256: d53140beaec899e01fbda8b54793aa09a966b54d1ae044f385fb66a6ad083582
+  EXPECTED_BROWSER_TEST_SHA256: ac5f4812ea96349d7e1e5d14ada97adc1f637f5fc812832af082acb248a40bbd
+  EXPECTED_GEOMETRY_TEST_SHA256: 7850af64fce1dd07bfe220b57b305e39e7ff9b8a42eed4871fc563efc8712b62
+  EXPECTED_VERIFY_WORKFLOW_SHA256: 5b300b2ace848dc77384b6d080488f20fe7efd31a999dd2dfbcb08fb550ff732
+  EXPECTED_BEFORE_QA_SHA256: 80fc624846e6c93b89b03df8e2eb0e77c64fed6be89bedd62106620868afc7ae
+  EXPECTED_REVIEW_SHA256: f3650396a28dad389234069c97d1b1f5616eaa56fa15bf79890b6f610e63c294
+  EXPECTED_BEFORE_SCREENS: '8'
+  EXPECTED_BROWSER_CHECKS: '8'
+  EXPECTED_SCREENS: '39'
+  EXPECTED_GEOMETRY_CHECKS: '157'
+  PUBLIC_ARTIFACT_NAME: shoe-r13-public-${{ github.run_id }}-${{ github.run_attempt }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      build: ${{ steps.commit.outputs.build }}
+    steps:
+      - name: Require an explicitly unlocked reviewed candidate
+        run: |
+          test "$PROMOTION_READY" = true || { echo 'Candidate promotion is locked; review and replace the candidate constants first.'; exit 1; }
+          test "$GITHUB_REPOSITORY" = "$REPOSITORY"
+          test "$GITHUB_REF" = "refs/heads/$TARGET_BRANCH"
+          test "$GITHUB_SHA" = "$EXPECTED_HEAD"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXPECTED_HEAD }}
+          sparse-checkout: |
+            shoe-workshop/r13
+            shoe-workshop/r12
+            shoe-workshop/r10
+            shoe-workshop/r09/src
+            shoe-workshop/r07/src
+            shoe-workshop/r05/src
+            shoe-workshop/r04/src
+            shoe-workshop/r04/vendor
+            .github/workflows/shoe-r13-verify.yml
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ env.CANDIDATE_ARTIFACT_ID }}
+          run-id: ${{ env.CANDIDATE_RUN_ID }}
+          repository: ${{ env.REPOSITORY }}
+          github-token: ${{ github.token }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/r13-candidate
+      - name: Validate immutable evidence and copy data only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_DIR: ${{ runner.temp }}/r13-candidate
+        run: |
+          python -I - <<'PY'
+          import hashlib, json, os, pathlib, re, shutil, urllib.request
+          e = os.environ
+          repo = pathlib.Path(e['GITHUB_WORKSPACE']).resolve()
+          candidate = pathlib.Path(e['CANDIDATE_DIR']).resolve()
+          module = repo / e['MODULE']
+          source = e['SOURCE_COMMIT']
+          runtime_hash = e['EXPECTED_RUNTIME_SHA256']
+          runtime_bytes = int(e['EXPECTED_RUNTIME_BYTES'])
+          def require(ok, message):
+              if not ok: raise SystemExit(message)
+          def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+          def file(root, relative):
+              p = pathlib.PurePosixPath(relative)
+              require(not p.is_absolute() and '..' not in p.parts and p.as_posix() == relative, 'Unsafe path: ' + relative)
+              target = root.joinpath(*p.parts)
+              require(target.resolve().is_relative_to(root) and target.is_file(), 'Missing or escaped file: ' + relative)
+              require(not any(root.joinpath(*p.parts[:i]).is_symlink() for i in range(1, len(p.parts) + 1)), 'Symlink: ' + relative)
+              return target
+          def api(suffix):
+              request = urllib.request.Request('https://api.github.com/repos/' + e['REPOSITORY'] + suffix,
+                  headers={'Authorization': 'Bearer ' + e['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+              with urllib.request.urlopen(request, timeout=45) as response: return json.load(response)
+          for key in ('SOURCE_COMMIT', 'BASE_COMMIT', 'EXPECTED_HEAD'):
+              require(re.fullmatch(r'[a-f0-9]{40}', e[key]), 'Invalid commit lock: ' + key)
+          for key in [k for k in e if k.startswith('EXPECTED_') and k.endswith('_SHA256')]:
+              require(re.fullmatch(r'[a-f0-9]{64}', e[key]), 'Invalid hash lock: ' + key)
+          require(e['VISUAL_HUMAN_REVIEW'] == 'false', 'AI publication cannot grant human review')
+          require(re.fullmatch(r'sha256:[a-f0-9]{64}', e['CANDIDATE_ARTIFACT_DIGEST']), 'Invalid artifact digest')
+          run = api('/actions/runs/' + e['CANDIDATE_RUN_ID'])
+          require(run['status'] == 'completed' and run['conclusion'] == 'success', 'Candidate CI did not pass')
+          require(run['event'] == 'push' and run['head_sha'] == source and run['head_branch'] == e['TARGET_BRANCH'], 'Wrong candidate source or branch')
+          require(run['path'] == e['VERIFY_WORKFLOW'] and run['head_repository']['full_name'] == e['REPOSITORY'], 'Wrong candidate workflow or repository')
+          artifact = api('/actions/artifacts/' + e['CANDIDATE_ARTIFACT_ID'])
+          require(str(artifact['id']) == e['CANDIDATE_ARTIFACT_ID'] and artifact['name'] == e['CANDIDATE_ARTIFACT_NAME'], 'Wrong candidate artifact')
+          require(not artifact['expired'] and artifact['digest'] == e['CANDIDATE_ARTIFACT_DIGEST'], 'Expired or changed candidate artifact')
+          require(str(artifact['workflow_run']['id']) == e['CANDIDATE_RUN_ID'] and artifact['workflow_run']['head_sha'] == source, 'Artifact is from another run/source')
+          comparison = api('/compare/' + source + '...' + e['EXPECTED_HEAD'])
+          require(comparison['status'] in ('ahead', 'identical') and comparison['merge_base_commit']['sha'] == source, 'Expected head is not a descendant of candidate source')
+          manifest_file = file(candidate, 'BUILD_MANIFEST.json')
+          geometry_file = file(candidate, 'evidence/GEOMETRY.json')
+          material_file = file(candidate, 'evidence/MATERIAL_COORDINATES.json')
+          qa_file = file(candidate, 'evidence/browser/QA.json')
+          for path, key in ((manifest_file, 'EXPECTED_MANIFEST_SHA256'), (geometry_file, 'EXPECTED_GEOMETRY_SHA256'), (material_file, 'EXPECTED_MATERIAL_QA_SHA256'), (qa_file, 'EXPECTED_QA_SHA256')):
+              require(sha(path) == e[key], 'Evidence hash mismatch: ' + path.name)
+          manifest, geometry, material, qa = [json.loads(p.read_text()) for p in (manifest_file, geometry_file, material_file, qa_file)]
+          require(all(d['sourceCommit'] == source for d in (manifest, geometry, material, qa)), 'Manifest, geometry and browser source disagree')
+          require(manifest['version'] == qa['version'] == 'R13.0' and manifest['styles'] == ['penny', 'chelsea', 'monk', 'canvas'], 'Wrong version or style set')
+          require(manifest['baseCommit'] == geometry['baseline'] == e['BASE_COMMIT'], 'Wrong retained baseline')
+          runtime = file(candidate, 'public-lite.html')
+          require(runtime.stat().st_size == manifest['runtime']['bytes'] == runtime_bytes, 'Runtime byte count mismatch')
+          require(sha(runtime) == manifest['runtime']['sha256'] == runtime_hash, 'Runtime hash mismatch')
+          require(geometry['suite'] == 'SHOE-R13-INDEPENDENT-GEOMETRY' and geometry['taskId'] == 'SHOE-R13-SEAM-SHAPE-REVIEW-20261017', 'Wrong geometry suite')
+          require(geometry['success'] is True and geometry['failed'] == 0 and geometry['failures'] == [], 'Geometry failed')
+          require(geometry['passed'] == int(e['EXPECTED_GEOMETRY_CHECKS']) and geometry['validatedParameterCases'] >= 100, 'Geometry coverage changed')
+          require(len(geometry['measuredResponses']) == 4 and len(geometry['preservation']) == 3 and all(x['passed'] is True for x in geometry['measuredResponses'] + geometry['preservation']), 'Parameter or preservation check failed')
+          require(material['suite'] == 'R13-INDEPENDENT-FINAL-MATERIAL-COORDINATES-DIAGNOSTIC' and material['taskId'] == geometry['taskId'], 'Wrong material diagnostic')
+          require(material['success'] is True and material['numericIssues'] == [] and material['measuredPanels'] == len(material['results']) == 66, 'Material diagnostic failed or coverage changed')
+          require({x['preset'] for x in material['results']} == {'default', 'all-low', 'all-high'} and {x['style'] for x in material['results']} == set(manifest['styles']), 'Material parameter/style coverage changed')
+          require(all(x['sourceGeometryIdentical'] is True for x in material['results']), 'Material comparison changed geometry')
+          require(all(material['scope'][k] is True for k in ('sameSurfaceSeedComparison', 'finalFloat32Triangles', 'independentJacobianImplementation')), 'Material audit is not independent final geometry')
+          require(all(material['scope'][k] is True for k in ('producerSnapshotsCapturedBeforeSeedBuild', 'producerStatisticsCheckedUnchanged', 'comparedPartIdentityRecorded')), 'Material audit lacks per-panel immutable producer evidence')
+          require(material['acceptanceCriteria']['maximumProducerReportRelativeDifference'] == .01, 'Material statistics tolerance changed')
+          for record in material['results']:
+              identity = {'preset': record['preset'], 'style': record['style'], 'partId': record['part']}
+              snapshot = record['producerSnapshot']
+              require(snapshot['identity'] == identity and snapshot['capturedBeforeSeedBuild'] is True and snapshot['rawStatisticsUnchanged'] is True, 'Material producer snapshot has wrong identity or changed data')
+              require(re.fullmatch(r'[a-f0-9]{64}', snapshot['sha256']), 'Invalid material producer snapshot digest')
+              for phase in ('before', 'after'):
+                  comparison_record = record['reportComparison'][phase]
+                  expected_identity = dict(identity, phase=phase, snapshotSha256=snapshot['sha256'])
+                  require(comparison_record['identity'] == expected_identity and comparison_record['present'] is True and comparison_record['invalidCountsAgree'] is True, 'Material comparison has wrong producer identity')
+                  require(comparison_record['maximumRelativeDifference'] <= .01 and comparison_record['maximumDifference']['relativeDifference'] <= .01, 'Material producer statistics differ from final triangles')
+          require(all(material['scope'][k] is False for k in ('productionFilesChanged', 'humanApproval', 'userApproval', 'physicalSolver', 'wearerFit', 'manufacturing')), 'Material diagnostic claims unsupported acceptance')
+          require(material['testSha256'] == e['EXPECTED_MATERIAL_TEST_SHA256'], 'Material diagnostic script differs')
+          require({x['path'] for x in material['sourceHashes']} == {'src/' + x + '.mjs' for x in ('kernel', 'model', 'penny-chelsea', 'monk-canvas', 'soles', 'surface-coordinates')} and len(material['sourceHashes']) == 6, 'Material source inventory changed')
+          for record in material['sourceHashes']:
+              require(sha(file(module, record['path'])) == record['sha256'], 'Current material diagnostic source differs: ' + record['path'])
+          require(qa['completed'] is True and qa['phase'] == 'complete' and not qa.get('failure'), 'Browser suite incomplete')
+          require(qa['buildSha'] is None and qa['url'].startswith('file:///'), 'Candidate must come from actual file URL testing')
+          require(all(qa[k] == [] for k in ('errors', 'consoleErrors', 'requestFailures', 'networkRequests')), 'Candidate browser or offline failure')
+          require(qa['final']['source'] == source and qa['final']['stats']['errors'] == [], 'Runtime source or runtime errors mismatch')
+          checks = qa['checks']
+          require(len(checks) == len({x['name'] for x in checks}) == int(e['EXPECTED_BROWSER_CHECKS']) and all(x['passed'] is True for x in checks), 'Browser checks did not all pass')
+          require(qa['visualHumanReview'] is False and qa['manufacturingValidated'] is False, 'CI cannot claim human or manufacturing acceptance')
+          # BUILD_MANIFEST paths are repository-root paths. GEOMETRY paths are R13-relative.
+          sources = manifest['sources']
+          require(len(sources) > 0 and len({x['path'] for x in sources}) == len(sources), 'Empty or duplicate source inventory')
+          for record in sources:
+              require(record['path'].startswith('shoe-workshop/'), 'Unexpected source path')
+              require(sha(file(repo, record['path'])) == record['sha256'], 'Current source differs: ' + record['path'])
+          for record in geometry['testedSourceFiles']:
+              require(sha(file(module, record['path'])) == record['sha256'], 'Current tested source differs: ' + record['path'])
+          for relative, key in ((e['MODULE'] + '/tests/browser.mjs', 'EXPECTED_BROWSER_TEST_SHA256'), (e['MODULE'] + '/tests/geometry.mjs', 'EXPECTED_GEOMETRY_TEST_SHA256'), (e['MODULE'] + '/tests/material-coordinates-audit.mjs', 'EXPECTED_MATERIAL_TEST_SHA256'), (e['VERIFY_WORKFLOW'], 'EXPECTED_VERIFY_WORKFLOW_SHA256')):
+              require(sha(file(repo, relative)) == e[key], 'Current test/workflow differs: ' + relative)
+          retained_fixture = json.loads(file(module, 'tests/fixtures/r12-baseline.json').read_text())
+          require(retained_fixture['baseCommit'] == e['BASE_COMMIT'] and len(retained_fixture['files']) == 27, 'Wrong retained R12 inventory')
+          require(len({x['path'] for x in retained_fixture['files']}) == 27, 'Duplicate retained R12 paths')
+          for record in retained_fixture['files']:
+              require(sha(file(repo / 'shoe-workshop/r12', record['path'])) == record['sha256'], 'Current R12 file differs: ' + record['path'])
+          legacy = manifest['legacy']
+          require(legacy['preserved'] is True and legacy['path'] == 'shoe-workshop/r10/public-lite.html', 'Original R10 was not retained')
+          original = file(repo, legacy['path'])
+          require(original.stat().st_size == legacy['bytes'] and sha(original) == legacy['sha256'], 'Original R10 runtime changed')
+          copies = {'public-lite.html': runtime, 'BUILD_MANIFEST.json': manifest_file, 'evidence/GEOMETRY.json': geometry_file, 'evidence/MATERIAL_COORDINATES.json': material_file, 'evidence/browser/QA.json': qa_file}
+          screens = qa['screens']
+          require(len(screens) == len({x['name'] for x in screens}) == int(e['EXPECTED_SCREENS']), 'Screenshot coverage changed')
+          for screen in screens:
+              require(re.fullmatch(r'[a-z0-9-]+', screen['name']), 'Unsafe screenshot name')
+              relative = 'evidence/browser/' + screen['name'] + '.png'
+              path = file(candidate, relative)
+              require(sha(path) == screen['sha256'] and path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'), 'Screenshot hash/type mismatch: ' + relative)
+              copies[relative] = path
+          before_file = file(candidate, 'evidence/before/QA.json')
+          require(sha(before_file) == e['EXPECTED_BEFORE_QA_SHA256'], 'R12 before evidence changed')
+          before = json.loads(before_file.read_text())
+          require(before['sourceCommit'] == '7fd5527f475908d615db4f1fd36357f47e68ce46' and before['buildSha'] == 'd27ef0f200257741fa67f1c6291418cf771443e9', 'Wrong R12 before version')
+          require(before['runtimeSha256'] == 'aaba719b65cbd4e53c19ffa74de335d90c81a8974ada4afa6460ada0a9d40a61' and before['sameCameraMatrices'] is True and before['errors'] == [], 'Unverified before runtime or cameras')
+          comparison = qa['beforeComparison']
+          require(comparison['path'] == 'evidence/before/QA.json' and comparison['sameCameraMatrices'] is True and comparison['screens'] == int(e['EXPECTED_BEFORE_SCREENS']) and comparison['sourceCommit'] == before['sourceCommit'] and comparison['buildSha'] == before['buildSha'], 'Candidate lacks paired views')
+          require(len(before['screens']) == len({x['name'] for x in before['screens']}) == int(e['EXPECTED_BEFORE_SCREENS']), 'Before screenshot coverage changed')
+          require({x['name'] for x in before['screens']} == {style + '-' + view for style in manifest['styles'] for view in ('back', 'join')}, 'Wrong before views')
+          copies['evidence/before/QA.json'] = before_file
+          for screen in before['screens']:
+              require(re.fullmatch(r'[a-z0-9-]+', screen['name']), 'Unsafe before screenshot name')
+              relative = 'evidence/before/' + screen['name'] + '.png'
+              path = file(candidate, relative)
+              require(sha(path) == screen['sha256'] and path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'), 'Before screenshot hash/type mismatch')
+              copies[relative] = path
+          review_file = file(module, 'VISUAL_REVIEW.json')
+          require(sha(review_file) == e['EXPECTED_REVIEW_SHA256'], 'Independent review lock changed')
+          review = json.loads(review_file.read_text())
+          require(review['version'] == 'R13.0' and review['sourceCommit'] == source and review['status'] == 'ACCEPTED_SOURCE_CANDIDATE', 'Candidate not independently accepted')
+          require(review['independentReviewer'] == 'footwear_science' and review['reviewerEditedProduction'] is False, 'Review is not independent from production')
+          require(review['humanApproval'] is False and review['userApproval'] is False, 'AI review cannot grant human approval')
+          reviewed = review['candidate']
+          require(str(reviewed['runId']) == e['CANDIDATE_RUN_ID'] and str(reviewed['artifactId']) == e['CANDIDATE_ARTIFACT_ID'] and reviewed['artifactDigest'] == e['CANDIDATE_ARTIFACT_DIGEST'], 'Review describes another artifact')
+          require(reviewed['manifestSha256'] == e['EXPECTED_MANIFEST_SHA256'] and reviewed['runtimeSha256'] == runtime_hash and reviewed['geometrySha256'] == e['EXPECTED_GEOMETRY_SHA256'] and reviewed['materialQaSha256'] == e['EXPECTED_MATERIAL_QA_SHA256'] and reviewed['qaSha256'] == e['EXPECTED_QA_SHA256'] and reviewed['beforeQaSha256'] == e['EXPECTED_BEFORE_QA_SHA256'], 'Review evidence binding differs')
+          # Drop earlier publication receipts: a new candidate is not yet publicly verified.
+          for relative in ('evidence/browser', 'evidence/before', 'evidence/public'):
+              target = module / relative
+              require(not target.is_symlink() and not target.parent.is_symlink(), 'Unsafe evidence destination')
+              if target.exists(): shutil.rmtree(target)
+          for relative in ('PUBLIC_URL.txt', 'RELEASE_RECEIPT.json'):
+              target = module / relative
+              require(not target.is_symlink(), 'Unsafe receipt destination')
+              if target.exists(): target.unlink()
+          for relative, path in copies.items():
+              target = module / relative
+              require(not target.is_symlink(), 'Unsafe output destination')
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(path, target)
+          receipt = {'version': 'R13.0', 'status': 'CANDIDATE_PROMOTED_PUBLIC_PENDING', 'sourceCommit': source,
+              'expectedParent': e['EXPECTED_HEAD'], 'candidateRunId': int(e['CANDIDATE_RUN_ID']),
+              'candidateArtifactId': artifact['id'], 'candidateArtifactDigest': artifact['digest'],
+              'runtime': manifest['runtime'], 'materialCoordinatesQaSha256': e['EXPECTED_MATERIAL_QA_SHA256'], 'materialCoordinatesPanels': 66, 'sourceReviewSha256': e['EXPECTED_REVIEW_SHA256'], 'sourceReviewStatus': 'ACCEPTED_SOURCE_CANDIDATE', 'independentSourceReviewer': 'footwear_science', 'beforeQAHash': e['EXPECTED_BEFORE_QA_SHA256'], 'beforeScreenshotsVerified': int(e['EXPECTED_BEFORE_SCREENS']), 'projectCodeExecutedInWriteJob': False, 'publicVerified': False,
+              'visualHumanReview': False, 'manufacturingValidated': False}
+          require(not (module / 'PROMOTION_RECEIPT.json').is_symlink(), 'Unsafe promotion receipt destination')
+          (module / 'PROMOTION_RECEIPT.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          print('Validated locked candidate, current sources, all geometry/browser checks and every screenshot; copied data only.')
+          PY
+      - name: Commit only verified artifacts with an expected-head fast-forward guard
+        id: commit
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          test "$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | cut -f1)" = "$EXPECTED_HEAD"
+          git config core.hooksPath /dev/null
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$MODULE"
+          while IFS= read -r -d '' path; do
+            case "$path" in
+              "$MODULE/public-lite.html"|"$MODULE/BUILD_MANIFEST.json"|"$MODULE/PROMOTION_RECEIPT.json"|"$MODULE/RELEASE_RECEIPT.json"|"$MODULE/PUBLIC_URL.txt"|"$MODULE/evidence/GEOMETRY.json"|"$MODULE/evidence/MATERIAL_COORDINATES.json"|"$MODULE/evidence/browser/QA.json"|"$MODULE/evidence/browser/"*.png|"$MODULE/evidence/before/QA.json"|"$MODULE/evidence/before/"*.png|"$MODULE/evidence/public/QA.json"|"$MODULE/evidence/public/"*.png) ;;
+              *) echo "Refusing unexpected staged path: $path"; exit 1 ;;
+            esac
+          done < <(git diff --cached --name-only -z)
+          git diff --cached --quiet && { echo 'No new promotion delta'; exit 1; }
+          git commit -m 'Publish reviewed R13 standalone candidate and bound evidence'
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+          echo "build=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  public_browser:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    permissions:
+      contents: read
+    outputs:
+      artifact_id: ${{ steps.evidence.outputs.artifact-id }}
+      artifact_digest: ${{ steps.evidence.outputs.artifact-digest }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      browser_attempt: ${{ steps.identity.outputs.browser_attempt }}
+    steps:
+      - name: Bind evidence identity to the browser job attempt
+        id: identity
+        run: |
+          echo "artifact_name=$PUBLIC_ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
+          echo "browser_attempt=$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.publish.outputs.build }}
+          sparse-checkout: shoe-workshop/r13
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: shoe-workshop/r13/package-lock.json
+      - name: Install the checked dependency lock
+        working-directory: shoe-workshop/r13
+        run: npm ci --ignore-scripts
+      - name: Chromium render environment
+        working-directory: shoe-workshop/r13
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get install --yes fonts-noto-cjk
+      - name: Test exact public bytes and live public controls
+        working-directory: shoe-workshop/r13
+        env:
+          PUBLIC_BUILD_SHA: ${{ needs.publish.outputs.build }}
+        run: node tests/browser.mjs --public
+      - name: Preserve public browser evidence
+        id: evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PUBLIC_ARTIFACT_NAME }}
+          path: shoe-workshop/r13/evidence/public/
+          if-no-files-found: error
+          retention-days: 14
+
+  receipt:
+    needs: [publish, public_browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.publish.outputs.build }}
+          sparse-checkout: shoe-workshop/r13
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.public_browser.outputs.artifact_id }}
+          run-id: ${{ github.run_id }}
+          repository: ${{ env.REPOSITORY }}
+          github-token: ${{ github.token }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/r13-public
+      - name: Validate public evidence and write the URL receipt without project execution
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLIC_BUILD_SHA: ${{ needs.publish.outputs.build }}
+          PUBLIC_ARTIFACT_ID: ${{ needs.public_browser.outputs.artifact_id }}
+          PUBLIC_ARTIFACT_DIGEST: ${{ needs.public_browser.outputs.artifact_digest }}
+          PUBLIC_ARTIFACT_NAME: ${{ needs.public_browser.outputs.artifact_name }}
+          PUBLIC_BROWSER_ATTEMPT: ${{ needs.public_browser.outputs.browser_attempt }}
+          PUBLIC_EVIDENCE_DIR: ${{ runner.temp }}/r13-public
+        run: |
+          python -I - <<'PY'
+          import hashlib, json, os, pathlib, re, shutil, urllib.request
+          e = os.environ
+          module = pathlib.Path(e['GITHUB_WORKSPACE']).resolve() / e['MODULE']
+          evidence = pathlib.Path(e['PUBLIC_EVIDENCE_DIR']).resolve()
+          def require(ok, message):
+              if not ok: raise SystemExit(message)
+          def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+          def file(root, relative):
+              p = pathlib.PurePosixPath(relative)
+              require(not p.is_absolute() and '..' not in p.parts and p.as_posix() == relative, 'Unsafe evidence path')
+              target = root.joinpath(*p.parts)
+              require(target.resolve().is_relative_to(root) and target.is_file(), 'Missing or escaped evidence')
+              require(not any(root.joinpath(*p.parts[:i]).is_symlink() for i in range(1, len(p.parts) + 1)), 'Symlink evidence')
+              return target
+          require(re.fullmatch(r'[a-f0-9]{40}', e['PUBLIC_BUILD_SHA']), 'Invalid public build commit')
+          request = urllib.request.Request('https://api.github.com/repos/' + e['REPOSITORY'] + '/actions/artifacts/' + e['PUBLIC_ARTIFACT_ID'],
+              headers={'Authorization': 'Bearer ' + e['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+          with urllib.request.urlopen(request, timeout=45) as response: artifact = json.load(response)
+          digest = 'sha256:' + e['PUBLIC_ARTIFACT_DIGEST'].removeprefix('sha256:')
+          require(re.fullmatch(r'sha256:[a-f0-9]{64}', digest), 'Invalid public artifact digest')
+          require(str(artifact['id']) == e['PUBLIC_ARTIFACT_ID'] and artifact['name'] == e['PUBLIC_ARTIFACT_NAME'], 'Wrong public artifact')
+          require(not artifact['expired'] and artifact['digest'] == digest, 'Expired or changed public artifact')
+          require(str(artifact['workflow_run']['id']) == e['GITHUB_RUN_ID'] and artifact['workflow_run']['head_sha'] == e['EXPECTED_HEAD'], 'Public artifact is from another workflow run')
+          manifest_file = file(module, 'BUILD_MANIFEST.json')
+          candidate_qa_file = file(module, 'evidence/browser/QA.json')
+          require(sha(manifest_file) == e['EXPECTED_MANIFEST_SHA256'] and sha(candidate_qa_file) == e['EXPECTED_QA_SHA256'], 'Promoted evidence changed')
+          require(sha(file(module, 'evidence/MATERIAL_COORDINATES.json')) == e['EXPECTED_MATERIAL_QA_SHA256'], 'Promoted material diagnostic changed')
+          manifest = json.loads(manifest_file.read_text())
+          candidate_qa = json.loads(candidate_qa_file.read_text())
+          qa_file = file(evidence, 'QA.json')
+          qa = json.loads(qa_file.read_text())
+          require(qa['version'] == manifest['version'] == 'R13.0', 'Wrong public version')
+          require(qa['sourceCommit'] == manifest['sourceCommit'] == e['SOURCE_COMMIT'] and qa['buildSha'] == e['PUBLIC_BUILD_SHA'], 'Public source/build mismatch')
+          require(qa['completed'] is True and qa['phase'] == 'complete' and not qa.get('failure'), 'Public browser incomplete')
+          require(all(qa[k] == [] for k in ('errors', 'consoleErrors', 'requestFailures')), 'Public browser errors')
+          require(qa['final']['source'] == e['SOURCE_COMMIT'] and qa['final']['stats']['errors'] == [], 'Public runtime mismatch or errors')
+          require(qa['visualHumanReview'] is False and qa['manufacturingValidated'] is False, 'Machine QA cannot grant human or manufacturing acceptance')
+          checks = qa['checks']
+          require(len(checks) == len({x['name'] for x in checks}) == int(e['EXPECTED_BROWSER_CHECKS']) and all(x['passed'] is True for x in checks), 'Public checks did not all pass')
+          require({x['name'] for x in checks} == {x['name'] for x in candidate_qa['checks']}, 'Public test coverage differs from reviewed candidate')
+          raw = 'https://raw.githubusercontent.com/' + e['REPOSITORY'] + '/' + e['PUBLIC_BUILD_SHA'] + '/' + e['MODULE'] + '/public-lite.html'
+          url = 'https://htmlpreview.github.io/?' + raw
+          require(qa['url'] == url and qa['publicBytes']['raw'] == raw and qa['publicBytes']['matchesBuild'] is True, 'Public URL was not verified')
+          runtime = file(module, 'public-lite.html')
+          require(qa['publicBytes']['sha256'] == manifest['runtime']['sha256'] == e['EXPECTED_RUNTIME_SHA256'] == sha(runtime), 'Public bytes hash differs')
+          require(qa['publicBytes']['bytes'] == manifest['runtime']['bytes'] == int(e['EXPECTED_RUNTIME_BYTES']) == runtime.stat().st_size, 'Public byte count differs')
+          screens = qa['screens']
+          require(len(screens) == len({x['name'] for x in screens}) == int(e['EXPECTED_SCREENS']), 'Public screenshot coverage changed')
+          require({x['name'] for x in screens} == {x['name'] for x in candidate_qa['screens']}, 'Public views differ from reviewed candidate')
+          copies = {'QA.json': qa_file}
+          for screen in screens:
+              require(re.fullmatch(r'[a-z0-9-]+', screen['name']), 'Unsafe public screenshot name')
+              relative = screen['name'] + '.png'
+              path = file(evidence, relative)
+              require(sha(path) == screen['sha256'] and path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'), 'Public screenshot hash/type mismatch: ' + relative)
+              copies[relative] = path
+          destination = module / 'evidence/public'
+          require(not destination.is_symlink() and not destination.parent.is_symlink(), 'Unsafe public evidence destination')
+          if destination.exists(): shutil.rmtree(destination)
+          destination.mkdir(parents=True)
+          for relative, path in copies.items(): shutil.copyfile(path, destination / relative)
+          receipt = {'version': 'R13.0', 'status': 'PUBLIC_VERIFIED_ACCEPTANCE_CANDIDATE', 'sourceCommit': e['SOURCE_COMMIT'],
+              'buildSha': e['PUBLIC_BUILD_SHA'], 'publicUrl': url, 'rawUrl': raw, 'runtime': manifest['runtime'],
+              'candidateRunId': int(e['CANDIDATE_RUN_ID']), 'candidateArtifactId': int(e['CANDIDATE_ARTIFACT_ID']),
+              'candidateArtifactDigest': e['CANDIDATE_ARTIFACT_DIGEST'], 'publicRunId': int(e['GITHUB_RUN_ID']),
+              'publicRunAttempt': int(e['PUBLIC_BROWSER_ATTEMPT']), 'publicArtifactId': artifact['id'], 'publicArtifactDigest': digest,
+              'publicQAHash': sha(qa_file), 'publicVerified': True, 'browserChecksPassed': len(checks),
+              'screenshotsVerified': len(screens), 'materialCoordinatesQaSha256': e['EXPECTED_MATERIAL_QA_SHA256'], 'materialCoordinatesPanels': 66, 'sourceReviewSha256': e['EXPECTED_REVIEW_SHA256'], 'sourceReviewStatus': 'ACCEPTED_SOURCE_CANDIDATE', 'independentSourceReviewer': 'footwear_science', 'beforeQAHash': e['EXPECTED_BEFORE_QA_SHA256'], 'beforeScreenshotsVerified': int(e['EXPECTED_BEFORE_SCREENS']), 'environment': qa['environment'], 'projectCodeExecutedInWriteJob': False,
+              'visualHumanReview': False, 'userVisualApproval': False,
+              'manufacturingValidated': False, 'physicalSolver': False, 'wearerFit': False}
+          for name, text in (('PUBLIC_URL.txt', url + '\n'), ('RELEASE_RECEIPT.json', json.dumps(receipt, indent=2) + '\n')):
+              require(not (module / name).is_symlink(), 'Unsafe release destination')
+              (module / name).write_text(text)
+          print('Verified public immutable bytes, live browser checks and all screenshot hashes; human review is separately recorded.')
+          PY
+      - name: Commit public data with a build-head fast-forward guard
+        env:
+          PUBLIC_BUILD_SHA: ${{ needs.publish.outputs.build }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$PUBLIC_BUILD_SHA"
+          test "$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | cut -f1)" = "$PUBLIC_BUILD_SHA"
+          git config core.hooksPath /dev/null
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$MODULE/evidence/public" "$MODULE/PUBLIC_URL.txt" "$MODULE/RELEASE_RECEIPT.json"
+          while IFS= read -r -d '' path; do
+            case "$path" in
+              "$MODULE/PUBLIC_URL.txt"|"$MODULE/RELEASE_RECEIPT.json"|"$MODULE/evidence/public/QA.json"|"$MODULE/evidence/public/"*.png) ;;
+              *) echo "Refusing unexpected staged path: $path"; exit 1 ;;
+            esac
+          done < <(git diff --cached --name-only -z)
+          git diff --cached --quiet && { echo 'No new public receipt delta'; exit 1; }
+          git commit -m 'Record exact R13 public browser evidence and immutable URL'
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"

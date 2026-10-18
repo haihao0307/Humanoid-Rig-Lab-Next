@@ -4,7 +4,7 @@
   "dispatchDate": "2026-10-17",
   "timezone": "Asia/Shanghai",
   "target": "shoe-workshop/r13",
-  "status": "EXECUTE_PENDING_VERIFICATION",
+  "status": "SOURCE_ACCEPTED_PUBLIC_PENDING",
   "userRequest": "自己审核缝线、造型、布料拼接和整体形态，再进行下一轮调整",
   "baseSha": "fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d",
   "branch": "feature/shoe-r13-seam-shape-review-20261017",
@@ -60,7 +60,8 @@
       "https://www.satra.com/test_methods/detail.php?id=140",
       "https://us.crockettandjones.com/pages/in-the-making-closing",
       "https://www.crockettandjones.com/blogs/the-article/a-guide-to-loafers",
-      "https://www.cs.jhu.edu/~misha/Fall09/Levy02.pdf"
+      "https://www.cs.jhu.edu/~misha/Fall09/Levy02.pdf",
+      "https://cs.harvard.edu/~sjg/papers/arap.pdf"
     ],
     "noChineseWebsitesUsed": true,
     "commercialDimensionsMeasured": false
@@ -83,35 +84,39 @@
   "acceptanceGates": [
     {
       "id": "contract",
-      "status": "PENDING"
+      "status": "PASSED_SOURCE_SCOPE"
     },
     {
       "id": "freshness",
-      "status": "PENDING"
+      "status": "PASSED_SOURCE_SCOPE"
     },
     {
       "id": "geometry",
-      "status": "PENDING"
+      "status": "PASSED_SOURCE_SCOPE"
     },
     {
       "id": "seam_support",
-      "status": "PENDING"
+      "status": "PASSED_SOURCE_SCOPE"
+    },
+    {
+      "id": "material_coordinates",
+      "status": "PASSED_SOURCE_SCOPE"
     },
     {
       "id": "reference_fidelity",
-      "status": "PENDING"
+      "status": "PASSED_AUTHORIZED_ARCHETYPE_REFINEMENT_SCOPE"
     },
     {
       "id": "interaction",
-      "status": "PENDING"
+      "status": "PASSED_SOURCE_SCOPE"
     },
     {
       "id": "machine",
-      "status": "PENDING"
+      "status": "PASSED_SOURCE_SCOPE"
     },
     {
       "id": "independent_review",
-      "status": "PENDING"
+      "status": "PASSED_INDEPENDENT_AI"
     },
     {
       "id": "public_delivery",
@@ -121,15 +126,15 @@
   "agentsChecklist": [
     {
       "text": "没有用生成图片代替真实三维实现",
-      "status": "PENDING_FINAL_VERIFICATION"
+      "status": "VERIFIED_SOURCE_SCOPE"
     },
     {
       "text": "已实际修改生产源码",
-      "status": "PENDING_FINAL_VERIFICATION"
+      "status": "VERIFIED_SOURCE_SCOPE"
     },
     {
       "text": "用户看到的是可交互三维工作台",
-      "status": "PENDING_FINAL_VERIFICATION"
+      "status": "PENDING_PUBLIC_VERIFICATION"
     },
     {
       "text": "人物/动物几何、骨骼和动作来自真实运行时；本轮仅鞋几何，人体骨骼不适用",
@@ -137,15 +142,15 @@
     },
     {
       "text": "镜头、选择、动作或参数控制可以实际操作",
-      "status": "PENDING_FINAL_VERIFICATION"
+      "status": "VERIFIED_SOURCE_SCOPE"
     },
     {
       "text": "公网固定链接和真实浏览器已验证",
-      "status": "PENDING_FINAL_VERIFICATION"
+      "status": "PENDING_PUBLIC_VERIFICATION"
     },
     {
       "text": "如果只有截图而没有工作台，本轮判定失败",
-      "status": "PENDING_FINAL_VERIFICATION"
+      "status": "PENDING_PUBLIC_VERIFICATION"
     }
   ],
   "limitations": {
@@ -162,7 +167,51 @@
     "event": "Executor restored an earlier uncommitted workspace snapshot",
     "remoteBaselineUnchanged": true,
     "patchesReplayed": true,
-    "acceptanceEvidenceRegenerated": false
+    "acceptanceEvidenceRegenerated": true
   },
-  "nextTaskPointer": "针对本Anchor的actual geometry和before/after近景完成独立验证，再发布绑定本轮源码的固定公网版本"
+  "nextTaskPointer": "提升已独立接受的同一CI构建，然后在固定公网地址复验；保持源码接受记录冻结，公网独立复核另存文件。",
+  "sourceCommit": "8b05ebd8b0755216743792034e3cbb58b8d9ff54",
+  "draftPullRequest": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/pull/89",
+  "verificationRun": "https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/39098015887",
+  "historicalCandidates": [
+    {
+      "sourceCommit": "961996dca84b110191405a1e5b840cec51de0a65",
+      "status": "REJECTED_REAR_COLLAR_GAPS",
+      "published": false,
+      "record": "evidence/iterations/961996dc-collar-gap.json"
+    },
+    {
+      "sourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+      "status": "STRUCTURE_AND_VISUAL_PASS_DIAGNOSTIC_TRACEABILITY_ENHANCEMENT_REQUIRED",
+      "published": false,
+      "record": "evidence/iterations/f854e267-visual-pass.json"
+    }
+  ],
+  "diagnosticAnomaly": {
+    "status": "ROOT_CAUSE_UNRESOLVED",
+    "scope": "One historical local producer-statistics comparison; final Float32 actual metrics matched independent CI",
+    "originalReport": "evidence/iterations/local-collars-uv-first-failure.json",
+    "originalReportSha256": "e7d46fda7ee3bc0de89ef57a3ee47569b0eac07b30e38d24dacc05230b503090",
+    "forensicReview": "evidence/iterations/UV_FORENSIC_REVIEW.json",
+    "diagnosticChange": "Deep-frozen raw statistics keyed by part identity, unchanged checks, explicit actual/claimed values and runtime version",
+    "productionAlgorithmChangedForAnomaly": false,
+    "thresholdsChanged": false,
+    "rootCauseClaimedSolved": false
+  },
+  "sourceEvidence": {
+    "runId": 39098015887,
+    "artifactId": 12125268687,
+    "artifactDigest": "sha256:a7e642a327057ee536abfa43c20de588c58300dbe380336ced1f126810faf23f",
+    "runtimeSha256": "7db6ec885c0d7d972b2fb0574039448d2115b98c6e8e428f297c7f989410535b",
+    "runtimeBytes": 13746414,
+    "geometryChecksPassed": 157,
+    "parameterCases": 100,
+    "materialPanels": 66,
+    "materialRawComparisonsRecomputed": 132,
+    "browserChecksPassed": 8,
+    "browserScreens": 39,
+    "beforeScreens": 8,
+    "sourceReview": "VISUAL_REVIEW.json",
+    "sourceReviewSha256": "f3650396a28dad389234069c97d1b1f5616eaa56fa15bf79890b6f610e63c294"
+  }
 }

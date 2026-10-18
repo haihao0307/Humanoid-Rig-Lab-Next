@@ -14,14 +14,19 @@
 
 ## 研究与验证记录
 
+- `RESEARCH.md`：制帮、缝合及曲面参数化的一手研究与实现边界。
 - `AUDIT.md`：原缺陷、实际测量、对应修正和一手研究依据。
 - `tests/fixtures/r12-regression-before.json`：同一新回归对旧版本的真实失败。
 - `tests/fixtures/r12-baseline.json`：27 个 R12 文件精确保留清单。
 - `evidence/GEOMETRY.json`：独立数值验收，包含旧行为回归和本轮实际支承/闭合检查。
+- `evidence/MATERIAL_COORDINATES.json`：66 个最终面片的独立材料坐标诊断，含位置不变核对、拉伸分位数与最坏三角形。
 - `evidence/browser`：本次构建真实 Chromium 渲染与控制操作；每款七个视角。
 - `evidence/before`：保持旧 R12 字节不变，以相同相机矩阵生成的后视和拼缝近景。
 - `VISUAL_REVIEW.json`：独立 AI 对本轮实际证据的审核；不代表人工或用户批准。
+- `evidence/iterations`：保留未发布的后口缺口候选，以及一次原因尚未查明的历史材料统计对照异常；最终诊断通过不抹去原始失败。
 - `BUILD_MANIFEST.json` / `PROMOTION_RECEIPT.json` / `RELEASE_RECEIPT.json`：源码、运行文件、流水线证据与固定公网地址的绑定。
+
+最终源码 `8b05ebd8b0755216743792034e3cbb58b8d9ff54` 的[专用 CI](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/39098015887)已完成 157 项几何检查、100 组参数检查、66 个实际面片的材料坐标检查，以及 8 组真实浏览器功能检查。材料诊断按裁片身份冻结原统计，保存原值、最大差字段和运行时版本，核对 seed 构建及测量期间没有改写。该数值验收不代替独立视觉审核或公网验收，后两者分别记录。
 
 ## 本地复现
 
@@ -29,6 +34,7 @@
 npm ci --ignore-scripts
 npm run build
 npm test
+node tests/material-coordinates-audit.mjs evidence/MATERIAL_COORDINATES.json
 npx playwright install --with-deps chromium
 node tests/browser.mjs
 ```
