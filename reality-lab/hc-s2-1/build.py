@@ -10,7 +10,8 @@ assert lock['version']==dictionary['version']=='0.2.0'
 assert lock['allowedDomains']==['human','footwear','pattern','garment','fabric']
 ids=[m['id'] for m in dictionary['measurements']];assert len(ids)==len(set(ids))
 assert all(m['domain'] in lock['allowedDomains'] for m in dictionary['measurements'])
-public_source='\n'.join((ROOT/n).read_text(errors='ignore') for n in source_files)
+public_inputs=['SCOPE_LOCK.json','measurement-dictionary.json','protocol.js','adapters.js','index.template.html','app.js','tests/protocol.cjs','tests/browser.py']
+public_source='\n'.join((ROOT/n).read_text(errors='ignore') for n in public_inputs)
 assert '#key=' not in json.dumps(dictionary)
 assert 'PRIVATE_ACCESS.json' not in public_source
 build={'version':'REALITY-HC-S2.1','contractVersion':'0.2.0','sourceCommit':source,'baseCommit':lock['baseCommit'],'sourceFiles':records,'scope':lock['allowedDomains'],'activeObjects':lock['activeObjects'],'registeredOnly':lock['registeredOnly'],'sourceWorkbenchesModified':False,'automaticRepair':False,'publicBrowserVerified':False}
