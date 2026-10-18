@@ -13,6 +13,7 @@ changed=False
 changed|=replace('app.js',"function select(id){const next=configs.find(x=>x.id===id);if(!next)throw Error('对象不在允许范围');selected=id;", "function select(id){const next=configs.find(x=>x.id===id);if(!next)throw Error('对象不在允许范围');if(frame&&(next.registeredOnly||frameGroup!==next.group))unload();selected=id;")
 changed|=replace('app.js',"frame=iframe;frameGroup=group;$('native-wrap').replaceChildren(iframe);$('native-caption').textContent='固定文件摘要已核对，正在初始化';", "frame=iframe;frameGroup=group;$('native-wrap').replaceChildren(iframe);$('unload').disabled=false;$('native-caption').textContent='固定文件摘要已核对，正在初始化';")
 changed|=replace('app.js',"select(selected);$('unload').disabled=false;status('共同协议、测量字典和适配器已就绪。请选择对象读取；布料与成衣保持登记状态。');", "select(selected);$('unload').disabled=true;status('共同协议、测量字典和适配器已就绪。请选择对象读取；布料与成衣保持登记状态。');")
-changed|=replace('build.py',"assert '#key=' not in json.dumps(dictionary) and 'Ko7gYO-' not in '\\n'.join((ROOT/n).read_text(errors='ignore') for n in source_files)", "public_source='\\n'.join((ROOT/n).read_text(errors='ignore') for n in source_files)\nassert '#key=' not in json.dumps(dictionary)\nassert 'PRIVATE_ACCESS.json' not in public_source")
 changed|=replace('tests/browser.py',"  check('public source has no access fragment', '#key=' not in page.content() and 'PRIVATE_ACCESS' not in page.content())", "  check('public startup contains no access credential',not s['keyPresent'] and page.locator('#access-key').input_value()=='' and 'PRIVATE_ACCESS.json' not in page.content())")
+build=(ROOT/'build.py').read_text()
+assert "public_inputs=" in build and "assert 'PRIVATE_ACCESS.json' not in public_source" in build,('build.py','privacy scan not finalized')
 print('PREPARED' if changed else 'ALREADY_PREPARED')
