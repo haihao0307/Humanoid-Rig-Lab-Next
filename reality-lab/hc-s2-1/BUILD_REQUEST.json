@@ -1,9 +1,9 @@
 {
   "task": "REALITY-HC-S2.1-20261018",
   "requestedAt": "2026-10-18",
-  "attempt": 6,
+  "attempt": 7,
   "base": "704e7d019ff97550f29181cf1f354016f1d344b4",
-  "reason": "The first pure protocol regression exposed that slash-form N/A was rejected instead of normalized to NOT_APPLICABLE. Status parsing now treats slash, whitespace and hyphen separators consistently; the regression remains required.",
+  "reason": "The exact public run showed the native R12 page visibly loaded, but the common observer read during the transient matrixWorldNeedsUpdate state. The adapter now waits for the original renderer to finish its own frame and retries observation; it still does not call matrix update, mutate the shoe, or relax any validation.",
   "mode": "build common contract, test live S1 human and footwear, publish immutable public core, keep S2 private data locked",
   "scope": ["human", "footwear", "pattern", "garment", "fabric"],
   "excluded": ["architecture", "aircraft", "terrain", "animals", "vegetation", "world"]
