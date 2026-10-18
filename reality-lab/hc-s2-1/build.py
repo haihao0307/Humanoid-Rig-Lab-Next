@@ -10,10 +10,13 @@ assert lock['version']==dictionary['version']=='0.2.0'
 assert lock['allowedDomains']==['human','footwear','pattern','garment','fabric']
 ids=[m['id'] for m in dictionary['measurements']];assert len(ids)==len(set(ids))
 assert all(m['domain'] in lock['allowedDomains'] for m in dictionary['measurements'])
-public_inputs=['SCOPE_LOCK.json','measurement-dictionary.json','protocol.js','adapters.js','index.template.html','app.js','tests/protocol.cjs','tests/browser.py']
-public_source='\n'.join((ROOT/n).read_text(errors='ignore') for n in public_inputs)
+runtime_inputs=['SCOPE_LOCK.json','measurement-dictionary.json','protocol.js','adapters.js','index.template.html','app.js']
+runtime_source='\n'.join((ROOT/n).read_text(errors='ignore') for n in runtime_inputs)
 assert '#key=' not in json.dumps(dictionary)
-assert 'PRIVATE_ACCESS.json' not in public_source
+assert 'PRIVATE_ACCESS.json' not in runtime_source
+# A complete access key is a 43-character base64url bearer token. Public runtime source must not contain one.
+credential_literals=re.findall(r'(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])',runtime_source)
+assert credential_literals==[],credential_literals
 build={'version':'REALITY-HC-S2.1','contractVersion':'0.2.0','sourceCommit':source,'baseCommit':lock['baseCommit'],'sourceFiles':records,'scope':lock['allowedDomains'],'activeObjects':lock['activeObjects'],'registeredOnly':lock['registeredOnly'],'sourceWorkbenchesModified':False,'automaticRepair':False,'publicBrowserVerified':False}
 js='const REALITY_DICTIONARY='+json.dumps(dictionary,ensure_ascii=False,separators=(',',':'))+';\nconst REALITY_BUILD='+json.dumps(build,ensure_ascii=False,separators=(',',':'))+';\n'+'\n'.join((ROOT/name).read_text() for name in ['protocol.js','adapters.js','app.js'])
 assert '</script' not in js.lower(),'Authored JavaScript unexpectedly contains a script terminator'
