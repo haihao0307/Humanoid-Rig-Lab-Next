@@ -1,0 +1,321 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>KAOPU 世界基准 · 人物与服装 S1</title><link rel="icon" href="data:,"><style>
+:root{color-scheme:dark;--bg:#10191d;--card:#19252b;--line:#314149;--ink:#ecf2f0;--muted:#a9bdc3;--accent:#91dfca;--warn:#edc780;--bad:#ef9999}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.65 system-ui,-apple-system,'Segoe UI',sans-serif}button,input,textarea,select{font:inherit}button,a,input,textarea,select{outline-offset:3px}button,select,input{color:var(--ink);background:#24343c;border:1px solid #405761;border-radius:7px}button{cursor:pointer;padding:8px 12px}button:hover{border-color:var(--accent)}button:disabled{opacity:.45;cursor:not-allowed}button.primary{background:var(--accent);color:#12372e;font-weight:700;border-color:var(--accent)}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}header{padding:22px 28px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:18px}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--accent)}h1{font-size:25px;font-weight:650;margin:3px 0}h2{font-size:18px;margin:0 0 8px}h3{font-size:14px;margin:0 0 6px}p{margin:6px 0}.muted,small{color:var(--muted)}.badge{border:1px solid #487d6e;background:#1b3b35;color:#b3f2df;border-radius:30px;padding:6px 12px;white-space:nowrap}.shell{display:grid;grid-template-columns:225px minmax(0,1fr);min-height:calc(100vh - 107px)}aside{padding:20px 14px;border-right:1px solid var(--line)}nav{display:grid;gap:10px;margin:16px 0}nav button{text-align:left;padding:13px;display:block;background:transparent;line-height:1.5}nav button.active{border-color:var(--accent);background:#203831}nav button b,nav button small{display:block}nav button small{font-size:11px;margin-top:5px}.small-note{padding:12px;background:#142f2b;border:1px solid #365a50;border-radius:8px;font-size:12px;margin-top:18px}main{padding:22px;min-width:0}.topline{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.columns{display:grid;grid-template-columns:minmax(0,1fr) 315px;gap:16px}.card{border:1px solid var(--line);border-radius:10px;background:var(--card);overflow:hidden}.pad{padding:18px}.scene{position:relative;background:#142026;min-height:410px}#calibration{display:block;width:100%;height:410px}.legend{position:absolute;top:15px;left:18px;pointer-events:none;background:#132229e8;border:1px solid #39515a;border-radius:7px;padding:10px 13px;max-width:80%;font-size:12px}.legend b{color:var(--accent)}.controls{padding:15px 18px;display:flex;flex-wrap:wrap;gap:15px;border-top:1px solid var(--line)}label{display:flex;align-items:center;gap:7px}input[type=number]{width:85px;padding:5px}input[type=range]{width:145px;accent-color:var(--accent)}.small{font-size:12px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#122026;border:1px solid #2a414a;border-radius:8px;text-align:center;padding:13px 6px}.stat strong{font-size:25px;display:block;color:var(--accent)}.stat.warn strong{color:var(--warn)}.stat.bad strong{color:var(--bad)}#rows{max-height:560px;overflow:auto;margin-top:15px}.row{border-top:1px solid var(--line);padding:10px 0;font-size:12px}.row-head{display:flex;gap:8px;align-items:baseline}.dot{width:6px;height:6px;background:var(--accent);border-radius:50%;flex-shrink:0}.row.unknown .dot{background:var(--warn)}.row.fail .dot{background:var(--bad)}.row code{font-size:10px;color:var(--muted);overflow-wrap:anywhere}.row p{color:#dae5e8;margin:4px 0}.detail{color:var(--muted);overflow-wrap:anywhere;font-size:11px}.status{background:#10272a;border-top:1px solid var(--line);padding:10px 16px;color:#b0ddda;font-size:12px;min-height:44px;overflow-wrap:anywhere}.status.error{color:var(--bad)}#native-panel{display:none}#native-container iframe{width:100%;height:810px;display:block;border:0;background:white}#native-container{min-height:100px}.bottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.facts{display:grid;grid-template-columns:100px 1fr;gap:8px;font-size:12px}.facts .value{overflow-wrap:anywhere}.facts .label{color:var(--muted)}textarea{width:100%;height:250px;resize:vertical;background:#0d171c;color:#d8e8e4;border:1px solid #3b5058;border-radius:8px;padding:12px;font-family:ui-monospace,monospace;font-size:11px;line-height:1.6}details{margin-top:16px}summary{cursor:pointer;color:var(--accent);padding:8px 0}.bounds{font:20px/1.5 ui-monospace,monospace;margin:10px 0;color:#d8eee7}.warning{color:var(--warn)}footer{padding:16px 22px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.sr-only{position:absolute;left:-10000px}.file-label{cursor:pointer;padding:8px 12px;background:#24343c;border:1px solid #405761;border-radius:7px}.file-label input{max-width:210px;font-size:11px}.source-version{font-family:ui-monospace,monospace;font-size:11px}.next{white-space:normal;color:#d1e6df}.line{height:1px;background:var(--line);margin:15px 0}.chip{display:inline-block;color:var(--warn);font-size:11px;border:1px solid #655941;padding:2px 7px;border-radius:4px}.back{padding:7px 12px;font-size:12px}#stage-name{font-size:12px;color:var(--accent)}.snapshot-note{font-size:12px;line-height:1.7;color:var(--muted);margin-top:8px}
+@media(max-width:1200px){.columns{grid-template-columns:minmax(0,1fr) 285px}.shell{grid-template-columns:195px 1fr}main{padding:16px}}@media(max-width:980px){.columns{grid-template-columns:1fr}.bottom{grid-template-columns:1fr}#rows{max-height:300px}.shell{grid-template-columns:175px 1fr}}@media(max-width:650px){header{padding:15px;align-items:flex-start;flex-direction:column;gap:8px}h1{font-size:22px}.shell{display:block}aside{padding:10px 14px;border-right:0;border-bottom:1px solid var(--line)}nav{display:flex;overflow:auto;margin:8px 0;gap:8px}nav button{min-width:155px;padding:9px}aside .small-note,aside>p{display:none}main{padding:12px}.topline{display:block}.scene{min-height:330px}#calibration{height:330px}.legend{font-size:11px}.controls{gap:12px}input[type=range]{width:120px}.bottom{gap:12px}#native-container iframe{height:900px}.file-label{max-width:100%;flex-wrap:wrap}footer{padding:14px}.facts{grid-template-columns:85px 1fr}.bounds{font-size:17px}}
+</style></head><body>
+<header><div><div class="eyebrow">KAOPU / REALITY FOUNDATION</div><h1>世界基准 · 人物与服装</h1><p class="muted">规则可执行，观测可追溯。先检查，不替你改坏原来的工作台。</p></div><span class="badge">S1 · 隔离只读试点</span></header>
+<div class="shell"><aside><b>对象范围</b><p class="muted small">只有你负责的这两个领域</p><nav id="catalog"></nav><div class="small-note"><b>保护边界</b><p>不接建筑、飞机或其他工作者板块。不改原人物、裁片、材质、灯光和物理解算。没有自动修复或生产合并按钮。</p></div><div class="small-note"><b>本次接入方式</b><p>独立公共核心 + 本页只读观察器。旧工作台文件未插入依赖；后续逐一接入，不全库替换。</p></div></aside>
+<main><div class="topline"><div><div id="stage-name">STEP 01 / DECLARE & OBSERVE</div><h2 id="entry-title"></h2><p class="muted small" id="entry-note"></p></div><span id="entry-status" class="chip"></span></div>
+<div class="toolbar"><button id="show-calibration">几何基准场</button><button id="load-native" class="primary">加载原生工作台</button><button id="observe" disabled>读取当前基准</button><button id="unload" disabled>关闭原台并释放</button><a id="original-link" class="back" target="_blank" rel="noopener noreferrer">独立打开原版 ↗</a></div>
+<div class="card" id="native-panel"><div class="pad small"><b>这是原版的独立运行副本，不是简化替身。</b> 本页副本的 localStorage / sessionStorage 仅存在于当前 iframe 内存；测试保存不覆盖原台缓存。基准读取不回写；永久配方仍请回原工作台保存。</div><div id="native-container"></div><div class="status" id="native-state">尚未加载。</div></div>
+<div class="columns" id="calibration-layout"><section class="card"><div class="scene"><canvas id="calibration" aria-label="可以拖动旋转的一米三维校准立方体"></canvas><div class="legend"><b>1 m × 1 m × 1 m</b><br>真实 WebGL 几何标尺 · 拖动旋转<br>这是校准器，不是人物或服装替身。</div></div><div class="controls"><label class="small">距离 <input id="distance" type="range" min="1.8" max="8" step=".1" value="3"><output id="distance-value">3.0 m</output></label><label class="small">垂直视场 <input id="fov" type="range" min="25" max="75" step="1" value="45"><output id="fov-value">45°</output></label></div><div class="pad"><h3>像素足迹计算</h3><div class="toolbar"><label class="small">细节宽度 <input id="feature" type="number" min="0.001" max="100" step=".01" value=".45">mm</label><label class="small">参考画布高 <input id="pixels" type="number" min="100" max="8192" step="1" value="1080">px</label></div><div id="footprint" class="bounds"></div><p class="muted small">独立计算器：垂直于视轴的样本平面。此处参考距离是样本视轴深度，不是自动量到原台材质的距离；不会放大牛仔纹理或改变着色器。</p></div><div class="status" id="app-status">正在初始化基准核心…</div></section>
+<section class="card pad"><h3>当前声明核验</h3><p class="small muted">缺失值保留“未确认”，不会凑出绿色通过。</p><div class="stats"><div class="stat"><strong id="pass">0</strong><small>已核对</small></div><div class="stat bad"><strong id="fail">0</strong><small>有冲突</small></div><div class="stat warn"><strong id="unknown">0</strong><small>未确认</small></div></div><div id="rows"></div></section></div>
+<div class="bottom"><section class="card pad"><h3>读到的是什么</h3><div id="measurement" class="bounds">尚未读取原生尺寸</div><p class="snapshot-note" id="measurement-note">登记一个网址，不等于已经测量这个对象。</p><div class="line"></div><div id="facts" class="facts"></div><div class="line"></div><h3>此对象的下一步</h3><p id="next" class="next small"></p><p class="warning small">通过声明检查 ≠ 视觉合格 ≠ 真实物性或制造认证。</p></section>
+<section class="card pad"><h3>单位检查 · 不猜，不重复缩放</h3><div class="toolbar"><input id="unit-value" type="number" value="250" aria-label="待换算长度"><select id="unit-from" aria-label="源单位"><option>mm</option><option>cm</option><option>m</option><option>in</option><option>ft</option></select><span>→</span><select id="unit-to" aria-label="目标单位"><option>m</option><option>mm</option><option>cm</option><option>in</option><option>ft</option></select></div><p id="unit-result" class="bounds"></p><p class="muted small">鞋台原始几何是 mm，进入场景后是 m。尺寸倍率、Tex 线密度、像素不是同一类量，禁止直接当毫米。</p><div class="line"></div><h3>第一步的完成边界</h3><p class="small muted">已实现公共校验核心、只读观察接口、基准场、局部草稿与报告。裁片、布料和成衣目前先登记来源；运行时逐一接入。颜色仅声明与记录，不强制切换 ACES 或旧灯光。</p></section></div>
+<details class="card pad" id="editor-panel" open><summary>声明 / 读数 JSON · 只编辑实验室副本</summary><textarea id="json-editor" spellcheck="false" aria-label="本地世界基准声明 JSON"></textarea><div class="toolbar"><button id="validate-json" class="primary">核验这个 JSON</button><button id="fault-unit">测试错误单位</button><button id="restore-observation">恢复原始读数</button><button id="save-draft">保存本页草稿</button><button id="restore-draft">读取本页草稿</button><button id="export">导出报告</button><label class="file-label">导入 JSON<input id="import" type="file" accept="application/json,.json"></label></div><p class="small muted">只支持本协议、本页报告包与固定 R12 鞋款导出。未知纸样或人物存档不会自动猜字段；不会上传文件，不把整个原生档案存入实验室。</p></details>
+<details class="card pad"><summary>版本、来源与后续接入</summary><div id="refs" class="small"></div><p class="source-version" id="build-id"></p><p class="small muted">公共核心为纯函数，可移入其他仓库；本阶段独立保存在人物仓库的 reality-lab/hc-s1。没有云服务，没有跨项目全局门禁，没有计划任务。关掉此实验室，旧工作台仍按原版本运行。</p></details>
+</main></div><footer>REALITY-HC-S1 / 规则版本 0.1.0 · 人物、成衣、裁片、布料、鞋履 · 原生页按需联网读取，核心校验与几何标尺自包含。实际显示器、Safari、Vision Pro 与手机真机未认证。</footer>
+<script>
+const REALITY_CATALOG={"version": "REALITY-HC-S1", "inspectedAt": "2026-10-18", "scope": ["human", "garment", "pattern", "fabric", "footwear"], "entries": [{"id": "human-r07", "name": "人物 · R07", "domain": "human", "status": "observer-candidate", "repository": "haihao0307/guilin-dem-pipeline", "commit": "5543f756ca3af1428323696324303fa70b8de850", "path": "kaopu-unified-human-workbench/human-integrated-r07/preview.html", "sha256": "d1bd7940b885cb872143bc0e68ce85fd2f663c81be36a18e58fc6086781cf31a", "sourceImplementation": "1923ee7af9e121c40caa2089a49ed064e05451fe", "rawURL": "https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/5543f756ca3af1428323696324303fa70b8de850/kaopu-unified-human-workbench/human-integrated-r07/preview.html", "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/5543f756ca3af1428323696324303fa70b8de850/kaopu-unified-human-workbench/human-integrated-r07/preview.html", "note": "读取已登记的 R07 原生人物；不取代当前并行嘴唇、皮肤或头发支线。数字包围范围不等于人体身高测量。", "next": "只读核心尺寸、骨架身份和标准镜头比较；先不改任何绑定。"}, {"id": "shoe-r12", "name": "鞋履 · R12", "domain": "footwear", "status": "observer-candidate", "repository": "haihao0307/Humanoid-Rig-Lab-Next", "commit": "d27ef0f200257741fa67f1c6291418cf771443e9", "path": "shoe-workshop/r12/public-lite.html", "sha256": "aaba719b65cbd4e53c19ffa74de335d90c81a8974ada4afa6460ada0a9d40a61", "sourceImplementation": "7fd5527f475908d615db4f1fd36357f47e68ce46", "rawURL": "https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/d27ef0f200257741fa67f1c6291418cf771443e9/shoe-workshop/r12/public-lite.html", "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/d27ef0f200257741fa67f1c6291418cf771443e9/shoe-workshop/r12/public-lite.html", "note": "毫米裁片 × 0.001 进入米制场景；length / width 是倍率，不是毫米。配方不是鞋码或制造认证。", "next": "进一步区分单鞋、成双、拆件包围范围与鞋楦尺寸。"}, {"id": "garment-review", "name": "成衣 · 统一皮肤宿主", "domain": "garment", "status": "registered-only", "repository": "haihao0307/guilin-dem-pipeline", "commit": "9de8f3c26ec2f8dd444548c4ea242f7ad198a0d6", "path": "kaopu-unified-human-workbench/shared-skin-hosts-r01/wardrobe-preview.html", "sha256": null, "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/9de8f3c26ec2f8dd444548c4ea242f7ad198a0d6/kaopu-unified-human-workbench/shared-skin-hosts-r01/wardrobe-preview.html#look=D01", "note": "来源入口已核对；本阶段尚未接入实时测量。不能把服装宿主登记当成试穿、碰撞或全部款式已验收。", "next": "读取实际裁片坐标、人物版本、衣服尺寸与变形后相机状态。"}, {"id": "pattern-short", "name": "裁缝 / 裁片 · 短裤", "domain": "pattern", "status": "registered-only", "repository": "haihao0307/Human-Clothing-Workbench", "commit": "071acbd71cff4c1e430e8230242de03b8a5ec3fb", "path": "PROJECT_INDEX.json", "sha256": null, "publicURL": null, "privateSource": true, "note": "只登记私有源位置，不公开源码、纸样或人物资料；R3 数字试裁索引不代表完成物理试穿。", "next": "在私有源端加入只读纸样接口，明确净样、缝份、二维毫米与三维米之间的对应。"}, {"id": "fabric-r03", "name": "布料 / 皮革 · R03 集合", "domain": "fabric", "status": "registered-only", "repository": "haihao0307/Human-Fabric-Workbench", "commit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f", "path": "fabric-workbench/r03", "sha256": null, "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/", "accessFragmentRequired": true, "note": "棉布、腈纶、针织、丝绸、牛仔、皮革、亚麻列入本范围；本次不读取私有密钥、不重打包或改动任何材质。", "next": "按材料登记线密度、纱线间距、厚度和材质空间；Tex 不直接换算成几何直径。"}], "references": [{"name": "现有人物母本：标准坐标建议", "kind": "project", "path": "Humanoid_Rig_Lab_Next_项目总记录与技术架构说明书母本_v3_含图片姿势重建与多窗口板块.md", "section": "4.5 / 23.3 / 19", "note": "右手、Y向上、Z向前、米；保持绑定与姿势分离。文档声明不冒充运行测量。"}, {"name": "Three.js 相机定义", "kind": "official", "url": "https://threejs.org/docs/pages/PerspectiveCamera.html", "note": "fov 为垂直视场角；filmGauge 单独设置不等于改变投影。"}, {"name": "Three.js 颜色管理", "kind": "official", "url": "https://threejs.org/manual/pages/color-management.html", "note": "工作空间 Linear-sRGB 与显示输出区分；ACESFilmic 开关不等于完成 ACES/OCIO 管线。"}, {"name": "Khronos glTF 规范入口", "kind": "official", "url": "https://registry.khronos.org/glTF/", "note": "使用现有资产规范作为接口参考；不迁移引擎。"}]};
+const REALITY_BUILD={"version": "REALITY-HC-S1", "sourceCommit": "15486b8c5ff1b615783be6a003a76b46bfbfd7f6", "coreVersion": "0.1.0", "sourceFiles": {"SCOPE_LOCK.json": "9679a1d7af51156ed60f020b61e527f18f3feb83b6d89c4ef511767e2b4414bf", "catalog.json": "103128b0b214e52035a7ce0495f258a092168272c2b802d19614dd115f7559aa", "core.js": "73ecbe74873cf0b16ad3c5ac4e915d01fa0999c00f449c1e1ccb901faff56ded", "adapters.js": "d791c478c0e2563a10b7c8adbca85b8f44914fbe1d3f2a955d70e1b4a7840f1c", "isolation.js": "e53657b1981eb92967305dfffb859c5d699e211b3d12f596ee463f578add9318", "lab.html": "8248e527028e52eba3e1cdcf70505caa451a26e141bb6982d3a7c668c6f2f0df", "lab.js": "c7120b9ea28dcc88863fbff0fe23d64e0866a74ccb914ed3cea8a42d30ad1020", "tests/core.cjs": "7cfff4b6d350ee9c4b1f58b79c75435a3bb70c0dd877d8d398467c6b89cfeaf6", "tests/browser.py": "e7196a877b44831e0809465993fa080d04d1be551f54bc4066ae3eb900395f04", "build.py": "6b62ba6bb79cf78956bc6ccb9d1a7edc6f4689b035e73b9810db5098c4a7b7d7"}, "scope": ["human", "garment", "pattern", "fabric", "footwear"], "nativeRuntimeModified": false, "physicalCertification": false, "productionReady": false};
+/* KAOPU Reality HC S1. Pure functions: never mutates a host or submitted document. */
+(function(root){
+'use strict';
+const VERSION='0.1.0', SCHEMA='kaopu/reality-observation@1';
+const DOMAINS=Object.freeze(['human','garment','pattern','fabric','footwear']);
+const LENGTH=Object.freeze({m:1,cm:.01,mm:.001,in:.0254,ft:.3048});
+const BASIS=Object.freeze(['source_declared','runtime_computed','physical_measured','artistic','unknown','test_fixture']);
+const finite=x=>typeof x==='number'&&Number.isFinite(x);
+const array=(x,n)=>Array.isArray(x)&&x.length===n&&x.every(finite);
+const clone=x=>JSON.parse(JSON.stringify(x));
+function length(value,from,to='m'){
+ if(!finite(value))throw Error('长度必须为有限数值');
+ if(!Object.hasOwn(LENGTH,from)||!Object.hasOwn(LENGTH,to))throw Error('未知长度单位；Tex、比例和像素不能当作长度');
+ return value*LENGTH[from]/LENGTH[to];
+}
+function det(m){return m[0]*(m[4]*m[8]-m[7]*m[5])-m[3]*(m[1]*m[8]-m[7]*m[2])+m[6]*(m[1]*m[5]-m[4]*m[2]);}
+function checkBasis(m,handedness='right'){
+ if(!array(m,9)||!['left','right'].includes(handedness))return false;
+ for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+  let dot=0;for(let k=0;k<3;k++)dot+=m[i*3+k]*m[j*3+k];
+  if(Math.abs(dot-(i===j?1:0))>1e-8)return false;
+ }
+ return Math.abs(det(m)-(handedness==='left'?-1:1))<1e-8;
+}
+function pointToMeters(point,unit,basis){
+ if(!array(point,3)||!array(basis,9))throw Error('坐标数据无效');
+ if(!checkBasis(basis,'right')&&!checkBasis(basis,'left'))throw Error('轴变换必须正交；缩放只能在单位转换中出现一次');
+ const p=point.map(x=>length(x,unit));
+ return [0,1,2].map(i=>basis[i]*p[0]+basis[3+i]*p[1]+basis[6+i]*p[2]);
+}
+function basisMapsAxes(f){
+ if(!f||!checkBasis(f.toCanonicalBasis,f.handedness))return false;
+ for(const [axis,expected]of [[f.up,[0,1,0]],[f.forward,[0,0,1]]]){
+  if(typeof axis!=='string'||!/^[-+][XYZ]$/.test(axis))return false;
+  const p=[0,0,0];p['XYZ'.indexOf(axis[1])]=axis[0]==='-'?-1:1;
+  const actual=pointToMeters(p,'m',f.toCanonicalBasis);
+  if(actual.some((v,i)=>Math.abs(v-expected[i])>1e-8))return false;
+ }
+ return true;
+}
+function pixelFootprint({distanceM,fovYDeg,zoom=1,heightPx},featureMm){
+ if(![distanceM,fovYDeg,zoom,heightPx,featureMm].every(finite)||distanceM<=0||zoom<=0||heightPx<=0||featureMm<0||fovYDeg<=0||fovYDeg>=180)throw Error('相机或尺度数据无效');
+ const mmPerPixel=2000*distanceM*Math.tan(fovYDeg*Math.PI/360)/(zoom*heightPx);
+ return {mmPerPixel,featurePixels:featureMm/mmPerPixel,assumption:'透视相机；样本平面垂直视轴；distanceM 是视轴深度。非斜角表面、镜头模糊或人眼可见性保证。'};
+}
+function validate(doc){
+ const rows=[];
+ const add=(id,status,message,detail=null)=>rows.push({id,status,message,detail});
+ const unknown=(id,msg)=>add(id,'unknown',msg);
+ if(!doc||typeof doc!=='object'||Array.isArray(doc))return {schema:'kaopu/reality-validation@1',version:VERSION,status:'rejected',rows:[{id:'document',status:'fail',message:'必须输入一个 JSON 对象'}],physicalCertification:false,visualAcceptance:false,hostModified:false};
+ add('schema',doc.schema===SCHEMA?'pass':'fail','观察协议必须为 '+SCHEMA);
+ add('scope',DOMAINS.includes(doc.domain)?'pass':'fail','仅允许人物、成衣、裁片、布料、鞋履',doc.domain??null);
+ add('identity',typeof doc.assetId==='string'&&/^[a-zA-Z0-9_.:-]{1,128}$/.test(doc.assetId)?'pass':'fail','对象需要稳定标识');
+ const s=doc.source;
+ if(!s)unknown('source','未提供源版本；不得当成当前项目真实读数');
+ else {
+  add('source.commit',typeof s.commit==='string'&&/^[0-9a-f]{40}$/.test(s.commit)?'pass':'fail','源文件绑定完整不可变提交',s.commit??null);
+  add('source.path',typeof s.path==='string'&&s.path.length>0&&!s.path.startsWith('/')&&!s.path.split('/').includes('..')?'pass':'fail','源文件路径必须明确且不越界');
+  add('source.repo',typeof s.repository==='string'&&/^[\w.-]+\/[\w.-]+$/.test(s.repository)?'pass':'fail','源仓库声明');
+  if(s.sha256===null||s.sha256===undefined)unknown('source.digest','未提供已核对的文件摘要');
+  else add('source.digest',typeof s.sha256==='string'&&/^[0-9a-f]{64}$/.test(s.sha256)?'pass':'fail','文件 SHA-256 格式',s.sha256);
+ }
+ const u=doc.units;
+ if(!u)unknown('units','长度单位未声明；不会按大小自动猜米或毫米');
+ else {
+  for(const k of ['geometry','scene']){
+   if(u[k]===null||u[k]===undefined)unknown('units.'+k,'尚未确认'+(k==='geometry'?'源几何':'场景')+'长度单位');
+   else add('units.'+k,Object.hasOwn(LENGTH,u[k])?'pass':'fail',k+' 长度单位',u[k]);
+  }
+  if(u.geometryToScene!==null&&u.geometryToScene!==undefined){
+   const expected=Object.hasOwn(LENGTH,u.geometry)&&Object.hasOwn(LENGTH,u.scene)?LENGTH[u.geometry]/LENGTH[u.scene]:null;
+   add('units.transform',expected!==null&&finite(u.geometryToScene)&&Math.abs(u.geometryToScene-expected)<=1e-10*Math.max(1,expected)?'pass':'fail','只换算一次：源几何单位 → 场景单位',{declared:u.geometryToScene,expected});
+  }
+ }
+ const f=doc.frame;
+ if(!f)unknown('frame','坐标轴或手性尚未声明');
+ else {
+  const axes=['+X','-X','+Y','-Y','+Z','-Z'];
+  add('frame.axes',axes.includes(f.up)&&axes.includes(f.forward)&&f.up.slice(1)!==f.forward.slice(1)?'pass':'fail','向上与正面轴必须明确且不平行');
+  add('frame.handedness',['right','left'].includes(f.handedness)?'pass':'fail','坐标手性');
+  if(f.toCanonicalBasis==null)unknown('frame.transform','尚未审核到基准坐标系的轴转换');
+  else {
+   add('frame.transform',checkBasis(f.toCanonicalBasis,f.handedness)?'pass':'fail','列主序轴转换必须正交，不能夹带第二次长度缩放');
+   add('frame.mapping',basisMapsAxes(f)?'pass':'fail','声明的向上 / 正面轴必须映射到基准 +Y / +Z，不能只看矩阵行列式');
+  }
+  if(!f.lateralMeaning)unknown('frame.lateral','对象解剖学左右未审核；不能仅凭 X 正负猜左脚或右脚');
+ }
+ const d=doc.dimensions;
+ if(!d)unknown('dimensions','尚无尺寸观测；不从类别名称生成尺寸');
+ else {
+  add('dimensions.values',array(d.xyz,3)&&d.xyz.every(x=>x>0)?'pass':'fail','包围范围 X / Y / Z 必须为正有限数值');
+  add('dimensions.unit',Object.hasOwn(LENGTH,d.unit)?'pass':'fail','尺寸结果单独声明单位');
+  add('dimensions.basis',BASIS.includes(d.basis)?'pass':'fail','区分源声明、运行计算、实物测量与艺术设定',d.basis??null);
+  if(!d.method)unknown('dimensions.method','缺少测量或计算方法');
+  if(d.basis!=='physical_measured')unknown('reality.measurement','数字几何尺寸不是实物测量，也不证明符合人体或制造规格');
+  else {
+   const e=doc.evidence||{};
+   add('reality.protocol',typeof e.specimen==='string'&&!!e.specimen&&typeof e.protocol==='string'&&!!e.protocol&&finite(e.uncertaintyM)&&e.uncertaintyM>=0?'pass':'fail','实物测量必须提供样本、方法及量纲明确的不确定度');
+  }
+ }
+ if(doc.evidence?.confidence!=null){
+  const e=doc.evidence;
+  add('evidence.confidence',finite(e.confidence)&&e.confidence>=0&&e.confidence<=1&&typeof e.confidenceMethod==='string'&&!!e.confidenceMethod?'pass':'fail','数值置信度必须附校准或生成方法；不填装饰性 0.82');
+ }
+ const c=doc.camera;
+ if(!c)unknown('camera','尚未读取原生相机；不能认为已经采用标准镜头');
+ else if(c.projection==='perspective'){
+  add('camera.perspective',finite(c.fovYDeg)&&c.fovYDeg>0&&c.fovYDeg<180&&finite(c.aspect)&&c.aspect>0&&finite(c.zoom)&&c.zoom>0&&finite(c.near)&&finite(c.far)&&c.near>0&&c.far>c.near?'pass':'fail','透视相机的垂直视场、缩放、宽高比和裁剪面');
+  add('camera.position',array(c.position,3)?'pass':'fail','相机位置为三个有限值');
+  add('camera.buffer',array(c.bufferPx,2)&&c.bufferPx.every(x=>Number.isInteger(x)&&x>0)?'pass':'fail','记录真正 drawing buffer 像素，而非只记录 CSS 宽度');
+  if(array(c.bufferPx,2)&&finite(c.aspect))add('camera.aspect',Math.abs(c.aspect-c.bufferPx[0]/c.bufferPx[1])<.02?'pass':'fail','投影宽高比与实际画布比例相符');
+  if(c.calibrated!==true)unknown('camera.calibration','记录的是原台数字镜头，不是实物摄影标定；S1 不强改镜头');
+ }else unknown('camera.projection','S1 暂不审核此投影类型：'+String(c.projection));
+ const col=doc.color;
+ if(!col)unknown('color','颜色工作空间与输出未声明');
+ else {
+  add('color.output',['srgb','srgb-linear','display-p3'].includes(col.output)?'pass':'unknown','原生输出颜色空间',col.output??null);
+  unknown('color.calibration','本阶段只读记录曝光与色调映射，未更换灯光、未实施 ACES/OCIO 标定');
+ }
+ if(doc.preservation){for(const k of ['geometry','camera','settings'])add('preservation.'+k,doc.preservation[k]===true?'pass':'fail','本次同步读取前后 '+k+' 未改变');}
+ else unknown('preservation','没有本次原生对象的读取前后保护证据');
+ const failed=rows.filter(r=>r.status==='fail').length,unresolved=rows.filter(r=>r.status==='unknown').length;
+ return {schema:'kaopu/reality-validation@1',version:VERSION,assetId:doc.assetId??null,domain:doc.domain??null,status:failed?'rejected':unresolved?'partial':'declaration-valid',counts:{pass:rows.filter(r=>r.status==='pass').length,fail:failed,unknown:unresolved},rows,hostModified:false,physicalCertification:false,visualAcceptance:false,productionReady:false};
+}
+const api=Object.freeze({VERSION,SCHEMA,DOMAINS,LENGTH,BASIS,length,det,checkBasis,basisMapsAxes,pointToMeters,pixelFootprint,validate,clone});
+root.RealityCore=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);
+
+/* Reads existing public native APIs. No setters, render calls, normalization, or writes. */
+(function(root){
+'use strict';
+const I=[1,0,0,0,1,0,0,0,1];
+const finite=x=>typeof x==='number'&&Number.isFinite(x);
+function meshes(group){const out=[];function visit(o,visible){if(!o)return;visible=visible&&o.visible!==false;if(visible&&o.geometry?.attributes?.position)out.push(o);if(visible)for(const c of o.children||[])visit(c,visible);}visit(group,true);return out;}
+function cameraRecord(c,renderer){const canvas=renderer.domElement;return {projection:c.isPerspectiveCamera?'perspective':c.isOrthographicCamera?'orthographic':'unknown',fovYDeg:c.fov??null,aspect:c.aspect??null,zoom:c.zoom??1,near:c.near,far:c.far,position:[c.position.x,c.position.y,c.position.z],worldMatrix:Array.from(c.matrixWorld.elements),projectionMatrix:Array.from(c.projectionMatrix.elements),bufferPx:[canvas.width,canvas.height],cssPx:[canvas.clientWidth,canvas.clientHeight],filmGaugeMetadata:c.filmGauge??null,calibrated:false,method:'read current native camera; filmGauge alone is not lens calibration'};}
+function guard(nodes,camera,settings){
+ let bytes=0;const arrays=[];
+ for(const n of nodes){
+  const g=n.geometry;
+  for(const [key,a]of [['position',g.attributes.position],['normal',g.attributes.normal],['csRest',g.attributes.csRest],['index',g.index]])if(a?.array){
+   const v=new Uint8Array(a.array.buffer,a.array.byteOffset,a.array.byteLength);bytes+=v.byteLength;if(bytes>96*1024*1024)throw Error('只读保护快照超过 96 MiB 上限；未读取或修改对象');arrays.push({key,live:v,copy:v.slice()});
+  }
+ }
+ return {arrays,bytes,transforms:JSON.stringify(nodes.map(n=>Array.from(n.matrixWorld.elements))),camera:JSON.stringify(cameraRecord(camera.camera,camera.renderer)),settings:JSON.stringify(settings())};
+}
+function unchanged(g,nodes,camera,settings){let same=true;for(const r of g.arrays){if(r.live.byteLength!==r.copy.byteLength){same=false;break;}for(let i=0;i<r.copy.length;i++)if(r.live[i]!==r.copy[i]){same=false;break;}if(!same)break;}
+ return {geometry:same&&g.transforms===JSON.stringify(nodes.map(n=>Array.from(n.matrixWorld.elements))),camera:g.camera===JSON.stringify(cameraRecord(camera.camera,camera.renderer)),settings:g.settings===JSON.stringify(settings())};}
+function rawWorldBounds(nodes){const min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];let vertices=0,triangles=0;
+ for(const node of nodes){const g=node.geometry,p=g.attributes.position,m=node.matrixWorld?.elements;if(!m||m.length!==16)throw Error('缺少原生世界矩阵');
+  if(node.matrixWorldNeedsUpdate)throw Error('原生矩阵尚未更新；本观察器不擅自执行更新，请待原台出画后重读');
+  if(p.count>3000000)throw Error('单网格超出同步检查预算');
+  for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i);const v=[m[0]*x+m[4]*y+m[8]*z+m[12],m[1]*x+m[5]*y+m[9]*z+m[13],m[2]*x+m[6]*y+m[10]*z+m[14]];for(let j=0;j<3;j++){if(!finite(v[j]))throw Error('检测到无效顶点或变换');min[j]=Math.min(min[j],v[j]);max[j]=Math.max(max[j],v[j]);}}
+  vertices+=p.count;triangles+=(g.index?.count??p.count)/3;
+ }
+ if(!vertices)throw Error('当前对象没有可观察的可见几何');
+ return {min,max,xyz:max.map((v,i)=>v-min[i]),vertices,triangles,method:'CPU position attributes transformed by existing matrixWorld; not a readback of final vertex-shader deformation'};
+}
+function isReady(w,id){try{return id==='human-r07'?!!w.__HEAD_PROC__?.ready:id==='shoe-r12'?!!w.SHOE_R12?.ready:false;}catch{return false;}}
+function capture(w,entry){
+ let camera,renderer,group,settings,native,units,frame;
+ if(entry.id==='shoe-r12'){
+  native=w.SHOE_R12;if(!native?.ready)throw Error('原生 R12 尚未就绪');
+  camera=native.camera;renderer=native.renderer;group=native.group();settings=()=>native.state();
+  units={geometry:'mm',scene:'m',geometryToScene:.001,basis:'source_declared'};
+  frame={handedness:'right',up:'+Y',forward:'+Z',toCanonicalBasis:I.slice(),lateralMeaning:null,basis:'source_declared'};
+ }else if(entry.id==='human-r07'){
+  if(!w.__HEAD_PROC__?.ready||!w.__IDENTITY_QA__?.viewer)throw Error('原生 R07 尚未就绪');
+  native=w.__IDENTITY_QA__.viewer();camera=native.camera;renderer=native.renderer;group=native.mesh;
+  settings=()=>({head:w.headProceduralSkin?.settings?.()??null,body:w.bodyProceduralSkin?.settings?.()??null});
+  units={geometry:'m',scene:'m',geometryToScene:1,basis:'source_declared'};
+  frame={handedness:'right',up:'+Y',forward:'+Z',toCanonicalBasis:I.slice(),lateralMeaning:null,basis:'project_contract_declared_not_anatomical_verification'};
+ }else throw Error('此板块尚未接入只读运行时；不能伪造读数');
+ const nodes=meshes(group),ctx={camera,renderer},before=guard(nodes,ctx,settings),t=performance.now();
+ const box=rawWorldBounds(nodes),preservation=unchanged(before,nodes,ctx,settings);
+ const record={schema:'kaopu/reality-observation@1',assetId:entry.id,domain:entry.domain,source:{repository:entry.repository,commit:entry.commit,path:entry.path,sha256:entry.sha256},units,frame,dimensions:{xyz:box.xyz,unit:'m',basis:'runtime_computed',method:box.method},camera:cameraRecord(camera,renderer),color:{working:'srgb-linear',output:renderer.outputColorSpace??null,toneMappingCode:renderer.toneMapping??null,exposure:renderer.toneMappingExposure??null,basis:'read native renderer; no color transform applied'},evidence:{confidence:null,confidenceMethod:null,uncertaintyM:null,method:'synchronous read-only native API and visible CPU geometry observation'},preservation,observation:{capturedAt:new Date().toISOString(),nativeMeshCount:nodes.length,vertices:box.vertices,triangles:box.triangles,boundsMin:box.min,boundsMax:box.max,guardBytes:before.bytes,readMs:performance.now()-t,checkedChannels:['position','normal where present','csRest where present','index','visible mesh world matrices','camera','head/body skin settings or R12 design state'],notChecked:['all application state','final shader displaced bounds','swept collision volume','anatomical dimensions','physical sample','manufacturing fit','display calibration'],authoritativeHostModified:false}};
+ if(entry.id==='shoe-r12'){
+  const s=native.state();record.assetId='shoe-r12:'+s.style;record.nativeMeasurements=native.report().current.map(r=>({id:r.id,xyz:r.measuredBoundsMm,unit:'mm',basis:'native_geometry_report',notPhysicalMeasurement:true}));
+  record.observation.presentation={pair:s.pair,compare:s.compare,explode:s.explode,part:s.part};
+  record.observation.note='场景包围范围可含成双、拆件或多款排布；不等于单鞋鞋长、脚长、鞋码或制鞋楦尺寸。length/width 参数是倍率，不是毫米。';
+ }else record.observation.note='人物范围仅为当前可见 CPU 网格及已有世界矩阵，不自动当作身高。轮廓可能受原生顶点着色器继续影响。';
+ return record;
+}
+function importShoeRecipe(doc,entry){
+ if(doc.schema!=='kaopu/shoe-style@1'||!Array.isArray(doc.measurements)||doc.measurements.length<1||doc.measurements.length>8)throw Error('不是已支持的 R12 鞋款设计配方');
+ if(doc.sourceCommit!==entry.sourceImplementation)throw Error('鞋款源实现不是本次固定 R12；需要重新登记适配，不自动猜测');
+ const m=doc.measurements[0];if(!Array.isArray(m.boundsMm)||m.boundsMm.length!==3||!m.boundsMm.every(finite))throw Error('鞋款尺寸数据无效');
+ return {schema:'kaopu/reality-observation@1',assetId:'shoe-r12:import',domain:'footwear',source:{repository:entry.repository,commit:entry.commit,path:entry.path,sha256:entry.sha256},units:{geometry:'mm',scene:'m',geometryToScene:.001},frame:{handedness:'right',up:'+Y',forward:'+Z',toCanonicalBasis:I.slice(),lateralMeaning:null},dimensions:{xyz:m.boundsMm.slice(),unit:'mm',basis:'source_declared',method:'imported R12 design export; untrusted local file, not a live observation'},camera:null,color:null,evidence:{confidence:null},observation:{sourceType:'user_import',nativeRuntimeVerified:false,notManufacturing:true}};
+}
+root.RealityAdapters=Object.freeze({capture,isReady,importShoeRecipe,rawWorldBounds});
+if(typeof module!=='undefined'&&module.exports)module.exports=root.RealityAdapters;
+})(globalThis);
+
+/* Trusted, digest-locked native pages only. This is storage separation, not a hostile-code sandbox. */
+(function(root){
+'use strict';
+function bootstrap(){
+ 'use strict';
+ function storage(){
+  const values=new Map();const api={get length(){return values.size;},key(i){return [...values.keys()][Number(i)]??null;},getItem(k){k=String(k);return values.has(k)?values.get(k):null;},setItem(k,v){values.set(String(k),String(v));},removeItem(k){values.delete(String(k));},clear(){values.clear();}};
+  return new Proxy(api,{get(target,key){if(key in target){const v=Reflect.get(target,key);return typeof v==='function'?v.bind(target):v;}return typeof key==='string'?(values.get(key)??undefined):undefined;},set(target,key,value){values.set(String(key),String(value));return true;},deleteProperty(target,key){values.delete(String(key));return true;}});
+ }
+ for(const name of ['localStorage','sessionStorage'])Object.defineProperty(window,name,{configurable:false,enumerable:true,value:storage()});
+ Object.defineProperty(window,'__REALITY_STORAGE_ISOLATION__',{configurable:false,value:Object.freeze({version:'1',webStorage:'per-frame-volatile',parentStorageRead:false,parentStorageWritten:false,hostileCodeSandbox:false})});
+}
+function wrap(html){
+ if(typeof html!=='string'||!/<head(?:\s[^>]*)?>/i.test(html))throw Error('固定原版缺少 head，拒绝猜测注入位置');
+ const prefix='<!--REALITY_VOLATILE_STORAGE_V1-->',suffix='<!--/REALITY_VOLATILE_STORAGE_V1-->';
+ if(html.includes(prefix))throw Error('原版已含存储隔离标记，拒绝重复包装');
+ const insertion=prefix+'<scr'+'ipt>('+bootstrap.toString()+')();</scr'+'ipt>'+suffix;
+ const result=html.replace(/<head(?:\s[^>]*)?>/i,head=>head+insertion);
+ if(result.replace(insertion,'')!==html)throw Error('原版正文发生意外变化');
+ return result;
+}
+root.RealityIsolation=Object.freeze({wrap});if(typeof module!=='undefined'&&module.exports)module.exports=root.RealityIsolation;
+})(globalThis);
+
+(function(){
+'use strict';
+const C=RealityCore,A=RealityAdapters,DATA=REALITY_CATALOG,$=id=>document.getElementById(id),clone=C.clone;
+let entry=DATA.entries[0],doc=null,lastObservation=null,frame=null,generation=0,controller=null,ready=false,loadedId=null;
+const events=[];const log=(type,detail)=>{events.push({type,detail,at:new Date().toISOString()});if(events.length>40)events.shift();};
+function message(text,error=false){$('app-status').textContent=text;$('app-status').classList.toggle('error',error);$('native-state').textContent=text;$('native-state').classList.toggle('error',error);}
+function declaration(e){return {schema:C.SCHEMA,assetId:e.id,domain:e.domain,source:{repository:e.repository,commit:e.commit,path:e.path,sha256:e.sha256},units:null,frame:null,dimensions:null,camera:null,color:null,evidence:{confidence:null},observation:{sourceType:'registered_entry_only',nativeRuntimeVerified:false}};}
+function element(tag,text,className){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(className)e.className=className;return e;}
+function renderReport(){
+ const r=C.validate(doc);$('pass').textContent=r.counts?.pass??0;$('fail').textContent=r.counts?.fail??1;$('unknown').textContent=r.counts?.unknown??0;$('rows').replaceChildren();
+ for(const x of r.rows){const row=element('div',undefined,'row '+x.status),h=element('div',undefined,'row-head');h.append(element('span',undefined,'dot'),element('code',x.id));row.append(h,element('p',x.message));if(x.detail!==null&&x.detail!==undefined)row.append(element('div',typeof x.detail==='string'?x.detail:JSON.stringify(x.detail),'detail'));$('rows').append(row);}
+ const d=doc?.dimensions;
+ if(d&&Array.isArray(d.xyz)&&d.xyz.length===3&&Object.hasOwn(C.LENGTH,d.unit)&&d.xyz.every(Number.isFinite)){$('measurement').textContent=d.xyz.map(v=>C.length(v,d.unit).toFixed(4)).join(' × ')+' m';$('measurement-note').textContent=(doc.observation?.note||d.method||'')+'　这是 X / Y / Z 方向包围范围，不自动当作身高、腰围、脚长或鞋码。';}
+ else {$('measurement').textContent='尚未读取原生尺寸';$('measurement-note').textContent='登记网址、来源或一条规则，不等于已经测量这个对象。';}
+ $('facts').replaceChildren();const facts=[['状态',r.status==='rejected'?'存在冲突，拒绝作为有效声明':r.status==='partial'?'部分信息已核对，仍有未确认项':'声明有效，非实体认证'],['原始几何单位',doc?.units?.geometry??'未声明'],['场景单位',doc?.units?.scene??'未声明'],['源版本',doc?.source?.commit?.slice(0,12)??'未声明'],['读取来源',doc?.dimensions?.basis??'尚无读数'],['回写原台','没有'],['实物 / 审美验收','未授予']];
+ for(const [key,value]of facts)$('facts').append(element('div',key,'label'),element('div',String(value),'value'));
+ return r;
+}
+function setDocument(next,saveBaseline=false){doc=clone(next);if(saveBaseline)lastObservation=clone(next);$('json-editor').value=JSON.stringify(doc,null,2);return renderReport();}
+function unload(){generation++;controller?.abort();controller=null;ready=false;loadedId=null;frame?.remove();frame=null;$('observe').disabled=true;$('unload').disabled=true;$('load-native').disabled=entry.status==='registered-only';$('native-container').replaceChildren();$('native-panel').style.display='none';log('native-unloaded',null);}
+function select(id){const e=DATA.entries.find(x=>x.id===id);if(!e)throw Error('对象不在授权目录');unload();entry=e;lastObservation=null;$('entry-title').textContent=e.name;$('entry-note').textContent=e.note;$('next').textContent=e.next;$('entry-status').textContent=e.status==='registered-only'?'仅登记 · 实时接口待接入':'可加载原台 · 只读接口';$('load-native').disabled=e.status==='registered-only';
+ const link=$('original-link');link.hidden=!e.publicURL||e.accessFragmentRequired===true;if(!link.hidden)link.href=e.publicURL;
+ document.querySelectorAll('[data-entry]').forEach(b=>b.classList.toggle('active',b.dataset.entry===id));setDocument(declaration(e));message('已选择 '+e.name+'。尚未读取原生尺寸。');log('entry-selected',id);}
+function safe(fn){return async()=>{try{await fn();}catch(e){message(String(e.message||e),true);log('handled-error',String(e.message||e));}};}
+async function loadNative(){
+ if(!['human-r07','shoe-r12'].includes(entry.id))throw Error('此板块只有来源登记，实时观察器尚未实现');
+ unload();const e=entry,token=generation;controller=new AbortController();$('load-native').disabled=true;$('unload').disabled=false;$('native-panel').style.display='block';message('按需读取原版 '+e.name+'。只在摘要一致后执行；不加载其他对象。');
+ try{
+  const response=await fetch(e.rawURL,{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});if(!response.ok)throw Error('原版读取失败：HTTP '+response.status);
+  const bytes=await response.arrayBuffer();if(token!==generation)return;
+  if(bytes.byteLength>40*1024*1024)throw Error('原版超过本次允许的 40 MiB 页面上限');
+  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+  if(token!==generation)return;if(hash!==e.sha256)throw Error('原版 SHA-256 不符，拒绝执行；没有回退到其他版本');
+  log('source-verified',{id:e.id,sha256:hash,bytes:bytes.byteLength});
+  frame=document.createElement('iframe');frame.id='native-frame';frame.title=e.name+' 固定原版独立副本';frame.referrerPolicy='no-referrer';
+  /* Digest-verified native HTML; a removable head prelude isolates Web Storage. Original geometry/material APIs and original body bytes stay unchanged. */
+  frame.srcdoc=RealityIsolation.wrap(new TextDecoder().decode(bytes));$('native-container').replaceChildren(frame);const started=performance.now();
+  while(token===generation&&!A.isReady(frame.contentWindow,e.id)){
+   if(performance.now()-started>240000)throw Error('原生工作台未在 240 秒上限内就绪。未把空画布算通过；可关闭后重试。');
+   await new Promise(r=>setTimeout(r,250));
+  }
+  if(token!==generation)return;ready=true;loadedId=e.id;$('observe').disabled=false;message('原版已就绪，文件摘要一致。点击“读取当前基准”；读取不会调整模型、镜头或配方。');log('native-ready',{id:e.id,waitMs:performance.now()-started});
+ }catch(error){if(token!==generation||error.name==='AbortError')return;ready=false;$('load-native').disabled=false;throw error;}
+}
+function observe(){if(!ready||!frame||loadedId!==entry.id)throw Error('当前原生对象还未就绪');const result=A.capture(frame.contentWindow,entry),report=setDocument(result,true);message('已读取当前原生副本。'+report.counts.pass+' 项核对，'+report.counts.fail+' 项冲突，'+report.counts.unknown+' 项未确认；未回写。');log('observation',{id:entry.id,preservation:result.preservation,readMs:result.observation.readMs});return result;}
+function parse(text){if(text.length>1024*1024)throw Error('输入超过 1 MiB；不要导入完整顶点或人物照片');let v=JSON.parse(text);if(v?.schema==='kaopu/reality-bundle@1')v=v.document;if(v?.schema==='kaopu/shoe-style@1')v=A.importShoeRecipe(v,DATA.entries.find(e=>e.id==='shoe-r12'));return v;}
+function checkEditor(){const next=parse($('json-editor').value),r=setDocument(next);message(r.status==='rejected'?'该副本存在冲突，未应用到任何原台。':'已核验本地副本；未确认项保留，未应用到任何原台。',r.status==='rejected');return r;}
+function download(name,value){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function units(){try{$('unit-result').textContent=C.length(Number($('unit-value').value),$('unit-from').value,$('unit-to').value).toLocaleString('en-US',{maximumFractionDigits:9})+' '+$('unit-to').value;}catch(e){$('unit-result').textContent=e.message;}}
+function footprint(){try{const d=Number($('distance').value),f=Number($('fov').value);$('distance-value').value=d.toFixed(1)+' m';$('fov-value').value=f+'°';const r=C.pixelFootprint({distanceM:d,fovYDeg:f,heightPx:Number($('pixels').value)},Number($('feature').value));$('footprint').textContent=r.featurePixels.toFixed(3)+' px / 细节宽度';$('footprint').classList.toggle('warning',r.featurePixels<1);}catch(e){$('footprint').textContent=e.message;}}
+function startCalibration(){
+ const canvas=$('calibration'),gl=canvas.getContext('webgl',{antialias:true,preserveDrawingBuffer:true});if(!gl)throw Error('此设备无法建立 WebGL 校准场；JSON 核验仍可使用');
+ const vs='attribute vec3 p;attribute vec3 c;varying vec3 col;uniform float yaw;uniform float pitch;uniform float distance;uniform float focal;uniform float aspect;void main(){vec3 v=p-vec3(0.0,0.5,0.0);float a=cos(yaw),b=sin(yaw);v=vec3(a*v.x+b*v.z,v.y,-b*v.x+a*v.z);a=cos(pitch);b=sin(pitch);v=vec3(v.x,a*v.y-b*v.z,b*v.y+a*v.z);v.z-=distance;gl_Position=vec4(v.x*focal/aspect,v.y*focal,-1.002002*v.z-0.2002002,-v.z);col=c;}',fs='precision mediump float;varying vec3 col;void main(){gl_FragColor=vec4(col,1.0);}';
+ function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;}
+ const v=shader(gl.VERTEX_SHADER,vs),f=shader(gl.FRAGMENT_SHADER,fs),program=gl.createProgram();gl.attachShader(program,v);gl.attachShader(program,f);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));gl.deleteShader(v);gl.deleteShader(f);gl.useProgram(program);
+ const data=[];function line(a,b,color){data.push(...a,...color,...b,...color);}
+ for(let i=-6;i<=6;i++){let x=i*.25;line([x,0,-1.5],[x,0,1.5],[.19,.28,.31]);line([-1.5,0,x],[1.5,0,x],[.19,.28,.31]);}
+ const corners=[];for(let y=0;y<=1;y++)for(let z=0;z<=1;z++)for(let x=0;x<=1;x++)corners.push([x-.5,y,z-.5]);
+ for(let i=0;i<8;i++)for(const bit of [1,2,4])if(!(i&bit))line(corners[i],corners[i|bit],[.67,.93,.84]);
+ line([0,0,0],[1.25,0,0],[.91,.47,.48]);line([0,0,0],[0,1.35,0],[.48,.9,.72]);line([0,0,0],[0,0,1.25],[.78,.73,.39]);
+ for(let i=0;i<=10;i++)line([-.52,i*.1,-.5],[-.58,i*.1,-.5],[.86,.89,.83]);
+ const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);
+ for(const [name,offset]of [['p',0],['c',12]]){const loc=gl.getAttribLocation(program,name);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,24,offset);}
+ const uniforms=Object.fromEntries(['yaw','pitch','distance','focal','aspect'].map(x=>[x,gl.getUniformLocation(program,x)]));let yaw=-.6,pitch=.26,drag=null,draws=0;
+ function draw(){const dpr=Math.min(devicePixelRatio||1,2),r=canvas.getBoundingClientRect();canvas.width=Math.max(1,Math.round(r.width*dpr));canvas.height=Math.max(1,Math.round(r.height*dpr));gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.065,.102,.122,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniform1f(uniforms.yaw,yaw);gl.uniform1f(uniforms.pitch,pitch);gl.uniform1f(uniforms.distance,Number($('distance').value));gl.uniform1f(uniforms.focal,1/Math.tan(Number($('fov').value)*Math.PI/360));gl.uniform1f(uniforms.aspect,canvas.width/canvas.height);gl.drawArrays(gl.LINES,0,data.length/6);draws++;}
+ canvas.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY];canvas.setPointerCapture(e.pointerId);});canvas.addEventListener('pointermove',e=>{if(!drag)return;yaw+=(e.clientX-drag[0])*.007;pitch=Math.max(-1.1,Math.min(1.1,pitch+(e.clientY-drag[1])*.007));drag=[e.clientX,e.clientY];draw();});for(const type of ['pointerup','pointercancel'])canvas.addEventListener(type,()=>drag=null);
+ for(const id of ['distance','fov'])$(id).addEventListener('input',()=>{draw();footprint();});new ResizeObserver(draw).observe(canvas);draw();
+ return {report:()=>({webgl:true,cubeSizeM:[1,1,1],vertices:data.length/6,draws,buffer:[canvas.width,canvas.height],glError:gl.getError(),notAnAssetReplacement:true}),draw};
+}
+for(const e of DATA.entries){const b=element('button');b.dataset.entry=e.id;b.append(element('b',e.name),element('small',e.status==='registered-only'?'来源登记 / 实时接入待办':'固定原版 / 可只读观察'));b.onclick=safe(()=>select(e.id));$('catalog').append(b);}
+$('load-native').onclick=safe(loadNative);$('observe').onclick=safe(observe);$('unload').onclick=safe(()=>{unload();message('已关闭原台；基准读数仍留在本页，原版文件未改。');});$('show-calibration').onclick=()=>{$('calibration-layout').scrollIntoView({behavior:'smooth',block:'start'});};
+$('validate-json').onclick=safe(checkEditor);$('fault-unit').onclick=safe(()=>{const v=clone(doc);v.units={geometry:'mm',scene:'m',geometryToScene:1};setDocument(v);message('只在实验室副本中注入 mm→m 却乘 1 的错误，校验器应拒绝；原台没有修改。',true);});
+$('restore-observation').onclick=safe(()=>{setDocument(lastObservation||declaration(entry));message('已恢复本页原始读数 / 登记；没有向原台写入。');});
+$('save-draft').onclick=safe(()=>{const v=parse($('json-editor').value),r=C.validate(v);if(r.status==='rejected')throw Error('声明存在冲突，拒绝覆盖本页已存草稿');localStorage.setItem('kaopu:reality-hc-s1:draft',JSON.stringify(v));message('草稿保存在本浏览器的独立命名空间，不覆盖任何原台档案。');});
+$('restore-draft').onclick=safe(()=>{const text=localStorage.getItem('kaopu:reality-hc-s1:draft');if(!text)throw Error('本页尚无草稿');setDocument(parse(text));message('已读入本页草稿；来源是缓存，不冒充新实时观测。');});
+$('export').onclick=safe(()=>download('KAOPU-Reality-HC-S1-report.json',{schema:'kaopu/reality-bundle@1',build:REALITY_BUILD,document:doc,validation:C.validate(doc)}));
+$('import').onchange=safe(async()=>{const file=$('import').files[0];if(!file)return;if(file.size>1024*1024)throw Error('文件超过 1 MiB；禁止在此导入完整模型或图片');const v=parse(await file.text());setDocument(v);message(C.validate(v).status==='rejected'?'导入副本存在冲突，原台未改。':'已在本页读取 JSON；未上传，未写入原生工作台。',C.validate(v).status==='rejected');});
+for(const id of ['unit-value','unit-from','unit-to'])$(id).addEventListener('input',units);for(const id of ['feature','pixels'])$(id).addEventListener('input',footprint);
+for(const r of DATA.references){const p=element('p');if(r.url){const a=element('a',r.name);a.href=r.url;a.target='_blank';a.rel='noopener noreferrer';p.append(a);}else p.append(element('b',r.name));p.append(element('span',' — '+r.note));$('refs').append(p);}
+$('build-id').textContent='S1 源构建 '+REALITY_BUILD.sourceCommit+' / '+C.VERSION;
+let calibration=null;select(entry.id);units();footprint();try{calibration=startCalibration();message('基准核心已运行。按需加载人物或鞋台后读取真实当前数据；其他板块先登记，不伪造读数。');}catch(e){message(e.message,true);}
+window.__REALITY_LAB__={version:'REALITY-HC-S1',sourceCommit:REALITY_BUILD.sourceCommit,core:C,adapters:A,select,loadNative,observe,checkEditor,unload,report:()=>({version:'REALITY-HC-S1',sourceCommit:REALITY_BUILD.sourceCommit,selected:entry.id,nativeReady:ready,loadedId,iframeCount:document.querySelectorAll('#native-container iframe').length,calibration:calibration?.report()??null,validation:C.validate(doc),document:clone(doc),events:clone(events),scope:DATA.scope,hostWriteAPI:false}),setDocument:v=>setDocument(v)};
+})();
+
+</script>
+</body></html>
