@@ -15,7 +15,7 @@ const clone=value=>value===undefined?undefined:JSON.parse(JSON.stringify(value))
 const finite=value=>typeof value==='number'&&Number.isFinite(value);
 const plain=value=>value&&typeof value==='object'&&!Array.isArray(value);
 function normalizeStatus(value){
- const key=String(value??'').trim().toUpperCase().replace(/[\s-]+/g,'_');
+ const key=String(value??'').trim().toUpperCase().replace(/[\s\/-]+/g,'_');
  const aliases={OK:'PASS',PASSED:'PASS',ERROR:'FAIL',CONFLICT:'FAIL',WARN:'WARNING',UNRESOLVED:'UNKNOWN',NA:'NOT_APPLICABLE',N_A:'NOT_APPLICABLE'};
  const status=aliases[key]||key;
  if(!STATUSES.includes(status))throw Error('未知状态：'+String(value));
