@@ -1,0 +1,157 @@
+name: Reality HC S2.1 common foundation acceptance
+on:
+  push:
+    branches: [feature/reality-contract-hc-s2-1-20261018]
+    paths: [.github/workflows/reality-hc-s2-1.yml, reality-lab/hc-s2-1/BUILD_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
+      source: ${{ steps.freeze.outputs.source }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /reality-lab/hc-s2-1/
+            /.github/workflows/reality-hc-s2-1.yml
+      - name: Finalize new S2.1 source and enforce strict human-clothing scope
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          python reality-lab/hc-s2-1/prepare.py
+          if ! git diff --quiet; then
+            git add reality-lab/hc-s2-1/app.js reality-lab/hc-s2-1/build.py reality-lab/hc-s2-1/tests/browser.py
+            git commit -m 'fix(reality): finalize frame lifecycle and public credential checks'
+            git push origin HEAD:refs/heads/feature/reality-contract-hc-s2-1-20261018
+          fi
+          git fetch --filter=blob:none --depth=1 origin 704e7d019ff97550f29181cf1f354016f1d344b4
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json,ast
+          changed=subprocess.check_output(['git','diff','--name-only','704e7d019ff97550f29181cf1f354016f1d344b4','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s2-1/') or p=='.github/workflows/reality-hc-s2-1.yml' for p in changed),changed
+          for forbidden in ['reality-lab/hc-s1/','reality-lab/hc-s2/releases/','shoe-workshop/','body/','denim-workshop/','leather-workshop/']:
+            assert not any(p.startswith(forbidden) for p in changed),(forbidden,changed)
+          for p in Path('reality-lab/hc-s2-1').rglob('*.py'):ast.parse(p.read_text(),filename=str(p))
+          q=Path('reality-lab/hc-s2-1/qa/local');q.mkdir(parents=True,exist_ok=True)
+          (q/'SCOPE_REPORT.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'sourceWorkbenchPathsChanged':[],'excludedDomainsTouched':[]},indent=2))
+          PY
+      - name: Build common schema and run pure contract regressions
+        run: |
+          python reality-lab/hc-s2-1/build.py
+          node reality-lab/hc-s2-1/tests/protocol.cjs
+          node --check reality-lab/hc-s2-1/protocol.js
+          node --check reality-lab/hc-s2-1/adapters.js
+          node --check reality-lab/hc-s2-1/app.js
+      - name: Install fixed browser tools
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Exercise actual S1 human and footwear plus locked S2 route
+        env:
+          REALITY_URL: http://127.0.0.1:8765/preview.html
+          REALITY_QA: ${{ github.workspace }}/reality-lab/hc-s2-1/qa/local
+        run: |
+          python -m http.server 8765 --directory reality-lab/hc-s2-1 >/tmp/reality-s21-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER"' EXIT
+          python reality-lab/hc-s2-1/tests/browser.py
+      - name: Freeze tested common foundation at immutable commit
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          q=Path('reality-lab/hc-s2-1/qa/local')
+          for name in ['SCOPE_REPORT.json','PROTOCOL_REPORT.json','BROWSER_REPORT.json']:
+            assert json.loads((q/name).read_text())['passed'],name
+          PY
+          BEFORE=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-contract-hc-s2-1-20261018
+          test "$(git rev-parse FETCH_HEAD)" = "$BEFORE"
+          git add -f reality-lab/hc-s2-1/preview.html reality-lab/hc-s2-1/BUILD_MANIFEST.json reality-lab/hc-s2-1/reality-object.schema.json reality-lab/hc-s2-1/qa/local
+          git commit -m 'build(reality): freeze tested S2.1 common foundation and live S1 evidence'
+          git push origin HEAD:refs/heads/feature/reality-contract-hc-s2-1-20261018
+          SHA=$(git rev-parse HEAD)
+          SOURCE=$(python -c "import json;print(json.load(open('reality-lab/hc-s2-1/BUILD_MANIFEST.json'))['sourceCommit'])")
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "source=$SOURCE" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s2-1/preview.html" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-hc-s2-1-public-core-local-evidence
+          path: reality-lab/hc-s2-1/qa/local/
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s2-1
+      - name: Verify exact immutable public bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          REALITY_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,urllib.request,hashlib
+          root=Path('reality-lab/hc-s2-1');m=json.loads((root/'BUILD_MANIFEST.json').read_text())
+          raw='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s2-1/preview.html'
+          data=urllib.request.urlopen(raw,timeout=120).read()
+          assert len(data)==m['html']['bytes'] and hashlib.sha256(data).hexdigest()==m['html']['sha256']
+          q=root/'qa/public';q.mkdir(parents=True,exist_ok=True)
+          (q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'url':os.environ['REALITY_URL'],'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'keyPublished':False},indent=2))
+          PY
+      - name: Install independent Chromium
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Test exact HTTPS common foundation
+        env:
+          REALITY_URL: ${{ needs.build.outputs.url }}
+          REALITY_QA: ${{ github.workspace }}/reality-lab/hc-s2-1/qa/public
+        run: python reality-lab/hc-s2-1/tests/browser.py
+      - name: Record public-core receipt and private-pattern handoff
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          REALITY_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          root=Path('reality-lab/hc-s2-1');m=json.loads((root/'BUILD_MANIFEST.json').read_text());r=json.loads((root/'qa/public/BROWSER_REPORT.json').read_text());b=json.loads((root/'qa/public/PUBLIC_BYTES.json').read_text());p=json.loads((root/'qa/local/PROTOCOL_REPORT.json').read_text())
+          assert r['passed'] and r['publicBrowserVerified'] and b['passed']
+          d={'version':'REALITY-HC-S2.1','status':'PUBLIC_CORE_VERIFIED_AWAITING_PRIVATE_PATTERN','fixedURL':os.environ['REALITY_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'htmlBytes':m['html']['bytes'],'htmlSHA256':m['html']['sha256'],'protocolChecks':p['count'],'publicBrowserChecks':len(r['checks']),'actualObjectsVerified':['human-r07','shoe-r12'],'patternRouteVerified':'locked-without-private-fragment','privatePatternCommonAdapterVerified':False,'registeredOnly':['fabric-s3','garment-s5'],'sourceWorkbenchesModified':False,'automaticRepair':False,'privateKeyPublished':False,'physicalCertification':False,'manufacturingCertification':False,'userVisualAcceptance':False,'productionReady':False,'nextStep':'Run private Human-Clothing-Workbench verifier against this exact public URL with the existing S2 access file; then record full three-object receipt.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (root/'DELIVERY_PUBLIC.json').write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          (root/'TASK_STATE.json').write_text(json.dumps({'task':'REALITY-HC-S2.1-20261018','status':d['status'],'fixedURL':d['fixedURL'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'completed':['common status vocabulary','semantic measurement dictionary','shared adapter interface','live S1 human and shoe normalization','common report and defect export'],'pending':['private S2 pattern normalization at exact public URL'],'next':d['nextStep'],'excludedDomains':['architecture','aircraft','terrain','animals','vegetation','world'],'userAccepted':False},ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-contract-hc-s2-1-20261018
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s2-1/DELIVERY_PUBLIC.json reality-lab/hc-s2-1/TASK_STATE.json reality-lab/hc-s2-1/qa/public
+          git commit -m 'docs(reality): record S2.1 public core and private-pattern verification handoff'
+          git push origin HEAD:refs/heads/feature/reality-contract-hc-s2-1-20261018
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-hc-s2-1-public-core-evidence
+          path: reality-lab/hc-s2-1/qa/public/
+          retention-days: 30
