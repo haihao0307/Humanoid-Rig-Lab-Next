@@ -1,0 +1,396 @@
+{
+  "version": "R13.0",
+  "taskId": "SHOE-R13-SEAM-SHAPE-REVIEW-20261017",
+  "sourceCommit": "961996dca84b110191405a1e5b840cec51de0a65",
+  "status": "REJECTED_SOURCE_CANDIDATE",
+  "reviewedAtUTC": "2026-10-18T04:14:50.579Z",
+  "independentReviewer": "footwear_science",
+  "reviewerType": "AI independent geometry and visual reviewer",
+  "reviewerEditedProduction": false,
+  "humanApproval": false,
+  "userApproval": false,
+  "candidate": {
+    "runId": 39095317681,
+    "artifactId": 12124905197,
+    "artifactDigest": "sha256:764ef599cb8fa4c16ef5e86fe2daaf9712646342b5ca1415338dde012196242f",
+    "manifestSha256": "9769da30ca4cdb46dec7375fd23fac341a9006355595630215f8ebeb4e9a3b7a",
+    "runtimeSha256": "b76a6bfd694fd7f65c95aae946c4e5e6e84732821b951de1cecc8422242579b7",
+    "geometrySha256": "bad4aad47f4fe1a35f333e887977d096050b07c1c63fa2629bf579714b2a9b85",
+    "materialQaSha256": "17417dd69d9dc31fd38a08b1ff332cc23052cce38a2c6640453e5b08bbcb29c8",
+    "qaSha256": "97f2723142c76ecdc672ae291bc7adea0bd2caf7ea934ad35493061abfbaed92",
+    "beforeQaSha256": "80fc624846e6c93b89b03df8e2eb0e77c64fed6be89bedd62106620868afc7ae",
+    "runtimeBytes": 13746178,
+    "artifactDirectory": "/tmp/shoe-r13-candidate-961996dc",
+    "coreFileHashesIndependentlyRecomputed": true,
+    "screenshotHashesIndependentlyRecomputed": 47,
+    "localProbeProductionFilesMatchCandidateManifest": true,
+    "artifactZipDigestProvidedBy": "root; root downloaded and verified ZIP; this reviewer independently checked extracted core files and all screenshot hashes"
+  },
+  "baseline": {
+    "path": "shoe-workshop/r12",
+    "frozenHead": "fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d",
+    "sourceCommit": "7fd5527f475908d615db4f1fd36357f47e68ce46",
+    "publishedBuild": "d27ef0f200257741fa67f1c6291418cf771443e9",
+    "runtimeSha256": "aaba719b65cbd4e53c19ffa74de335d90c81a8974ada4afa6460ada0a9d40a61",
+    "sameCameraMatrices": true,
+    "historicalR12ApprovalUnchanged": true
+  },
+  "decision": {
+    "publishAllowed": false,
+    "reason": "Penny 鞋口后中线存在真实三角破口：实际 CI 图中可见浅色三角，精确相机射线穿过后帮，首击远处前掌内衬。157 个现有数值门禁与浏览器运行通过不能代替此项视觉覆盖。",
+    "blockingIssueIds": [
+      "R13-VIS-PENNY-REAR-COLLAR-GAP"
+    ],
+    "unaffectedWork": "Canvas 包边、Penny 连续 U 形前片、Chelsea 侧面折返、缝线实际支承和材料角色的已观察改进保留；拒绝仅要求修复已定位孔口后用新源码同源证据复核。"
+  },
+  "visualCoverage": {
+    "currentScreensActuallyViewed": [
+      {
+        "path": "evidence/browser/desktop-first-frame.png",
+        "sha256": "a4086aa9628200088deedee9e7cadc19c43ff6083379b9c5a7aeacaf2bed7a9c"
+      },
+      {
+        "path": "evidence/browser/penny-hero.png",
+        "sha256": "019ead5125c5af3b093fda43229741ae3d083501e424418adb2124b6276b31df"
+      },
+      {
+        "path": "evidence/browser/penny-side.png",
+        "sha256": "bf3f501465851549e5031c5a7a2681a17bf19acefe0738cf7db7cfcc6ac100aa"
+      },
+      {
+        "path": "evidence/browser/penny-top.png",
+        "sha256": "2b75611b1aafb1e0df206d99161f2091c174b76b75ac1876d261da19e4bdb85b"
+      },
+      {
+        "path": "evidence/browser/penny-back.png",
+        "sha256": "95b1e639f3e31b30a0716e2408a96a6cc47a49c1afd9e6d311c4e7a3369d218b"
+      },
+      {
+        "path": "evidence/browser/penny-detail.png",
+        "sha256": "6feb01b81718f38e077ca432d7578be17a1420c591a21121655d377a8afaff70"
+      },
+      {
+        "path": "evidence/browser/penny-join.png",
+        "sha256": "57a0f1770978eeb25279ee5d40268af7bcccea1bd22cac2c443fdcc9af280194"
+      },
+      {
+        "path": "evidence/browser/chelsea-hero.png",
+        "sha256": "347066128c020dc324b39e62a65adba865153f1a8d17593cf49ee17c859ebf82"
+      },
+      {
+        "path": "evidence/browser/chelsea-side.png",
+        "sha256": "b8f59648d585993d32254907d54b8b3d8364fe5ab2f1291489f59b76cc5f14e4"
+      },
+      {
+        "path": "evidence/browser/chelsea-top.png",
+        "sha256": "43a822d4770f3bce4a6e42b7ef6265dd697aa8427234e696d10d4f37d9cd83c8"
+      },
+      {
+        "path": "evidence/browser/chelsea-back.png",
+        "sha256": "e3fa79ec829bc0f417ea89ac8d75fc1079fe7978019699ca1d7d4de5b444109c"
+      },
+      {
+        "path": "evidence/browser/chelsea-join.png",
+        "sha256": "02efe2b88b66ec037faa8417267c77881620993f3ec7744463d8d89fede4899f"
+      },
+      {
+        "path": "evidence/browser/chelsea-clay.png",
+        "sha256": "327295aff8d34111172ee454010f201c7cafafb6efeaf75d88285b5e9f649e2f"
+      },
+      {
+        "path": "evidence/browser/monk-hero.png",
+        "sha256": "aeb9dbfb02ede0ef9bcadb968b36f4a4e080814e26df0c07832b594d0d78a454"
+      },
+      {
+        "path": "evidence/browser/monk-side.png",
+        "sha256": "f9d428aad0773b45624ad315ca38bdd82ee059b1c21012993effc97193344fa9"
+      },
+      {
+        "path": "evidence/browser/monk-top.png",
+        "sha256": "36c2f57e9907360d78551969e107167dacd2899062ce2f386f3788319d135835"
+      },
+      {
+        "path": "evidence/browser/monk-back.png",
+        "sha256": "404ae362deff744793d4dd76be00f23ca591ec7bbbfc9c2fdd52f751c5fbce2e"
+      },
+      {
+        "path": "evidence/browser/monk-join.png",
+        "sha256": "e557eddd8f9d7384b20391178ad7539174dca673a2fc9b6ac2b5de66a8cb7582"
+      },
+      {
+        "path": "evidence/browser/canvas-hero.png",
+        "sha256": "052dd7dc4c5de80ab129e4fe0d43e77fec8604638791cd36e334bf6675dee6bc"
+      },
+      {
+        "path": "evidence/browser/canvas-side.png",
+        "sha256": "521ccdbeafdfd8d9d502de62499379595132e7bbf24964f951de7875ad53b335"
+      },
+      {
+        "path": "evidence/browser/canvas-top.png",
+        "sha256": "a2cb9b92aa010760a8d7b0406228d480fc65460ce64270896791334ee3cceb84"
+      },
+      {
+        "path": "evidence/browser/canvas-front.png",
+        "sha256": "4a20681fd1dec513d3cf15b20ed4704cefd190f09283724802cf5f68c425533f"
+      },
+      {
+        "path": "evidence/browser/canvas-back.png",
+        "sha256": "ce336ebb64072a29e03fb039b5e0e2fc7f69facd716b5c410da833d39a2bcfc3"
+      },
+      {
+        "path": "evidence/browser/canvas-join.png",
+        "sha256": "118945180e0880ab564e6aee047b06aa7a40e73c594cefa4d552ff18d63671b4"
+      },
+      {
+        "path": "evidence/browser/four-style-comparison.png",
+        "sha256": "80231dd2e2ff5498ea058cf82fb9fe0306b1425d7142af441d092088a3b9c8e1"
+      }
+    ],
+    "beforeScreensActuallyViewed": [
+      {
+        "path": "evidence/before/penny-back.png",
+        "sha256": "b109193973c9247cbb9715bed7249fa9b9ed0305eaad92fea185732e4b9e428c"
+      },
+      {
+        "path": "evidence/before/penny-join.png",
+        "sha256": "e7aa053363543cca9f63dca45c656d1d5318b87effff281187ad42d39328b1f8"
+      },
+      {
+        "path": "evidence/before/chelsea-back.png",
+        "sha256": "d5142acbe71d37e13fcfdf0a226138625e4e6abf8f400396b400636af0d2ead4"
+      },
+      {
+        "path": "evidence/before/chelsea-join.png",
+        "sha256": "905eebfeb233e492888aada822d508e7e4235654d885549a8ee0114405b8bb74"
+      },
+      {
+        "path": "evidence/before/monk-back.png",
+        "sha256": "4ad48dcc590d7da20d26a53e59f4a2948a25abceafab1d4df4c28e5d0631eca6"
+      },
+      {
+        "path": "evidence/before/monk-join.png",
+        "sha256": "ea9f1c96c1dbdde2c7d2e8b57fa1dee27b4aa33b7213c3523c6f733bea72e522"
+      },
+      {
+        "path": "evidence/before/canvas-back.png",
+        "sha256": "d4f935375188bdc46e1ff92c8c8a02ca5741068297ec6d963ac546cf9e99dc6b"
+      },
+      {
+        "path": "evidence/before/canvas-join.png",
+        "sha256": "3c057b416010a9b6f393a912322d55c38dfbb00a8fef4961891606a76fbf4696"
+      }
+    ],
+    "currentScreensViewedCount": 25,
+    "beforeScreensViewedCount": 8,
+    "otherScreens": "其余 14 张当前截图只核对文件哈希，不声称逐图视觉验收。",
+    "method": "使用 view_image 直接查看真实 CI PNG；每款 hero/side/top/back/join 与同相机 R12 back/join 对照，另看 Canvas front、Penny detail、Chelsea clay、桌面首帧与四款同场对照。针对已见 Penny 小三角使用精确相机与真实三维网格只读射线定位。",
+    "commercialReferenceImagesThisPass": "此前研究和 Task Anchor 保留官方母型来源；本次最终候选检查没有重新取得或声称查看已不在临时目录的原厂图片。商业型号一比一拟合不在本次结论范围。"
+  },
+  "observations": [
+    {
+      "style": "penny",
+      "status": "BLOCKED",
+      "views": [
+        "penny-hero",
+        "penny-side",
+        "penny-top",
+        "penny-back",
+        "penny-detail",
+        "penny-join"
+      ],
+      "findings": [
+        "前片共边和针路呈连续圆顺 U 形，原尖 V 与前端断续已消失。",
+        "鞍带贴合前帮，侧视保持独立皮片厚度；针脚成为贴面的间断线段，沿条不再呈粗波浪线。",
+        "外部极后高窄脊已消失，但鞋口后中线存在可见浅色三角，实际为孔口，详见阻断记录。"
+      ]
+    },
+    {
+      "style": "chelsea",
+      "status": "ACCEPTABLE_WITH_RECORDED_SHAPE_RESIDUAL",
+      "views": [
+        "chelsea-hero",
+        "chelsea-side",
+        "chelsea-top",
+        "chelsea-back",
+        "chelsea-join",
+        "chelsea-clay"
+      ],
+      "findings": [
+        "旧 R12 gore 下部的明显 tan 内衬楔形暴露和后帮脱离现象在当前视图中消失；嵌片和皮片连续相接。",
+        "鞋口读作有内壁的真实开口，后拉环与靴口连接关系清楚；未见旧鞋头内翻灰三角。",
+        "针线沿嵌片边界贴合，皮面与弹力片纹理角色清楚。",
+        "筒身—前帮保留规整的曲率肩部，在 clay 中也可见；已查看视角未见由此产生新孔口、露内衬或交叉皮片。将其作为自有参数化款式的造型残余，非本轮结构阻断。"
+      ]
+    },
+    {
+      "style": "monk",
+      "status": "ACCEPTABLE_WITH_RETAINED_CLOSURE_STYLE",
+      "views": [
+        "monk-hero",
+        "monk-side",
+        "monk-top",
+        "monk-back",
+        "monk-join"
+      ],
+      "findings": [
+        "双扣、皮带、带孔和覆盖片仍可区分，当前视图未见新的带片穿插或错层暴露。",
+        "后部旧明亮细长尖脊消失，轮廓收圆；针脚更贴面，沿条线不再呈波浪翻折。",
+        "覆盖片与两条垂向带尾仍是规则、较硬挺的设计表达；本轮未验证真实扣合运动、材料弯曲或穿着状态。"
+      ]
+    },
+    {
+      "style": "canvas",
+      "status": "ACCEPTABLE_FOR_REVIEWED_VIEWS",
+      "views": [
+        "canvas-hero",
+        "canvas-side",
+        "canvas-top",
+        "canvas-front",
+        "canvas-back",
+        "canvas-join"
+      ],
+      "findings": [
+        "最终 canvas-back 后跟橡胶带上已无绿色小矩形；前后包边未见贯穿带高的竖向破口。",
+        "前帮/侧帮接缝与鞋眼加强片边缘连续，针脚为贴面间断线；帆布、胶带、鞋带和内衬材质角色可区分。",
+        "鞋带在当前 hero/side/top 中贴近鞋舌与眼片，未见旧高拱漂浮交叉；鞋口外轮廓和内腔可辨认。"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "id": "R13-VIS-PENNY-REAR-COLLAR-GAP",
+      "priority": "P1_RELEASE_BLOCKER",
+      "part": "penny-galosh at rear collar, adjacent to collar-bound-edge",
+      "evidenceImages": [
+        "evidence/browser/penny-back.png",
+        "evidence/browser/penny-hero.png",
+        "evidence/browser/penny-detail.png"
+      ],
+      "pixelLocation": {
+        "image": "evidence/browser/penny-back.png",
+        "size": [
+          962,
+          640
+        ],
+        "approximatePixel": [
+          519,
+          308
+        ]
+      },
+      "observed": "后鞋口中线下方出现数像素高的浅色三角；并非当地皮革厚度切面，射线实际穿到约 256 mm 更前方的内衬。",
+      "reproduction": {
+        "cameraSource": "evidence/before/QA.json screens[name=penny-back].camera (same matrices used for current image)",
+        "geometry": "buildStyle(penny) with default parameters; actual positions/index; mesh scale 0.001; Three.js DoubleSide matches runtime materials",
+        "pixelSampling": "NDC = [2*(x+0.5)/962-1, 1-2*(y+0.5)/640]",
+        "firstHits": [
+          {
+            "pixel": [
+              519,
+              308
+            ],
+            "part": "penny-galosh",
+            "faceIndex": 18563,
+            "materialIndex": 1,
+            "layer": "inner",
+            "pointMm": [
+              -29.613752793,
+              15.492683836,
+              124.114405094
+            ]
+          },
+          {
+            "pixel": [
+              522,
+              306
+            ],
+            "part": "penny-galosh",
+            "faceIndex": 88,
+            "materialIndex": 0,
+            "layer": "outer",
+            "pointMm": [
+              -1.382817868,
+              72.476669119,
+              -131.634027398
+            ]
+          }
+        ],
+        "additionalFailingPixels": [
+          [
+            519,
+            304
+          ],
+          [
+            519,
+            306
+          ],
+          [
+            519,
+            311
+          ]
+        ],
+        "candidateSourceFilesIndependentlyHashMatched": 8
+      },
+      "rootCauseAssessment": "定位成立；初步根因是实际 rear patch 的 0..0.44 / 36 纵向站不包含精确 collar start s=0.035，首个开口网格弦跨越 0.024444..0.036667，与精确鞋口包边不共边。由负责生产的 agent 独立确认后再改。",
+      "sourceLocations": [
+        "src/penny-chelsea.mjs buildPenny rear upperPatches calls",
+        "src/kernel.mjs upperPatches uniform longitudinal sampling and collarAngle boundary"
+      ],
+      "minimalCorrection": "使生成的后帮裁片在真实鞋口起点及其边界拥有共源、匹配的网格顶点，恢复实体皮革覆盖；不通过压暗内衬、加粗包边或翻法线遮蔽。",
+      "requiredRecheck": "精确失败射线与邻域必须先命中近处应有皮层/切边；三组设计参数复核实际后口覆盖；重建后查看新源码绑定的 hero/back/detail/top，确认孔口消失且轮廓保留。"
+    }
+  ],
+  "residuals": [
+    {
+      "id": "CHELSEA-CURVATURE-SHOULDER",
+      "blocking": false,
+      "description": "规整横向曲率肩部仍可见，属于现有自有靴型的风格化过渡；已查看图中连续闭合，不宣称扫描般自然。"
+    },
+    {
+      "id": "SLAB-END-FACETING",
+      "blocking": false,
+      "description": "Penny/Canvas 外底极前/后端仍有极细旧 slab 折痕或短中线；它们在外底本身，当前未贯穿 Canvas 覆盖带，也不是本次小矩形穿出。"
+    },
+    {
+      "id": "MATERIAL-COORDINATE-TAIL",
+      "blocking": false,
+      "description": "最终 Float32 独立诊断保留局部端帽高各向异性尾部；66 面片无数值失败不等于全部表面无畸变。具体三角位置、面积和奇异值在绑定的 MATERIAL_COORDINATES.json；本次视图未发现新的大面积纹理撕裂。"
+    }
+  ],
+  "machineEvidence": {
+    "geometry": {
+      "passed": 157,
+      "failed": 0,
+      "generatedCases": 104,
+      "parameterCases": 100
+    },
+    "materialCoordinates": {
+      "panels": 66,
+      "success": true,
+      "numericIssues": []
+    },
+    "browser": {
+      "checks": 8,
+      "completed": true,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "requestFailures": 0,
+      "coreNetworkRequests": 0
+    },
+    "interpretation": "记录实际机器结果，但不能将其升级为全部外表连续、视觉自然或制造成立的证明。"
+  },
+  "scope": {
+    "independentAIVisualReview": true,
+    "sourceCandidateVisualAcceptance": false,
+    "publicVerification": false,
+    "publicStatus": "PENDING_NEW_ACCEPTED_SOURCE",
+    "humanApproval": false,
+    "userApproval": false,
+    "physicalSolver": false,
+    "manufacturingValidated": false,
+    "materialCalibrated": false,
+    "wearerFitValidated": false,
+    "realMobileDeviceTested": false,
+    "commercialModelReplication": false
+  },
+  "recordPolicy": "本次拒绝记录不得伪装为批准。若后续候选通过，必须绑定新源码与新产物并保留本次拒绝历史；任何用于发布锁定的源审核文件保持不变，公网复核另写 PUBLIC_VISUAL_REVIEW.json。"
+}

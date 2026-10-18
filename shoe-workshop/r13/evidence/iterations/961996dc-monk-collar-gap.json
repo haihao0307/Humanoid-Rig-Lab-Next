@@ -1,0 +1,97 @@
+{
+  "version": "R13.0",
+  "sourceCommit": "961996dca84b110191405a1e5b840cec51de0a65",
+  "status": "REJECTED_SOURCE_CANDIDATE_SUPPLEMENT",
+  "reviewedAtUTC": "2026-10-18T04:23:53.083Z",
+  "independentReviewer": "footwear_science",
+  "reviewerEditedProduction": false,
+  "humanApproval": false,
+  "userApproval": false,
+  "relatedRejection": "evidence/iterations/961996dc-collar-gap.json",
+  "candidate": {
+    "runId": 39095317681,
+    "artifactId": 12124905197,
+    "artifactDigest": "sha256:764ef599cb8fa4c16ef5e86fe2daaf9712646342b5ca1415338dde012196242f"
+  },
+  "blockingIssue": {
+    "id": "R13-VIS-MONK-REAR-COLLAR-GAP",
+    "priority": "P1_RELEASE_BLOCKER",
+    "part": "monk-open-quarters",
+    "image": {
+      "path": "evidence/browser/monk-back.png",
+      "sha256": "404ae362deff744793d4dd76be00f23ca591ec7bbbfc9c2fdd52f751c5fbce2e",
+      "size": [
+        962,
+        640
+      ]
+    },
+    "observed": "同一后鞋口采样行缺失影响 Monk。已查看的 back 图在后口中心有更小的浅色三角；独立使用原相机精确射线，确认穿过后帮命中远处前掌内衬，覆盖了先前整图观察的盲区。",
+    "fullAssemblyFirstHits": [
+      {
+        "style": "monk",
+        "pixel": [
+          516,
+          313
+        ],
+        "part": "monk-integral-vamp-tongue",
+        "layer": 1,
+        "face": 4669,
+        "pointMm": [
+          -28.80272188790982,
+          21.54226487119496,
+          125.94069869383759
+        ]
+      },
+      {
+        "style": "monk",
+        "pixel": [
+          517,
+          313
+        ],
+        "part": "monk-integral-vamp-tongue",
+        "layer": 1,
+        "face": 4669,
+        "pointMm": [
+          -29.32475195842759,
+          21.689011703330777,
+          125.23979874560496
+        ]
+      },
+      {
+        "style": "monk",
+        "pixel": [
+          518,
+          313
+        ],
+        "part": "monk-integral-vamp-tongue",
+        "layer": 1,
+        "face": 4669,
+        "pointMm": [
+          -29.845763635666692,
+          21.83547225696336,
+          124.54026613583916
+        ]
+      }
+    ],
+    "rootCause": "实际 upperPatches 0..0.588/54 未包含 collarStart 0.035，首开口网格粗弦与真实鞋口不共边。",
+    "minimalCorrection": "在原相邻纵向行之间插入真实后口起点，保留全部原行和其他曲面。不得用包边加粗或内衬变暗遮挡。"
+  },
+  "negativeControl": {
+    "fixture": "tests/fixtures/r13-collar-gap-before.json",
+    "fixtureSha256": "3dd345342b2be1faef9d433240e73423713b2f59fe2452fe380f0a5d0e71c139",
+    "before": {
+      "passed": 0,
+      "failed": 6,
+      "totalRays": 135,
+      "failedRays": 47
+    },
+    "method": "全部 8 个原生产模块与 961996dc manifest SHA 匹配；两鞋、三参数组共 135 条测试射线，47 条失败。两种新修复的同一135条局部射线全通过，但仍等待全套及新CI视觉。"
+  },
+  "scope": {
+    "independentAIReview": true,
+    "publicVerified": false,
+    "physicalSolver": false,
+    "manufacturingValidated": false,
+    "wearerFitValidated": false
+  }
+}

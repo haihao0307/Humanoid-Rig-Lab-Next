@@ -1,0 +1,3060 @@
+{
+  "suite": "SHOE-R13-INDEPENDENT-GEOMETRY",
+  "taskId": "SHOE-R13-SEAM-SHAPE-REVIEW-20261017",
+  "sourceCommit": "8b05ebd8b0755216743792034e3cbb58b8d9ff54",
+  "success": true,
+  "passed": 157,
+  "failed": 0,
+  "generatedCases": 104,
+  "validatedParameterCases": 100,
+  "extremeCornersPerStyle": 16,
+  "baseline": "fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d",
+  "retainedOriginalBase": "cafab0889b612ed6cbf461683dfe2851909df3be",
+  "failures": [],
+  "measuredResponses": [
+    {
+      "name": "penny/measured parameter response",
+      "passed": true,
+      "detail": {
+        "lengthChangeMm": 56,
+        "widthChangeMm": 27.59362030029297,
+        "upperInstepRaiseMm": 10.308204650878906,
+        "thicknessRatio": 2.3333332644125586
+      }
+    },
+    {
+      "name": "chelsea/measured parameter response",
+      "passed": true,
+      "detail": {
+        "lengthChangeMm": 57.20001220703125,
+        "widthChangeMm": 27.320411682128906,
+        "upperInstepRaiseMm": 11.5123291015625,
+        "thicknessRatio": 2.33333326565324
+      }
+    },
+    {
+      "name": "monk/measured parameter response",
+      "passed": true,
+      "detail": {
+        "lengthChangeMm": 57.79998779296875,
+        "widthChangeMm": 27.04721450805664,
+        "upperInstepRaiseMm": 12.999900817871094,
+        "thicknessRatio": 2.33333331269797
+      }
+    },
+    {
+      "name": "canvas/measured parameter response",
+      "passed": true,
+      "detail": {
+        "lengthChangeMm": 55.79998779296875,
+        "widthChangeMm": 28.413230895996094,
+        "upperInstepRaiseMm": 3.965839385986328,
+        "thicknessRatio": 2.3333333722005913
+      }
+    }
+  ],
+  "meridianContinuity": {
+    "name": "chelsea/front and rear meridian continuity",
+    "passed": true,
+    "detail": {
+      "parameterCases": 3,
+      "meridians": [
+        "front",
+        "rear"
+      ],
+      "angularStepRadians": 0.00001,
+      "comparisons": 108,
+      "maxDistanceMm": 0.026121064384299064,
+      "limitMm": 0.1
+    }
+  },
+  "toeCoverage": {
+    "name": "chelsea/toe cover follows last roof",
+    "passed": true,
+    "detail": {
+      "method": "ray intersection with actual upper and insole triangles",
+      "limitMm": 3,
+      "maxRoofErrorMm": 0.8277977561138989,
+      "samples": [
+        {
+          "backFromToeMm": 3,
+          "actualY": 24.080867461020162,
+          "lastRoofY": 24.90866521713406,
+          "roofErrorMm": 0.8277977561138989
+        },
+        {
+          "backFromToeMm": 6,
+          "actualY": 29.363717195771216,
+          "lastRoofY": 29.533703868747153,
+          "roofErrorMm": 0.16998667297593784
+        },
+        {
+          "backFromToeMm": 9,
+          "actualY": 32.78406541591963,
+          "lastRoofY": 33.05258740988157,
+          "roofErrorMm": 0.2685219939619401
+        },
+        {
+          "backFromToeMm": 13,
+          "actualY": 35.44347139002217,
+          "lastRoofY": 35.54291080209896,
+          "roofErrorMm": 0.09943941207679075
+        },
+        {
+          "backFromToeMm": 20,
+          "actualY": 37.26533833935824,
+          "lastRoofY": 37.30201998231455,
+          "roofErrorMm": 0.036681642956310156
+        }
+      ],
+      "winding": {
+        "regionFromToeMm": [
+          0,
+          35
+        ],
+        "triangles": 313,
+        "minimumMeanNormalDot": 0.8438348752178173
+      }
+    }
+  },
+  "reviewRegressions": [
+    {
+      "name": "penny/R13 stitch sections remain continuous without neck collapse/default",
+      "passed": true,
+      "detail": {
+        "seams": 6,
+        "testedRings": 5120,
+        "minimumAxisDot": 0.9950763732529743,
+        "minimumNeckRatio": 0.9987683347318378,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "penny/R13 welt stitches stay supported and penetrate every period/default",
+      "passed": true,
+      "detail": [
+        {
+          "id": "welt-stitch--1",
+          "supportIds": [
+            "welt--1"
+          ],
+          "rings": 1268,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 89,
+          "minimumVisibleClearanceMm": 0.04943640468757508,
+          "maximumHiddenClearanceMm": -0.016345755020834563,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "welt-stitch-1",
+          "supportIds": [
+            "welt-1"
+          ],
+          "rings": 1280,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 90,
+          "minimumVisibleClearanceMm": 0.04956576772621032,
+          "maximumHiddenClearanceMm": -0.016242189105056152,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "penny/R13 rear collar curvature converges to a round join/default",
+      "passed": true,
+      "detail": {
+        "rearPointMm": [
+          0,
+          74.95443359375,
+          -130.2
+        ],
+        "radiusSamplesMm": [
+          {
+            "step": 0.04,
+            "radiusMm": 7.962270362963132
+          },
+          {
+            "step": 0.02,
+            "radiusMm": 7.922791509710787
+          },
+          {
+            "step": 0.01,
+            "radiusMm": 7.912908429641359
+          }
+        ],
+        "convergence": 0.9938005203200104,
+        "closestGeneratedVertexMm": 0.00000476699808854679,
+        "actualRearCapRiseMm": 1.2000007629394531,
+        "actualRearCapZMm": -140,
+        "actualRearCapVertices": 89,
+        "rearOpeningCover": {
+          "rearPartId": "penny-galosh",
+          "actualBindingRearMm": [
+            0,
+            73.64942932128906,
+            -131.63348388671875
+          ],
+          "worldRays": 20,
+          "fixedCameraRays": 9,
+          "worldSamples": [
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.14380898011271,
+              "firstPointMm": [
+                -1,
+                72.89942932128906,
+                -131.48967490660604
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.665410167655153,
+              "firstPointMm": [
+                -1,
+                72.14942932128906,
+                -131.9680737190636
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.027545084378403,
+              "firstPointMm": [
+                -1,
+                71.14942932128906,
+                -132.60593880234035
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.278076910851354,
+              "firstPointMm": [
+                -1,
+                69.64942932128906,
+                -133.3554069758674
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.129412922941583,
+              "firstPointMm": [
+                -0.5,
+                72.89942932128906,
+                -131.50407096377717
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.65028129694406,
+              "firstPointMm": [
+                -0.5,
+                72.14942932128906,
+                -131.9832025897747
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.01131409090121,
+              "firstPointMm": [
+                -0.5,
+                71.14942932128906,
+                -132.62216979581754
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.269377606346097,
+              "firstPointMm": [
+                -0.5,
+                69.64942932128906,
+                -133.36410628037265
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.120353911660658,
+              "firstPointMm": [
+                0,
+                72.89942932128906,
+                -131.5131299750581
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.641110131846318,
+              "firstPointMm": [
+                0,
+                72.14942932128906,
+                -131.99237375487243
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.002118425427227,
+              "firstPointMm": [
+                0,
+                71.14942932128906,
+                -132.63136546129152
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.26485139233415,
+              "firstPointMm": [
+                0,
+                69.64942932128906,
+                -133.3686324943846
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.129412922941583,
+              "firstPointMm": [
+                0.5,
+                72.89942932128906,
+                -131.50407096377717
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.65028129694406,
+              "firstPointMm": [
+                0.5,
+                72.14942932128906,
+                -131.9832025897747
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.01131409090121,
+              "firstPointMm": [
+                0.5,
+                71.14942932128906,
+                -132.62216979581754
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.269377606346097,
+              "firstPointMm": [
+                0.5,
+                69.64942932128906,
+                -133.36410628037265
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.14380898011271,
+              "firstPointMm": [
+                1,
+                72.89942932128906,
+                -131.48967490660604
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.665410167655153,
+              "firstPointMm": [
+                1,
+                72.14942932128906,
+                -131.9680737190636
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.027545084378403,
+              "firstPointMm": [
+                1,
+                71.14942932128906,
+                -132.60593880234035
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.278076910851354,
+              "firstPointMm": [
+                1,
+                69.64942932128906,
+                -133.3554069758674
+              ]
+            }
+          ],
+          "fixedCameraSamples": [
+            {
+              "pixel": [
+                519,
+                304
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 177,
+              "firstPointMm": [
+                -0.36107991114371174,
+                73.1442806862949,
+                -131.35008116320267
+              ]
+            },
+            {
+              "pixel": [
+                519,
+                306
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 176,
+              "firstPointMm": [
+                -0.32068397602104426,
+                72.52005609186897,
+                -131.7496485171623
+              ]
+            },
+            {
+              "pixel": [
+                519,
+                308
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 176,
+              "firstPointMm": [
+                -0.28033372901376197,
+                71.89662459552602,
+                -132.14875816759246
+              ]
+            },
+            {
+              "pixel": [
+                518,
+                309
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 220,
+              "firstPointMm": [
+                0.08884907405045794,
+                71.5911720874983,
+                -132.34746144458794
+              ]
+            },
+            {
+              "pixel": [
+                520,
+                309
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 177,
+              "firstPointMm": [
+                -0.6095801117422894,
+                71.5786043940678,
+                -132.34595159740667
+              ]
+            },
+            {
+              "pixel": [
+                519,
+                311
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 176,
+              "firstPointMm": [
+                -0.21990324237828673,
+                70.96294335433913,
+                -132.74648413422904
+              ]
+            },
+            {
+              "pixel": [
+                522,
+                306
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 179,
+              "firstPointMm": [
+                -1.3720073521350713,
+                72.49681658798835,
+                -131.72631073938032
+              ]
+            },
+            {
+              "pixel": [
+                513,
+                307
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 224,
+              "firstPointMm": [
+                1.7861989878098967,
+                72.22761821218725,
+                -131.8715369406031
+              ]
+            },
+            {
+              "pixel": [
+                525,
+                307
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 181,
+              "firstPointMm": [
+                -2.407779987006883,
+                72.15294524569757,
+                -131.86325615703578
+              ]
+            }
+          ],
+          "failures": [],
+          "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+        },
+        "scope": "shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review"
+      }
+    },
+    {
+      "name": "penny/R13 apron U seam is continuous and has real panel support/default",
+      "passed": true,
+      "detail": {
+        "connectedComponents": 1,
+        "physicalOpenEnds": 2,
+        "endCentresMm": [
+          [
+            -28.707939783732094,
+            59.932411193847656,
+            -16.777138710021973
+          ],
+          [
+            30.10996945699056,
+            59.93211364746094,
+            -16.782904942830402
+          ]
+        ],
+        "frontInsetMm": -0.0929718017578125,
+        "maximumBoundaryDistanceMm": 0.22754319382176733,
+        "support": [
+          {
+            "id": "penny-apron-seam",
+            "supportIds": [
+              "penny-apron",
+              "penny-galosh"
+            ],
+            "rings": 1492,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 0,
+            "minimumVisibleClearanceMm": null,
+            "maximumHiddenClearanceMm": null,
+            "method": "ray cast every centre and each eighth full section against the actual panel union; no per-period penetration claim"
+          }
+        ]
+      }
+    },
+    {
+      "name": "penny/R13 stitch sections remain continuous without neck collapse/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "seams": 6,
+        "testedRings": 4619,
+        "minimumAxisDot": 0.9977071440726251,
+        "minimumNeckRatio": 0.9994266216367965,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "penny/R13 welt stitches stay supported and penetrate every period/extreme-corner-0",
+      "passed": true,
+      "detail": [
+        {
+          "id": "welt-stitch--1",
+          "supportIds": [
+            "welt--1"
+          ],
+          "rings": 1143,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 80,
+          "minimumVisibleClearanceMm": 0.04981041279441116,
+          "maximumHiddenClearanceMm": -0.010783926051904938,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "welt-stitch-1",
+          "supportIds": [
+            "welt-1"
+          ],
+          "rings": 1153,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 81,
+          "minimumVisibleClearanceMm": 0.0491559536349583,
+          "maximumHiddenClearanceMm": -0.015042927329450095,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "penny/R13 rear collar curvature converges to a round join/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "rearPointMm": [
+          0,
+          74.76948058636543,
+          -117.17999999999999
+        ],
+        "radiusSamplesMm": [
+          {
+            "step": 0.04,
+            "radiusMm": 8.841588676021217
+          },
+          {
+            "step": 0.02,
+            "radiusMm": 8.801756944501804
+          },
+          {
+            "step": 0.01,
+            "radiusMm": 8.79178428574517
+          }
+        ],
+        "convergence": 0.9943670315255538,
+        "closestGeneratedVertexMm": 0.0000027590566458298193,
+        "actualRearCapRiseMm": 1.2000007629394531,
+        "actualRearCapZMm": -126,
+        "actualRearCapVertices": 89,
+        "rearOpeningCover": {
+          "rearPartId": "penny-galosh",
+          "actualBindingRearMm": [
+            0,
+            73.36516571044922,
+            -118.5647964477539
+          ],
+          "worldRays": 20,
+          "fixedCameraRays": 0,
+          "worldSamples": [
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.157191513622664,
+              "firstPointMm": [
+                -1,
+                72.61516571044922,
+                -118.40760493413124
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.723161258362182,
+              "firstPointMm": [
+                -1,
+                71.86516571044922,
+                -118.84163518939172
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.144454251348222,
+              "firstPointMm": [
+                -1,
+                70.86516571044922,
+                -119.42034219640568
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.505523949057405,
+              "firstPointMm": [
+                -1,
+                69.36516571044922,
+                -120.0592724986965
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.1440717944686,
+              "firstPointMm": [
+                -0.5,
+                72.61516571044922,
+                -118.4207246532853
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.70937327426472,
+              "firstPointMm": [
+                -0.5,
+                71.86516571044922,
+                -118.85542317348919
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.12964369071493,
+              "firstPointMm": [
+                -0.5,
+                70.86516571044922,
+                -119.43515275703898
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.497634207665413,
+              "firstPointMm": [
+                -0.5,
+                69.36516571044922,
+                -120.06716224008849
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.13586560292181,
+              "firstPointMm": [
+                0,
+                72.61516571044922,
+                -118.4289308448321
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.70106421548556,
+              "firstPointMm": [
+                0,
+                71.86516571044922,
+                -118.86373223226835
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.121329032237213,
+              "firstPointMm": [
+                0,
+                70.86516571044922,
+                -119.4434674155167
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.49355376913421,
+              "firstPointMm": [
+                0,
+                69.36516571044922,
+                -120.0712426786197
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.1440717944686,
+              "firstPointMm": [
+                0.5,
+                72.61516571044922,
+                -118.4207246532853
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.70937327426472,
+              "firstPointMm": [
+                0.5,
+                71.86516571044922,
+                -118.85542317348919
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.12964369071493,
+              "firstPointMm": [
+                0.5,
+                70.86516571044922,
+                -119.43515275703898
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.497634207665413,
+              "firstPointMm": [
+                0.5,
+                69.36516571044922,
+                -120.06716224008849
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.157191513622664,
+              "firstPointMm": [
+                1,
+                72.61516571044922,
+                -118.40760493413124
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.723161258362182,
+              "firstPointMm": [
+                1,
+                71.86516571044922,
+                -118.84163518939172
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.144454251348222,
+              "firstPointMm": [
+                1,
+                70.86516571044922,
+                -119.42034219640568
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.505523949057405,
+              "firstPointMm": [
+                1,
+                69.36516571044922,
+                -120.0592724986965
+              ]
+            }
+          ],
+          "fixedCameraSamples": [],
+          "failures": [],
+          "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+        },
+        "scope": "shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review"
+      }
+    },
+    {
+      "name": "penny/R13 apron U seam is continuous and has real panel support/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "connectedComponents": 1,
+        "physicalOpenEnds": 2,
+        "endCentresMm": [
+          [
+            -26.079820950826008,
+            56.44230397542317,
+            -15.092249870300293
+          ],
+          [
+            27.52777894337972,
+            56.44222450256348,
+            -15.098783651987711
+          ]
+        ],
+        "frontInsetMm": -0.09797159830728219,
+        "maximumBoundaryDistanceMm": 0.22767154369685774,
+        "support": [
+          {
+            "id": "penny-apron-seam",
+            "supportIds": [
+              "penny-apron",
+              "penny-galosh"
+            ],
+            "rings": 1337,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 0,
+            "minimumVisibleClearanceMm": null,
+            "maximumHiddenClearanceMm": null,
+            "method": "ray cast every centre and each eighth full section against the actual panel union; no per-period penetration claim"
+          }
+        ]
+      }
+    },
+    {
+      "name": "penny/R13 stitch sections remain continuous without neck collapse/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "seams": 6,
+        "testedRings": 5679,
+        "minimumAxisDot": 0.9917327808891951,
+        "minimumNeckRatio": 0.9979310549555006,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "penny/R13 welt stitches stay supported and penetrate every period/extreme-corner-15",
+      "passed": true,
+      "detail": [
+        {
+          "id": "welt-stitch--1",
+          "supportIds": [
+            "welt--1"
+          ],
+          "rings": 1399,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 98,
+          "minimumVisibleClearanceMm": 0.04981073906398679,
+          "maximumHiddenClearanceMm": -0.0125887907414527,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "welt-stitch-1",
+          "supportIds": [
+            "welt-1"
+          ],
+          "rings": 1412,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 99,
+          "minimumVisibleClearanceMm": 0.049984416805917094,
+          "maximumHiddenClearanceMm": -0.014863739285662638,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "penny/R13 rear collar curvature converges to a round join/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "rearPointMm": [
+          0,
+          75.25035840556532,
+          -143.22
+        ],
+        "radiusSamplesMm": [
+          {
+            "step": 0.04,
+            "radiusMm": 7.243291317777788
+          },
+          {
+            "step": 0.02,
+            "radiusMm": 7.203753786475442
+          },
+          {
+            "step": 0.01,
+            "radiusMm": 7.193857138014539
+          }
+        ],
+        "convergence": 0.9931751771957702,
+        "closestGeneratedVertexMm": 0.0000012333224453849417,
+        "actualRearCapRiseMm": 1.2000007629394531,
+        "actualRearCapZMm": -154,
+        "actualRearCapVertices": 89,
+        "rearOpeningCover": {
+          "rearPartId": "penny-galosh",
+          "actualBindingRearMm": [
+            0,
+            74.0322494506836,
+            -144.68992614746094
+          ],
+          "worldRays": 20,
+          "fixedCameraRays": 0,
+          "worldSamples": [
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.129529232004245,
+              "firstPointMm": [
+                -1,
+                73.2822494506836,
+                -144.5603969154567
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.609939218806915,
+              "firstPointMm": [
+                -1,
+                72.5322494506836,
+                -145.07998692865402
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.91715253454379,
+              "firstPointMm": [
+                -1,
+                71.5322494506836,
+                -145.77277361291715
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.050541344927268,
+              "firstPointMm": [
+                -1,
+                70.0322494506836,
+                -146.63938480253367
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.113931186302864,
+              "firstPointMm": [
+                -0.5,
+                73.2822494506836,
+                -144.57599496115807
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.59355164034605,
+              "firstPointMm": [
+                -0.5,
+                72.5322494506836,
+                -145.0963745071149
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.899598667701298,
+              "firstPointMm": [
+                -0.5,
+                71.5322494506836,
+                -145.79032747975964
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.041057825553253,
+              "firstPointMm": [
+                -0.5,
+                70.0322494506836,
+                -146.64886832190768
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.10405902977203,
+              "firstPointMm": [
+                0,
+                73.2822494506836,
+                -144.5858671176889
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.583559730888112,
+              "firstPointMm": [
+                0,
+                72.5322494506836,
+                -145.10636641657283
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.889560665709553,
+              "firstPointMm": [
+                0,
+                71.5322494506836,
+                -145.80036548175138
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.036091877667502,
+              "firstPointMm": [
+                0,
+                70.0322494506836,
+                -146.65383426979344
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.113931186302864,
+              "firstPointMm": [
+                0.5,
+                73.2822494506836,
+                -144.57599496115807
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.59355164034605,
+              "firstPointMm": [
+                0.5,
+                72.5322494506836,
+                -145.0963745071149
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.899598667701298,
+              "firstPointMm": [
+                0.5,
+                71.5322494506836,
+                -145.79032747975964
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.041057825553253,
+              "firstPointMm": [
+                0.5,
+                70.0322494506836,
+                -146.64886832190768
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.129529232004245,
+              "firstPointMm": [
+                1,
+                73.2822494506836,
+                -144.5603969154567
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.609939218806915,
+              "firstPointMm": [
+                1,
+                72.5322494506836,
+                -145.07998692865402
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.91715253454379,
+              "firstPointMm": [
+                1,
+                71.5322494506836,
+                -145.77277361291715
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.050541344927268,
+              "firstPointMm": [
+                1,
+                70.0322494506836,
+                -146.63938480253367
+              ]
+            }
+          ],
+          "fixedCameraSamples": [],
+          "failures": [],
+          "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+        },
+        "scope": "shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review"
+      }
+    },
+    {
+      "name": "penny/R13 apron U seam is continuous and has real panel support/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "connectedComponents": 1,
+        "physicalOpenEnds": 2,
+        "endCentresMm": [
+          [
+            -31.99371083577474,
+            65.51444117228189,
+            -18.461345672607422
+          ],
+          [
+            33.33846791585286,
+            65.513978322347,
+            -18.46645895640055
+          ]
+        ],
+        "frontInsetMm": -0.08815765380859375,
+        "maximumBoundaryDistanceMm": 0.22935986716408716,
+        "support": [
+          {
+            "id": "penny-apron-seam",
+            "supportIds": [
+              "penny-apron",
+              "penny-galosh"
+            ],
+            "rings": 1661,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 0,
+            "minimumVisibleClearanceMm": null,
+            "maximumHiddenClearanceMm": null,
+            "method": "ray cast every centre and each eighth full section against the actual panel union; no per-period penetration claim"
+          }
+        ]
+      }
+    },
+    {
+      "name": "chelsea/R13 stitch sections remain continuous without neck collapse/default",
+      "passed": true,
+      "detail": {
+        "seams": 7,
+        "testedRings": 5521,
+        "minimumAxisDot": 0.9923207904066513,
+        "minimumNeckRatio": 0.9986361819025689,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "chelsea/R13 welt stitches stay supported and penetrate every period/default",
+      "passed": true,
+      "detail": [
+        {
+          "id": "welt-stitch--1",
+          "supportIds": [
+            "welt--1"
+          ],
+          "rings": 1294,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 91,
+          "minimumVisibleClearanceMm": 0.04934113250300727,
+          "maximumHiddenClearanceMm": -0.012387759679598006,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "welt-stitch-1",
+          "supportIds": [
+            "welt-1"
+          ],
+          "rings": 1305,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 92,
+          "minimumVisibleClearanceMm": 0.049740951078446796,
+          "maximumHiddenClearanceMm": -0.010125211009031986,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "chelsea/R13 side rays encounter exterior without inner surfaces or gaps/default",
+      "passed": true,
+      "detail": {
+        "rays": 430,
+        "directions": [
+          "world +X",
+          "world -X"
+        ],
+        "innerFirstHits": 0,
+        "misses": 0,
+        "explicitR12FailureSamplesPerSide": 5
+      }
+    },
+    {
+      "name": "chelsea/R13 gore stitches penetrate actual leather/default",
+      "passed": true,
+      "detail": [
+        {
+          "id": "gore-seam--1--1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 595,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 45,
+          "minimumVisibleClearanceMm": 0.037958889993266055,
+          "maximumHiddenClearanceMm": -0.015542621477671102,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "gore-seam--1-1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 538,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 41,
+          "minimumVisibleClearanceMm": 0.04112372789713045,
+          "maximumHiddenClearanceMm": -0.010285464802003466,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "gore-seam-1--1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 538,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 41,
+          "minimumVisibleClearanceMm": 0.03884344073011594,
+          "maximumHiddenClearanceMm": -0.016614425599939052,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "gore-seam-1-1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 595,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 45,
+          "minimumVisibleClearanceMm": 0.042765902265435744,
+          "maximumHiddenClearanceMm": -0.013551095892386504,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "chelsea/R13 stitch sections remain continuous without neck collapse/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "seams": 7,
+        "testedRings": 5253,
+        "minimumAxisDot": 0.9919567428440506,
+        "minimumNeckRatio": 0.9987406943899114,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "chelsea/R13 welt stitches stay supported and penetrate every period/extreme-corner-0",
+      "passed": true,
+      "detail": [
+        {
+          "id": "welt-stitch--1",
+          "supportIds": [
+            "welt--1"
+          ],
+          "rings": 1166,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 82,
+          "minimumVisibleClearanceMm": 0.05031855092250822,
+          "maximumHiddenClearanceMm": -0.016942436831111757,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "welt-stitch-1",
+          "supportIds": [
+            "welt-1"
+          ],
+          "rings": 1177,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 83,
+          "minimumVisibleClearanceMm": 0.04942016762314681,
+          "maximumHiddenClearanceMm": -0.012754434612424979,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "chelsea/R13 side rays encounter exterior without inner surfaces or gaps/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "rays": 430,
+        "directions": [
+          "world +X",
+          "world -X"
+        ],
+        "innerFirstHits": 0,
+        "misses": 0,
+        "explicitR12FailureSamplesPerSide": 5
+      }
+    },
+    {
+      "name": "chelsea/R13 gore stitches penetrate actual leather/extreme-corner-0",
+      "passed": true,
+      "detail": [
+        {
+          "id": "gore-seam--1--1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 588,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 44,
+          "minimumVisibleClearanceMm": 0.04359891557213515,
+          "maximumHiddenClearanceMm": -0.025366037821995396,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "gore-seam--1-1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 542,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 41,
+          "minimumVisibleClearanceMm": 0.043576464464212115,
+          "maximumHiddenClearanceMm": -0.018996968502445904,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "gore-seam-1--1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 543,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 41,
+          "minimumVisibleClearanceMm": 0.04053638426612243,
+          "maximumHiddenClearanceMm": -0.010270959201865739,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "gore-seam-1-1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 588,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 44,
+          "minimumVisibleClearanceMm": 0.04459469199281113,
+          "maximumHiddenClearanceMm": -0.02004124500591515,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "chelsea/R13 stitch sections remain continuous without neck collapse/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "seams": 7,
+        "testedRings": 5783,
+        "minimumAxisDot": 0.9928704026034556,
+        "minimumNeckRatio": 0.9986222787823797,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "chelsea/R13 welt stitches stay supported and penetrate every period/extreme-corner-15",
+      "passed": true,
+      "detail": [
+        {
+          "id": "welt-stitch--1",
+          "supportIds": [
+            "welt--1"
+          ],
+          "rings": 1426,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 100,
+          "minimumVisibleClearanceMm": 0.04984681317220827,
+          "maximumHiddenClearanceMm": -0.011251684014038017,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "welt-stitch-1",
+          "supportIds": [
+            "welt-1"
+          ],
+          "rings": 1439,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 101,
+          "minimumVisibleClearanceMm": 0.04972646300345056,
+          "maximumHiddenClearanceMm": -0.013787725653475764,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "chelsea/R13 side rays encounter exterior without inner surfaces or gaps/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "rays": 430,
+        "directions": [
+          "world +X",
+          "world -X"
+        ],
+        "innerFirstHits": 0,
+        "misses": 0,
+        "explicitR12FailureSamplesPerSide": 5
+      }
+    },
+    {
+      "name": "chelsea/R13 gore stitches penetrate actual leather/extreme-corner-15",
+      "passed": true,
+      "detail": [
+        {
+          "id": "gore-seam--1--1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 600,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 45,
+          "minimumVisibleClearanceMm": 0.03765941527363569,
+          "maximumHiddenClearanceMm": -0.010931339715656687,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "gore-seam--1-1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 527,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 40,
+          "minimumVisibleClearanceMm": 0.03819844345744881,
+          "maximumHiddenClearanceMm": -0.011478967818577187,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "gore-seam-1--1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 527,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 40,
+          "minimumVisibleClearanceMm": 0.03694769694623917,
+          "maximumHiddenClearanceMm": -0.014400085989934162,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "gore-seam-1-1",
+          "supportIds": [
+            "chelsea-whole-vamp",
+            "chelsea-back-quarter"
+          ],
+          "rings": 600,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 45,
+          "minimumVisibleClearanceMm": 0.0399422038552378,
+          "maximumHiddenClearanceMm": -0.01588655745743137,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "monk/R13 stitch sections remain continuous without neck collapse/default",
+      "passed": true,
+      "detail": {
+        "seams": 11,
+        "testedRings": 5783,
+        "minimumAxisDot": 0.9994384514402461,
+        "minimumNeckRatio": 0.9998593716030458,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "monk/R13 welt stitches stay supported and penetrate every period/default",
+      "passed": true,
+      "detail": [
+        {
+          "id": "welt-stitch--1",
+          "supportIds": [
+            "welt--1"
+          ],
+          "rings": 1303,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 92,
+          "minimumVisibleClearanceMm": 0.049352785409932355,
+          "maximumHiddenClearanceMm": -0.015586789026010368,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "welt-stitch-1",
+          "supportIds": [
+            "welt-1"
+          ],
+          "rings": 1314,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 92,
+          "minimumVisibleClearanceMm": 0.04954783970496185,
+          "maximumHiddenClearanceMm": -0.010961462938924135,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "monk/R13 rear collar curvature converges to a round join/default",
+      "passed": true,
+      "detail": {
+        "rearPointMm": [
+          0,
+          80.08421875,
+          -134.385
+        ],
+        "radiusSamplesMm": [
+          {
+            "step": 0.04,
+            "radiusMm": 7.652325059432075
+          },
+          {
+            "step": 0.02,
+            "radiusMm": 7.6165433136375995
+          },
+          {
+            "step": 0.01,
+            "radiusMm": 7.607586939055445
+          }
+        ],
+        "convergence": 0.9941536565646167,
+        "closestGeneratedVertexMm": 0.07999776242955459,
+        "actualRearCapRiseMm": 1.2151031494140625,
+        "actualRearCapZMm": -145.92991638183594,
+        "actualRearCapVertices": 29,
+        "rearOpeningCover": {
+          "rearPartId": "monk-open-quarters",
+          "actualBindingRearMm": [
+            0.011315647512674332,
+            81.05484008789062,
+            -136.05413818359375
+          ],
+          "worldRays": 20,
+          "fixedCameraRays": 6,
+          "worldSamples": [
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.045790882704296,
+              "firstPointMm": [
+                -0.9886843524873257,
+                80.30484008789062,
+                -136.00834730088945
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.582661926403432,
+              "firstPointMm": [
+                -0.9886843524873257,
+                79.55484008789062,
+                -136.47147625719032
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.057080330788267,
+              "firstPointMm": [
+                -0.9886843524873257,
+                78.55484008789062,
+                -136.99705785280548
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.268472063303278,
+              "firstPointMm": [
+                -0.9886843524873257,
+                77.05484008789062,
+                -137.78566612029047
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.005353022634182,
+              "firstPointMm": [
+                -0.48868435248732567,
+                80.30484008789062,
+                -136.04878516095957
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.558159754808628,
+              "firstPointMm": [
+                -0.48868435248732567,
+                79.55484008789062,
+                -136.49597842878512
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.032403167690177,
+              "firstPointMm": [
+                -0.48868435248732567,
+                78.55484008789062,
+                -137.02173501590357
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.2430488877786,
+              "firstPointMm": [
+                -0.48868435248732567,
+                77.05484008789062,
+                -137.81108929581515
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.966745484846996,
+              "firstPointMm": [
+                0.011315647512674332,
+                80.30484008789062,
+                -136.08739269874675
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.53436689754477,
+              "firstPointMm": [
+                0.011315647512674332,
+                79.55484008789062,
+                -136.51977128604898
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.008130710937053,
+              "firstPointMm": [
+                0.011315647512674332,
+                78.55484008789062,
+                -137.0460074726567
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.218776431025447,
+              "firstPointMm": [
+                0.011315647512674332,
+                77.05484008789062,
+                -137.8353617525683
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.00718334491708,
+              "firstPointMm": [
+                0.5113156475126743,
+                80.30484008789062,
+                -136.04695483867667
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.559268786556856,
+              "firstPointMm": [
+                0.5113156475126743,
+                79.55484008789062,
+                -136.4948693970369
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.033553886461732,
+              "firstPointMm": [
+                0.5113156475126743,
+                78.55484008789062,
+                -137.02058429713202
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.244199606550154,
+              "firstPointMm": [
+                0.5113156475126743,
+                77.05484008789062,
+                -137.8099385770436
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.047621204987166,
+              "firstPointMm": [
+                1.0113156475126743,
+                80.30484008789062,
+                -136.00651697860658
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.58377095815169,
+              "firstPointMm": [
+                1.0113156475126743,
+                79.55484008789062,
+                -136.47036722544206
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.058189362536524,
+              "firstPointMm": [
+                1.0113156475126743,
+                78.55484008789062,
+                -136.99594882105723
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.269622782074833,
+              "firstPointMm": [
+                1.0113156475126743,
+                77.05484008789062,
+                -137.78451540151892
+              ]
+            }
+          ],
+          "fixedCameraSamples": [
+            {
+              "pixel": [
+                516,
+                313
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 196,
+              "firstPointMm": [
+                0.4819950531503423,
+                80.3777196402455,
+                -135.98564996330623
+              ]
+            },
+            {
+              "pixel": [
+                517,
+                313
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 196,
+              "firstPointMm": [
+                0.11954416054943096,
+                80.37777879828771,
+                -136.01491175279588
+              ]
+            },
+            {
+              "pixel": [
+                518,
+                313
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 168,
+              "firstPointMm": [
+                -0.24666623568010237,
+                80.37040226577632,
+                -136.01107567496751
+              ]
+            },
+            {
+              "pixel": [
+                517,
+                314
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 141,
+              "firstPointMm": [
+                0.14323085772095823,
+                80.05777031763705,
+                -136.24857627776544
+              ]
+            },
+            {
+              "pixel": [
+                516,
+                315
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 141,
+              "firstPointMm": [
+                0.5236036987443171,
+                79.72685356009343,
+                -136.40386011396956
+              ]
+            },
+            {
+              "pixel": [
+                519,
+                315
+              ],
+              "passed": true,
+              "firstLayer": 0,
+              "firstFace": 57,
+              "firstPointMm": [
+                -0.5722944609725715,
+                79.70877302701263,
+                -136.41097685057332
+              ]
+            }
+          ],
+          "failures": [],
+          "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+        },
+        "scope": "shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review"
+      }
+    },
+    {
+      "name": "monk/R13 stitch sections remain continuous without neck collapse/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "seams": 11,
+        "testedRings": 5254,
+        "minimumAxisDot": 0.9994146128169261,
+        "minimumNeckRatio": 0.9998536424939718,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "monk/R13 welt stitches stay supported and penetrate every period/extreme-corner-0",
+      "passed": true,
+      "detail": [
+        {
+          "id": "welt-stitch--1",
+          "supportIds": [
+            "welt--1"
+          ],
+          "rings": 1174,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 82,
+          "minimumVisibleClearanceMm": 0.049839924519468094,
+          "maximumHiddenClearanceMm": -0.01103709344955775,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "welt-stitch-1",
+          "supportIds": [
+            "welt-1"
+          ],
+          "rings": 1184,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 83,
+          "minimumVisibleClearanceMm": 0.04938669780536983,
+          "maximumHiddenClearanceMm": -0.01273131601912757,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "monk/R13 rear collar curvature converges to a round join/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "rearPointMm": [
+          0,
+          79.89926574261543,
+          -120.9465
+        ],
+        "radiusSamplesMm": [
+          {
+            "step": 0.04,
+            "radiusMm": 8.4975201522987
+          },
+          {
+            "step": 0.02,
+            "radiusMm": 8.461559965687236
+          },
+          {
+            "step": 0.01,
+            "radiusMm": 8.452557884253533
+          }
+        ],
+        "convergence": 0.9947087777093411,
+        "closestGeneratedVertexMm": 0.07999710118600431,
+        "actualRearCapRiseMm": 1.2093429565429688,
+        "actualRearCapZMm": -131.0299530029297,
+        "actualRearCapVertices": 29,
+        "rearOpeningCover": {
+          "rearPartId": "monk-open-quarters",
+          "actualBindingRearMm": [
+            0.010100306943058968,
+            80.52364349365234,
+            -122.32350158691406
+          ],
+          "worldRays": 20,
+          "fixedCameraRays": 0,
+          "worldSamples": [
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.099902842646145,
+              "firstPointMm": [
+                -0.989899693056941,
+                79.77364349365234,
+                -122.22359874426792
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.69278516470885,
+              "firstPointMm": [
+                -0.989899693056941,
+                79.02364349365234,
+                -122.63071642220521
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.217400852825918,
+              "firstPointMm": [
+                -0.989899693056941,
+                78.02364349365234,
+                -123.10610073408814
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.504039737899404,
+              "firstPointMm": [
+                -0.989899693056941,
+                76.52364349365234,
+                -123.81946184901466
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.063225911355403,
+              "firstPointMm": [
+                -0.48989969305694103,
+                79.77364349365234,
+                -122.26027567555866
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.67073521060611,
+              "firstPointMm": [
+                -0.48989969305694103,
+                79.02364349365234,
+                -122.65276637630795
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.195137818360948,
+              "firstPointMm": [
+                -0.48989969305694103,
+                78.02364349365234,
+                -123.12836376855311
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.481052653387678,
+              "firstPointMm": [
+                -0.48989969305694103,
+                76.52364349365234,
+                -123.84244893352638
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.028030773119724,
+              "firstPointMm": [
+                0.010100306943058968,
+                79.77364349365234,
+                -122.29547081379434
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.649136216935247,
+              "firstPointMm": [
+                0.010100306943058968,
+                79.02364349365234,
+                -122.67436536997882
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.173079440286415,
+              "firstPointMm": [
+                0.010100306943058968,
+                78.02364349365234,
+                -123.15042214662765
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.458994275313145,
+              "firstPointMm": [
+                0.010100306943058968,
+                76.52364349365234,
+                -123.86450731160092
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.064707704410466,
+              "firstPointMm": [
+                0.510100306943059,
+                79.77364349365234,
+                -122.2587938825036
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.671626055824177,
+              "firstPointMm": [
+                0.510100306943059,
+                79.02364349365234,
+                -122.65187553108989
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.196066524798127,
+              "firstPointMm": [
+                0.510100306943059,
+                78.02364349365234,
+                -123.12743506211594
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.481981359824857,
+              "firstPointMm": [
+                0.510100306943059,
+                76.52364349365234,
+                -123.8415202270892
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 20.10138463570121,
+              "firstPointMm": [
+                1.010100306943059,
+                79.77364349365234,
+                -122.22211695121285
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.693676009926918,
+              "firstPointMm": [
+                1.010100306943059,
+                79.02364349365234,
+                -122.62982557698714
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.218291698043984,
+              "firstPointMm": [
+                1.010100306943059,
+                78.02364349365234,
+                -123.10520988887008
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.504968444336583,
+              "firstPointMm": [
+                1.010100306943059,
+                76.52364349365234,
+                -123.81853314257748
+              ]
+            }
+          ],
+          "fixedCameraSamples": [],
+          "failures": [],
+          "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+        },
+        "scope": "shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review"
+      }
+    },
+    {
+      "name": "monk/R13 stitch sections remain continuous without neck collapse/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "seams": 11,
+        "testedRings": 6425,
+        "minimumAxisDot": 0.9994798138095606,
+        "minimumNeckRatio": 0.9998699449952403,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "monk/R13 welt stitches stay supported and penetrate every period/extreme-corner-15",
+      "passed": true,
+      "detail": [
+        {
+          "id": "welt-stitch--1",
+          "supportIds": [
+            "welt--1"
+          ],
+          "rings": 1436,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 101,
+          "minimumVisibleClearanceMm": 0.04987653880388216,
+          "maximumHiddenClearanceMm": -0.013959222225674925,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        },
+        {
+          "id": "welt-stitch-1",
+          "supportIds": [
+            "welt-1"
+          ],
+          "rings": 1449,
+          "unsupportedCentres": 0,
+          "verifiedCompletePeriods": 102,
+          "minimumVisibleClearanceMm": 0.04979346327048536,
+          "maximumHiddenClearanceMm": -0.012192393772874515,
+          "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+        }
+      ]
+    },
+    {
+      "name": "monk/R13 rear collar curvature converges to a round join/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "rearPointMm": [
+          0,
+          80.38014356181533,
+          -147.8235
+        ],
+        "radiusSamplesMm": [
+          {
+            "step": 0.04,
+            "radiusMm": 6.9612378707573805
+          },
+          {
+            "step": 0.02,
+            "radiusMm": 6.925275081068775
+          },
+          {
+            "step": 0.01,
+            "radiusMm": 6.91627433256362
+          }
+        ],
+        "convergence": 0.9935408703123559,
+        "closestGeneratedVertexMm": 0.07999387317429411,
+        "actualRearCapRiseMm": 1.2252006530761719,
+        "actualRearCapZMm": -161.12985229492188,
+        "actualRearCapVertices": 29,
+        "rearOpeningCover": {
+          "rearPartId": "monk-open-quarters",
+          "actualBindingRearMm": [
+            0.012545973062515259,
+            81.9318618774414,
+            -149.9711456298828
+          ],
+          "worldRays": 20,
+          "fixedCameraRays": 0,
+          "worldSamples": [
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.99692204741808,
+              "firstPointMm": [
+                -0.9874540269374847,
+                81.1818618774414,
+                -149.97422358246473
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.469665970597532,
+              "firstPointMm": [
+                -0.9874540269374847,
+                80.4318618774414,
+                -150.50147965928528
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.89622856935668,
+              "firstPointMm": [
+                -0.9874540269374847,
+                79.4318618774414,
+                -151.07491706052613
+              ]
+            },
+            {
+              "lateralMm": -1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.035923679330693,
+              "firstPointMm": [
+                -0.9874540269374847,
+                77.9318618774414,
+                -151.93522195055212
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.952983580182774,
+              "firstPointMm": [
+                -0.48745402693748474,
+                81.1818618774414,
+                -150.01816204970004
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.44271805436867,
+              "firstPointMm": [
+                -0.48745402693748474,
+                80.4318618774414,
+                -150.52842757551414
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.869173980248462,
+              "firstPointMm": [
+                -0.48745402693748474,
+                79.4318618774414,
+                -151.10197164963435
+              ]
+            },
+            {
+              "lateralMm": -0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.00817280328394,
+              "firstPointMm": [
+                -0.48745402693748474,
+                77.9318618774414,
+                -151.96297282659887
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.911250116252802,
+              "firstPointMm": [
+                0.012545973062515259,
+                81.1818618774414,
+                -150.05989551363
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.4168165358181,
+              "firstPointMm": [
+                0.012545973062515259,
+                80.4318618774414,
+                -150.5543290940647
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.842815751175067,
+              "firstPointMm": [
+                0.012545973062515259,
+                79.4318618774414,
+                -151.12832987870775
+              ]
+            },
+            {
+              "lateralMm": 0,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 17.981814574210546,
+              "firstPointMm": [
+                0.012545973062515259,
+                77.9318618774414,
+                -151.98933105567227
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.955188583488138,
+              "firstPointMm": [
+                0.5125459730625153,
+                81.1818618774414,
+                -150.01595704639467
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.444070405693083,
+              "firstPointMm": [
+                0.5125459730625153,
+                80.4318618774414,
+                -150.52707522418973
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.870566627221848,
+              "firstPointMm": [
+                0.5125459730625153,
+                79.4318618774414,
+                -151.10057900266096
+              ]
+            },
+            {
+              "lateralMm": 0.5,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.0095654502573,
+              "firstPointMm": [
+                0.5125459730625153,
+                77.9318618774414,
+                -151.9615801796255
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 0.75,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.999127050723445,
+              "firstPointMm": [
+                1.0125459730625153,
+                81.1818618774414,
+                -149.97201857915937
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 1.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 19.471018321921918,
+              "firstPointMm": [
+                1.0125459730625153,
+                80.4318618774414,
+                -150.5001273079609
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 2.5,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.897580920681065,
+              "firstPointMm": [
+                1.0125459730625153,
+                79.4318618774414,
+                -151.07356470920175
+              ]
+            },
+            {
+              "lateralMm": 1,
+              "belowBindingMm": 4,
+              "passed": true,
+              "firstLayer": 0,
+              "firstDistanceMm": 18.03731632630405,
+              "firstPointMm": [
+                1.0125459730625153,
+                77.9318618774414,
+                -151.93382930357876
+              ]
+            }
+          ],
+          "fixedCameraSamples": [],
+          "failures": [],
+          "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+        },
+        "scope": "shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review"
+      }
+    },
+    {
+      "name": "canvas/R13 stitch sections remain continuous without neck collapse/default",
+      "passed": true,
+      "detail": {
+        "seams": 5,
+        "testedRings": 1856,
+        "minimumAxisDot": 0.961670173515983,
+        "minimumNeckRatio": 0.9903711863530343,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "canvas/R13 rear collar curvature converges to a round join/default",
+      "passed": true,
+      "detail": {
+        "rearPointMm": [
+          0,
+          70.61035495535714,
+          -126.94500000000001
+        ],
+        "radiusSamplesMm": [
+          {
+            "step": 0.04,
+            "radiusMm": 9.364534826840293
+          },
+          {
+            "step": 0.02,
+            "radiusMm": 9.332320358819107
+          },
+          {
+            "step": 0.01,
+            "radiusMm": 9.32425567035237
+          }
+        ],
+        "convergence": 0.9956987552256759,
+        "closestGeneratedVertexMm": 0.10296759572164291,
+        "actualRearCapRiseMm": 1.208796501159668,
+        "actualRearCapZMm": -140.34996032714844,
+        "actualRearCapVertices": 62,
+        "rearOpeningCover": null,
+        "scope": "shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review"
+      }
+    },
+    {
+      "name": "canvas/R13 foxing and upper bead form physical closed loops/default",
+      "passed": true,
+      "detail": {
+        "outerStripComponents": 1,
+        "closedRimLoops": 2,
+        "beadComponents": 1,
+        "openBeadEnds": 0,
+        "method": "actual indexed triangles welded only within 0.0001 mm to account for UV duplicates",
+        "endFaceRays": 40,
+        "minimumCoverClearanceMm": 0.45417637133832045,
+        "endFaceScope": "actual exterior first hits at toe and heel, including upper panels, outsole and insole; real bead may provide cover"
+      }
+    },
+    {
+      "name": "canvas/R13 stitch sections remain continuous without neck collapse/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "seams": 5,
+        "testedRings": 1707,
+        "minimumAxisDot": 0.9486212549179284,
+        "minimumNeckRatio": 0.9870717438256921,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "canvas/R13 rear collar curvature converges to a round join/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "rearPointMm": [
+          0,
+          70.38706583632299,
+          -114.2505
+        ],
+        "radiusSamplesMm": [
+          {
+            "step": 0.04,
+            "radiusMm": 10.400032863986258
+          },
+          {
+            "step": 0.02,
+            "radiusMm": 10.367993259849857
+          },
+          {
+            "step": 0.01,
+            "radiusMm": 10.35997117452684
+          }
+        ],
+        "convergence": 0.9961479266476028,
+        "closestGeneratedVertexMm": 0.3274551220615152,
+        "actualRearCapRiseMm": 1.207942008972168,
+        "actualRearCapZMm": -126.39996337890625,
+        "actualRearCapVertices": 62,
+        "rearOpeningCover": null,
+        "scope": "shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review"
+      }
+    },
+    {
+      "name": "canvas/R13 foxing and upper bead form physical closed loops/extreme-corner-0",
+      "passed": true,
+      "detail": {
+        "outerStripComponents": 1,
+        "closedRimLoops": 2,
+        "beadComponents": 1,
+        "openBeadEnds": 0,
+        "method": "actual indexed triangles welded only within 0.0001 mm to account for UV duplicates",
+        "endFaceRays": 40,
+        "minimumCoverClearanceMm": 0.453961592189998,
+        "endFaceScope": "actual exterior first hits at toe and heel, including upper panels, outsole and insole; real bead may provide cover"
+      }
+    },
+    {
+      "name": "canvas/R13 stitch sections remain continuous without neck collapse/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "seams": 5,
+        "testedRings": 2039,
+        "minimumAxisDot": 0.9674571787987479,
+        "minimumNeckRatio": 0.991830917975201,
+        "method": "actual ring vertices and interpolated connecting sections; configured width alone is not used"
+      }
+    },
+    {
+      "name": "canvas/R13 rear collar curvature converges to a round join/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "rearPointMm": [
+          0,
+          70.96761754581178,
+          -139.63950000000003
+        ],
+        "radiusSamplesMm": [
+          {
+            "step": 0.04,
+            "radiusMm": 8.517740284414742
+          },
+          {
+            "step": 0.02,
+            "radiusMm": 8.485059413463897
+          },
+          {
+            "step": 0.01,
+            "radiusMm": 8.476879024666864
+          }
+        ],
+        "convergence": 0.9952028051591755,
+        "closestGeneratedVertexMm": 0.4062011862411769,
+        "actualRearCapRiseMm": 1.2096281051635742,
+        "actualRearCapZMm": -154.29994201660156,
+        "actualRearCapVertices": 62,
+        "rearOpeningCover": null,
+        "scope": "shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review"
+      }
+    },
+    {
+      "name": "canvas/R13 foxing and upper bead form physical closed loops/extreme-corner-15",
+      "passed": true,
+      "detail": {
+        "outerStripComponents": 1,
+        "closedRimLoops": 2,
+        "beadComponents": 1,
+        "openBeadEnds": 0,
+        "method": "actual indexed triangles welded only within 0.0001 mm to account for UV duplicates",
+        "endFaceRays": 40,
+        "minimumCoverClearanceMm": 0.45433276709587744,
+        "endFaceScope": "actual exterior first hits at toe and heel, including upper panels, outsole and insole; real bead may provide cover"
+      }
+    }
+  ],
+  "reviewParameterScope": [
+    "default",
+    "extreme-corner-0",
+    "extreme-corner-15"
+  ],
+  "preservation": [
+    {
+      "name": "R10 files unchanged against fixed Git baseline",
+      "passed": true,
+      "detail": {
+        "fileCount": 22,
+        "baseline": "cafab0889b612ed6cbf461683dfe2851909df3be",
+        "method": "exact Git blob bytes, not geometry similarity"
+      }
+    },
+    {
+      "name": "R12 files and historical evidence unchanged against fixed baseline",
+      "passed": true,
+      "detail": {
+        "fileCount": 27,
+        "baseline": "fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d",
+        "method": "exact retained file bytes, including published HTML and prior review evidence"
+      }
+    },
+    {
+      "name": "R13 retains exact original R10 shoe and scan payloads",
+      "passed": true,
+      "detail": {
+        "method": "exact embedded payload equality against unchanged R10",
+        "payloads": {
+          "shoe-data": {
+            "bytes": 8537894,
+            "sha256": "cdc486a8dd1a58af8eb6e04ca7596cb70c2935e09f5f030de0178cd479c61e04"
+          },
+          "scan-data": {
+            "bytes": 1274856,
+            "sha256": "0ef8c11c7328e20492ef33aadd2c9ac874161b871be04016f3ea109dced8ab1e"
+          }
+        }
+      }
+    }
+  ],
+  "defaults": [
+    {
+      "style": "penny",
+      "case": "default",
+      "parts": 17,
+      "triangles": 123844,
+      "dimensionsMm": [
+        108.34329986572266,
+        76.60298001766205,
+        280
+      ]
+    },
+    {
+      "style": "chelsea",
+      "case": "default",
+      "parts": 20,
+      "triangles": 143352,
+      "dimensionsMm": [
+        107.33142852783203,
+        187.0817016363144,
+        286
+      ]
+    },
+    {
+      "style": "monk",
+      "case": "default",
+      "parts": 32,
+      "triangles": 106072,
+      "dimensionsMm": [
+        106.3195571899414,
+        95.14343869686127,
+        291.78240966796875
+      ]
+    },
+    {
+      "style": "canvas",
+      "case": "default",
+      "parts": 39,
+      "triangles": 89788,
+      "dimensionsMm": [
+        113.7877311706543,
+        85.77980649471283,
+        282.8942108154297
+      ]
+    }
+  ],
+  "testedSourceFiles": [
+    {
+      "path": "src/kernel.mjs",
+      "sha256": "7156a5432fed1dd654905a967255f167e3c45bf7ed69fc674db25263de9dde06"
+    },
+    {
+      "path": "src/penny-chelsea.mjs",
+      "sha256": "b02cbdd1525c143badec36b11371bb44277a94acf865a6040e0fa399cc7fa70d"
+    },
+    {
+      "path": "src/monk-canvas.mjs",
+      "sha256": "4a73df17527e247bcb863a852064ce12638a5a78190e587784b2d496f43b1524"
+    },
+    {
+      "path": "src/soles.mjs",
+      "sha256": "fcc5d6ccae4e38e099e94019803a8aff4ed6dd42abbd6c6992f284382d0308fa"
+    },
+    {
+      "path": "src/model.mjs",
+      "sha256": "d34f8b825f45667f8da384a198284ee2c4755568851d6a87a420a429db7b1e14"
+    },
+    {
+      "path": "src/surface-coordinates.mjs",
+      "sha256": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970"
+    },
+    {
+      "path": "tests/geometry.mjs",
+      "sha256": "7850af64fce1dd07bfe220b57b305e39e7ff9b8a42eed4871fc563efc8712b62"
+    },
+    {
+      "path": "tests/review-regressions.mjs",
+      "sha256": "62ca367b11c88dd5d829c253315f4295d415a4b536e87d562132e2337aa877e4"
+    },
+    {
+      "path": "tests/fixtures/r12-baseline.json",
+      "sha256": "0cbd10a81e7e78d02e4cc14983849c51d7bb6d4447c6659b98be5283066a2a4e"
+    },
+    {
+      "path": "tests/fixtures/r12-regression-before.json",
+      "sha256": "2115af0f1f1abc5f666e522984bd32a9f5401f9424a63b6b2163d841872523f9"
+    },
+    {
+      "path": "tests/fixtures/r13-collar-gap-before.json",
+      "sha256": "3dd345342b2be1faef9d433240e73423713b2f59fe2452fe380f0a5d0e71c139"
+    }
+  ],
+  "scope": {
+    "numericGeometry": true,
+    "rendered": false,
+    "visualApproved": false,
+    "wearerFit": false,
+    "physicalSolver": false,
+    "manufacturing": false,
+    "publicLinkVerified": false
+  }
+}

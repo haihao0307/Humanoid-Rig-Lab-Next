@@ -1,0 +1,723 @@
+{
+  "version": "R13.0",
+  "taskId": "SHOE-R13-SEAM-SHAPE-REVIEW-20261017",
+  "sourceCommit": "8b05ebd8b0755216743792034e3cbb58b8d9ff54",
+  "status": "ACCEPTED_SOURCE_CANDIDATE",
+  "reviewedAtUTC": "2026-10-18T04:51:36.508Z",
+  "independentReviewer": "footwear_science",
+  "reviewerType": "AI independent geometry, material-coordinate and visual reviewer",
+  "reviewerEditedProduction": false,
+  "humanApproval": false,
+  "userApproval": false,
+  "candidate": {
+    "runId": 39098015887,
+    "artifactId": 12125268687,
+    "artifactDigest": "sha256:a7e642a327057ee536abfa43c20de588c58300dbe380336ced1f126810faf23f",
+    "manifestSha256": "01af253afb2e3e04235bd93068300d8783e4c95c51b24d3260d1d22db94332fb",
+    "runtimeSha256": "7db6ec885c0d7d972b2fb0574039448d2115b98c6e8e428f297c7f989410535b",
+    "geometrySha256": "92948c4863c4e40736ce4625829e3ddfe45ae084080966f15fef12e0b8cd0e4c",
+    "materialQaSha256": "a1da07c7c7f7bf8bd2c9d18a7cd13e5d091617446b5b8c4eccafb4d0870a1a1f",
+    "qaSha256": "d53140beaec899e01fbda8b54793aa09a966b54d1ae044f385fb66a6ad083582",
+    "beforeQaSha256": "80fc624846e6c93b89b03df8e2eb0e77c64fed6be89bedd62106620868afc7ae",
+    "runtimeBytes": 13746414,
+    "artifactDirectory": "/tmp/shoe-r13-candidate-8b05ebd8",
+    "zipDigestIndependentlyRecomputed": true,
+    "coreFileHashesIndependentlyRecomputed": true,
+    "screenshotHashesIndependentlyRecomputed": 47,
+    "sourceHashesIndependentlyChecked": {
+      "manifest": 24,
+      "geometry": 11,
+      "material": 6
+    },
+    "productionFilesByteIdenticalToSource2": true
+  },
+  "baseline": {
+    "path": "shoe-workshop/r12",
+    "frozenHead": "fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d",
+    "sourceCommit": "7fd5527f475908d615db4f1fd36357f47e68ce46",
+    "publishedBuild": "d27ef0f200257741fa67f1c6291418cf771443e9",
+    "runtimeSha256": "aaba719b65cbd4e53c19ffa74de335d90c81a8974ada4afa6460ada0a9d40a61",
+    "sameCameraMatrices": true,
+    "historicalR12ApprovalUnchanged": true
+  },
+  "decision": {
+    "sourceCandidateAccepted": true,
+    "publishAllowed": true,
+    "publicDeliveryVerified": false,
+    "reason": "本次源码候选的真实几何、逐片材料坐标数值和已覆盖实际视图可接受。Penny 与 Monk 后鞋口破口已被实际网格补行修复并由失败对照、固定相机射线和新 CI 图像验证；新增冻结快照门禁在本次真实源码 CI 通过且原值可独立复算。审核范围内没有剩余具体发布阻断。",
+    "blockingIssueIds": [],
+    "resolvedIssueIds": [
+      "R13-VIS-PENNY-REAR-COLLAR-GAP",
+      "R13-VIS-MONK-REAR-COLLAR-GAP"
+    ],
+    "authorizationScope": "此项为独立 AI 源码候选验收，供已授权的发布流程使用；不代替人类或用户批准。公网交付须另核同源实物与实际页面。"
+  },
+  "visualCoverage": {
+    "method": "直接 view_image 查看最终 CI 的 7 张实际文件；其余 19 张主要当前视图与本 reviewer 已实际查看的源 2 文件逐字节相同，独立重算 SHA 后继承该视觉判断。全部 47 张 PNG 哈希已核验，未把仅核哈希等同于目视。",
+    "source3ScreensActuallyViewed": [
+      {
+        "path": "evidence/browser/desktop-first-frame.png",
+        "sha256": "037590619c13e02679500d40062a432426f082a2805e8982feb4707f75cc1467",
+        "bytes": 277723
+      },
+      {
+        "path": "evidence/browser/penny-back.png",
+        "sha256": "47c32239742e7ae0f675fd5376c3de377c96bd54e2e61c62e7385d5079e03cfa",
+        "bytes": 70863
+      },
+      {
+        "path": "evidence/browser/chelsea-join.png",
+        "sha256": "02efe2b88b66ec037faa8417267c77881620993f3ec7744463d8d89fede4899f",
+        "bytes": 426708
+      },
+      {
+        "path": "evidence/browser/monk-back.png",
+        "sha256": "031465642ad7b3f9ebd7926a4956fce99741b3a1514875317f732d86c98f8675",
+        "bytes": 77947
+      },
+      {
+        "path": "evidence/browser/canvas-back.png",
+        "sha256": "ce336ebb64072a29e03fb039b5e0e2fc7f69facd716b5c410da833d39a2bcfc3",
+        "bytes": 70420
+      },
+      {
+        "path": "evidence/browser/four-style-comparison.png",
+        "sha256": "9a14f4fc65a7c23012ef44fd8675a53271dc1bc04ad57ee807cecd9e913c87c1",
+        "bytes": 257624
+      },
+      {
+        "path": "evidence/browser/mobile-viewport.png",
+        "sha256": "6bd14790fc3d35af0151d3e27ab86aedce0a0d4e29709ca3497ae84d7bc1268e",
+        "bytes": 160674
+      }
+    ],
+    "source3ScreensActuallyViewedCount": 7,
+    "additionalScreensCoveredByExactByteIdentity": [
+      {
+        "path": "evidence/browser/penny-hero.png",
+        "sha256": "7f2f03643b1e813359e22e0db09b38cb3d175c83fbcd50bf46010c90b9cff785",
+        "bytes": 143250,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "7f2f03643b1e813359e22e0db09b38cb3d175c83fbcd50bf46010c90b9cff785",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/penny-side.png",
+        "sha256": "49b794c92e457c28aedd38331208a7b156fbcc11db84de90c356558bd4929df9",
+        "bytes": 105610,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "49b794c92e457c28aedd38331208a7b156fbcc11db84de90c356558bd4929df9",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/penny-top.png",
+        "sha256": "a3860cd73a4c096f4a46b19c8d0ffb03f478eb2cd72e149e5ce41e20a113e7f4",
+        "bytes": 160942,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "a3860cd73a4c096f4a46b19c8d0ffb03f478eb2cd72e149e5ce41e20a113e7f4",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/penny-detail.png",
+        "sha256": "56054c8ac5ff40ac3ae6277c77a36a037caa4b9de5c724a50bc21fcf851b7f6e",
+        "bytes": 277637,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "56054c8ac5ff40ac3ae6277c77a36a037caa4b9de5c724a50bc21fcf851b7f6e",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/penny-join.png",
+        "sha256": "829addd777ecb553b447ddc913c6f4363a91f2bfffc14807ba5a4f9b25132ceb",
+        "bytes": 431650,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "829addd777ecb553b447ddc913c6f4363a91f2bfffc14807ba5a4f9b25132ceb",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/chelsea-hero.png",
+        "sha256": "347066128c020dc324b39e62a65adba865153f1a8d17593cf49ee17c859ebf82",
+        "bytes": 155504,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "347066128c020dc324b39e62a65adba865153f1a8d17593cf49ee17c859ebf82",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/chelsea-side.png",
+        "sha256": "b8f59648d585993d32254907d54b8b3d8364fe5ab2f1291489f59b76cc5f14e4",
+        "bytes": 144209,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "b8f59648d585993d32254907d54b8b3d8364fe5ab2f1291489f59b76cc5f14e4",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/chelsea-top.png",
+        "sha256": "43a822d4770f3bce4a6e42b7ef6265dd697aa8427234e696d10d4f37d9cd83c8",
+        "bytes": 129501,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "43a822d4770f3bce4a6e42b7ef6265dd697aa8427234e696d10d4f37d9cd83c8",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/chelsea-back.png",
+        "sha256": "e3fa79ec829bc0f417ea89ac8d75fc1079fe7978019699ca1d7d4de5b444109c",
+        "bytes": 100679,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "e3fa79ec829bc0f417ea89ac8d75fc1079fe7978019699ca1d7d4de5b444109c",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/monk-hero.png",
+        "sha256": "a46ef1e210dffd32b1d683afaec525e1149e4e066f6a7109c6ec543513a896d2",
+        "bytes": 144907,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "a46ef1e210dffd32b1d683afaec525e1149e4e066f6a7109c6ec543513a896d2",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/monk-side.png",
+        "sha256": "9889d2020e90596c06f46011e26268b64b6a12df0d6f3c6979dad247d0ac8030",
+        "bytes": 115158,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "9889d2020e90596c06f46011e26268b64b6a12df0d6f3c6979dad247d0ac8030",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/monk-top.png",
+        "sha256": "11227e0e3d8a0621da9a10ab7112efbe3e4be407d1850200e4c7de026bbbed34",
+        "bytes": 155575,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "11227e0e3d8a0621da9a10ab7112efbe3e4be407d1850200e4c7de026bbbed34",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/monk-join.png",
+        "sha256": "d6e652ae7ee8df1311449c0aa490f66a176a36c6dd52dd8d593cdd867b6466fa",
+        "bytes": 462110,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "d6e652ae7ee8df1311449c0aa490f66a176a36c6dd52dd8d593cdd867b6466fa",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/canvas-hero.png",
+        "sha256": "052dd7dc4c5de80ab129e4fe0d43e77fec8604638791cd36e334bf6675dee6bc",
+        "bytes": 119831,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "052dd7dc4c5de80ab129e4fe0d43e77fec8604638791cd36e334bf6675dee6bc",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/canvas-side.png",
+        "sha256": "521ccdbeafdfd8d9d502de62499379595132e7bbf24964f951de7875ad53b335",
+        "bytes": 79271,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "521ccdbeafdfd8d9d502de62499379595132e7bbf24964f951de7875ad53b335",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/canvas-top.png",
+        "sha256": "a2cb9b92aa010760a8d7b0406228d480fc65460ce64270896791334ee3cceb84",
+        "bytes": 143880,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "a2cb9b92aa010760a8d7b0406228d480fc65460ce64270896791334ee3cceb84",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/canvas-front.png",
+        "sha256": "4a20681fd1dec513d3cf15b20ed4704cefd190f09283724802cf5f68c425533f",
+        "bytes": 91818,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "4a20681fd1dec513d3cf15b20ed4704cefd190f09283724802cf5f68c425533f",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/canvas-join.png",
+        "sha256": "118945180e0880ab564e6aee047b06aa7a40e73c594cefa4d552ff18d63671b4",
+        "bytes": 456502,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "118945180e0880ab564e6aee047b06aa7a40e73c594cefa4d552ff18d63671b4",
+        "byteIdentical": true
+      },
+      {
+        "path": "evidence/browser/chelsea-clay.png",
+        "sha256": "327295aff8d34111172ee454010f201c7cafafb6efeaf75d88285b5e9f649e2f",
+        "bytes": 109589,
+        "priorSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+        "priorScreenshotSha256": "327295aff8d34111172ee454010f201c7cafafb6efeaf75d88285b5e9f649e2f",
+        "byteIdentical": true
+      }
+    ],
+    "additionalScreensCoveredByExactByteIdentityCount": 19,
+    "currentScreensVisuallyCoveredTotal": 26,
+    "beforeScreensPreviouslyViewedAndExactlyByteMatched": [
+      {
+        "path": "evidence/before/penny-back.png",
+        "sha256": "b109193973c9247cbb9715bed7249fa9b9ed0305eaad92fea185732e4b9e428c",
+        "bytes": 74302,
+        "byteIdenticalToPreviouslyViewedR12Before": true
+      },
+      {
+        "path": "evidence/before/penny-join.png",
+        "sha256": "e7aa053363543cca9f63dca45c656d1d5318b87effff281187ad42d39328b1f8",
+        "bytes": 435831,
+        "byteIdenticalToPreviouslyViewedR12Before": true
+      },
+      {
+        "path": "evidence/before/chelsea-back.png",
+        "sha256": "d5142acbe71d37e13fcfdf0a226138625e4e6abf8f400396b400636af0d2ead4",
+        "bytes": 101559,
+        "byteIdenticalToPreviouslyViewedR12Before": true
+      },
+      {
+        "path": "evidence/before/chelsea-join.png",
+        "sha256": "905eebfeb233e492888aada822d508e7e4235654d885549a8ee0114405b8bb74",
+        "bytes": 415970,
+        "byteIdenticalToPreviouslyViewedR12Before": true
+      },
+      {
+        "path": "evidence/before/monk-back.png",
+        "sha256": "4ad48dcc590d7da20d26a53e59f4a2948a25abceafab1d4df4c28e5d0631eca6",
+        "bytes": 81361,
+        "byteIdenticalToPreviouslyViewedR12Before": true
+      },
+      {
+        "path": "evidence/before/monk-join.png",
+        "sha256": "ea9f1c96c1dbdde2c7d2e8b57fa1dee27b4aa33b7213c3523c6f733bea72e522",
+        "bytes": 479988,
+        "byteIdenticalToPreviouslyViewedR12Before": true
+      },
+      {
+        "path": "evidence/before/canvas-back.png",
+        "sha256": "d4f935375188bdc46e1ff92c8c8a02ca5741068297ec6d963ac546cf9e99dc6b",
+        "bytes": 70983,
+        "byteIdenticalToPreviouslyViewedR12Before": true
+      },
+      {
+        "path": "evidence/before/canvas-join.png",
+        "sha256": "3c057b416010a9b6f393a912322d55c38dfbb00a8fef4961891606a76fbf4696",
+        "bytes": 425014,
+        "byteIdenticalToPreviouslyViewedR12Before": true
+      }
+    ],
+    "beforeScreensCount": 8,
+    "currentScreensHashCheckedOnly": [
+      {
+        "path": "evidence/browser/penny-front.png",
+        "sha256": "a1c6df513e5a3f84a18562f871f176add749add180dc0744704263af3072ba67",
+        "bytes": 98908
+      },
+      {
+        "path": "evidence/browser/chelsea-front.png",
+        "sha256": "0eeb37c99c2a9218178f10f6dcc0f1e87aef1c0938e50bf0622e429b1095c175",
+        "bytes": 124448
+      },
+      {
+        "path": "evidence/browser/chelsea-detail.png",
+        "sha256": "34d0bd7eae25386dc43073323c190786a5cb23e48f5b2fe366d3e76a81c3e855",
+        "bytes": 221214
+      },
+      {
+        "path": "evidence/browser/monk-front.png",
+        "sha256": "1f1a7890a823bdd1fb0cefe52271e54d0871da35d4a0f03108583864b401e53d",
+        "bytes": 101501
+      },
+      {
+        "path": "evidence/browser/monk-detail.png",
+        "sha256": "1fde50297d7355524dc4222922fbfb7fb49cf98cbab46d134117a57d28a84a9c",
+        "bytes": 274289
+      },
+      {
+        "path": "evidence/browser/canvas-detail.png",
+        "sha256": "f29ab24db45da041ed560561d1c2f8e292870b4be55bd6dd0cb548c4dbe9cf79",
+        "bytes": 235216
+      },
+      {
+        "path": "evidence/browser/monk-parameter-and-flex.png",
+        "sha256": "591a0f8f418f2ca599447c2f0b040a9e1985c6e761385d24bc528445d77c8fe5",
+        "bytes": 141673
+      },
+      {
+        "path": "evidence/browser/canvas-pair.png",
+        "sha256": "e3a1368621de810841e2d7b24283ef26fa6083b87d1f5939b50913d19bbd3e65",
+        "bytes": 225959
+      },
+      {
+        "path": "evidence/browser/penny-exploded.png",
+        "sha256": "484e0a84b51d3da916849d9e698af28a6a02562c654de55c9935027dfe6092c7",
+        "bytes": 187756
+      },
+      {
+        "path": "evidence/browser/penny-first-part.png",
+        "sha256": "76890a3bf93b5fdf1f226db7b12a504131e478dce12be5cf7721557dc370b488",
+        "bytes": 90351
+      },
+      {
+        "path": "evidence/browser/penny-section.png",
+        "sha256": "4e5b1dbedf6cfa6b8964ddc767260e6abc8a22a27b5a586fd6dd8686a404a81e",
+        "bytes": 84712
+      },
+      {
+        "path": "evidence/browser/retained-r10-original.png",
+        "sha256": "b29bd30b12dfd6cb74513b92910bce0948365659b76130d24cf99b731d003527",
+        "bytes": 139486
+      },
+      {
+        "path": "evidence/browser/retained-r10-p05.png",
+        "sha256": "1e9fbdb16e9408599297342dbf3461c29fde28d5c4ad53eb38ed08d3948657aa",
+        "bytes": 124854
+      }
+    ],
+    "currentScreensHashCheckedOnlyCount": 13,
+    "priorVisualRecord": {
+      "path": "evidence/iterations/f854e267-visual-pass.json",
+      "sha256": "01337508983e9cdb91d803b9dceab5737aeb983da7e8c1899ad5ab652dfda9d2",
+      "sourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e"
+    },
+    "totalPngHashesVerified": 47,
+    "source2ByteIdenticalPngCount": 44,
+    "source2ChangedPngActuallyViewed": [
+      "evidence/browser/desktop-first-frame.png",
+      "evidence/browser/four-style-comparison.png",
+      "evidence/browser/mobile-viewport.png"
+    ],
+    "commercialReferenceImagesThisPass": "此前研究和 Task Anchor 保留官方母型来源；本次最终候选检查没有重新取得或声称查看已不在临时目录的原厂图片。商业型号一比一拟合不在本次结论范围。"
+  },
+  "observations": [
+    {
+      "style": "penny",
+      "status": "ACCEPTABLE_FOR_REVIEWED_VIEWS",
+      "views": [
+        "penny-hero",
+        "penny-side",
+        "penny-top",
+        "penny-back",
+        "penny-detail",
+        "penny-join"
+      ],
+      "findings": [
+        "前片共边和针路呈连续圆顺 U 形，原尖 V 与前端断续已消失。",
+        "鞍带贴合前帮，侧视保持独立皮片厚度；针脚成为贴面的间断线段，沿条不再呈粗波浪线。",
+        "源1后口浅色三角在本次实际 back/hero/detail 中消失，后帮与鞋口闭合。侧视与顶视未见补行引起的新尖脊或孔口。"
+      ]
+    },
+    {
+      "style": "chelsea",
+      "status": "ACCEPTABLE_WITH_RECORDED_SHAPE_RESIDUAL",
+      "views": [
+        "chelsea-hero",
+        "chelsea-side",
+        "chelsea-top",
+        "chelsea-back",
+        "chelsea-join",
+        "chelsea-clay"
+      ],
+      "findings": [
+        "旧 R12 gore 下部的明显 tan 内衬楔形暴露和后帮脱离现象在当前视图中消失；嵌片和皮片连续相接。",
+        "鞋口读作有内壁的真实开口，后拉环与靴口连接关系清楚；未见旧鞋头内翻灰三角。",
+        "针线沿嵌片边界贴合，皮面与弹力片纹理角色清楚。",
+        "筒身—前帮保留规整的曲率肩部，在 clay 中也可见；已查看视角未见由此产生新孔口、露内衬或交叉皮片。将其作为自有参数化款式的造型残余，非本轮结构阻断。"
+      ]
+    },
+    {
+      "style": "monk",
+      "status": "ACCEPTABLE_WITH_RETAINED_CLOSURE_STYLE",
+      "views": [
+        "monk-hero",
+        "monk-side",
+        "monk-top",
+        "monk-back",
+        "monk-join"
+      ],
+      "findings": [
+        "双扣、皮带、带孔和覆盖片仍可区分，当前视图未见新的带片穿插或错层暴露。",
+        "后部旧明亮细长尖脊消失，轮廓收圆；针脚更贴面，沿条线不再呈波浪翻折。",
+        "覆盖片与两条垂向带尾仍是规则、较硬挺的设计表达；本轮未验证真实扣合运动、材料弯曲或穿着状态。",
+        "同类后口小破口在源2 back/hero 已消失；独立真实射线和新CI几何门禁包含其固定失败像素。"
+      ]
+    },
+    {
+      "style": "canvas",
+      "status": "ACCEPTABLE_FOR_REVIEWED_VIEWS",
+      "views": [
+        "canvas-hero",
+        "canvas-side",
+        "canvas-top",
+        "canvas-front",
+        "canvas-back",
+        "canvas-join"
+      ],
+      "findings": [
+        "最终 canvas-back 后跟橡胶带上已无绿色小矩形；前后包边未见贯穿带高的竖向破口。",
+        "前帮/侧帮接缝与鞋眼加强片边缘连续，针脚为贴面间断线；帆布、胶带、鞋带和内衬材质角色可区分。",
+        "鞋带在当前 hero/side/top 中贴近鞋舌与眼片，未见旧高拱漂浮交叉；鞋口外轮廓和内腔可辨认。"
+      ]
+    }
+  ],
+  "finalSourceSpecificObservations": [
+    "Penny-back 与 Monk-back 实际复看：两处后中线附近的远内衬小亮孔已消失；后帮与包边衔接保留，未见补行带来的新裂口或尖脊。",
+    "Canvas-back 实际复看：绿色小矩形及贯穿白色包边的缝隙未出现；最下方外底仍有很细的原有分面短线。",
+    "Chelsea-join 实际复看：皮片与松紧片闭合相接，针脚沿实边贴合；规则横向曲率肩部仍可见，但没有新内衬暴露、裂口或交叉皮片。",
+    "源码标识变化的 desktop-first-frame、four-style-comparison、mobile-viewport 均实际查看：四款形态、材质角色与当前布局保留，无新可见回归。移动端仅是浏览器视口检查。"
+  ],
+  "residuals": [
+    {
+      "id": "CHELSEA-CURVATURE-SHOULDER",
+      "blocking": false,
+      "description": "规整横向曲率肩部仍可见，属于现有自有靴型的风格化过渡；已查看图中连续闭合，不宣称扫描般自然。"
+    },
+    {
+      "id": "SLAB-END-FACETING",
+      "blocking": false,
+      "description": "Penny/Canvas 外底极前/后端仍有极细旧 slab 折痕或短中线；它们在外底本身，当前未贯穿 Canvas 覆盖带，也不是本次小矩形穿出。"
+    },
+    {
+      "id": "MATERIAL-COORDINATE-TAIL",
+      "blocking": false,
+      "description": "最终 Float32 独立诊断保留局部端帽高各向异性尾部；66 面片无数值失败不等于全部表面无畸变。具体三角位置、面积和奇异值在绑定的 MATERIAL_COORDINATES.json；本次视图未发现新的大面积纹理撕裂。"
+    }
+  ],
+  "materialCoordinateResidualExamples": {
+    "preset": "default",
+    "weighting": "actual final Float32 triangle area",
+    "note": "仍有极小端帽三角的较高各向异性。以下保留最坏位置与实际面积；整体分位数改善不等于无畸变、等距展平或制造裁片。全部 66 面片和各参数尾部见绑定的材料坐标报告。",
+    "panels": [
+      {
+        "part": "penny-galosh",
+        "p95": 2.044954910520332,
+        "max": 119.01637611192037,
+        "above5": 0.00438870056539223,
+        "above10": 0.002045303508793772,
+        "worst": {
+          "triangle": 1408,
+          "centreMm": [
+            3.934871256351471,
+            32.965484619140625,
+            -138.85925801595053
+          ],
+          "areaMm2": 0.23945933364044353,
+          "areaFraction": 0.00000955599714417502,
+          "sigmaMin": 0.009837814505649021,
+          "sigmaMax": 1.1708610313236298,
+          "anisotropy": 119.01637611192037
+        }
+      },
+      {
+        "part": "chelsea-whole-vamp",
+        "p95": 1.9268556316493544,
+        "max": 30.49225776775061,
+        "above5": 0.0035671614117921404,
+        "above10": 0.0016641739386542569,
+        "worst": {
+          "triangle": 1500,
+          "centreMm": [
+            -4.06802515188853,
+            17.148369471232098,
+            141.62564086914062
+          ],
+          "areaMm2": 3.7212158445003873,
+          "areaFraction": 0.00010913509176799638,
+          "sigmaMin": 0.20617503345456964,
+          "sigmaMax": 6.286742265371343,
+          "anisotropy": 30.49225776775061
+        }
+      },
+      {
+        "part": "monk-open-quarters",
+        "p95": 1.6013126736334848,
+        "max": 151.8868088155295,
+        "above5": 0.0015445581139098324,
+        "above10": 0.0012768105960980975,
+        "worst": {
+          "triangle": 86,
+          "centreMm": [
+            0.6058841571211815,
+            38.08669090270996,
+            -144.87159729003906
+          ],
+          "areaMm2": 0.6869932061728801,
+          "areaFraction": 0.00004211352589053853,
+          "sigmaMin": 0.008631246869813664,
+          "sigmaMax": 1.3109725431550254,
+          "anisotropy": 151.8868088155295
+        }
+      },
+      {
+        "part": "canvas-quarter--1",
+        "p95": 1.2138077995021699,
+        "max": 144.9010547487598,
+        "above5": 0.0008222056078892393,
+        "above10": 0.0007686955272464734,
+        "worst": {
+          "triangle": 5050,
+          "centreMm": [
+            -1.2288897037506104,
+            25.06680965423584,
+            -139.61221822102866
+          ],
+          "areaMm2": 0.27291965546950026,
+          "areaFraction": 0.00002177193526680237,
+          "sigmaMin": 0.007022312630923094,
+          "sigmaMax": 1.0175405069962948,
+          "anisotropy": 144.9010547487598
+        }
+      },
+      {
+        "part": "canvas-quarter-1",
+        "p95": 1.3074743466301302,
+        "max": 114.1491027282883,
+        "above5": 0.0009084530861428952,
+        "above10": 0.0007606210365486013,
+        "worst": {
+          "triangle": 5062,
+          "centreMm": [
+            2.6350332150856652,
+            24.184418360392254,
+            -139.5754140218099
+          ],
+          "areaMm2": 0.2982107948616017,
+          "areaFraction": 0.000023878118286765173,
+          "sigmaMin": 0.009364652808185988,
+          "sigmaMax": 1.0689667154163758,
+          "anisotropy": 114.1491027282883
+        }
+      }
+    ]
+  },
+  "machineEvidence": {
+    "geometry": {
+      "passed": 157,
+      "failed": 0,
+      "generatedCases": 104,
+      "parameterCases": 100,
+      "rearCollarRegression": "Penny/Monk 三组参数共 135 条实际上层覆盖和固定相机射线通过；同一回归在准确源 1 负例中有 47 条失败，记录在 tests/fixtures/r13-collar-gap-before.json。R12 负例和原 114 行为门禁保留。"
+    },
+    "materialCoordinates": {
+      "panels": 66,
+      "success": true,
+      "numericIssues": [],
+      "auditSha256": "085553c814f73c1ca7443e99a6469bbfc1bb5dedecffef65d3cb518ca5692014",
+      "environment": {
+        "node": "v22.23.3",
+        "v8": "12.4.254.21-node.57",
+        "platform": "linux",
+        "arch": "x64",
+        "execArgv": []
+      },
+      "rawSnapshotsCapturedBeforeSeedBuild": true,
+      "rawStatisticsCheckedUnchanged": true,
+      "snapshotIdentitiesAndSha256IndependentlyRecomputed": 66,
+      "comparisonsIndependentlyRecomputedFromRawValues": 132,
+      "snapshotOrComparisonMismatches": [],
+      "maximumProducerReportRelativeDifference": 0.007943408051314339,
+      "maximumComparison": {
+        "id": "all-low/penny/penny-apron",
+        "phase": "after",
+        "field": "sigmaMax.max",
+        "actual": 1.2502304823523442,
+        "claimed": 1.2602410915858444,
+        "relativeDifference": 0.007943408051314339,
+        "snapshotSha256": "8ef0f0e2aa7dddee02c5196823e0bf2a93bcabaefd696d8e23661d97a0acfc7e"
+      },
+      "acceptanceCriteria": {
+        "invalidTriangles": 0,
+        "newOrientationChanges": 0,
+        "maximumLogStretchIncrease": 0.0001,
+        "maximumProducerReportRelativeDifference": 0.01,
+        "maximumComparativeTailAreaFraction": 0.050001,
+        "maximumExtremeScaleOrAnisotropyRatio": 1.0201,
+        "minimumExtremeScaleRatio": 0.9802960494069208,
+        "note": "Tail comparison uses each same-surface seed chart. The 0.01% extrema allowance accounts for final Float32 rounding; it does not assert low absolute distortion."
+      },
+      "measurementsOrTolerancesRelaxed": false,
+      "source2ActualBeforeAfterDifferenceCount": 0
+    },
+    "browser": {
+      "checks": 8,
+      "completed": true,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "requestFailures": 0,
+      "coreNetworkRequests": 0
+    },
+    "interpretation": "数值门禁和截图覆盖相互补充，未据此宣称每一视角、所有中间参数、真实材料力学或制造工艺都已验证。"
+  },
+  "history": [
+    {
+      "sourceCommit": "961996dca84b110191405a1e5b840cec51de0a65",
+      "status": "REJECTED_SOURCE_CANDIDATE",
+      "record": "evidence/iterations/961996dc-collar-gap.json",
+      "sha256": "51e226638f1311aebe8a5829cc59619fdb8410f033d722f78d6219c7b9f26a72"
+    },
+    {
+      "sourceCommit": "961996dca84b110191405a1e5b840cec51de0a65",
+      "status": "REJECTED_SOURCE_CANDIDATE_SUPPLEMENT",
+      "record": "evidence/iterations/961996dc-monk-collar-gap.json",
+      "sha256": "b63dba98590c2e5655b72117150481254fc0ead5fa13b234d8feb76959ee8e1b"
+    },
+    {
+      "sourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+      "status": "VISUAL_PASS_PENDING_SOURCE_GATE",
+      "record": "evidence/iterations/f854e267-visual-pass.json",
+      "sha256": "01337508983e9cdb91d803b9dceab5737aeb983da7e8c1899ad5ab652dfda9d2"
+    }
+  ],
+  "auditInvestigation": {
+    "status": "ROOT_CAUSE_UNRESOLVED",
+    "record": "evidence/iterations/UV_FORENSIC_REVIEW.json",
+    "recordSha256": "d4c8b7383b6db21456cfc114f9477b1590d3eb91b175147660c2055a97778b38",
+    "firstFailureReport": "evidence/iterations/local-collars-uv-first-failure.json",
+    "firstFailureSha256": "e7d46fda7ee3bc0de89ef57a3ee47569b0eac07b30e38d24dacc05230b503090",
+    "originalAnomalousMaximumRelativeDifference": 0.7593546585077461,
+    "originalRawClaimedFieldCaptured": false,
+    "productionFixClaimed": false,
+    "firstAnomalyErased": false,
+    "explanation": "首次本地 after 比较标量异常的具体赋值来源未明。跨片 RMS 数值指纹不能证明整份对象串片，也没有证据归因 Node/V8 或 Float32。未把后续通过写作根因修复。",
+    "newGateFreshSourceCIPassed": true,
+    "currentPreviouslyAnomalousPart": {
+      "identity": {
+        "preset": "default",
+        "style": "monk",
+        "partId": "monk-integral-vamp-tongue"
+      },
+      "actualAfterRms": 0.11489932420370846,
+      "claimedAfterRms": 0.11489931782197582,
+      "afterComparison": {
+        "identity": {
+          "preset": "default",
+          "style": "monk",
+          "partId": "monk-integral-vamp-tongue",
+          "phase": "after",
+          "snapshotSha256": "8e5b0b746aa57dd7c9282838b1a0c5ea3c74bcc40cf6e2e3c6792c2f1bfa1755"
+        },
+        "present": true,
+        "maximumRelativeDifference": 0.00021053347534305983,
+        "invalidCountsAgree": true,
+        "maximumDifference": {
+          "field": "v.min",
+          "actual": 0.018815382470043347,
+          "claimed": 0.01881142120218202,
+          "relativeDifference": 0.00021053347534305983
+        },
+        "note": "Producer measures pre-Float32 doubles; this diagnostic measures the buffers submitted for rendering."
+      }
+    },
+    "acceptanceBasis": "当前源码 CI 对每片在 seed 构建前捕获并冻结原统计，检查其在构建和全部测量期间不变，保存身份、SHA 和所有原值。独立逐字段重算 132 次比较均与这些原值一致，实际 Float32 统计与前次成功 CI 相同；因此当前几何与外观坐标具备可追溯的正面证据，早先异常继续保留。"
+  },
+  "scope": {
+    "independentAIVisualReview": true,
+    "independentNumericReview": true,
+    "sourceCandidateVisualAcceptance": true,
+    "overallSourceAccepted": true,
+    "publicVerification": false,
+    "publicVerified": false,
+    "publicStatus": "PENDING_SEPARATE_PUBLIC_VERIFICATION",
+    "humanApproval": false,
+    "userApproval": false,
+    "physicalSolver": false,
+    "manufacturingValidated": false,
+    "materialCalibrated": false,
+    "wearerFitValidated": false,
+    "realMobileDeviceTested": false,
+    "commercialModelReplication": false
+  },
+  "recordPolicy": "源候选审核文件用于发布 SHA 锁定后保持不变。首次拒绝和未明异常的原始记录均保留；后续公网同源复核另写 PUBLIC_VISUAL_REVIEW.json，不回写本文件。"
+}

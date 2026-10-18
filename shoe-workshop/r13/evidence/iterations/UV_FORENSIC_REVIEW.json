@@ -1,0 +1,75 @@
+{
+  "version": "R13.0",
+  "status": "ROOT_CAUSE_UNRESOLVED",
+  "reviewedAtUTC": "2026-10-18T04:40:18.924Z",
+  "independentReviewer": "footwear_science",
+  "sourceLabelAtFirstFailure": "local-r13-collars-final-20261018",
+  "productionSnapshotSourceCommit": "f854e26786a40cbcfb30b1d71e86aaf26561179e",
+  "firstFailureReport": "evidence/iterations/local-collars-uv-first-failure.json",
+  "firstFailureSha256": "e7d46fda7ee3bc0de89ef57a3ee47569b0eac07b30e38d24dacc05230b503090",
+  "firstContext": "evidence/iterations/local-collars-uv-first-failure-context.json",
+  "finding": {
+    "partId": "monk-integral-vamp-tongue",
+    "preset": "default",
+    "phase": "after",
+    "recordedMaximumRelativeDifference": 0.7593546585077461,
+    "originalRawClaimedFieldCaptured": false,
+    "actualFinalBeforeAfterEqualToCI2": true,
+    "actualFinalBeforeAfterEqualToFrozenSnapshotDiagnostic": true,
+    "numericFingerprint": {
+      "vampActualAfterLogStretchRms": 0.11489932420370846,
+      "toeCapClaimedBeforeLogStretchRms": 0.47746332212878895,
+      "computedRelativeDifference": 0.7593546585077461,
+      "exactlyMatchesOriginal": true
+    },
+    "wholeObjectSubstitutionWouldDiffer": {
+      "toeBefore": 0.8213113451487117,
+      "toeAfter": 0.8016059775769009
+    },
+    "interpretation": "The scalar has an exact cross-part RMS fingerprint, but substituting that whole report would yield another maximum. The first run did not save the raw claimed field; there is no established assignment path explaining the scalar. Do not label this a fixed production bug, a proven alias, Float32 error, or a Node/V8 defect."
+  },
+  "boundedChecks": {
+    "canonicalOriginalCommand": true,
+    "firstAuditSha256": "9c1e1d404b42945d7dd61f4eba2685870288f80ed023cca6a1fdc42632d441e2",
+    "sourceMutationsDuringFirstAuditDetected": false,
+    "negativeCoordinateValueInjectionUsed": false,
+    "temporaryDiagnosticsCreatedAfterFailure": true,
+    "productionChangesForDiagnosis": false,
+    "producerStateStaticReview": "Reports, accumulators and fit arrays are per-call. No cross-part statistics cache or post-build UV/report mutation was found.",
+    "independentAgentObjectReview": "shoe_materials and shoe_archetypes reported no shared statistics objects across parts and no mutation after later models; these checks do not reconstruct the missing first-run claimed value."
+  },
+  "strongerVerification": {
+    "productionChanged": false,
+    "numericalMeasurementChanged": false,
+    "tolerancesChanged": false,
+    "auditSha256": "085553c814f73c1ca7443e99a6469bbfc1bb5dedecffef65d3cb518ca5692014",
+    "rawStatisticsCapturedByPartBeforeSeed": true,
+    "rawStatisticsDeepFrozen": true,
+    "rawStatisticsCheckedAfterSeedAndAllMeasurements": true,
+    "partIdentityAndSnapshotHashRecorded": true,
+    "allRawClaimedStatisticsStored": true,
+    "winningDifferenceFieldActualAndClaimedStored": true,
+    "nodeAndV8Recorded": true,
+    "localFullPanels": 66,
+    "localNumericIssues": [],
+    "snapshotHashAndIdentityMismatches": [],
+    "localEnvironment": {
+      "node": "v24.19.0",
+      "v8": "13.6.233.17-node.51",
+      "platform": "linux",
+      "arch": "x64",
+      "execArgv": []
+    },
+    "localReportSha256": "97213adf40da489fc203d81ad7ed904543818e59857a53306c1b1be1631abed6"
+  },
+  "independentDisposition": {
+    "concreteProductGeometryOrUVDefectRemaining": false,
+    "firstAnomalyErased": false,
+    "firstAnomalyClaimedResolved": false,
+    "sourceCandidateCanBeAcceptedAfter": "Fresh source-bound CI passes unchanged geometry and numeric criteria with the frozen per-part producer snapshots, plus the final artifact visual review. Acceptance concerns actual geometry/appearance coordinates; the earlier unexplained comparator result remains documented.",
+    "humanApproval": false,
+    "userApproval": false,
+    "physicalSolver": false,
+    "manufacturingValidated": false
+  }
+}

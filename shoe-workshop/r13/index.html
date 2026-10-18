@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KAOPU · 鞋履工坊 R13 · 形态与拼接</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><div class="brand">KAOPU <span>鞋履工坊</span></div><div class="edition">FOOTWEAR / R13 <i></i> FORM &amp; CONSTRUCTION</div><div class="history-links"><button id="previous-workbench" class="text-button">R12 上轮工作台 ↗</button><button id="old-workbench" class="text-button">原 R10 完整工作台 ↗</button></div></header>
+<main>
+<aside class="catalogue"><p class="eyebrow">THE COLLECTION</p><h1>从结构开始，<br>做出不同的鞋。</h1><p class="intro">四种新鞋款，独立裁片与闭合结构。原款也在这里。</p><div id="styles" aria-label="鞋款选择"></div><button id="compare" class="wide-button">四款同看</button><div class="catalogue-foot"><span class="dot"></span> 程序生成 · 可调尺寸<br><small>皮面沿用原鞋台材质体系</small></div></aside>
+<section class="workspace">
+ <div class="work-title"><div><p class="eyebrow" id="style-en">PENNY LOAFER</p><h2 id="style-title">便士乐福鞋</h2><p id="style-desc">正在准备真实三维结构…</p></div><div class="view-toggle"><button id="single" class="active">单鞋</button><button id="pair">左右一双</button></div></div>
+ <div id="stage"><canvas id="canvas" aria-label="可旋转三维鞋履"></canvas><div id="loading"><span class="loading-mark"></span><strong>正在生成鞋履</strong><small>第一次加载包含原鞋台的保留数据</small></div><div class="stage-label"><span id="stage-mode">成鞋检查</span><small id="geometry-stat"></small></div><div class="gesture">拖动旋转 · 滚轮缩放</div><div id="part-label"></div></div>
+ <nav class="cameras" aria-label="观察视角"><button data-view="hero" class="active">整体</button><button data-view="side">侧面</button><button data-view="top">鞋口俯视</button><button data-view="front">鞋头</button><button data-view="back">后跟</button><button data-view="bottom">鞋底</button><button data-view="detail">近看</button><button data-view="join">拼缝近看</button></nav>
+ <div class="status"><span id="status">准备生成</span><span id="build-label">R13</span></div>
+ <div class="structure-card"><div><p class="eyebrow">CONSTRUCTION NOTES</p><h3>看得见的结构差异</h3></div><ul id="feature-list"></ul></div>
+ <details id="reference-panel"><summary>查看原厂结构参考与研究依据</summary><div class="reference-grid"><div><img id="reference-image" alt="原厂鞋款结构参考照片" loading="lazy"><p class="caption">参考照片来自原厂，仅用于结构对照；本款为自有参数设计。</p></div><div><button id="reference-link" class="text-button">打开对应原厂参考 ↗</button><p>本页按足部纵向截面、局部前掌宽与脚背体积构形。裁片具有厚度，鞋口和闭合件有真实边界。</p><p>展开、绷楦受力、胶合强度与人体穿着仍需测量。弯折滑块是几何检查，当前未接入材料物理求解。</p><p class="research-links"><a href="https://www.satra.com/bulletin/article.php?id=1135" target="_blank" rel="noreferrer">SATRA 绷楦</a><a href="https://www.mdpi.com/1996-1944/15/15/5107" target="_blank" rel="noreferrer">鞋帮材料实验</a><a href="https://docs.mcneel.com/rhino/7mac/help/en-us/commands/squish.htm" target="_blank" rel="noreferrer">曲面展开边界</a></p></div></div></details>
+</section>
+<aside class="controls"><p class="eyebrow">LAST & ASSEMBLY</p><h3>鞋楦与结构</h3>
+ <label for="length">鞋长比例 <output id="length-value">100%</output></label><input type="range" id="length" min="0.9" max="1.1" step="0.005" value="1">
+ <label for="width">前掌宽度 <output id="width-value">100%</output></label><input type="range" id="width" min="0.88" max="1.15" step="0.005" value="1">
+ <label for="instep">脚背高度 <output id="instep-value">0 mm</output></label><input type="range" id="instep" min="-5" max="8" step="0.5" value="0">
+ <label for="thickness">鞋面厚度 <output id="thickness-value">1.35 mm</output></label><input type="range" id="thickness" min="0.9" max="2.1" step="0.05" value="1.35">
+ <p id="dimensions" class="measurement"></p><p class="hint">尺寸为当前设计值；尚未标定为标准鞋码。</p>
+ <div class="divider"></div><h3>结构检查</h3><div class="button-grid"><button id="explode">拆件</button><button id="clay">灰模</button><button id="section">剖面</button><button id="wire">线框</button><button id="seams" class="active">缝线</button><button id="reset-camera">重置镜头</button></div>
+ <label for="bend" class="bend-label">前掌弯折检查 <output id="bend-value">0°</output></label><input type="range" id="bend" min="0" max="30" step="1" value="0"><p class="hint">几何联动检查，非受力仿真。</p>
+ <div id="legacy-controls" hidden><label for="legacy-preset">原款材料组合</label><select id="legacy-preset"></select></div>
+ <div class="divider"></div><label for="part-select">部件检查</label><select id="part-select"><option value="all">全部部件</option></select><p class="hint" id="part-note">选择部件后可单独查看。</p>
+ <div class="button-grid persistence"><button id="save">保存配方</button><button id="restore">读取配方</button><button id="export">导出 JSON</button><button id="reset">恢复默认</button></div>
+</aside>
+</main><script type="module" src="src/main.mjs"></script></body></html>
