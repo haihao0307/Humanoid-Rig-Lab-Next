@@ -1,9 +1,9 @@
 {
   "task": "REALITY-HC-S2.1-20261018",
   "requestedAt": "2026-10-18",
-  "attempt": 3,
+  "attempt": 4,
   "base": "704e7d019ff97550f29181cf1f354016f1d344b4",
-  "reason": "The second run started from a branch where the first run had already committed the exact source edits, so the one-time preparer rejected its now-changed build.py. The preparer is now idempotent and still fails if the required privacy guard is absent.",
+  "reason": "Privacy scanning now targets only files shipped into the public runtime. It still rejects a 43-character bearer credential, a private access file reference, or an embedded key in the measurement dictionary. Test descriptions are not mistaken for shipped credentials.",
   "mode": "build common contract, test live S1 human and footwear, publish immutable public core, keep S2 private data locked",
   "scope": ["human", "footwear", "pattern", "garment", "fabric"],
   "excluded": ["architecture", "aircraft", "terrain", "animals", "vegetation", "world"]
