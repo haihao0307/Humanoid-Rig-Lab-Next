@@ -1,0 +1,267 @@
+{
+  "schema": "kaopu/reality-measurement-dictionary@1",
+  "version": "0.2.0",
+  "canonicalLengthUnit": "m",
+  "statusVocabulary": ["PASS", "FAIL", "WARNING", "UNKNOWN", "NOT_APPLICABLE"],
+  "basisVocabulary": ["source_declared", "runtime_computed", "physical_measured", "artistic", "unknown"],
+  "measurements": [
+    {
+      "id": "human.visible_bounds_x",
+      "domain": "human",
+      "label": "当前可见数字几何 X 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前观察状态中，受检可见 CPU 网格经已有世界矩阵变换后的 X 方向包围范围。",
+      "notEquivalentTo": ["肩宽", "臂展", "身体宽度实测"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "human.visible_bounds_y",
+      "domain": "human",
+      "label": "当前可见数字几何 Y 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前观察状态中，受检可见 CPU 网格经已有世界矩阵变换后的 Y 方向包围范围。",
+      "notEquivalentTo": ["人体身高", "真人身高实测", "最终顶点着色器轮廓"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "human.visible_bounds_z",
+      "domain": "human",
+      "label": "当前可见数字几何 Z 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前观察状态中，受检可见 CPU 网格经已有世界矩阵变换后的 Z 方向包围范围。",
+      "notEquivalentTo": ["胸厚", "骨盆厚度实测"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "human.body_height",
+      "domain": "human",
+      "label": "人体身高",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "从定义明确的头顶点到足底支撑平面的语义距离，必须引用人物比例版本和测量方法。",
+      "requiredEvidence": ["proportion_revision", "top_landmark", "support_plane", "measurement_method"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "human.shoulder_width",
+      "domain": "human",
+      "label": "肩宽",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "在指定比例版本和姿态中，两个语义肩点之间的距离；不得从整体包围盒猜测。",
+      "requiredEvidence": ["proportion_revision", "left_shoulder_landmark", "right_shoulder_landmark"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "footwear.visible_bounds_x",
+      "domain": "footwear",
+      "label": "当前可见鞋几何 X 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前鞋台显示状态的可见几何 X 方向包围范围。成双、拆件或款式比较会影响结果。",
+      "notEquivalentTo": ["鞋楦宽", "脚宽", "标准鞋码"],
+      "owner": "shoe-workbench"
+    },
+    {
+      "id": "footwear.visible_bounds_y",
+      "domain": "footwear",
+      "label": "当前可见鞋几何 Y 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前鞋台显示状态的可见几何 Y 方向包围范围。",
+      "notEquivalentTo": ["鞋帮高度制造值", "脚背高度"],
+      "owner": "shoe-workbench"
+    },
+    {
+      "id": "footwear.visible_bounds_z",
+      "domain": "footwear",
+      "label": "当前可见鞋几何 Z 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前鞋台显示状态的可见几何 Z 方向包围范围。",
+      "notEquivalentTo": ["脚长", "鞋内长", "鞋码"],
+      "owner": "shoe-workbench"
+    },
+    {
+      "id": "footwear.last_length",
+      "domain": "footwear",
+      "label": "鞋楦长度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定鞋楦版本的制造语义长度，必须引用鞋楦身份和测量方法。",
+      "requiredEvidence": ["last_id", "last_revision", "measurement_method"],
+      "owner": "shoe-workbench"
+    },
+    {
+      "id": "pattern.panel_count",
+      "domain": "pattern",
+      "label": "裁片数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "当前固定批次中具有独立身份的裁片数量。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.seam_count",
+      "domain": "pattern",
+      "label": "有向配缝数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "按原始有向配缝路径登记的接缝关系数量；不是命名边数量。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.net_vertices",
+      "domain": "pattern",
+      "label": "净样顶点数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "缝合线/净样基础几何中的顶点总数。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.material_vertices",
+      "domain": "pattern",
+      "label": "材料裁片顶点数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "包含缝份与折边材料后的顶点总数。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.net_triangles",
+      "domain": "pattern",
+      "label": "净样三角形数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "净样基础网格三角形总数。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.material_triangles",
+      "domain": "pattern",
+      "label": "材料三角形数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "包含缝份与折边材料后的三角形总数。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.reduced_vertices",
+      "domain": "pattern",
+      "label": "记录化缩减顶点数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "实际材料偏移小于该处标称留量的已记录顶点数量。它是检查提示，不自动等于制造缺陷。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.zero_offset_panel_count",
+      "domain": "pattern",
+      "label": "含局部零偏移端点的裁片数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "至少存在一个端点法向偏移为零的裁片数；不表示整片全部缝份为零。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.max_seam_declaration_error",
+      "domain": "pattern",
+      "label": "最大接缝声明残差",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "原始有向配缝路径复算长度与声明长度之间的最大绝对残差。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.max_paired_edge_mismatch",
+      "domain": "pattern",
+      "label": "最大配对边长差",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "一条接缝两侧有向路径复算长度的最大绝对差。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.panel.cut_width",
+      "domain": "pattern",
+      "label": "裁片实际裁切宽度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定裁片实际裁切线在本地 U 方向的包围范围。动态实例必须携带 panel_id。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.panel.cut_height",
+      "domain": "pattern",
+      "label": "裁片实际裁切高度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定裁片实际裁切线在本地 V 方向的包围范围。动态实例必须携带 panel_id。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.waist_seam_length",
+      "domain": "pattern",
+      "label": "腰线净样长度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "由明确语义腰线段组成的净样长度，必须引用组成路径和方向。",
+      "requiredEvidence": ["panel_ids", "directed_path_ids", "pattern_revision"],
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.outseam_length",
+      "domain": "pattern",
+      "label": "侧缝净样长度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定裁片和方向的侧缝净样路径长度；局部开口段必须分开。",
+      "requiredEvidence": ["panel_id", "directed_path_id", "pattern_revision"],
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.inseam_length",
+      "domain": "pattern",
+      "label": "内缝净样长度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定裁片和方向的内缝净样路径长度。",
+      "requiredEvidence": ["panel_id", "directed_path_id", "pattern_revision"],
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "fabric.thickness",
+      "domain": "fabric",
+      "label": "布料厚度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "在明确压强、方法与材料状态下的厚度；不得由着色法线幅度或双面间距自动替代。",
+      "requiredEvidence": ["material_id", "measurement_method", "condition"],
+      "owner": "fabric-workbench"
+    },
+    {
+      "id": "fabric.yarn_spacing_warp",
+      "domain": "fabric",
+      "label": "经纱中心间距",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "材料空间中相邻经纱中心的现实距离。Tex 是线密度，不能直接替代该长度。",
+      "requiredEvidence": ["material_id", "material_axis", "source"],
+      "owner": "fabric-workbench"
+    },
+    {
+      "id": "fabric.yarn_spacing_weft",
+      "domain": "fabric",
+      "label": "纬纱中心间距",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "材料空间中相邻纬纱中心的现实距离。",
+      "requiredEvidence": ["material_id", "material_axis", "source"],
+      "owner": "fabric-workbench"
+    }
+  ]
+}

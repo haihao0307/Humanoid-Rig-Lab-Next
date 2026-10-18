@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kaopu:reality:object:0.2",
+  "title": "KAOPU Reality Foundation common object",
+  "type": "object",
+  "required": [
+    "schema",
+    "objectId",
+    "domain",
+    "sourceMode",
+    "source",
+    "units",
+    "frames",
+    "measurements",
+    "checks",
+    "defects"
+  ],
+  "properties": {
+    "schema": {
+      "const": "kaopu/reality-object@0.2"
+    },
+    "objectId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.:-]{1,160}$"
+    },
+    "domain": {
+      "enum": [
+        "human",
+        "footwear",
+        "pattern",
+        "garment",
+        "fabric"
+      ]
+    },
+    "sourceMode": {
+      "enum": [
+        "live_read_only",
+        "fixed_snapshot",
+        "imported_unverified",
+        "registered_only"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "repository",
+        "commit",
+        "path"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "units": {
+      "type": "array"
+    },
+    "frames": {
+      "type": "array"
+    },
+    "measurements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "definitionId",
+          "label",
+          "value",
+          "unit",
+          "status",
+          "basis"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "definitionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "WARNING",
+              "UNKNOWN",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "basis": {
+            "enum": [
+              "source_declared",
+              "runtime_computed",
+              "physical_measured",
+              "artistic",
+              "unknown"
+            ]
+          },
+          "method": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "message"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "WARNING",
+              "UNKNOWN",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "defects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "schema",
+          "id",
+          "objectId",
+          "code",
+          "severity",
+          "state",
+          "owner",
+          "repairAuthorized",
+          "verificationRequired"
+        ],
+        "properties": {
+          "schema": {
+            "const": "kaopu/reality-defect@0.2"
+          },
+          "id": {
+            "type": "string"
+          },
+          "objectId": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "critical",
+              "warning",
+              "info"
+            ]
+          },
+          "state": {
+            "const": "OPEN"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "repairAuthorized": {
+            "const": false
+          },
+          "verificationRequired": {
+            "const": true
+          }
+        }
+      }
+    }
+  },
+  "$comment": "Schema verifies structure. protocol.js additionally validates dictionary identity, units, statuses, duplicate IDs, source boundaries and immutable no-repair semantics."
+}

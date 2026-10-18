@@ -1,0 +1,310 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><link rel="icon" href="data:,"><title>KAOPU 世界基准 · 人物与服装统一入口 S2.1</title><style>
+:root{color-scheme:dark;--bg:#0e171b;--panel:#17242a;--panel2:#1d2d34;--line:#33464e;--text:#e8f0ed;--muted:#a9bcc2;--mint:#91dfca;--red:#ee8f96;--gold:#e4bc75;--blue:#8fc4df;--gray:#8d9aa0}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 system-ui,-apple-system,'Segoe UI',sans-serif}button,input,select{font:inherit}button,input,select{color:var(--text);background:#263a43;border:1px solid #48616b;border-radius:7px;padding:8px 11px}button{cursor:pointer}button:hover{border-color:var(--mint)}button:disabled{opacity:.45;cursor:not-allowed}button.primary{background:#2b554c;border-color:var(--mint);color:#d1fff1;font-weight:700}a{color:var(--mint);text-decoration:none}a:hover{text-decoration:underline}header{padding:20px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:18px}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--mint)}h1{font-size:25px;margin:2px 0}h2{font-size:18px;margin:0 0 8px}h3{font-size:14px;margin:0 0 7px}p{margin:5px 0}.muted,small{color:var(--muted)}.badge{border:1px solid #477566;border-radius:24px;padding:6px 12px;background:#18342f;color:#c2eedf;white-space:nowrap}.shell{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:calc(100vh - 99px)}aside{border-right:1px solid var(--line);padding:17px 13px}.object-list{display:grid;gap:8px;margin:12px 0}.object-list button{text-align:left;padding:11px;background:transparent}.object-list button.active{background:#203a34;border-color:var(--mint)}.object-list b,.object-list small{display:block}.object-list small{font-size:11px;margin-top:4px}.scope-note{background:#13282a;border:1px solid #34534e;border-radius:8px;padding:11px;font-size:12px;margin-top:14px}main{padding:18px;min-width:0}.topline{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:13px 0}.statusline{border:1px solid var(--line);background:#132329;border-radius:8px;padding:10px 13px;color:#b9ded5;overflow-wrap:anywhere}.statusline.error{color:var(--red)}.summary{display:grid;grid-template-columns:repeat(5,minmax(90px,1fr));gap:8px;margin:14px 0}.counter{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}.counter strong{display:block;font-size:23px}.counter.pass strong{color:var(--mint)}.counter.fail strong{color:var(--red)}.counter.warning strong{color:var(--gold)}.counter.unknown strong{color:var(--blue)}.counter.na strong{color:var(--gray)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}.pad{padding:16px}.native-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 15px;border-bottom:1px solid var(--line);font-size:12px}.native-wrap{position:relative;min-height:520px;background:#111d22}.native-wrap iframe{display:block;border:0;width:100%;height:760px;background:white}.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;color:var(--muted)}.facts{display:grid;grid-template-columns:115px minmax(0,1fr);gap:7px;font-size:12px}.label{color:var(--muted)}.value{overflow-wrap:anywhere}.line{height:1px;background:var(--line);margin:14px 0}.table-wrap{overflow:auto;max-height:380px;border:1px solid var(--line);border-radius:7px}table{border-collapse:collapse;width:100%;min-width:720px;font-size:12px}th,td{text-align:left;padding:8px 9px;border-bottom:1px solid #2d4149;vertical-align:top}th{position:sticky;top:0;background:#203139;color:#cfe4df;z-index:1}td code{font-size:10px;color:var(--muted)}.pill{display:inline-block;padding:2px 7px;border-radius:12px;border:1px solid currentColor;font-size:10px}.PASS{color:var(--mint)}.FAIL{color:var(--red)}.WARNING{color:var(--gold)}.UNKNOWN{color:var(--blue)}.NOT_APPLICABLE{color:var(--gray)}.defects{display:grid;gap:8px;max-height:380px;overflow:auto}.defect{border:1px solid var(--line);border-radius:8px;background:#14242a;padding:10px}.defect.critical{border-color:#75464b}.defect.warning{border-color:#6f6042}.defect.info{border-color:#3f6275}.defect-head{display:flex;justify-content:space-between;gap:10px;font-size:11px}.defect p{font-size:12px}.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}.tabs button.active{border-color:var(--mint);background:#23463f}.panel[hidden]{display:none}.registered{padding:18px;text-align:center;color:var(--muted)}#access-key{width:280px;font-family:ui-monospace,monospace;font-size:11px}footer{padding:14px 20px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}.mini{font-size:11px}.source-link{white-space:nowrap}.mode{font-size:11px;color:var(--gold)}
+@media(max-width:1180px){.layout{grid-template-columns:1fr}.native-wrap iframe{height:700px}.shell{grid-template-columns:205px 1fr}}@media(max-width:760px){header{padding:14px;flex-wrap:wrap}h1{font-size:22px}.shell{display:block}aside{border-right:0;border-bottom:1px solid var(--line);padding:10px 12px}.object-list{display:flex;overflow:auto;margin:8px 0}.object-list button{min-width:150px}.scope-note{display:none}main{padding:11px}.topline{display:block}.summary{grid-template-columns:repeat(3,1fr)}.native-wrap iframe{height:870px}.layout{gap:11px}.facts{grid-template-columns:100px minmax(0,1fr)}#access-key{width:100%}.counter{padding:8px 4px}.counter strong{font-size:20px}.table-wrap{max-height:330px}footer{padding:12px}}
+</style></head><body><header><div><div class="eyebrow">KAOPU / REALITY FOUNDATION / CONSOLIDATION</div><h1>人物与服装 · 统一世界基准</h1><p class="muted">同一协议读取人物、鞋履与裁片；检查、派单、复验分开，绝不自动修源项目。</p></div><span class="badge">S2.1 · 公共核心收束</span></header>
+<div class="shell"><aside><b>统一对象入口</b><div class="object-list" id="objects"></div><div class="scope-note"><b>本轮只做基础层</b><p>统一状态、语义测量和缺陷回传。人物、鞋、纸样仍由各自工作台负责生产。布料与成衣先登记，建筑、飞机等不接入。</p></div><div class="scope-note"><b>状态含义</b><p><span class="PASS">PASS</span> 已核对；<span class="FAIL">FAIL</span> 冲突；<span class="WARNING">WARNING</span> 已知风险；<span class="UNKNOWN">UNKNOWN</span> 缺证据；<span class="NOT_APPLICABLE">N/A</span> 对当前对象不适用。</p></div></aside>
+<main><div class="topline"><div><div id="stage" class="eyebrow">COMMON CONTRACT 0.2</div><h2 id="title">选择对象</h2><p id="description" class="muted"></p></div><span id="mode" class="mode"></span></div>
+<div class="toolbar"><button id="load" class="primary">读取并统一核验</button><button id="unload" disabled>关闭原台</button><button id="export-report" disabled>导出统一报告</button><button id="export-defects" disabled>导出缺陷派单</button><a id="open-fixed" class="source-link" target="_blank" rel="noopener noreferrer" hidden>独立打开固定原版 ↗</a></div>
+<div class="toolbar" id="key-row" hidden><label>裁片访问参数 <input id="access-key" type="password" autocomplete="off" placeholder="完整链接会自动带入；不保存"></label></div>
+<div id="status" class="statusline">公共核心正在初始化。</div>
+<div class="summary"><div class="counter pass"><strong id="count-pass">0</strong><small>PASS</small></div><div class="counter fail"><strong id="count-fail">0</strong><small>FAIL</small></div><div class="counter warning"><strong id="count-warning">0</strong><small>WARNING</small></div><div class="counter unknown"><strong id="count-unknown">0</strong><small>UNKNOWN</small></div><div class="counter na"><strong id="count-na">0</strong><small>NOT APPLICABLE</small></div></div>
+<div class="layout"><section class="card"><div class="native-head"><span>原生工作台 / 固定观察页</span><span id="native-caption" class="muted">尚未加载</span></div><div class="native-wrap" id="native-wrap"><div class="empty" id="empty">选择人物、鞋履或裁片并点击读取。<br>原版按需载入；统一层只读，不重新制作对象。</div></div></section>
+<section class="card pad"><h3>统一对象身份</h3><div id="facts" class="facts"></div><div class="line"></div><h3>当前判断</h3><p id="verdict" class="muted">尚无统一结果。</p><div class="line"></div><h3>保护结果</h3><div id="preservation" class="facts"></div><div class="line"></div><p class="mini muted">“对象协议有效”只表示来源、单位和检查关系可解释，不等于审美、物性、制造或用户批准。</p></section></div>
+<div class="card pad" style="margin-top:15px"><div class="tabs"><button data-tab="measurements" class="active">语义测量</button><button data-tab="checks">全部检查</button><button data-tab="defects">缺陷派单</button><button data-tab="dictionary">测量定义</button></div><section id="panel-measurements" class="panel"><div class="table-wrap"><table><thead><tr><th>语义ID</th><th>名称</th><th>值</th><th>依据</th><th>方法 / 边界</th></tr></thead><tbody id="measurement-rows"></tbody></table></div></section><section id="panel-checks" class="panel" hidden><div class="table-wrap"><table><thead><tr><th>状态</th><th>检查ID</th><th>说明</th><th>责任工作台</th></tr></thead><tbody id="check-rows"></tbody></table></div></section><section id="panel-defects" class="panel" hidden><div id="defect-list" class="defects"></div></section><section id="panel-dictionary" class="panel" hidden><div class="table-wrap"><table><thead><tr><th>定义ID</th><th>名称</th><th>单位</th><th>定义</th><th>不等同于 / 所需证据</th></tr></thead><tbody id="dictionary-rows"></tbody></table></div></section></div>
+</main></div><footer>REALITY-HC-S2.1 · 统一入口本身不包含 S2 访问密钥。原生页面只在用户选择后按固定提交和摘要读取。未实施自动修复、制造认证、实机性能认证或其他领域接入。</footer>
+<script>
+const REALITY_DICTIONARY={"schema":"kaopu/reality-measurement-dictionary@1","version":"0.2.0","canonicalLengthUnit":"m","statusVocabulary":["PASS","FAIL","WARNING","UNKNOWN","NOT_APPLICABLE"],"basisVocabulary":["source_declared","runtime_computed","physical_measured","artistic","unknown"],"measurements":[{"id":"human.visible_bounds_x","domain":"human","label":"当前可见数字几何 X 范围","quantity":"length","unit":"m","definition":"当前观察状态中，受检可见 CPU 网格经已有世界矩阵变换后的 X 方向包围范围。","notEquivalentTo":["肩宽","臂展","身体宽度实测"],"owner":"human-workbench"},{"id":"human.visible_bounds_y","domain":"human","label":"当前可见数字几何 Y 范围","quantity":"length","unit":"m","definition":"当前观察状态中，受检可见 CPU 网格经已有世界矩阵变换后的 Y 方向包围范围。","notEquivalentTo":["人体身高","真人身高实测","最终顶点着色器轮廓"],"owner":"human-workbench"},{"id":"human.visible_bounds_z","domain":"human","label":"当前可见数字几何 Z 范围","quantity":"length","unit":"m","definition":"当前观察状态中，受检可见 CPU 网格经已有世界矩阵变换后的 Z 方向包围范围。","notEquivalentTo":["胸厚","骨盆厚度实测"],"owner":"human-workbench"},{"id":"human.body_height","domain":"human","label":"人体身高","quantity":"length","unit":"m","definition":"从定义明确的头顶点到足底支撑平面的语义距离，必须引用人物比例版本和测量方法。","requiredEvidence":["proportion_revision","top_landmark","support_plane","measurement_method"],"owner":"human-workbench"},{"id":"human.shoulder_width","domain":"human","label":"肩宽","quantity":"length","unit":"m","definition":"在指定比例版本和姿态中，两个语义肩点之间的距离；不得从整体包围盒猜测。","requiredEvidence":["proportion_revision","left_shoulder_landmark","right_shoulder_landmark"],"owner":"human-workbench"},{"id":"footwear.visible_bounds_x","domain":"footwear","label":"当前可见鞋几何 X 范围","quantity":"length","unit":"m","definition":"当前鞋台显示状态的可见几何 X 方向包围范围。成双、拆件或款式比较会影响结果。","notEquivalentTo":["鞋楦宽","脚宽","标准鞋码"],"owner":"shoe-workbench"},{"id":"footwear.visible_bounds_y","domain":"footwear","label":"当前可见鞋几何 Y 范围","quantity":"length","unit":"m","definition":"当前鞋台显示状态的可见几何 Y 方向包围范围。","notEquivalentTo":["鞋帮高度制造值","脚背高度"],"owner":"shoe-workbench"},{"id":"footwear.visible_bounds_z","domain":"footwear","label":"当前可见鞋几何 Z 范围","quantity":"length","unit":"m","definition":"当前鞋台显示状态的可见几何 Z 方向包围范围。","notEquivalentTo":["脚长","鞋内长","鞋码"],"owner":"shoe-workbench"},{"id":"footwear.last_length","domain":"footwear","label":"鞋楦长度","quantity":"length","unit":"m","definition":"指定鞋楦版本的制造语义长度，必须引用鞋楦身份和测量方法。","requiredEvidence":["last_id","last_revision","measurement_method"],"owner":"shoe-workbench"},{"id":"pattern.panel_count","domain":"pattern","label":"裁片数量","quantity":"count","unit":"1","definition":"当前固定批次中具有独立身份的裁片数量。","owner":"tailor-workbench"},{"id":"pattern.seam_count","domain":"pattern","label":"有向配缝数量","quantity":"count","unit":"1","definition":"按原始有向配缝路径登记的接缝关系数量；不是命名边数量。","owner":"tailor-workbench"},{"id":"pattern.net_vertices","domain":"pattern","label":"净样顶点数量","quantity":"count","unit":"1","definition":"缝合线/净样基础几何中的顶点总数。","owner":"tailor-workbench"},{"id":"pattern.material_vertices","domain":"pattern","label":"材料裁片顶点数量","quantity":"count","unit":"1","definition":"包含缝份与折边材料后的顶点总数。","owner":"tailor-workbench"},{"id":"pattern.net_triangles","domain":"pattern","label":"净样三角形数量","quantity":"count","unit":"1","definition":"净样基础网格三角形总数。","owner":"tailor-workbench"},{"id":"pattern.material_triangles","domain":"pattern","label":"材料三角形数量","quantity":"count","unit":"1","definition":"包含缝份与折边材料后的三角形总数。","owner":"tailor-workbench"},{"id":"pattern.reduced_vertices","domain":"pattern","label":"记录化缩减顶点数量","quantity":"count","unit":"1","definition":"实际材料偏移小于该处标称留量的已记录顶点数量。它是检查提示，不自动等于制造缺陷。","owner":"tailor-workbench"},{"id":"pattern.zero_offset_panel_count","domain":"pattern","label":"含局部零偏移端点的裁片数量","quantity":"count","unit":"1","definition":"至少存在一个端点法向偏移为零的裁片数；不表示整片全部缝份为零。","owner":"tailor-workbench"},{"id":"pattern.max_seam_declaration_error","domain":"pattern","label":"最大接缝声明残差","quantity":"length","unit":"m","definition":"原始有向配缝路径复算长度与声明长度之间的最大绝对残差。","owner":"tailor-workbench"},{"id":"pattern.max_paired_edge_mismatch","domain":"pattern","label":"最大配对边长差","quantity":"length","unit":"m","definition":"一条接缝两侧有向路径复算长度的最大绝对差。","owner":"tailor-workbench"},{"id":"pattern.panel.cut_width","domain":"pattern","label":"裁片实际裁切宽度","quantity":"length","unit":"m","definition":"指定裁片实际裁切线在本地 U 方向的包围范围。动态实例必须携带 panel_id。","owner":"tailor-workbench"},{"id":"pattern.panel.cut_height","domain":"pattern","label":"裁片实际裁切高度","quantity":"length","unit":"m","definition":"指定裁片实际裁切线在本地 V 方向的包围范围。动态实例必须携带 panel_id。","owner":"tailor-workbench"},{"id":"pattern.waist_seam_length","domain":"pattern","label":"腰线净样长度","quantity":"length","unit":"m","definition":"由明确语义腰线段组成的净样长度，必须引用组成路径和方向。","requiredEvidence":["panel_ids","directed_path_ids","pattern_revision"],"owner":"tailor-workbench"},{"id":"pattern.outseam_length","domain":"pattern","label":"侧缝净样长度","quantity":"length","unit":"m","definition":"指定裁片和方向的侧缝净样路径长度；局部开口段必须分开。","requiredEvidence":["panel_id","directed_path_id","pattern_revision"],"owner":"tailor-workbench"},{"id":"pattern.inseam_length","domain":"pattern","label":"内缝净样长度","quantity":"length","unit":"m","definition":"指定裁片和方向的内缝净样路径长度。","requiredEvidence":["panel_id","directed_path_id","pattern_revision"],"owner":"tailor-workbench"},{"id":"fabric.thickness","domain":"fabric","label":"布料厚度","quantity":"length","unit":"m","definition":"在明确压强、方法与材料状态下的厚度；不得由着色法线幅度或双面间距自动替代。","requiredEvidence":["material_id","measurement_method","condition"],"owner":"fabric-workbench"},{"id":"fabric.yarn_spacing_warp","domain":"fabric","label":"经纱中心间距","quantity":"length","unit":"m","definition":"材料空间中相邻经纱中心的现实距离。Tex 是线密度，不能直接替代该长度。","requiredEvidence":["material_id","material_axis","source"],"owner":"fabric-workbench"},{"id":"fabric.yarn_spacing_weft","domain":"fabric","label":"纬纱中心间距","quantity":"length","unit":"m","definition":"材料空间中相邻纬纱中心的现实距离。","requiredEvidence":["material_id","material_axis","source"],"owner":"fabric-workbench"}]};
+const REALITY_BUILD={"version":"REALITY-HC-S2.1","contractVersion":"0.2.0","sourceCommit":"fe41a71b0d571af915512174fe98cbbd0bf6521d","baseCommit":"704e7d019ff97550f29181cf1f354016f1d344b4","sourceFiles":{"SCOPE_LOCK.json":"d11db62db03c36b0fcd334e9e78a967f9725a428a79e87cb87696a2d6b9e273c","measurement-dictionary.json":"2d24ebf8feb06746de6e69090c0a2ac02977636a41fe88e5975ffebc06dde305","protocol.js":"dc08e602e34271d016e46c6a8f32a0349861da193742c9c1509f15710d5cc8bd","adapters.js":"66718817630c87ce9e2318adeb5edd05a85d1b37e7b2343828201a420fd94deb","index.template.html":"0fdbc341a88df4d8ceb02145f199004a38932458c2f761ef09807c5fb53fe5ea","app.js":"2f40d6668de1a91c0da2f0317cf784e349ccb8e6d1e34bd3b6c00b3963edd506","build.py":"01c264609fcb98b59cf3cb20d16190a8af398530e242b5a7bcae0cdf3ef4a90f","tests/protocol.cjs":"2ac8a529c2bac825d2158995a853257453cb954d3cf3fede3413be36a80cba01","tests/browser.py":"cd68629a54896642b927d601f8bea7ca6708c493412d6b88138ab6b8f6bc317c"},"scope":["human","footwear","pattern","garment","fabric"],"activeObjects":["human-r07","shoe-r12","pattern-shorts-s2"],"registeredOnly":["garment","fabric"],"sourceWorkbenchesModified":false,"automaticRepair":false,"publicBrowserVerified":false};
+/* KAOPU Reality Foundation HC S2.1. Pure data contract; no source-workbench write API. */
+(function(root){
+'use strict';
+const VERSION='0.2.0';
+const OBJECT_SCHEMA='kaopu/reality-object@0.2';
+const BUNDLE_SCHEMA='kaopu/reality-foundation-bundle@0.2';
+const DEFECT_SCHEMA='kaopu/reality-defect@0.2';
+const STATUSES=Object.freeze(['PASS','FAIL','WARNING','UNKNOWN','NOT_APPLICABLE']);
+const DOMAINS=Object.freeze(['human','footwear','pattern','garment','fabric']);
+const SOURCE_MODES=Object.freeze(['live_read_only','fixed_snapshot','imported_unverified','registered_only']);
+const BASES=Object.freeze(['source_declared','runtime_computed','physical_measured','artistic','unknown']);
+const SEVERITY=Object.freeze({FAIL:'critical',WARNING:'warning',UNKNOWN:'info'});
+const UNITS=Object.freeze(['m','mm','cm','in','ft','1','m2','mm2','g/m2','tex','denier','px']);
+const clone=value=>value===undefined?undefined:JSON.parse(JSON.stringify(value));
+const finite=value=>typeof value==='number'&&Number.isFinite(value);
+const plain=value=>value&&typeof value==='object'&&!Array.isArray(value);
+function normalizeStatus(value){
+ const key=String(value??'').trim().toUpperCase().replace(/[\s\/-]+/g,'_');
+ const aliases={OK:'PASS',PASSED:'PASS',ERROR:'FAIL',CONFLICT:'FAIL',WARN:'WARNING',UNRESOLVED:'UNKNOWN',NA:'NOT_APPLICABLE',N_A:'NOT_APPLICABLE'};
+ const status=aliases[key]||key;
+ if(!STATUSES.includes(status))throw Error('未知状态：'+String(value));
+ return status;
+}
+function hashId(value){
+ let h=2166136261;for(const c of String(value)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return (h>>>0).toString(16).padStart(8,'0');
+}
+function validateDictionary(dictionary){
+ if(!plain(dictionary)||dictionary.schema!=='kaopu/reality-measurement-dictionary@1')throw Error('测量字典协议不正确');
+ if(!Array.isArray(dictionary.measurements)||!dictionary.measurements.length)throw Error('测量字典为空');
+ const ids=new Set();
+ for(const item of dictionary.measurements){
+  if(!plain(item)||typeof item.id!=='string'||!item.id)throw Error('测量定义缺少ID');
+  if(ids.has(item.id))throw Error('测量定义重复：'+item.id);ids.add(item.id);
+  if(!DOMAINS.includes(item.domain))throw Error('测量定义越界：'+item.id);
+  if(typeof item.quantity!=='string'||!item.quantity)throw Error('测量定义缺少量纲：'+item.id);
+  if(!UNITS.includes(item.unit))throw Error('测量定义使用未知单位：'+item.id+' / '+item.unit);
+  if(typeof item.definition!=='string'||item.definition.length<8)throw Error('测量定义不完整：'+item.id);
+  if(typeof item.owner!=='string'||!item.owner)throw Error('测量定义缺少责任工作台：'+item.id);
+ }
+ return Object.freeze({byId:Object.freeze(Object.fromEntries(dictionary.measurements.map(item=>[item.id,Object.freeze(clone(item))]))),ids:Object.freeze([...ids])});
+}
+function source(value){
+ if(!plain(value))throw Error('对象缺少来源');
+ if(typeof value.repository!=='string'||!/^[\w.-]+\/[\w.-]+$/.test(value.repository))throw Error('来源仓库无效');
+ if(typeof value.commit!=='string'||!/^[0-9a-f]{40}$/.test(value.commit))throw Error('来源必须绑定完整提交');
+ if(typeof value.path!=='string'||!value.path||value.path.startsWith('/')||value.path.split('/').includes('..'))throw Error('来源路径无效');
+ if(value.sha256!=null&&(!/^[0-9a-f]{64}$/.test(value.sha256)))throw Error('来源摘要格式错误');
+ return {repository:value.repository,commit:value.commit,path:value.path,sha256:value.sha256??null};
+}
+function makeMeasurement(dictionary,definitionId,value,options={}){
+ const index=validateDictionary(dictionary),definition=index.byId[definitionId];
+ if(!definition)throw Error('未登记测量：'+definitionId);
+ const status=value===null||value===undefined?'UNKNOWN':normalizeStatus(options.status||'PASS');
+ if(value!==null&&value!==undefined){
+  if(!finite(value))throw Error('测量必须是有限数值：'+definitionId);
+  if(definition.quantity==='count'&&(!Number.isInteger(value)||value<0))throw Error('计数必须为非负整数：'+definitionId);
+ }
+ const unit=options.unit||definition.unit;
+ if(unit!==definition.unit)throw Error('测量单位与字典不一致：'+definitionId+' 应为 '+definition.unit+'，收到 '+unit);
+ const basis=options.basis||'unknown';if(!BASES.includes(basis))throw Error('测量依据无效：'+definitionId);
+ return {id:options.id||definitionId,definitionId,label:definition.label,value:value??null,unit,status,basis,method:options.method||null,context:clone(options.context||{}),sourceRef:options.sourceRef||null,notEquivalentTo:clone(definition.notEquivalentTo||[]),requiredEvidence:clone(definition.requiredEvidence||[]),owner:definition.owner};
+}
+function makeCheck(id,status,message,options={}){
+ if(typeof id!=='string'||!id)throw Error('检查项缺少ID');
+ if(typeof message!=='string'||!message)throw Error('检查项缺少说明：'+id);
+ return {id,status:normalizeStatus(status),message,category:options.category||'contract',owner:options.owner||null,sourceRef:options.sourceRef||null,measurementId:options.measurementId||null,expected:clone(options.expected??null),observed:clone(options.observed??null),detail:clone(options.detail??null)};
+}
+function makeDefect(objectId,check,options={}){
+ const status=normalizeStatus(check.status);
+ if(!['FAIL','WARNING','UNKNOWN'].includes(status))throw Error('PASS或不适用项不能形成缺陷：'+check.id);
+ const code=options.code||check.id;
+ return {schema:DEFECT_SCHEMA,id:options.id||('defect:'+objectId+':'+hashId(code+'|'+check.message)),objectId,code,severity:options.severity||SEVERITY[status],state:'OPEN',owner:options.owner||check.owner||'reality-coordinator',sourceCommit:options.sourceCommit||null,measurementId:check.measurementId||null,message:check.message,expected:clone(check.expected),observed:clone(check.observed),detail:clone(check.detail),repairAuthorized:false,verificationRequired:true,createdBy:'REALITY-HC-S2.1',createdAt:options.createdAt||null};
+}
+function verifyAdapter(adapter){
+ const methods=['identity','source','units','frames','measurements','checks','defects','preservation'];
+ if(!adapter||typeof adapter!=='object')throw Error('适配器不存在');
+ for(const name of methods)if(typeof adapter[name]!=='function')throw Error('适配器缺少方法：'+name);
+ if(typeof adapter.read!=='function')throw Error('适配器缺少只读read方法');
+ if('write' in adapter)throw Error('S2.1适配器禁止暴露write接口');
+ return true;
+}
+function finalizeObject(candidate,dictionary){
+ const index=validateDictionary(dictionary);
+ if(!plain(candidate)||candidate.schema!==OBJECT_SCHEMA)throw Error('对象协议不正确');
+ if(typeof candidate.objectId!=='string'||!/^[a-zA-Z0-9_.:-]{1,160}$/.test(candidate.objectId))throw Error('对象身份无效');
+ if(!DOMAINS.includes(candidate.domain))throw Error('对象领域越界：'+candidate.domain);
+ if(!SOURCE_MODES.includes(candidate.sourceMode))throw Error('来源模式无效：'+candidate.sourceMode);
+ const result=clone(candidate);result.source=source(candidate.source);
+ if(!Array.isArray(result.units))throw Error('单位声明必须为数组');
+ for(const item of result.units){
+  if(!plain(item)||typeof item.quantity!=='string'||!item.quantity)throw Error('单位声明缺少量纲');
+  if(!UNITS.includes(item.unit))throw Error('未知单位声明：'+item.unit);
+  if(!BASES.includes(item.basis||'unknown'))throw Error('单位声明依据无效');
+ }
+ if(!Array.isArray(result.frames))throw Error('坐标框架必须为数组');
+ if(!Array.isArray(result.measurements))throw Error('测量必须为数组');
+ for(const m of result.measurements){
+  const definition=index.byId[m.definitionId];if(!definition)throw Error('对象含未登记测量：'+m.definitionId);
+  if(m.unit!==definition.unit)throw Error('对象测量单位错误：'+m.id);
+  if(!STATUSES.includes(normalizeStatus(m.status)))throw Error('对象测量状态错误：'+m.id);
+  if(m.value!=null&&!finite(m.value))throw Error('对象测量数值无效：'+m.id);
+ }
+ if(!Array.isArray(result.checks))throw Error('检查项必须为数组');
+ const checkIds=new Set();for(const c of result.checks){c.status=normalizeStatus(c.status);if(checkIds.has(c.id))throw Error('检查ID重复：'+c.id);checkIds.add(c.id);}
+ const counts=Object.fromEntries(STATUSES.map(status=>[status,0]));for(const c of result.checks)counts[c.status]++;
+ if(!Array.isArray(result.defects))result.defects=[];
+ const defectIds=new Set();for(const d of result.defects){if(d.schema!==DEFECT_SCHEMA||d.objectId!==result.objectId)throw Error('缺陷协议或对象不匹配');if(defectIds.has(d.id))throw Error('缺陷ID重复：'+d.id);defectIds.add(d.id);d.repairAuthorized=false;d.verificationRequired=true;}
+ result.status=counts.FAIL?'REJECTED':counts.WARNING||counts.UNKNOWN?'PARTIAL':'VALID';
+ result.counts=counts;
+ result.hostModified=false;result.physicalCertification=false;result.manufacturingCertification=false;result.aestheticAcceptance=false;result.productionReady=false;
+ result.contractVersion=VERSION;
+ return result;
+}
+function aggregate(objects,dictionary){
+ if(!Array.isArray(objects)||!objects.length)throw Error('汇总对象为空');
+ const normalized=objects.map(object=>finalizeObject(object,dictionary));
+ const counts=Object.fromEntries(STATUSES.map(status=>[status,0]));const defects=[];
+ for(const object of normalized){for(const status of STATUSES)counts[status]+=object.counts[status];defects.push(...object.defects);}
+ return {schema:BUNDLE_SCHEMA,version:VERSION,objects:normalized,counts,defects,status:counts.FAIL?'REJECTED':counts.WARNING||counts.UNKNOWN?'PARTIAL':'VALID',sourceWriteAPI:false,automaticRepair:false,physicalCertification:false,manufacturingCertification:false,aestheticAcceptance:false,productionReady:false};
+}
+function defectBundle(objects,dictionary){const bundle=aggregate(objects,dictionary);return {schema:'kaopu/reality-defect-bundle@0.2',version:VERSION,generatedAt:null,sourceObjects:bundle.objects.map(o=>({objectId:o.objectId,domain:o.domain,commit:o.source.commit})),defects:bundle.defects.map(d=>({...d,repairAuthorized:false,verificationRequired:true})),automaticRepair:false};}
+const api=Object.freeze({VERSION,OBJECT_SCHEMA,BUNDLE_SCHEMA,DEFECT_SCHEMA,STATUSES,DOMAINS,SOURCE_MODES,BASES,UNITS,clone,normalizeStatus,validateDictionary,source,makeMeasurement,makeCheck,makeDefect,verifyAdapter,finalizeObject,aggregate,defectBundle});
+root.RealityProtocol=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);
+
+/* Common read-only adapters for immutable S1 and S2. No source-workbench setters are exposed. */
+(function(root){
+'use strict';
+const P=RealityProtocol;
+const clone=P.clone;
+function lowerStatus(value){const key=String(value||'unknown').toLowerCase();return ({pass:'PASS',fail:'FAIL',warning:'WARNING',unknown:'UNKNOWN',not_applicable:'NOT_APPLICABLE'})[key]||P.normalizeStatus(value);}
+function toMeters(value,unit){const scale={m:1,mm:.001,cm:.01,in:.0254,ft:.3048};if(!(unit in scale)||typeof value!=='number'||!Number.isFinite(value))throw Error('无法换算长度：'+value+' '+unit);return value*scale[unit];}
+function checksToDefects(objectId,checks,sourceCommit){return checks.filter(c=>['FAIL','WARNING','UNKNOWN'].includes(c.status)).map(c=>P.makeDefect(objectId,c,{sourceCommit,owner:c.owner||undefined}));}
+function baseFromS1(report,objectId,dictionary){
+ if(!report?.nativeReady||report.loadedId!==objectId||!report.document)throw Error('S1 原生对象尚未形成实时观察');
+ const d=report.document,domain=objectId==='human-r07'?'human':'footwear',sourceMode='live_read_only';
+ const source=P.source(d.source),units=[
+  {quantity:'source_geometry_length',unit:d.units.geometry,basis:d.units.basis||'source_declared'},
+  {quantity:'scene_length',unit:d.units.scene,basis:d.units.basis||'source_declared'},
+  {quantity:'source_to_scene_scale',unit:'1',basis:d.units.basis||'source_declared',value:d.units.geometryToScene}
+ ];
+ const frames=d.frame?[{id:'asset_local',handedness:d.frame.handedness,up:d.frame.up,forward:d.frame.forward,toCanonicalBasis:clone(d.frame.toCanonicalBasis),lateralMeaning:d.frame.lateralMeaning??null,basis:d.frame.basis||'source_declared'}]:[];
+ const ids=domain==='human'?['human.visible_bounds_x','human.visible_bounds_y','human.visible_bounds_z']:['footwear.visible_bounds_x','footwear.visible_bounds_y','footwear.visible_bounds_z'];
+ const measurements=ids.map((id,i)=>P.makeMeasurement(dictionary,id,toMeters(d.dimensions.xyz[i],d.dimensions.unit),{basis:d.dimensions.basis,method:d.dimensions.method,sourceRef:'S1:'+d.assetId}));
+ const semanticId=domain==='human'?'human.body_height':'footwear.last_length';
+ measurements.push(P.makeMeasurement(dictionary,semanticId,null,{basis:'unknown',method:domain==='human'?'当前 S1 只有可见几何包围范围，缺少头顶/足底语义标记与比例版本。':'当前 S1 只有可见几何包围范围，缺少鞋楦身份、版本和制造测量方法。',sourceRef:'S1:'+d.assetId}));
+ const checks=(report.validation?.rows||[]).map(row=>P.makeCheck('s1.'+row.id,lowerStatus(row.status),row.message,{category:'s1-declaration',owner:domain==='human'?'human-workbench':'shoe-workbench',detail:row.detail??null}));
+ checks.push(P.makeCheck(domain==='human'?'semantic.body_height':'semantic.last_length','UNKNOWN',domain==='human'?'可见 Y 包围范围不能自动当成人体身高；需要语义地标、支撑平面和 proportion_revision。':'可见 Z 包围范围不能自动当作脚长、鞋内长或鞋楦长度；需要鞋楦语义与测量协议。',{category:'semantic-measurement',owner:domain==='human'?'human-workbench':'shoe-workbench',measurementId:semanticId}));
+ if(d.preservation)for(const channel of ['geometry','camera','settings'])checks.push(P.makeCheck('preservation.'+channel,d.preservation[channel]?'PASS':'FAIL','读取前后受检 '+channel+' '+(d.preservation[channel]?'保持不变':'发生变化'),{category:'preservation',owner:domain==='human'?'human-workbench':'shoe-workbench'}));
+ const object={schema:P.OBJECT_SCHEMA,objectId,domain,sourceMode,source,units,frames,measurements,checks,defects:[],preservation:clone(d.preservation||{}),camera:clone(d.camera||null),color:clone(d.color||null),evidence:clone(d.evidence||null),metadata:{sourceSystem:'REALITY-HC-S1',sourceVersion:report.version,nativeAssetId:d.assetId,observation:clone(d.observation||{}),nativeMeasurements:clone(d.nativeMeasurements||[]),freshObservation:true}};
+ object.defects=checksToDefects(objectId,checks,source.commit);return P.finalizeObject(object,dictionary);
+}
+function baseFromS2(report,dictionary){
+ if(!report?.loaded||!report.document||!report.validation)throw Error('S2 裁片观察尚未解锁');
+ const d=report.document,r=report.validation,source=P.source(d.source),objectId='pattern-shorts-s2';
+ const measurements=[
+  P.makeMeasurement(dictionary,'pattern.panel_count',r.summary.panels,{basis:'runtime_computed',method:'S2 对固定观察数据重新检查',sourceRef:'S2:'+d.patternId}),
+  P.makeMeasurement(dictionary,'pattern.seam_count',r.summary.seams,{basis:'runtime_computed',method:'按原有向 pairs 路径计数',sourceRef:'S2:'+d.patternId}),
+  P.makeMeasurement(dictionary,'pattern.net_vertices',r.summary.netVertices,{basis:'runtime_computed',method:'S2 原始净样拓扑总计'}),
+  P.makeMeasurement(dictionary,'pattern.material_vertices',r.summary.materialVertices,{basis:'runtime_computed',method:'S2 原始材料拓扑总计'}),
+  P.makeMeasurement(dictionary,'pattern.net_triangles',r.summary.netTriangles,{basis:'runtime_computed',method:'S2 原始净样拓扑总计'}),
+  P.makeMeasurement(dictionary,'pattern.material_triangles',r.summary.materialTriangles,{basis:'runtime_computed',method:'S2 原始材料拓扑总计'}),
+  P.makeMeasurement(dictionary,'pattern.reduced_vertices',r.summary.reducedVertices,{basis:'runtime_computed',method:'实际偏移小于标称留量的记录化顶点'}),
+  P.makeMeasurement(dictionary,'pattern.zero_offset_panel_count',(r.summary.zeroOffsetPanels||[]).length,{basis:'runtime_computed',method:'至少一个局部端点偏移为零的裁片数'}),
+  P.makeMeasurement(dictionary,'pattern.max_seam_declaration_error',toMeters(r.summary.maxSeamDeclarationErrorMm,'mm'),{basis:'runtime_computed',method:'有向配缝路径复算与声明长度最大绝对残差'}),
+  P.makeMeasurement(dictionary,'pattern.max_paired_edge_mismatch',toMeters(r.summary.maxPairedEdgeMismatchMm??0,'mm'),{basis:'runtime_computed',method:'接缝两侧有向路径最大绝对差'})
+ ];
+ for(const panel of r.panels||[]){
+  const width=panel.cutBoxMm.max[0]-panel.cutBoxMm.min[0],height=panel.cutBoxMm.max[1]-panel.cutBoxMm.min[1];
+  measurements.push(P.makeMeasurement(dictionary,'pattern.panel.cut_width',toMeters(width,'mm'),{id:'pattern.panel.'+panel.id+'.cut_width',basis:'runtime_computed',method:'实际裁切线局部 U 包围范围',context:{panelId:panel.id}}));
+  measurements.push(P.makeMeasurement(dictionary,'pattern.panel.cut_height',toMeters(height,'mm'),{id:'pattern.panel.'+panel.id+'.cut_height',basis:'runtime_computed',method:'实际裁切线局部 V 包围范围',context:{panelId:panel.id}}));
+ }
+ for(const id of ['pattern.waist_seam_length','pattern.outseam_length','pattern.inseam_length'])measurements.push(P.makeMeasurement(dictionary,id,null,{basis:'unknown',method:'S2.1 尚未将多裁片语义路径聚合成此成衣级测量；保留未知，不能从包围框推测。'}));
+ const checks=(r.rows||[]).map(row=>P.makeCheck('s2.'+row.id,lowerStatus(row.state),row.message,{category:'pattern-source',owner:'tailor-workbench',detail:row.detail??null}));
+ checks.push(P.makeCheck('pattern.target.proportion_revision',d.target?.proportionRevision==null?'UNKNOWN':'PASS',d.target?.proportionRevision==null?'纸样目标未提供 proportion_revision，不能冒认已适配当前 R07。':'纸样目标绑定版本已声明。',{category:'binding',owner:'tailor-workbench',observed:d.target?.proportionRevision??null,expected:'explicit proportion_revision'}));
+ checks.push(P.makeCheck('pattern.source.live_connection','WARNING','S2 当前是固定源快照，不是正在运行的裁缝铺实时连接；源变化后必须产生新观察版本。',{category:'integration',owner:'reality-coordinator',observed:'fixed_snapshot',expected:'future read-only live export'}));
+ checks.push(P.makeCheck('pattern.manufacturing','UNKNOWN','当前端点偏移、零严格交叉和接缝残差没有构成制造、试穿或工艺认证。',{category:'certification',owner:'tailor-workbench'}));
+ const units=[{quantity:'pattern_length',unit:d.units.pattern,basis:'source_declared'},{quantity:'scene_length',unit:d.units.scene,basis:'source_declared'},{quantity:'pattern_to_scene_scale',unit:'1',basis:'source_declared',value:d.units.patternToScene}];
+ const frames=[{id:'pattern_local',handedness:'right',up:'+V',forward:'planar',basis:'source_declared',note:'二维裁片 U/V 平面；显示时统一 mm→m 与仅用于排布的平移，不单片缩放。'}];
+ const object={schema:P.OBJECT_SCHEMA,objectId,domain:'pattern',sourceMode:'fixed_snapshot',source,units,frames,measurements,checks,defects:[],preservation:{sourceCoordinates:true,topology:true,seams:true,allowances:true},camera:null,color:null,evidence:{origin:report.origin,sourceSystem:'REALITY-HC-S2'},metadata:{sourceSystem:'REALITY-HC-S2',sourceVersion:report.version,patternId:d.patternId,patternVersion:d.patternVersion,target:clone(d.target),render:clone(report.render),liveConnection:false,freshObservation:report.origin==='verified-build'}};
+ object.defects=checksToDefects(objectId,checks,source.commit);return P.finalizeObject(object,dictionary);
+}
+function waitFor(test,timeout=240000){return new Promise((resolve,reject)=>{const start=performance.now();(function poll(){try{const value=test();if(value)return resolve(value);}catch(error){return reject(error);}if(performance.now()-start>timeout)return reject(Error('等待固定工作台就绪超时'));setTimeout(poll,120);})();});}
+async function observeS1WhenStable(api,timeout=30000){
+ const start=performance.now();let last=null;
+ while(performance.now()-start<=timeout){
+  try{api.observe();return api.report();}
+  catch(error){last=error;const message=String(error?.message||error);if(!message.includes('矩阵尚未更新')&&!message.includes('尚未就绪'))throw error;await new Promise(resolve=>setTimeout(resolve,120));}
+ }
+ throw last||Error('原生对象在限定时间内没有形成稳定可读矩阵');
+}
+function adapterShell(identity,reader){let last=null;return Object.freeze({
+ identity:()=>clone(identity),
+ source:()=>clone(last?.source||identity.source),
+ units:()=>clone(last?.units||[]),
+ frames:()=>clone(last?.frames||[]),
+ measurements:()=>clone(last?.measurements||[]),
+ checks:()=>clone(last?.checks||[]),
+ defects:()=>clone(last?.defects||[]),
+ preservation:()=>clone(last?.preservation||{}),
+ read:async(runtime,options={})=>{last=await reader(runtime,options);return clone(last);},
+ report:()=>clone(last)
+ });}
+function createS1Adapter(objectId,dictionary){
+ const domain=objectId==='human-r07'?'human':objectId==='shoe-r12'?'footwear':null;if(!domain)throw Error('未知S1对象：'+objectId);
+ return adapterShell({objectId,domain,source:{repository:'haihao0307/Humanoid-Rig-Lab-Next',commit:'4b9d26b4edc6f197823d8bcebd9fd242ce99d1ff',path:'reality-lab/hc-s1/preview.html',sha256:'94939009131344eb539a6e60414d001b1619e0d33944aef84517a81354f5f836'}},async runtime=>{
+  const api=await waitFor(()=>runtime.__REALITY_LAB__);api.select(objectId);await api.loadNative();const report=await observeS1WhenStable(api);return baseFromS1(report,objectId,dictionary);
+ });
+}
+function createS2Adapter(dictionary){
+ return adapterShell({objectId:'pattern-shorts-s2',domain:'pattern',source:{repository:'haihao0307/Humanoid-Rig-Lab-Next',commit:'8890bda261784ba14a79ea277bbb14bd547376ad',path:'reality-lab/hc-s2/releases/s2-893fe414335d/preview.html',sha256:'888479a0fc1070a00e161c9af937fc43bc1db871a88e8c37d87d0326e0b3fcce'}},async(runtime,options)=>{
+  const api=await waitFor(()=>runtime.__REALITY_S2__);if(!api.report().loaded){const input=runtime.document.getElementById('key-input');if(!input)throw Error('S2固定页面缺少访问入口');input.value=options.key||'';await api.unlock();await waitFor(()=>api.report().loaded,30000);}return baseFromS2(api.report(),dictionary);
+ });
+}
+const api=Object.freeze({toMeters,baseFromS1,baseFromS2,createS1Adapter,createS2Adapter,waitFor,observeS1WhenStable});
+root.RealityCommonAdapters=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);
+
+(function(){
+'use strict';
+const P=RealityProtocol,A=RealityCommonAdapters,D=REALITY_DICTIONARY,$=id=>document.getElementById(id),dictionaryIndex=P.validateDictionary(D);
+const SOURCE={
+ s1:{raw:'https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/4b9d26b4edc6f197823d8bcebd9fd242ce99d1ff/reality-lab/hc-s1/preview.html',fixed:'https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/4b9d26b4edc6f197823d8bcebd9fd242ce99d1ff/reality-lab/hc-s1/preview.html',sha256:'94939009131344eb539a6e60414d001b1619e0d33944aef84517a81354f5f836',bytes:55257},
+ s2:{raw:'https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/8890bda261784ba14a79ea277bbb14bd547376ad/reality-lab/hc-s2/releases/s2-893fe414335d/preview.html',fixed:'https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/8890bda261784ba14a79ea277bbb14bd547376ad/reality-lab/hc-s2/releases/s2-893fe414335d/preview.html',sha256:'888479a0fc1070a00e161c9af937fc43bc1db871a88e8c37d87d0326e0b3fcce',bytes:66052}
+};
+const configs=[
+ {id:'human-r07',label:'人物 · R07',domain:'human',group:'s1',stage:'S1 LIVE READ',description:'读取固定 R07 原生人物的当前数字几何、相机与声明，再映射到共同语义；包围范围不冒充人体身高。'},
+ {id:'shoe-r12',label:'鞋履 · R12',domain:'footwear',group:'s1',stage:'S1 LIVE READ',description:'读取固定 R12 鞋台的当前数字几何与毫米→米关系；外形范围不冒充脚长、鞋楦或鞋码。'},
+ {id:'pattern-shorts-s2',label:'裁片 · S2',domain:'pattern',group:'s2',stage:'S2 VERIFIED SNAPSHOT',description:'读取固定短裤九片纸样，统一净样、材料、裁切线、配缝和人物绑定缺口；不自动修缝份。'},
+ {id:'fabric-s3',label:'布料 / 皮革 · S3',domain:'fabric',registeredOnly:true,stage:'REGISTERED ONLY',description:'下一阶段：材料坐标、厚度、纱线间距和参数量纲。当前不读取或修改现有着色器与物理。'},
+ {id:'garment-s5',label:'成衣宿主 · 待接入',domain:'garment',registeredOnly:true,stage:'REGISTERED ONLY',description:'在布料接口稳定后接入真实成衣和人物版本、试穿、碰撞与动作状态。当前不冒充已接入。'}
+];
+const adapters={
+ 'human-r07':A.createS1Adapter('human-r07',D),
+ 'shoe-r12':A.createS1Adapter('shoe-r12',D),
+ 'pattern-shorts-s2':A.createS2Adapter(D)
+};
+for(const adapter of Object.values(adapters))P.verifyAdapter(adapter);
+let selected='human-r07',frame=null,frameGroup=null,loading=false,privateKey=new URLSearchParams(location.hash.slice(1)).get('key')||'',activeTab='measurements';
+const results=new Map(),events=[];
+function record(type,detail){events.push({type,detail,at:new Date().toISOString()});if(events.length>60)events.shift();}
+function config(){return configs.find(x=>x.id===selected);}
+function status(text,error=false){$('status').textContent=text;$('status').classList.toggle('error',error);record(error?'error':'status',text);}
+function el(tag,text,cls){const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(cls)node.className=cls;return node;}
+function addFact(target,label,value){target.append(el('div',label,'label'),el('div',String(value),'value'));}
+function valueText(m){
+ if(m.value===null)return '未确认';
+ const def=dictionaryIndex.byId[m.definitionId];
+ if(def.quantity==='count')return String(m.value);
+ if(def.quantity==='length'&&m.unit==='m')return Math.abs(m.value)<1?m.value.toFixed(6)+' m / '+(m.value*1000).toFixed(3)+' mm':m.value.toFixed(6)+' m';
+ return Number.isInteger(m.value)?String(m.value):Number(m.value).toPrecision(8)+' '+m.unit;
+}
+function clearNode(id){$(id).replaceChildren();}
+function renderCounts(object){for(const key of P.STATUSES)$('count-'+({PASS:'pass',FAIL:'fail',WARNING:'warning',UNKNOWN:'unknown',NOT_APPLICABLE:'na'})[key]).textContent=object?.counts?.[key]??0;}
+function renderFacts(object){clearNode('facts');clearNode('preservation');
+ if(!object){addFact($('facts'),'对象','尚未读取');addFact($('facts'),'当前范围',config().domain);$('verdict').textContent=config().registeredOnly?'已登记下一阶段；本轮不伪造接入结果。':'点击“读取并统一核验”后显示共同协议结果。';return;}
+ addFact($('facts'),'对象ID',object.objectId);addFact($('facts'),'领域',object.domain);addFact($('facts'),'来源模式',object.sourceMode);addFact($('facts'),'共同状态',object.status);addFact($('facts'),'源仓库',object.source.repository);addFact($('facts'),'源提交',object.source.commit);addFact($('facts'),'源路径',object.source.path);addFact($('facts'),'已加载对象',results.size);
+ $('verdict').textContent=object.status==='REJECTED'?'存在冲突，不能提升为有效世界声明。':object.status==='PARTIAL'?'结构和来源可解释，但仍有明确警告或缺证据项。':'当前声明在本协议范围内有效；仍不授予物性、审美或制造认证。';
+ const p=object.preservation||{};const entries=Object.entries(p);if(entries.length)for(const [key,value]of entries)addFact($('preservation'),key,value===true?'保持不变':value===false?'发生变化':JSON.stringify(value));else addFact($('preservation'),'保护证据','未提供');
+}
+function renderMeasurements(object){clearNode('measurement-rows');if(!object)return;
+ const rows=[...object.measurements].sort((a,b)=>P.STATUSES.indexOf(a.status)-P.STATUSES.indexOf(b.status)||a.id.localeCompare(b.id));
+ for(const m of rows){const tr=document.createElement('tr');const id=document.createElement('td');id.append(el('code',m.id),document.createElement('br'),el('span',m.definitionId,'mini muted'));const name=el('td',m.label);const value=document.createElement('td');value.append(el('span',m.status,'pill '+m.status),document.createElement('br'),el('span',valueText(m)));const basis=el('td',m.basis);const method=el('td',m.method||'未提供');if(m.notEquivalentTo?.length)method.append(document.createElement('br'),el('span','不等同于：'+m.notEquivalentTo.join('、'),'mini muted'));tr.append(id,name,value,basis,method);$('measurement-rows').append(tr);}
+}
+function renderChecks(object){clearNode('check-rows');if(!object)return;for(const c of object.checks){const tr=document.createElement('tr'),s=document.createElement('td');s.append(el('span',c.status,'pill '+c.status));tr.append(s,el('td',c.id),el('td',c.message),el('td',c.owner||'未分配'));$('check-rows').append(tr);}}
+function renderDefects(object){clearNode('defect-list');if(!object)return;if(!object.defects.length){$('defect-list').append(el('p','当前对象没有由 FAIL / WARNING / UNKNOWN 形成的开放派单。','muted'));return;}for(const d of object.defects){const box=el('article',undefined,'defect '+d.severity),head=el('div',undefined,'defect-head');head.append(el('code',d.code),el('span',d.severity+' / '+d.owner));box.append(head,el('p',d.message),el('div','repairAuthorized=false · verificationRequired=true','mini muted'));$('defect-list').append(box);}}
+function renderDictionary(){clearNode('dictionary-rows');const domain=config().domain;for(const d of D.measurements.filter(x=>x.domain===domain||x.domain==='fabric'&&domain==='fabric')){const tr=document.createElement('tr');tr.append(el('td',d.id),el('td',d.label),el('td',d.unit),el('td',d.definition),el('td',[...(d.notEquivalentTo||[]),...(d.requiredEvidence||[])].join('、')||'—'));$('dictionary-rows').append(tr);}}
+function render(object=results.get(selected)||null){renderCounts(object);renderFacts(object);renderMeasurements(object);renderChecks(object);renderDefects(object);renderDictionary();$('export-report').disabled=results.size===0;$('export-defects').disabled=results.size===0;}
+function select(id){const next=configs.find(x=>x.id===id);if(!next)throw Error('对象不在允许范围');if(frame&&(next.registeredOnly||frameGroup!==next.group))unload();selected=id;document.querySelectorAll('[data-object]').forEach(b=>b.classList.toggle('active',b.dataset.object===id));$('title').textContent=next.label;$('description').textContent=next.description;$('stage').textContent=next.stage;$('mode').textContent=next.registeredOnly?'登记中 / 无实时适配器':next.group==='s1'?'原生实时只读':'固定源快照只读';$('load').disabled=loading||next.registeredOnly;$('key-row').hidden=next.group!=='s2';$('open-fixed').hidden=next.registeredOnly;
+ if(!next.registeredOnly){const src=SOURCE[next.group];$('open-fixed').href=src.fixed+(next.group==='s2'&&(privateKey||$('access-key').value.trim())?'#key='+encodeURIComponent(privateKey||$('access-key').value.trim()):'');}
+ render();status(next.registeredOnly?'此对象只登记在共同目录中；当前没有适配器，不会显示假数据。':'已选择 '+next.label+'；尚未执行新的只读观察。');
+}
+async function digestHex(buffer){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',buffer))].map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function fetchExact(group){const src=SOURCE[group],response=await fetch(src.raw,{credentials:'omit',referrerPolicy:'no-referrer'});if(!response.ok)throw Error('固定原版读取失败：HTTP '+response.status);const bytes=await response.arrayBuffer();if(bytes.byteLength!==src.bytes)throw Error('固定原版字节数变化，拒绝执行');const hash=await digestHex(bytes);if(hash!==src.sha256)throw Error('固定原版摘要不符，拒绝回退到其他版本');record('source-verified',{group,bytes:bytes.byteLength,sha256:hash});return new TextDecoder().decode(bytes);}
+async function ensureFrame(group){if(frame&&frameGroup===group)return frame;if(frame)unload();const html=await fetchExact(group);const iframe=document.createElement('iframe');iframe.title=group==='s1'?'S1 人物与鞋履固定原版':'S2 裁片固定观察页';iframe.referrerPolicy='no-referrer';frame=iframe;frameGroup=group;$('native-wrap').replaceChildren(iframe);$('unload').disabled=false;$('native-caption').textContent='固定文件摘要已核对，正在初始化';await new Promise((resolve,reject)=>{iframe.onload=resolve;iframe.onerror=()=>reject(Error('固定原版 iframe 初始化失败'));iframe.srcdoc=html;});record('frame-created',group);return iframe;}
+async function loadSelected(){
+ if(loading)return;const c=config();if(c.registeredOnly)throw Error('此对象尚未接入适配器');loading=true;$('load').disabled=true;status('正在核对固定来源并读取 '+c.label+'；统一层不写回原台。');
+ try{const iframe=await ensureFrame(c.group),key=(privateKey||$('access-key').value.trim());if(c.group==='s2'&&!/^[A-Za-z0-9_-]{43}$/.test(key))throw Error('S2 裁片需要完整私人链接或有效访问参数');const object=await adapters[c.id].read(iframe.contentWindow,{key});results.set(c.id,object);$('access-key').value='';$('native-caption').textContent=c.label+' · 已形成共同协议结果';render(object);status('完成 '+c.label+'：'+object.counts.PASS+' PASS / '+object.counts.FAIL+' FAIL / '+object.counts.WARNING+' WARNING / '+object.counts.UNKNOWN+' UNKNOWN。没有自动修源数据。');record('object-normalized',{objectId:c.id,status:object.status,counts:object.counts});}
+ finally{loading=false;$('load').disabled=config().registeredOnly;}
+}
+function unload(){if(frame){try{frame.contentWindow.__REALITY_LAB__?.unload?.();}catch{}frame.remove();}frame=null;frameGroup=null;$('native-wrap').replaceChildren(el('div','原生页面已关闭；已经形成的共同报告仍保留在本页内存中。','empty'));$('native-caption').textContent='已释放原台';$('unload').disabled=true;record('frame-unloaded',selected);}
+function download(name,value){const text=JSON.stringify(value,null,2),url=URL.createObjectURL(new Blob([text],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function bundle(){if(!results.size)throw Error('尚无共同协议结果');return P.aggregate([...results.values()],D);}
+function defectBundle(){if(!results.size)throw Error('尚无缺陷记录');return P.defectBundle([...results.values()],D);}
+for(const c of configs){const b=el('button');b.dataset.object=c.id;b.append(el('b',c.label),el('small',c.registeredOnly?'来源登记 / 尚未接入':c.group==='s1'?'原生按需读取':'受保护固定快照'));b.onclick=()=>select(c.id);$('objects').append(b);}
+for(const b of document.querySelectorAll('[data-tab]'))b.onclick=()=>{activeTab=b.dataset.tab;document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(x=>x.hidden=x.id!=='panel-'+activeTab);};
+$('load').onclick=()=>loadSelected().catch(e=>{status(String(e.message||e),true);record('handled-error',String(e.message||e));});$('unload').onclick=unload;$('export-report').onclick=()=>download('KAOPU-Reality-Foundation-S2.1-report.json',{...bundle(),build:REALITY_BUILD,generatedAt:new Date().toISOString()});$('export-defects').onclick=()=>download('KAOPU-Reality-Foundation-S2.1-defects.json',{...defectBundle(),generatedAt:new Date().toISOString()});$('access-key').oninput=()=>{if(config().group==='s2')$('open-fixed').href=SOURCE.s2.fixed+($('access-key').value.trim()?'#key='+encodeURIComponent($('access-key').value.trim()):'');};
+select(selected);$('unload').disabled=true;status('共同协议、测量字典和适配器已就绪。请选择对象读取；布料与成衣保持登记状态。');
+window.__REALITY_FOUNDATION__=Object.freeze({version:'REALITY-HC-S2.1',sourceCommit:REALITY_BUILD.sourceCommit,select,loadSelected,unload,report:()=>({version:'REALITY-HC-S2.1',sourceCommit:REALITY_BUILD.sourceCommit,selected,loading,frameGroup,iframeCount:document.querySelectorAll('#native-wrap iframe').length,keyPresent:!!privateKey||!!$('access-key').value.trim(),results:Object.fromEntries([...results.entries()].map(([id,v])=>[id,P.clone(v)])),aggregate:results.size?bundle():null,events:P.clone(events),sourceWriteAPI:false,automaticRepair:false}),dictionary:()=>P.clone(D)});
+})();
+
+</script>
+</body></html>

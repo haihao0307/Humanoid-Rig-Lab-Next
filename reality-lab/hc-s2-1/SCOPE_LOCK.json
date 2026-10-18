@@ -1,0 +1,56 @@
+{
+  "task": "REALITY-HC-S2.1-20261018",
+  "version": "0.2.0",
+  "purpose": "Consolidate S1 and S2 into one executable contract, common adapter interface, semantic measurements and defect handoff without changing source workbenches.",
+  "allowedDomains": ["human", "footwear", "pattern", "garment", "fabric"],
+  "activeObjects": ["human-r07", "shoe-r12", "pattern-shorts-s2"],
+  "registeredOnly": ["garment", "fabric"],
+  "writeRepository": "haihao0307/Humanoid-Rig-Lab-Next",
+  "writePaths": ["reality-lab/hc-s2-1/", ".github/workflows/reality-hc-s2-1.yml"],
+  "excludedDomains": ["architecture", "aircraft", "terrain", "animals", "vegetation", "world"],
+  "baseCommit": "704e7d019ff97550f29181cf1f354016f1d344b4",
+  "mode": "read-only federation over immutable S1 and S2 builds",
+  "protected": [
+    "S1 fixed build and evidence",
+    "S2 fixed build and evidence",
+    "human geometry, rig, skin, camera and settings",
+    "shoe geometry, material and design state",
+    "pattern coordinates, topology, seams and allowances",
+    "fabric shaders, physics and lighting",
+    "private access key"
+  ],
+  "forbidden": [
+    "automatic repair",
+    "write-back to source workbenches",
+    "merge or force push",
+    "change canonical pointers",
+    "infer anatomical height from generic bounds",
+    "infer footwear size from model bounds",
+    "publish S2 access key",
+    "claim manufacturing, fit, physical or aesthetic certification"
+  ],
+  "deliverables": [
+    "one common status vocabulary",
+    "one versioned adapter output contract",
+    "semantic measurement dictionary",
+    "standard defect handoff records",
+    "one unified interactive entry for S1 human, S1 footwear and S2 pattern",
+    "actual browser evidence and immutable public URL"
+  ],
+  "acceptanceGates": [
+    "pure contract regressions",
+    "status and unit semantics",
+    "same-source S1 human and shoe observations",
+    "same-source S2 pattern observation with private fragment key",
+    "no source mutation",
+    "separate PASS FAIL WARNING UNKNOWN NOT_APPLICABLE counters",
+    "defect export without automatic repair authority",
+    "fixed public byte and browser verification"
+  ],
+  "approval": {
+    "implementation": true,
+    "sourceRepair": false,
+    "userVisualAcceptance": false,
+    "productionReady": false
+  }
+}
