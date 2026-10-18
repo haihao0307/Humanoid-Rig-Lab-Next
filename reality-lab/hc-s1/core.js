@@ -15,7 +15,7 @@ function length(value,from,to='m'){
 }
 function det(m){return m[0]*(m[4]*m[8]-m[7]*m[5])-m[3]*(m[1]*m[8]-m[7]*m[2])+m[6]*(m[1]*m[5]-m[4]*m[2]);}
 function checkBasis(m,handedness='right'){
- if(!array(m,9))return false;
+ if(!array(m,9)||!['left','right'].includes(handedness))return false;
  for(let i=0;i<3;i++)for(let j=0;j<3;j++){
   let dot=0;for(let k=0;k<3;k++)dot+=m[i*3+k]*m[j*3+k];
   if(Math.abs(dot-(i===j?1:0))>1e-8)return false;
@@ -27,6 +27,16 @@ function pointToMeters(point,unit,basis){
  if(!checkBasis(basis,'right')&&!checkBasis(basis,'left'))throw Error('轴变换必须正交；缩放只能在单位转换中出现一次');
  const p=point.map(x=>length(x,unit));
  return [0,1,2].map(i=>basis[i]*p[0]+basis[3+i]*p[1]+basis[6+i]*p[2]);
+}
+function basisMapsAxes(f){
+ if(!f||!checkBasis(f.toCanonicalBasis,f.handedness))return false;
+ for(const [axis,expected]of [[f.up,[0,1,0]],[f.forward,[0,0,1]]]){
+  if(typeof axis!=='string'||!/^[-+][XYZ]$/.test(axis))return false;
+  const p=[0,0,0];p['XYZ'.indexOf(axis[1])]=axis[0]==='-'?-1:1;
+  const actual=pointToMeters(p,'m',f.toCanonicalBasis);
+  if(actual.some((v,i)=>Math.abs(v-expected[i])>1e-8))return false;
+ }
+ return true;
 }
 function pixelFootprint({distanceM,fovYDeg,zoom=1,heightPx},featureMm){
  if(![distanceM,fovYDeg,zoom,heightPx,featureMm].every(finite)||distanceM<=0||zoom<=0||heightPx<=0||featureMm<0||fovYDeg<=0||fovYDeg>=180)throw Error('相机或尺度数据无效');
@@ -48,7 +58,7 @@ function validate(doc){
   add('source.path',typeof s.path==='string'&&s.path.length>0&&!s.path.startsWith('/')&&!s.path.split('/').includes('..')?'pass':'fail','源文件路径必须明确且不越界');
   add('source.repo',typeof s.repository==='string'&&/^[\w.-]+\/[\w.-]+$/.test(s.repository)?'pass':'fail','源仓库声明');
   if(s.sha256===null||s.sha256===undefined)unknown('source.digest','未提供已核对的文件摘要');
-  else add('source.digest',/^[0-9a-f]{64}$/.test(s.sha256)?'pass':'fail','文件 SHA-256 格式',s.sha256);
+  else add('source.digest',typeof s.sha256==='string'&&/^[0-9a-f]{64}$/.test(s.sha256)?'pass':'fail','文件 SHA-256 格式',s.sha256);
  }
  const u=doc.units;
  if(!u)unknown('units','长度单位未声明；不会按大小自动猜米或毫米');
@@ -69,7 +79,10 @@ function validate(doc){
   add('frame.axes',axes.includes(f.up)&&axes.includes(f.forward)&&f.up.slice(1)!==f.forward.slice(1)?'pass':'fail','向上与正面轴必须明确且不平行');
   add('frame.handedness',['right','left'].includes(f.handedness)?'pass':'fail','坐标手性');
   if(f.toCanonicalBasis==null)unknown('frame.transform','尚未审核到基准坐标系的轴转换');
-  else add('frame.transform',checkBasis(f.toCanonicalBasis,f.handedness)?'pass':'fail','列主序轴转换必须正交，不能夹带第二次长度缩放');
+  else {
+   add('frame.transform',checkBasis(f.toCanonicalBasis,f.handedness)?'pass':'fail','列主序轴转换必须正交，不能夹带第二次长度缩放');
+   add('frame.mapping',basisMapsAxes(f)?'pass':'fail','声明的向上 / 正面轴必须映射到基准 +Y / +Z，不能只看矩阵行列式');
+  }
   if(!f.lateralMeaning)unknown('frame.lateral','对象解剖学左右未审核；不能仅凭 X 正负猜左脚或右脚');
  }
  const d=doc.dimensions;
@@ -109,6 +122,6 @@ function validate(doc){
  const failed=rows.filter(r=>r.status==='fail').length,unresolved=rows.filter(r=>r.status==='unknown').length;
  return {schema:'kaopu/reality-validation@1',version:VERSION,assetId:doc.assetId??null,domain:doc.domain??null,status:failed?'rejected':unresolved?'partial':'declaration-valid',counts:{pass:rows.filter(r=>r.status==='pass').length,fail:failed,unknown:unresolved},rows,hostModified:false,physicalCertification:false,visualAcceptance:false,productionReady:false};
 }
-const api=Object.freeze({VERSION,SCHEMA,DOMAINS,LENGTH,BASIS,length,det,checkBasis,pointToMeters,pixelFootprint,validate,clone});
+const api=Object.freeze({VERSION,SCHEMA,DOMAINS,LENGTH,BASIS,length,det,checkBasis,basisMapsAxes,pointToMeters,pixelFootprint,validate,clone});
 root.RealityCore=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
