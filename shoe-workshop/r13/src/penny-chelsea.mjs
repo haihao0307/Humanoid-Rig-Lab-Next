@@ -6,6 +6,12 @@ export function lowCollar(last,role='edge'){
 }
 export function buildPenny(last){
  const thickness=last.params.thickness,A=.44,B=.975;
+ // Keep every existing rear row and insert the exact collar start. A chord
+ // from the last closed row to the first open row otherwise cuts a V below
+ // the true collar, leaving a small hole beneath its independent binding.
+ const collarStart=last.style.collar[0],rearStep=A/36,rearBefore=Math.floor(collarStart/rearStep),rearAfter=rearBefore+1;
+ const rearRanges=[[0,rearBefore*rearStep,rearBefore],[rearBefore*rearStep,collarStart,1],[collarStart,rearAfter*rearStep,1],[rearAfter*rearStep,A,36-rearAfter]];
+ const rearPatches=options=>rearRanges.flatMap(([s0,s1,nu])=>upperPatches(last,s0,s1,{...options,nu,nv:22}));
  // sqrt(distance-to-tip) in the rounded end gives a transverse tangent at
  // the nose. The former almost-linear falloff made both the cut and seam a V.
  const apron=s=>.80*Math.pow(1-smooth(.84,B,s),.25);
@@ -35,8 +41,8 @@ export function buildPenny(last){
  const out=[panel('penny-galosh',[
   // Splitting the rear region at the same angular line preserves matching
   // samples where the U opening begins; there is no hidden T-shaped cut wall.
-  ...upperPatches(last,0,A,{outer:()=>apron(A),nu:36,nv:22}),
-  ...upperPatches(last,0,A,{inner:()=>apron(A),nu:36,nv:22}),
+  ...rearPatches({outer:()=>apron(A)}),
+  ...rearPatches({inner:()=>apron(A)}),
   ...[-1,1].map(side=>apronPatch(side,false)),...upperPatches(last,B,1,{nu:10,nv:22})
  ],thickness,'leather',{name:'环绕帮面',explode:[0,22,0]}),
  panel('penny-apron',[-1,1].map(side=>apronPatch(side,true)),thickness,'leather',{name:'U 形前足拼片',construction:'rounded U cut shares its actual boundary with the galosh',explode:[0,60,16]})];

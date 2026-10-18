@@ -426,7 +426,7 @@ const report = {
   reviewParameterScope: ['default', 'extreme-corner-0', 'extreme-corner-15'],
   preservation: results.filter(r => r.name.startsWith('R10 ') || r.name.startsWith('R12 ') || r.name.startsWith('R13 retains')),
   defaults: caseMetrics.filter(m => m.case === 'default'),
-  testedSourceFiles: ['src/kernel.mjs', 'src/penny-chelsea.mjs', 'src/monk-canvas.mjs', 'src/soles.mjs', 'src/model.mjs', 'src/surface-coordinates.mjs', 'tests/geometry.mjs', 'tests/review-regressions.mjs', 'tests/fixtures/r12-baseline.json', 'tests/fixtures/r12-regression-before.json'].map(relative => ({ path: relative, sha256: createHash('sha256').update(fs.readFileSync(path.join(root, relative))).digest('hex') })),
+  testedSourceFiles: ['src/kernel.mjs', 'src/penny-chelsea.mjs', 'src/monk-canvas.mjs', 'src/soles.mjs', 'src/model.mjs', 'src/surface-coordinates.mjs', 'tests/geometry.mjs', 'tests/review-regressions.mjs', 'tests/fixtures/r12-baseline.json', 'tests/fixtures/r12-regression-before.json', 'tests/fixtures/r13-collar-gap-before.json'].map(relative => ({ path: relative, sha256: createHash('sha256').update(fs.readFileSync(path.join(root, relative))).digest('hex') })),
   scope: { numericGeometry: true, rendered: false, visualApproved: false, wearerFit: false, physicalSolver: false, manufacturing: false, publicLinkVerified: false }
 };
 fs.mkdirSync(path.join(root, 'evidence'), { recursive: true });

@@ -175,9 +175,15 @@ export function buildMonk(last) {
     let lo = 0, hi = HALF; for (let k = 0; k < 24; k++) { const m = (lo + hi) / 2; if (frontAt(m) < s) lo = m; else hi = m; }
     return (lo + hi) / 2;
   };
-  out.push(panel('monk-open-quarters', upperPatches(last, 0, .588, {
-    inner: s => Math.max(0, angleAt(s) - .065), offset: t + .08, nu: 54, nv: 14
-  }), t, 'leather', { construction: 'open quarters overlap vamp shoulders', explode: [0, 18, -18] }));
+  // Preserve all quarter rows and add the exact rear opening station. Without
+  // it, the last closed-to-open chord leaves a small gap below the collar trim.
+  const quarterEnd = .588, quarterStep = quarterEnd / 54, collarStart = last.style.collar[0];
+  const rowBefore = Math.floor(collarStart / quarterStep), rowAfter = rowBefore + 1;
+  const quarterRanges = [[0, rowBefore * quarterStep, rowBefore], [rowBefore * quarterStep, collarStart, 1],
+    [collarStart, rowAfter * quarterStep, 1], [rowAfter * quarterStep, quarterEnd, 54 - rowAfter]];
+  out.push(panel('monk-open-quarters', quarterRanges.flatMap(([s0, s1, nu]) => upperPatches(last, s0, s1, {
+    inner: s => Math.max(0, angleAt(s) - .065), offset: t + .08, nu, nv: 14
+  })), t, 'leather', { construction: 'open quarters overlap vamp shoulders', explode: [0, 18, -18] }));
 
   // The closure is a broad inside-quarter extension, followed by two free straps.
   const flapDomain = (u, v) => {

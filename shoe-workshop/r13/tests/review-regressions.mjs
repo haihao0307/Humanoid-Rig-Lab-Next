@@ -245,6 +245,56 @@ export function checkPennyU(model) {
   return { connectedComponents: topology.components.length, physicalOpenEnds: topology.boundaryLoops.length, endCentresMm: endCentres.map(c => c.toArray()), frontInsetMm: apronBounds.max.z - seamMaxZ, maximumBoundaryDistanceMm, support };
 }
 
+export function measureRearCollarCover(model) {
+  const fixture = JSON.parse(fs.readFileSync(new URL('./fixtures/r13-collar-gap-before.json', import.meta.url), 'utf8'));
+  const view = fixture.views[model.style.id];
+  assert.ok(view, 'rear opening fixture missing for ' + model.style.id);
+  const rearPartId = { penny: 'penny-galosh', monk: 'monk-open-quarters' }[model.style.id];
+  const upper = getPart(model, rearPartId), bindingIds = model.style.id === 'penny'
+    ? ['collar-bound-edge'] : ['monk-collar-binding--1', 'monk-collar-binding-1'];
+  const bindingPoints = [];
+  for (const id of bindingIds) {
+    const binding = getPart(model, id).geometry;
+    const outer = binding.groups.find(group => group.materialIndex === 0) ?? { start: 0, count: binding.index.count };
+    assert.ok(outer.count, `${model.style.id} rear opening has no actual binding exterior`);
+    for (const i of new Set(binding.index.array.slice(outer.start, outer.start + outer.count))) bindingPoints.push(at(binding, i));
+  }
+  const minimumZ = Math.min(...bindingPoints.map(p => p.z));
+  const rearVertices = bindingPoints.filter(p => p.z <= minimumZ + .00001);
+  const rear = rearVertices.reduce((sum, p) => sum.add(p), V()).divideScalar(rearVertices.length);
+  const target = renderMeshes([upper])[0], ray = new T.Raycaster(), worldSamples = [];
+  // The actual binding locates the small rear neighbourhood. Only the leather
+  // mesh may close it: a wider binding, thread or a distant inner wall cannot
+  // conceal a missing patch. The ray direction is fixed WORLD +Z.
+  for (const dx of fixture.worldSamples.lateralOffsetsMm) for (const down of fixture.worldSamples.belowActualBindingRearMm) {
+    ray.set(rear.clone().add(V(dx, -down, -fixture.worldSamples.originBehindMm)), V(0, 0, 1));
+    ray.near = 0; ray.far = 700;
+    const hit = ray.intersectObject(target, false)[0];
+    const passed = !!hit && hit.face.materialIndex !== 1 && hit.distance < fixture.worldSamples.maxAcceptedDistanceMm;
+    worldSamples.push({ lateralMm: dx, belowBindingMm: down, passed, firstLayer: hit?.face.materialIndex ?? null,
+      firstDistanceMm: hit?.distance ?? null, firstPointMm: hit?.point.toArray() ?? null });
+  }
+  const fixedCameraSamples = [], p = model.last.params;
+  if (p.length === 1 && p.width === 1 && p.instep === 0 && p.thickness === 1.35 && p.bend === 0) {
+    const c = view.camera, camera = new T.PerspectiveCamera(c.fov, c.aspect, c.near, c.far);
+    camera.position.fromArray(c.position); camera.quaternion.fromArray(c.quaternion);
+    camera.updateProjectionMatrix(); camera.updateMatrixWorld(true);
+    target.scale.setScalar(.001); target.updateMatrixWorld(true);
+    const [width, height] = view.image.size;
+    for (const [x, y] of view.pixels) {
+      ray.setFromCamera(new T.Vector2((x + .5) / width * 2 - 1, 1 - (y + .5) / height * 2), camera);
+      ray.near = 0; ray.far = 15;
+      const hit = ray.intersectObject(target, false)[0];
+      fixedCameraSamples.push({ pixel: [x, y], passed: !!hit && hit.face.materialIndex !== 1 && hit.point.z < 0,
+        firstLayer: hit?.face.materialIndex ?? null, firstFace: hit?.faceIndex ?? null,
+        firstPointMm: hit?.point.clone().multiplyScalar(1000).toArray() ?? null });
+    }
+  }
+  return { rearPartId, actualBindingRearMm: rear.toArray(), worldRays: worldSamples.length, fixedCameraRays: fixedCameraSamples.length,
+    worldSamples, fixedCameraSamples, failures: [...worldSamples, ...fixedCameraSamples].filter(s => !s.passed),
+    method: 'actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula' };
+}
+
 export function checkRearCollar(model) {
   // Curvature is evaluated in millimetres on the actual shared collar curve,
   // then checked against nearby generated upper/binding geometry. A fractional
@@ -288,9 +338,13 @@ export function checkRearCollar(model) {
   const actualRearCapRiseMm = Math.max(...capVertices.map(p => p.y)) - actualRearSoleTop;
   assert.ok(capVertices.length >= 3 && Number.isFinite(actualRearCapRiseMm), 'rear outer cap has insufficient measurable geometry');
   assert.ok(actualRearCapRiseMm < 5, `actual rear outer shell leaves a tall narrow ridge ${actualRearCapRiseMm} mm above its sole at z=${actualRearZ}`);
+  const rearOpeningCover = ['penny', 'monk'].includes(model.style.id) ? measureRearCollarCover(model) : null;
+  if (rearOpeningCover) assert.equal(rearOpeningCover.failures.length, 0,
+    `${model.style.id} rear collar has ${rearOpeningCover.failures.length} rays through missing leather or onto inner surfaces: ${JSON.stringify(rearOpeningCover.failures[0])}`);
   return { rearPointMm: centre.toArray(), radiusSamplesMm: samples.map(({ step, radiusMm }) => ({ step, radiusMm })), convergence, closestGeneratedVertexMm: closest,
     actualRearCapRiseMm, actualRearCapZMm: actualRearZ, actualRearCapVertices: capVertices.length,
-    scope: 'shared curve regularity, generated geometry linkage and actual rear outer-cap height; rendered outline still requires visual review' };
+    rearOpeningCover,
+    scope: 'shared curve regularity, generated geometry linkage, actual rear outer-cap height and Penny/Monk rear opening coverage; rendered outline still requires visual review' };
 }
 
 export function checkFoxingLoop(model) {
