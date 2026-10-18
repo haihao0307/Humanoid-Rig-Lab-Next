@@ -1,0 +1,922 @@
+name: Shoe R14 reviewed artifact promotion and public receipt
+
+'on':
+  push:
+    branches: [feature/shoe-r14-construction-and-flex-20261018]
+    paths: ['.github/workflows/shoe-r14-publish.yml']
+
+permissions: {}
+concurrency:
+  group: shoe-r14-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+# Publication remains locked until this exact source and candidate artifact
+# pass independent AI review of the frozen construction/flex report and paired renders.
+# Candidate identity/count/hash values remain LOCKED in this template.
+# Expected coverage: geometry 158, material ~66, runtime sources 25;
+# browser 66 screenshots, before 35 screenshots, 8 functional checks + 27 targets.
+# Final counts are derived only from an independently accepted CI artifact.
+# Human and user approval are recorded separately and remain false.
+env:
+  PROMOTION_READY: 'true'
+  VISUAL_HUMAN_REVIEW: 'false'
+  REPOSITORY: haihao0307/Humanoid-Rig-Lab-Next
+  TARGET_BRANCH: feature/shoe-r14-construction-and-flex-20261018
+  MODULE: shoe-workshop/r14
+  VERIFY_WORKFLOW: .github/workflows/shoe-r14-verify.yml
+  EXPECTED_HEAD: ${{ github.sha }}
+  SOURCE_COMMIT: "4306b375404a40b7b9842f29cfa5e53fcde70278"
+  BASE_COMMIT: 0f105165964795b4895c3a5d8d2440deac1add91
+  CANDIDATE_RUN_ID: "39108047375"
+  CANDIDATE_ARTIFACT_ID: "12129576334"
+  CANDIDATE_ARTIFACT_NAME: "shoe-r14-candidate-39108047375"
+  CANDIDATE_ARTIFACT_DIGEST: "sha256:08ffe17d46740b631954a359168996f5b9b52a03dc3a82f683d21174ba96cadb"
+  EXPECTED_RUNTIME_SHA256: "fdce5d544bf9816f331a1e8db16ad272d454780f9a6b8c255fee474f854a04e8"
+  EXPECTED_RUNTIME_BYTES: "13762029"
+  EXPECTED_MANIFEST_SHA256: "f197c2688ceadd4c1976ede9bc062f54259f40339be23bfe6f0813f1cb06d66c"
+  EXPECTED_MATERIAL_QA_SHA256: "1ee7af0182372edc511787ba42ae765d3a7c227cf3947a841c4196d5697971ef"
+  EXPECTED_MATERIAL_TEST_SHA256: "149e5304e79097a40fdd3237468031a6a819cd357218717826f3a7c81608d27a"
+  EXPECTED_GEOMETRY_SHA256: "e5142ee59d9c93a1772afaffe61d0f970c7272ce3099a4ad036beb2050c81f8b"
+  EXPECTED_QA_SHA256: "91b51f0633561664db0c682edc7896f2f295a3d52bf98c3fbf3a6f3663404601"
+  EXPECTED_BROWSER_TEST_SHA256: "3ecfeb8e5c2d2d64ded3cff955688b765fd719fa16a47cd4c78acb56b6b86e09"
+  EXPECTED_GEOMETRY_TEST_SHA256: "8c95761d8b4a5b7b0307fbff8798ee390146e9329e61eb3836c886bfdb38aaa0"
+  EXPECTED_VERIFY_WORKFLOW_SHA256: "a539078ca583ab0d43fcc9d5291973f9cc6058953e565fb6b05fc8413f123580"
+  EXPECTED_BEFORE_QA_SHA256: "15968811e2addadd8ee7e195353d97a8ad430ff209535c9ffbfa3a82c8a2efd2"
+  EXPECTED_REVIEW_SHA256: "054b1e86e92db2ba3b995273dd8a9f44f64d6339745ff57157e37177ace4399e"
+  EXPECTED_BEFORE_SCREENS: "35"
+  EXPECTED_BROWSER_CHECKS: "8"
+  EXPECTED_SCREENS: "66"
+  EXPECTED_GEOMETRY_CHECKS: "158"
+  CANDIDATE_RUN_ATTEMPT: "1"
+  CANDIDATE_WORKFLOW_ID: "388257468"
+  EXPECTED_CANDIDATE_ARTIFACT_BYTES: "38881477"
+  EXPECTED_CONSTRUCTION_QA_SHA256: "a7ad9e7effc47f9fdd4a344556ddba98c6b89db0a052dd0fe6999f4065e22edf"
+  EXPECTED_CONSTRUCTION_TEST_SHA256: "dce8a66b9cd1b7049da98819a262f1732abfe6df004f1b3e446b974ae206fabf"
+  EXPECTED_CONSTRUCTION_PRODUCERS_SHA256: "75ea73fb2053edb40edd3ebdd9bbec657338f03fd4391eb7bc04fdaad7f35387"
+  EXPECTED_CONSTRUCTION_CRITERIA_SHA256: "e18eda570baca71e965ce8b8484f691aec7eefe5fd3cd715ae1015884986616a"
+  EXPECTED_CONSTRUCTION_CHECKS: "67"
+  EXPECTED_LANE_A_CHECKS: "46"
+  EXPECTED_LANE_B_CHECKS: "6"
+  EXPECTED_LANE_C_CHECKS: "13"
+  EXPECTED_MATERIAL_PANELS: "66"
+  EXPECTED_RUNTIME_SOURCE_COUNT: "25"
+  EXPECTED_RUNTIME_SOURCES_SHA256: "95284b34a3ecbd1fe600923792b1ac907df31cf7034142a93f4753df0245f64c"
+  EXPECTED_GEOMETRY_PRESERVATIONS: "4"
+  EXPECTED_TARGET_RECORDS: "27"
+  EXPECTED_VIEW_PLAN_SHA256: "1d6fe03cebe0f8335304f2ed450b8499a9c8652747d5592c1f88d8b289a11ae7"
+  EXPECTED_R13_FIXTURE_SHA256: "54cb0bb2df8c8ac5f80787aa7bd995340822389db3cdbb93b6ee6620b3b91c5c"
+  EXPECTED_R12_FIXTURE_SHA256: "0cbd10a81e7e78d02e4cc14983849c51d7bb6d4447c6659b98be5283066a2a4e"
+  EXPECTED_R13_CONSTRUCTION_BEFORE_SHA256: "9c3dfad288ddf4ff7682a5ff4d83cb083a32cc53cf9c07861dcaec06c4312585"
+  EXPECTED_CONSTRUCTION_PRODUCER_COUNT: "9"
+  EXPECTED_CONSTRUCTION_CASES: "15"
+  EXPECTED_CONSTRUCTION_GLOBAL_CHECKS: "2"
+  EXPECTED_MATERIAL_SOURCE_COUNT: "7"
+  EXPECTED_MATERIAL_CRITERIA_SHA256: "74ed4c2c7de21d0ea0d22907a51183e8379d26414420a86bb815a944d41d93f6"
+  EXPECTED_GEOMETRY_RESPONSES: "4"
+  EXPECTED_GEOMETRY_PARAMETER_CASES: "100"
+  EXPECTED_R13_PRESERVED_FILES: "44"
+  EXPECTED_R12_PRESERVED_FILES: "27"
+  EXPECTED_R10_PRESERVED_FILES: "22"
+  PUBLIC_ARTIFACT_NAME: shoe-r14-public-${{ github.run_id }}-${{ github.run_attempt }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      build: ${{ steps.commit.outputs.build }}
+    steps:
+      - name: Require an explicitly unlocked reviewed candidate
+        run: |
+          test "$PROMOTION_READY" = true || { echo 'Candidate promotion is locked; review and replace the candidate constants first.'; exit 1; }
+          test "$GITHUB_REPOSITORY" = "$REPOSITORY"
+          test "$GITHUB_REF" = "refs/heads/$TARGET_BRANCH"
+          test "$GITHUB_SHA" = "$EXPECTED_HEAD"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EXPECTED_HEAD }}
+          sparse-checkout: |
+            shoe-workshop/r14
+            shoe-workshop/r13
+            shoe-workshop/r12
+            shoe-workshop/r10
+            shoe-workshop/r09/src
+            shoe-workshop/r07/src
+            shoe-workshop/r05/src
+            shoe-workshop/r06/src
+            shoe-workshop/r04/src
+            shoe-workshop/r04/vendor
+            .github/workflows/shoe-r14-verify.yml
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ env.CANDIDATE_ARTIFACT_ID }}
+          run-id: ${{ env.CANDIDATE_RUN_ID }}
+          repository: ${{ env.REPOSITORY }}
+          github-token: ${{ github.token }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/r14-candidate
+      - name: Validate immutable evidence and copy data only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_DIR: ${{ runner.temp }}/r14-candidate
+        run: |
+          python -I - <<'PY'
+          import hashlib, json, math, os, pathlib, re, shutil, urllib.request
+          e = os.environ
+          repo = pathlib.Path(e['GITHUB_WORKSPACE']).resolve()
+          candidate = pathlib.Path(e['CANDIDATE_DIR']).resolve()
+          module = repo / e['MODULE']
+          source = e['SOURCE_COMMIT']
+          runtime_hash = e['EXPECTED_RUNTIME_SHA256']
+          runtime_bytes = int(e['EXPECTED_RUNTIME_BYTES'])
+          def require(ok, message):
+              if not ok: raise SystemExit(message)
+          def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+          def canonical_sha(value): return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False, allow_nan=False).encode()).hexdigest()
+          def expected_targets():
+              defaults = {'length': 1, 'width': 1, 'instep': 0, 'thickness': 1.35, 'bend': 0}
+              result = {}
+              def add(name, style, view, params=None, target=None, clay=False, section=False, part=None):
+                  result[name] = {'style': style, 'params': dict(defaults, **(params or {})), 'view': view,
+                                  'hardwareTarget': target, 'clay': clay, 'section': section,
+                                  'isolatedParts': [part] if part else []}
+              front = 'canvas-eyelet-1-4'
+              for bend, label in ((0, '00'), (15, '15'), (30, '30')):
+                  add('canvas-front-eyelet-default-bend' + label, 'canvas', 'hardware', {'bend': bend}, front)
+              for label, thickness in (('thin', .9), ('thick', 2.1)):
+                  add('canvas-front-eyelet-' + label + '-bend30', 'canvas', 'hardware', {'thickness': thickness, 'bend': 30}, front)
+              add('canvas-front-eyelet-default-bend30-section', 'canvas', 'hardware', {'bend': 30}, front, section=True)
+              add('canvas-front-eyelet-inner-default-bend30', 'canvas', 'hardware', {'bend': 30}, 'canvas-eyelet--1-4')
+              for label, thickness in (('default', 1.35), ('thin', .9), ('thick', 2.1)):
+                  add('canvas-row2-quarter-' + label + '-static', 'canvas', 'hardware', {'thickness': thickness}, 'canvas-eyelet-1-2', part='canvas-quarter-1')
+              add('canvas-row2-facing-default-static', 'canvas', 'hardware', target='canvas-eyelet-1-2', part='canvas-perforated-facing-1')
+              add('canvas-default-bend30-side', 'canvas', 'side', {'bend': 30})
+              add('canvas-default-bend30-hero-clay', 'canvas', 'hero', {'bend': 30}, clay=True)
+              for label, params in (('default', {}), ('all-low', {'length': .9, 'width': .88, 'instep': -5, 'thickness': .9}), ('all-high', {'length': 1.1, 'width': 1.15, 'instep': 8, 'thickness': 2.1})):
+                  for clay in (False, True):
+                      add('chelsea-' + label + '-side-' + ('clay' if clay else 'leather'), 'chelsea', 'side', params, clay=clay)
+              for clay in (False, True):
+                  add('chelsea-default-oblique-' + ('clay' if clay else 'leather'), 'chelsea', 'hero', clay=clay)
+              for label, thickness in (('default', 1.35), ('thin', .9), ('thick', 2.1)):
+                  for buckle in (0, 1):
+                      add('monk-buckle' + str(buckle) + '-' + label, 'monk', 'hardware', {'thickness': thickness}, 'monk-buckle-frame-' + str(buckle))
+              return result
+
+          def model_state(scene):
+              # R13 has no hardware-view preset. Actual camera equality is checked below;
+              # copying the old view label is intentionally not an acceptance condition.
+              return {k: scene['state'][k] for k in ('style', 'params', 'pair', 'compare', 'explode', 'clay', 'wire', 'section', 'seams', 'part')}
+
+          def validate_scene_shape(scene, source):
+              require(scene['source'] == source, 'Screenshot scene comes from another runtime source')
+              camera = scene['camera']
+              for key, length in (('position', 3), ('quaternion', 4), ('up', 3), ('matrixWorld', 16), ('matrixWorldInverse', 16), ('projectionMatrix', 16)):
+                  require(len(camera[key]) == length and all(type(v) in (int, float) and math.isfinite(v) for v in camera[key]), 'Invalid actual camera vector/matrix: ' + key)
+              for key in ('fov', 'near', 'far', 'aspect', 'zoom', 'filmGauge', 'filmOffset'):
+                  require(type(camera[key]) in (int, float) and math.isfinite(camera[key]), 'Invalid actual camera scalar: ' + key)
+              require(camera['near'] > 0 and camera['far'] > camera['near'] and camera['aspect'] > 0 and camera['zoom'] > 0, 'Invalid camera frustum')
+              require(len(scene['viewport']) == len(scene['stage']) == 2 and all(type(v) in (int, float) and math.isfinite(v) and v > 0 for v in scene['viewport'] + scene['stage']), 'Invalid actual viewport/stage')
+              # Reject non-finite values anywhere in rendering, clipping, model or bounds.
+              canonical_sha(scene)
+
+          def validate_targeted_views(qa, source):
+              targets = expected_targets()
+              require(len(targets) == 27, 'Internal target contract is incomplete')
+              require(qa['plannedScreens'] == {'retained': 39, 'targeted': 27, 'candidate': 66, 'before': 35}, 'Browser coverage plan differs')
+              screens = {x['name']: x for x in qa['screens']}
+              retained = {style + '-' + view for style in ('penny', 'chelsea', 'monk', 'canvas') for view in ('hero', 'side', 'top', 'front', 'back', 'detail', 'join')}
+              retained |= {'desktop-first-frame', 'monk-parameter-and-flex', 'canvas-pair', 'four-style-comparison', 'penny-exploded', 'penny-first-part', 'penny-section', 'chelsea-clay', 'retained-r10-original', 'retained-r10-p05', 'mobile-viewport'}
+              require(len(qa['screens']) == len(screens) == 66 and set(screens) == retained | set(targets), 'Actual screenshot inventory differs')
+              records = {x['name']: x for x in qa['targetedViews']}
+              require(len(qa['targetedViews']) == len(records) == 27 and set(records) == set(targets), 'Missing or duplicate targeted view record')
+              for name, screen in screens.items():
+                  require(type(screen['targeted']) is bool and screen['targeted'] == (name in targets), 'Targeted screenshot flag differs: ' + name)
+                  validate_scene_shape(screen['scene'], source)
+              for name, expected in targets.items():
+                  record, screen = records[name], screens[name]
+                  scene, state = screen['scene'], screen['scene']['state']
+                  require(screen['fullPage'] is False and isinstance(record['purpose'], str) and record['purpose'], 'Target screenshot framing or purpose is missing: ' + name)
+                  require({k: record[k] for k in expected} == expected, 'Target metadata parameters or selection differs: ' + name)
+                  require(state['style'] == expected['style'] and state['params'] == expected['params'] and state['view'] == expected['view'], 'Actual target model/camera preset differs: ' + name)
+                  require(state['clay'] is expected['clay'] and state['section'] is expected['section'] and scene['isolatedParts'] == expected['isolatedParts'], 'Actual target display mode differs: ' + name)
+                  require(all(state[k] is False for k in ('pair', 'compare', 'explode', 'wire')) and state['seams'] is True, 'Actual target mode is not the specified single assembled shoe: ' + name)
+                  require(state['part'] == (expected['isolatedParts'][0] if expected['isolatedParts'] else 'all'), 'Actual selected part differs: ' + name)
+                  if expected['isolatedParts']:
+                      require(scene['visibleParts'] == expected['isolatedParts'], 'Target part isolation differs: ' + name)
+                  if expected['view'] == 'hardware':
+                      target = scene['target']
+                      require(target['id'] == state['hardwareTarget'] == expected['hardwareTarget'] and target['vertexCount'] > 0, 'Actual hardware target differs: ' + name)
+                      lo, hi = target['ndcBounds']
+                      require(len(lo) == len(hi) == 3 and all(type(v) in (int, float) and math.isfinite(v) for v in lo + hi + target['pixelSpan']), 'Invalid projected hardware bounds: ' + name)
+                      require(lo[0] > -.92 and hi[0] < .92 and lo[1] > -.92 and hi[1] < .92 and lo[2] > -1 and hi[2] < 1, 'Actual hardware is clipped or outside inspection frame: ' + name)
+                      require(abs((lo[0] + hi[0]) / 2) < .15 and abs((lo[1] + hi[1]) / 2) < .15 and all(v > 60 for v in target['pixelSpan']), 'Actual hardware is not legibly framed: ' + name)
+                      if expected['section']:
+                          require(len(scene['clippingPlanes']) == len(target['clipRanges']) == 1 and target['clipRanges'][0]['min'] < 0 < target['clipRanges'][0]['max'], 'Section plane does not cut the actual hardware: ' + name)
+              paired_names = {style + '-' + view for style in ('penny', 'chelsea', 'monk', 'canvas') for view in ('back', 'join')} | set(targets)
+              plan = {'targets': sorted(qa['targetedViews'], key=lambda x: x['name']), 'screens': [{'name': name, 'targeted': screens[name]['targeted'], 'scene': screens[name]['scene']} for name in sorted(paired_names)]}
+              require(len(paired_names) == 35, 'Paired target plan is incomplete')
+              return screens, paired_names, canonical_sha(plan)
+
+          def validate_before_scenes(before, qa, source, runtime_hash):
+              screens, paired_names, plan_hash = validate_targeted_views(qa, source)
+              require(before['version'] == 'R14.0' and before['sourceCommit'] == '8b05ebd8b0755216743792034e3cbb58b8d9ff54' and before['buildSha'] == 'c979ae664e53cdc2f09bd33511be5be61415efce', 'Wrong R13 before version')
+              require(before['runtimeSha256'] == '7db6ec885c0d7d972b2fb0574039448d2115b98c6e8e428f297c7f989410535b' and before['runtimeBytes'] == 13746414, 'Wrong R13 before bytes')
+              require(before['candidateSourceCommit'] == source and before['candidateRuntimeSha256'] == runtime_hash, 'Before evidence refers to another candidate')
+              require(before['completed'] is True and not before.get('failure') and all(before[k] == [] for k in ('errors', 'consoleErrors', 'requestFailures', 'networkRequests')), 'Before render did not finish cleanly')
+              require(all(before[k] is True for k in ('sameCameraMatrices', 'sameModelState', 'sameRenderingSettings')), 'Before comparison is not fully paired')
+              require(len(before['screens']) == len({x['name'] for x in before['screens']}) == 35 and {x['name'] for x in before['screens']} == paired_names, 'Before views omit a regression or new construction target')
+              comparison = qa['beforeComparison']
+              require(comparison['path'] == 'evidence/before/QA.json' and comparison['sourceCommit'] == before['sourceCommit'] and comparison['buildSha'] == before['buildSha'] and comparison['runtimeSha256'] == before['runtimeSha256'], 'Candidate before baseline binding differs')
+              require(comparison['candidateSourceCommit'] == source and comparison['candidateRuntimeSha256'] == runtime_hash and comparison['screens'] == 35 and comparison['targetedScreens'] == 27 and all(comparison[k] is True for k in ('sameCameraMatrices', 'sameModelState', 'sameRenderingSettings')), 'Candidate before model/rendering binding differs')
+              for record in before['screens']:
+                  name = record['name']
+                  candidate = screens[name]
+                  require(record['candidateScreenshotSha256'] == candidate['sha256'] and record['targeted'] is candidate['targeted'] and record['requestedScene'] == candidate['scene'], 'Before screenshot is paired to a different candidate scene: ' + name)
+                  actual, requested = record['scene'], record['requestedScene']
+                  validate_scene_shape(actual, before['sourceCommit'])
+                  require(model_state(actual) == model_state(requested), 'Actual R13 before model parameters differ: ' + name)
+                  for key in ('camera', 'viewport', 'stage', 'isolatedParts', 'clippingPlanes', 'floor', 'rendering'):
+                      require(actual[key] == requested[key], 'Actual R13 before scene differs: ' + name + '/' + key)
+                  delta = max(abs(a - b) for key in ('matrixWorld', 'matrixWorldInverse', 'projectionMatrix') for a, b in zip(actual['camera'][key], requested['camera'][key]))
+                  require(record['matrixMaxAbsDelta'] == delta == 0 and all(record[k] is True for k in ('sameCameraMatrices', 'sameModelState', 'sameRenderingSettings')), 'Actual R13 before matrices or pairing flags differ: ' + name)
+              return plan_hash
+
+          def validate_public_scenes(qa, candidate_qa, before, source, runtime_hash):
+              candidate_plan = validate_before_scenes(before, candidate_qa, source, runtime_hash)
+              screens, names, public_plan = validate_targeted_views(qa, source)
+              require(public_plan == candidate_plan, 'Actual public target parameters, geometry projections, matrices or rendering differ from accepted file candidate')
+              require(qa['targetedViews'] == candidate_qa['targetedViews'], 'Public targeted records differ from accepted candidate')
+              comparison = qa['beforeComparison']
+              require(comparison['path'] == 'evidence/before/QA.json' and comparison['sourceCommit'] == before['sourceCommit'] and comparison['buildSha'] == before['buildSha'] and comparison['runtimeSha256'] == before['runtimeSha256'], 'Public before binding differs')
+              require(comparison['candidateSourceCommit'] == source and comparison['candidateRuntimeSha256'] == runtime_hash and comparison['screens'] == 35 and comparison['targetedScreens'] == 27, 'Public paired-target coverage differs')
+              return public_plan
+
+          def validate_r13_construction_negative(negative, construction, test_hash):
+              require(negative['schemaVersion'] == construction['schemaVersion'] == 2 and negative['task'] == construction['task'] == 'SHOE-R14-CONSTRUCTION-FLEX', 'Wrong R13 construction negative suite')
+              require(negative['sourceCommit'] == '8b05ebd8b0755216743792034e3cbb58b8d9ff54' and negative['requestedLane'] == construction['requestedLane'] == 'ALL', 'R13 construction negative is not the complete fixed baseline')
+              require(negative['testSha256'] == construction['testSha256'] == test_hash, 'R13 negative and candidate were not measured by the same frozen test')
+              require(negative['criteria'] == construction['criteria'] and negative['r13BaselineHashes'] == construction['r13BaselineHashes'], 'R13 negative criteria or reference source differs')
+              old_checks, new_checks = negative['checks'], construction['checks']
+              require(len(old_checks) == len(new_checks) == len({x['name'] for x in old_checks}) and {x['name'] for x in old_checks} == {x['name'] for x in new_checks}, 'R13 negative does not cover the same checks')
+              require(all(type(x['passed']) is bool and isinstance(x['failures'], list) and x['passed'] == (x['failures'] == []) for x in old_checks), 'R13 negative check outcomes are inconsistent')
+              passed = sum(x['passed'] for x in old_checks)
+              failed = len(old_checks) - passed
+              require(failed > 0 and negative['summary'] == {'passed': passed, 'failed': failed, 'checks': len(old_checks)}, 'R13 fixture is not an actual failing negative control')
+              require(set(negative['laneResults']) == set(construction['laneResults']) == {'A', 'B', 'C'}, 'R13 negative lane inventory differs')
+              for lane in ('A', 'B', 'C'):
+                  old, new = negative['laneResults'][lane], construction['laneResults'][lane]
+                  lane_checks = [x for x in old_checks if x.get('lane') == lane]
+                  lane_passed = sum(x['passed'] for x in lane_checks)
+                  require(old['implemented'] is True and old['requested'] is True, 'R13 negative lane was not run: ' + lane)
+                  require(old['expectedCases'] == old['actualCases'] == new['expectedCases'] == new['actualCases'], 'R13 negative parameter matrix differs: ' + lane)
+                  require(old['expectedCheckCount'] == old['checkCount'] == len(lane_checks) == new['expectedCheckCount'] == new['checkCount'], 'R13 negative lane check coverage differs: ' + lane)
+                  require(old['passedChecks'] == lane_passed and old['failedChecks'] == len(lane_checks) - lane_passed and old['complete'] == (old['failedChecks'] == 0), 'R13 negative lane summary differs: ' + lane)
+              require(negative['scope'] == construction['scope'] and negative['scope']['humanApproval'] is False and negative['scope']['userApproval'] is False, 'R13 negative scope claims differ')
+              return negative['summary']
+
+          def validate_material_records(material):
+              require(material['acceptanceCriteria']['maximumProducerReportRelativeDifference'] == .01, 'Material statistics tolerance changed')
+              identities = {(x['preset'], x['style'], x['part']) for x in material['results']}
+              require(len(identities) == len(material['results']), 'Duplicate material panel evidence')
+              for record in material['results']:
+                  identity = {'preset': record['preset'], 'style': record['style'], 'partId': record['part']}
+                  snapshot = record['producerSnapshot']
+                  require(snapshot['identity'] == identity and snapshot['capturedBeforeSeedBuild'] is True and snapshot['rawStatisticsUnchanged'] is True, 'Material producer snapshot has wrong identity or changed data')
+                  require(re.fullmatch(r'[a-f0-9]{64}', snapshot['sha256']), 'Invalid material producer snapshot digest')
+                  for phase in ('before', 'after'):
+                      comparison = record['reportComparison'][phase]
+                      expected_identity = dict(identity, phase=phase, snapshotSha256=snapshot['sha256'])
+                      require(comparison['identity'] == expected_identity and comparison['present'] is True and comparison['invalidCountsAgree'] is True and comparison['validTrianglesAgree'] is True, 'Material comparison has wrong identity or triangle counts')
+                      maximum = comparison['maximumRelativeDifference']
+                      require(type(maximum) in (int, float) and math.isfinite(maximum) and 0 <= maximum <= .01 and 0 <= comparison['maximumDifference']['relativeDifference'] <= .01, 'Material producer statistics differ from final triangles')
+                      actual, claimed = record[phase], snapshot['statistics'][phase]
+                      require(type(actual['validTriangles']) is int and actual['validTriangles'] > 0 and actual['validTriangles'] == claimed['validTriangles'], 'Actual material valid-triangle count differs')
+                      require(all(actual[k] == claimed[k] for k in ('invalidUVTriangles', 'invalidSurfaceTriangles')), 'Actual material invalid-triangle counts differ')
+                      a, b = actual['surfaceAreaMm2'], claimed['surfaceAreaMm2']
+                      require(all(type(x) in (int, float) and math.isfinite(x) and x > 0 for x in (a, b)), 'Invalid actual or reported material surface area')
+                      area_difference = abs(a - b) / max(abs(a), abs(b), 1e-12)
+                      require(area_difference <= .01 and area_difference <= maximum + 1e-12, 'Material surface area was omitted from the original 1% statistics gate')
+          def file(root, relative):
+              p = pathlib.PurePosixPath(relative)
+              require(not p.is_absolute() and '..' not in p.parts and p.as_posix() == relative, 'Unsafe path: ' + relative)
+              target = root.joinpath(*p.parts)
+              require(target.resolve().is_relative_to(root) and target.is_file(), 'Missing or escaped file: ' + relative)
+              require(not any(root.joinpath(*p.parts[:i]).is_symlink() for i in range(1, len(p.parts) + 1)), 'Symlink: ' + relative)
+              return target
+          def api(suffix):
+              request = urllib.request.Request('https://api.github.com/repos/' + e['REPOSITORY'] + suffix,
+                  headers={'Authorization': 'Bearer ' + e['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+              with urllib.request.urlopen(request, timeout=45) as response: return json.load(response)
+          for key in ('SOURCE_COMMIT', 'BASE_COMMIT', 'EXPECTED_HEAD'):
+              require(re.fullmatch(r'[a-f0-9]{40}', e[key]), 'Invalid commit lock: ' + key)
+          for key in [k for k in e if k.startswith('EXPECTED_') and k.endswith('_SHA256')]:
+              require(re.fullmatch(r'[a-f0-9]{64}', e[key]), 'Invalid hash lock: ' + key)
+          require(e['VISUAL_HUMAN_REVIEW'] == 'false', 'AI publication cannot grant human review')
+          require(re.fullmatch(r'sha256:[a-f0-9]{64}', e['CANDIDATE_ARTIFACT_DIGEST']), 'Invalid artifact digest')
+          run = api('/actions/runs/' + e['CANDIDATE_RUN_ID'])
+          require(run['status'] == 'completed' and run['conclusion'] == 'success', 'Candidate CI did not pass')
+          require(str(run['id']) == e['CANDIDATE_RUN_ID'] and str(run['run_attempt']) == e['CANDIDATE_RUN_ATTEMPT'] and str(run['workflow_id']) == e['CANDIDATE_WORKFLOW_ID'], 'Candidate run/workflow attempt differs')
+          require(run['event'] == 'push' and run['head_sha'] == source and run['head_branch'] == e['TARGET_BRANCH'], 'Wrong candidate source or branch')
+          require(run['path'] == e['VERIFY_WORKFLOW'] and run['head_repository']['full_name'] == e['REPOSITORY'], 'Wrong candidate workflow or repository')
+          artifact = api('/actions/artifacts/' + e['CANDIDATE_ARTIFACT_ID'])
+          require(str(artifact['id']) == e['CANDIDATE_ARTIFACT_ID'] and artifact['name'] == e['CANDIDATE_ARTIFACT_NAME'], 'Wrong candidate artifact')
+          require(not artifact['expired'] and artifact['digest'] == e['CANDIDATE_ARTIFACT_DIGEST'] and artifact['size_in_bytes'] == int(e['EXPECTED_CANDIDATE_ARTIFACT_BYTES']), 'Expired or changed candidate artifact')
+          require(str(artifact['workflow_run']['id']) == e['CANDIDATE_RUN_ID'] and artifact['workflow_run']['head_sha'] == source, 'Artifact is from another run/source')
+          comparison = api('/compare/' + source + '...' + e['EXPECTED_HEAD'])
+          require(comparison['status'] in ('ahead', 'identical') and comparison['merge_base_commit']['sha'] == source, 'Expected head is not a descendant of candidate source')
+          manifest_file = file(candidate, 'BUILD_MANIFEST.json')
+          geometry_file = file(candidate, 'evidence/GEOMETRY.json')
+          material_file = file(candidate, 'evidence/MATERIAL_COORDINATES.json')
+          construction_file = file(candidate, 'evidence/CONSTRUCTION_FLEX.json')
+          qa_file = file(candidate, 'evidence/browser/QA.json')
+          for path, key in ((manifest_file, 'EXPECTED_MANIFEST_SHA256'), (geometry_file, 'EXPECTED_GEOMETRY_SHA256'), (material_file, 'EXPECTED_MATERIAL_QA_SHA256'), (construction_file, 'EXPECTED_CONSTRUCTION_QA_SHA256'), (qa_file, 'EXPECTED_QA_SHA256')):
+              require(sha(path) == e[key], 'Evidence hash mismatch: ' + path.name)
+          manifest, geometry, material, construction, qa = [json.loads(p.read_text()) for p in (manifest_file, geometry_file, material_file, construction_file, qa_file)]
+          require(all(d['sourceCommit'] == source for d in (manifest, geometry, material, construction, qa)), 'Manifest, geometry and browser source disagree')
+          require(manifest['version'] == qa['version'] == 'R14.0' and manifest['styles'] == ['penny', 'chelsea', 'monk', 'canvas'], 'Wrong version or style set')
+          require(manifest['baseCommit'] == geometry['baseline'] == e['BASE_COMMIT'], 'Wrong retained baseline')
+          runtime = file(candidate, 'public-lite.html')
+          require(runtime.stat().st_size == manifest['runtime']['bytes'] == runtime_bytes, 'Runtime byte count mismatch')
+          require(sha(runtime) == manifest['runtime']['sha256'] == runtime_hash, 'Runtime hash mismatch')
+          require(geometry['suite'] == 'SHOE-R14-INDEPENDENT-GEOMETRY' and geometry['taskId'] == 'SHOE-R14-CONSTRUCTION-FLEX-20261018', 'Wrong geometry suite')
+          require(geometry['success'] is True and geometry['failed'] == 0 and geometry['failures'] == [], 'Geometry failed')
+          require(geometry['passed'] == int(e['EXPECTED_GEOMETRY_CHECKS']) and geometry['validatedParameterCases'] == int(e['EXPECTED_GEOMETRY_PARAMETER_CASES']), 'Geometry coverage changed')
+          require(len(geometry['measuredResponses']) == int(e['EXPECTED_GEOMETRY_RESPONSES']) and len(geometry['preservation']) == int(e['EXPECTED_GEOMETRY_PRESERVATIONS']) and all(x['passed'] is True for x in geometry['measuredResponses'] + geometry['preservation']), 'Parameter or preservation check failed')
+          require(material['suite'] == 'R14-INDEPENDENT-FINAL-MATERIAL-COORDINATES-DIAGNOSTIC' and material['taskId'] == geometry['taskId'], 'Wrong material diagnostic')
+          require(material['success'] is True and material['numericIssues'] == [] and material['measuredPanels'] == len(material['results']) == int(e['EXPECTED_MATERIAL_PANELS']), 'Material diagnostic failed or coverage changed')
+          require({x['preset'] for x in material['results']} == {'default', 'all-low', 'all-high'} and {x['style'] for x in material['results']} == set(manifest['styles']), 'Material parameter/style coverage changed')
+          require(all(x['sourceGeometryIdentical'] is True for x in material['results']), 'Material comparison changed geometry')
+          require(all(material['scope'][k] is True for k in ('sameSurfaceSeedComparison', 'finalFloat32Triangles', 'independentJacobianImplementation')), 'Material audit is not independent final geometry')
+          require(all(material['scope'][k] is True for k in ('producerSnapshotsCapturedBeforeSeedBuild', 'producerStatisticsCheckedUnchanged', 'comparedPartIdentityRecorded')), 'Material audit lacks per-panel immutable producer evidence')
+          require(canonical_sha(material['acceptanceCriteria']) == e['EXPECTED_MATERIAL_CRITERIA_SHA256'], 'Material acceptance criteria differ')
+          validate_material_records(material)
+          require(all(material['scope'][k] is False for k in ('productionFilesChanged', 'humanApproval', 'userApproval', 'physicalSolver', 'wearerFit', 'manufacturing')), 'Material diagnostic claims unsupported acceptance')
+          require(material['testSha256'] == e['EXPECTED_MATERIAL_TEST_SHA256'], 'Material diagnostic script differs')
+          require({x['path'] for x in material['sourceHashes']} == {'src/' + x + '.mjs' for x in ('deformation', 'kernel', 'model', 'penny-chelsea', 'monk-canvas', 'soles', 'surface-coordinates')} and len(material['sourceHashes']) == int(e['EXPECTED_MATERIAL_SOURCE_COUNT']), 'Material source inventory changed')
+          for record in material['sourceHashes']:
+              require(sha(file(module, record['path'])) == record['sha256'], 'Current material diagnostic source differs: ' + record['path'])
+          require(construction['schemaVersion'] == 2 and construction['task'] == 'SHOE-R14-CONSTRUCTION-FLEX' and construction['requestedLane'] == 'ALL', 'Construction increment is not the complete R14 A/B/C suite')
+          require(construction['testSha256'] == e['EXPECTED_CONSTRUCTION_TEST_SHA256'], 'Construction increment test differs')
+          require(canonical_sha(construction['producerHashes']) == e['EXPECTED_CONSTRUCTION_PRODUCERS_SHA256'], 'Construction producer identity differs')
+          require(canonical_sha(construction['criteria']) == e['EXPECTED_CONSTRUCTION_CRITERIA_SHA256'], 'Construction acceptance criteria differ')
+          producer_paths = {'src/' + p.name for p in (module / 'src').glob('*.mjs')}
+          require(set(construction['producerHashes']) == producer_paths and len(producer_paths) == int(e['EXPECTED_CONSTRUCTION_PRODUCER_COUNT']), 'Construction producer source inventory differs')
+          for relative, digest in construction['producerHashes'].items():
+              require(sha(file(module, relative)) == digest, 'Construction producer changed: ' + relative)
+          require(set(construction['r13BaselineHashes']) == {'src/' + name + '.mjs' for name in ('kernel', 'main', 'materials', 'model', 'monk-canvas', 'penny-chelsea', 'soles', 'surface-coordinates')}, 'Construction baseline inventory differs')
+          for relative, digest in construction['r13BaselineHashes'].items():
+              require(sha(file(repo / 'shoe-workshop/r13', relative)) == digest, 'Construction baseline changed: ' + relative)
+          increment_checks = construction['checks']
+          require(len(increment_checks) == len({x['name'] for x in increment_checks}) == int(e['EXPECTED_CONSTRUCTION_CHECKS']), 'Construction increment check coverage differs')
+          require(all(x['passed'] is True and x['failures'] == [] for x in increment_checks), 'Construction increment has a failed check')
+          require(construction['summary'] == {'passed': len(increment_checks), 'failed': 0, 'checks': len(increment_checks)}, 'Construction increment summary differs')
+          require(len([x for x in increment_checks if x.get('lane') is None]) == int(e['EXPECTED_CONSTRUCTION_GLOBAL_CHECKS']) and all(x.get('lane') in (None, 'A', 'B', 'C') for x in increment_checks), 'Construction global checks differ')
+          require(sum(construction['laneResults'][lane]['checkCount'] for lane in ('A', 'B', 'C')) + int(e['EXPECTED_CONSTRUCTION_GLOBAL_CHECKS']) == len(increment_checks), 'Construction lane/global totals differ')
+          require(set(construction['laneResults']) == {'A', 'B', 'C'}, 'Construction lane inventory differs')
+          for lane, expected_cases in (('A', sorted('thickness=' + str(t) + '/bend=' + str(b) for t in (.9, 1.35, 2.1) for b in (0, 15, 30))), ('B', ['all-high', 'all-low', 'default']), ('C', sorted('thickness=' + str(t) + '/bend=0' for t in (.9, 1.35, 2.1)))):
+              result = construction['laneResults'][lane]
+              require(all(result[k] is True for k in ('implemented', 'requested', 'complete')), 'Construction lane is incomplete: ' + lane)
+              require(result['expectedCases'] == result['actualCases'] == expected_cases, 'Construction lane cases differ: ' + lane)
+              require(result['expectedCheckCount'] == result['checkCount'] == result['passedChecks'] == int(e['EXPECTED_LANE_' + lane + '_CHECKS']) and result['failedChecks'] == 0, 'Construction lane checks differ: ' + lane)
+          increment_cases = construction['cases']
+          require(len(increment_cases) == int(e['EXPECTED_CONSTRUCTION_CASES']) and {x['style'] for x in increment_cases} == {'canvas', 'chelsea', 'monk'}, 'Construction cases are missing or duplicated')
+          require({(x['params']['thickness'], x['params']['bend']) for x in increment_cases if x['style'] == 'canvas'} == {(t, b) for t in (.9, 1.35, 2.1) for b in (0, 15, 30)}, 'Canvas construction matrix differs')
+          require({x['parameterPreset'] for x in increment_cases if x['style'] == 'chelsea'} == {'default', 'all-low', 'all-high'}, 'Chelsea construction matrix differs')
+          require({(x['params']['thickness'], x['params']['bend']) for x in increment_cases if x['style'] == 'monk'} == {(t, 0) for t in (.9, 1.35, 2.1)}, 'Monk construction matrix differs')
+          require(all(construction['scope'][k] is True for k in ('independentIncrement', 'measuredFinalGeometry')), 'Construction acceptance was not independently measured')
+          require(all(construction['scope'][k] is False for k in ('rendered', 'visualAccepted', 'physicalSolver', 'manufacturingValidated', 'wearerFitValidated', 'humanApproval', 'userApproval')), 'Construction numeric evidence claims unsupported acceptance')
+          require(qa['completed'] is True and qa['phase'] == 'complete' and not qa.get('failure'), 'Browser suite incomplete')
+          require(qa['buildSha'] is None and qa['url'].startswith('file:///'), 'Candidate must come from actual file URL testing')
+          require(all(qa[k] == [] for k in ('errors', 'consoleErrors', 'requestFailures', 'networkRequests')), 'Candidate browser or offline failure')
+          require(qa['final']['source'] == source and qa['final']['stats']['errors'] == [], 'Runtime source or runtime errors mismatch')
+          checks = qa['checks']
+          require(len(checks) == len({x['name'] for x in checks}) == int(e['EXPECTED_BROWSER_CHECKS']) and all(x['passed'] is True for x in checks), 'Browser checks did not all pass')
+          require(qa['visualHumanReview'] is False and qa['manufacturingValidated'] is False, 'CI cannot claim human or manufacturing acceptance')
+          # BUILD_MANIFEST paths are repository-root paths. GEOMETRY paths are R14-relative.
+          sources = manifest['sources']
+          require(len(sources) == len({x['path'] for x in sources}) == int(e['EXPECTED_RUNTIME_SOURCE_COUNT']), 'Runtime source inventory count differs')
+          require(canonical_sha(sorted(sources, key=lambda x: x['path'])) == e['EXPECTED_RUNTIME_SOURCES_SHA256'], 'Runtime source inventory differs')
+          require(e['MODULE'] + '/src/deformation.mjs' in {x['path'] for x in sources}, 'R14 deformation module is not bound to the runtime')
+          for record in sources:
+              require(record['path'].startswith('shoe-workshop/'), 'Unexpected source path')
+              require(sha(file(repo, record['path'])) == record['sha256'], 'Current source differs: ' + record['path'])
+          for record in geometry['testedSourceFiles']:
+              require(sha(file(module, record['path'])) == record['sha256'], 'Current tested source differs: ' + record['path'])
+          for relative, key in ((e['MODULE'] + '/tests/browser.mjs', 'EXPECTED_BROWSER_TEST_SHA256'), (e['MODULE'] + '/tests/geometry.mjs', 'EXPECTED_GEOMETRY_TEST_SHA256'), (e['MODULE'] + '/tests/material-coordinates-audit.mjs', 'EXPECTED_MATERIAL_TEST_SHA256'), (e['MODULE'] + '/tests/construction-flex.mjs', 'EXPECTED_CONSTRUCTION_TEST_SHA256'), (e['VERIFY_WORKFLOW'], 'EXPECTED_VERIFY_WORKFLOW_SHA256')):
+              require(sha(file(repo, relative)) == e[key], 'Current test/workflow differs: ' + relative)
+          preserved_counts = {x['detail']['baseline']: x['detail']['fileCount'] for x in geometry['preservation'] if 'fileCount' in x['detail']}
+          require(preserved_counts == {e['BASE_COMMIT']: int(e['EXPECTED_R13_PRESERVED_FILES']), 'fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d': int(e['EXPECTED_R12_PRESERVED_FILES']), 'cafab0889b612ed6cbf461683dfe2851909df3be': int(e['EXPECTED_R10_PRESERVED_FILES'])}, 'Accepted preservation counts differ')
+          for release, baseline, count, key in (
+              ('r13', e['BASE_COMMIT'], int(e['EXPECTED_R13_PRESERVED_FILES']), 'EXPECTED_R13_FIXTURE_SHA256'),
+              ('r12', 'fd6c7ca5a338f85ae6c6152b2b23ccf126687c5d', int(e['EXPECTED_R12_PRESERVED_FILES']), 'EXPECTED_R12_FIXTURE_SHA256')):
+              fixture_file = file(module, 'tests/fixtures/' + release + '-baseline.json')
+              require(sha(fixture_file) == e[key], 'Retained inventory lock differs: ' + release)
+              fixture = json.loads(fixture_file.read_text())
+              require(fixture['baseCommit'] == baseline and len(fixture['files']) == len({x['path'] for x in fixture['files']}) == count, 'Wrong retained inventory: ' + release)
+              for record in fixture['files']:
+                  require(sha(file(repo / 'shoe-workshop' / release, record['path'])) == record['sha256'], 'Retained file changed: ' + release + '/' + record['path'])
+          baseline = manifest['acceptedBaseline']
+          require(baseline == {'sourceCommit': '8b05ebd8b0755216743792034e3cbb58b8d9ff54', 'buildCommit': 'c979ae664e53cdc2f09bd33511be5be61415efce', 'path': 'shoe-workshop/r13/public-lite.html', 'runtime': {'bytes': 13746414, 'sha256': '7db6ec885c0d7d972b2fb0574039448d2115b98c6e8e428f297c7f989410535b'}}, 'Accepted R13 baseline changed')
+          # Frozen cafab0889b612ed6cbf461683dfe2851909df3be Git blob oracle.
+          # Hash bytes with stdlib; do not import or execute the R10 tests.
+          r10_oracle = [('221d309d3d164952adb84f3d2b7e361a6e97a4da', 'BUILD_MANIFEST.json'), ('41d7ae9dc4b14ce894a700c2a3508fcb2232af72', 'HOST_COMPATIBILITY.json'), ('404ad0c0226ec4c12a815b3063d38eebbb9d0daf', 'PROMOTION_RECEIPT.json'), ('a06df6e3382464089c0b9cc86d43d2b9856b54d2', 'evidence/GENERATION.json'), ('39db84fd9ed873a3a521f72410d66733ffcb0cd0', 'evidence/UNIT.json'), ('5a1c4dca7cc31e583b100225d879ae5e5214fd60', 'evidence/browser/QA.json'), ('5b9f36809348e9a71ab93f82352c2518247f5f36', 'index.html'), ('90cd93fbc5657ab0dcfd9d27da700cb7c21b577d', 'public-lite.html'), ('caac919a86ebe778a2fd0d5a6204b6e01f9ede52', 'src/Binding.mjs'), ('418ea6a826029c7651db54d3addffa207e9a6512', 'src/FitCage.mjs'), ('d8eac5fae685fcbea16d018e5f5cbad5ab1643ba', 'src/Materials.mjs'), ('313075255b703f975b14bb0bae2609f92c34718a', 'src/Pack.mjs'), ('ea2ecfa049c0f99aa33757664fb3e0c8859bcade', 'src/Presets.mjs'), ('229fbeca5c6a502a60ee04ddce8be682f14b0981', 'src/RendererRealm.mjs'), ('2bb23f09c7642b3ed1a42e5a3ebcf61f13ff3966', 'src/Shape.mjs'), ('5041953688e26adeb981979e0ad14ebe28fc5e22', 'src/Wear.mjs'), ('15809769d1d05bd790032068ac386e2a220d6b37', 'src/main.mjs'), ('b6f11a932c5af078e3fd7b351c69cef7e691e97b', 'style.css'), ('05365b61d719a6f402dcb38bc0de1d563ecfb574', 'tests/browser.mjs'), ('33e565af373084fa51f290b2dc283bd23b9125e8', 'tests/unit.mjs'), ('6a7398c6c60413542163409e4913adfb4f5e9ba2', 'tools/build.mjs'), ('4853aaf7ad24c5bec17943c7eee39a48f2f00567', 'tools/generate.mjs')]
+          require(len(r10_oracle) == int(e['EXPECTED_R10_PRESERVED_FILES']), 'R10 preserved file count differs')
+          for digest, relative in r10_oracle:
+              data = file(repo / 'shoe-workshop/r10', relative).read_bytes()
+              require(hashlib.sha1(('blob ' + str(len(data)) + '\0').encode() + data).hexdigest() == digest, 'Retained R10 file changed: ' + relative)
+          legacy = manifest['legacy']
+          require(legacy['preserved'] is True and legacy['path'] == 'shoe-workshop/r10/public-lite.html', 'Original R10 was not retained')
+          original = file(repo, legacy['path'])
+          require(original.stat().st_size == legacy['bytes'] and sha(original) == legacy['sha256'], 'Original R10 runtime changed')
+          for relative, key in (('tests/browser.mjs', 'EXPECTED_BROWSER_TEST_SHA256'), ('tests/geometry.mjs', 'EXPECTED_GEOMETRY_TEST_SHA256'), ('tests/material-coordinates-audit.mjs', 'EXPECTED_MATERIAL_TEST_SHA256'), ('tests/construction-flex.mjs', 'EXPECTED_CONSTRUCTION_TEST_SHA256')):
+              require(sha(file(candidate, relative)) == e[key], 'Candidate artifact test differs: ' + relative)
+          negative_relative = 'tests/fixtures/r13-construction-flex-before.json'
+          negative_file = file(candidate, negative_relative)
+          require(sha(negative_file) == e['EXPECTED_R13_CONSTRUCTION_BEFORE_SHA256'] == sha(file(module, negative_relative)), 'Actual same-script R13 negative fixture differs')
+          negative = json.loads(negative_file.read_text())
+          validate_r13_construction_negative(negative, construction, e['EXPECTED_CONSTRUCTION_TEST_SHA256'])
+          for relative, digest in negative['producerHashes'].items():
+              require(sha(file(repo / 'shoe-workshop/r13', relative)) == digest, 'R13 negative producer source differs: ' + relative)
+          copies = {'public-lite.html': runtime, 'BUILD_MANIFEST.json': manifest_file, 'evidence/GEOMETRY.json': geometry_file, 'evidence/MATERIAL_COORDINATES.json': material_file, 'evidence/CONSTRUCTION_FLEX.json': construction_file, 'evidence/browser/QA.json': qa_file}
+          screens = qa['screens']
+          require(len(screens) == len({x['name'] for x in screens}) == int(e['EXPECTED_SCREENS']), 'Screenshot coverage changed')
+          for screen in screens:
+              require(re.fullmatch(r'[a-z0-9-]+', screen['name']), 'Unsafe screenshot name')
+              relative = 'evidence/browser/' + screen['name'] + '.png'
+              path = file(candidate, relative)
+              require(sha(path) == screen['sha256'] and path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'), 'Screenshot hash/type mismatch: ' + relative)
+              copies[relative] = path
+          before_file = file(candidate, 'evidence/before/QA.json')
+          require(sha(before_file) == e['EXPECTED_BEFORE_QA_SHA256'], 'R13 before evidence changed')
+          before = json.loads(before_file.read_text())
+          require(before['sourceCommit'] == '8b05ebd8b0755216743792034e3cbb58b8d9ff54' and before['buildSha'] == 'c979ae664e53cdc2f09bd33511be5be61415efce', 'Wrong R13 before version')
+          require(before['runtimeSha256'] == '7db6ec885c0d7d972b2fb0574039448d2115b98c6e8e428f297c7f989410535b' and before['sameCameraMatrices'] is True and before['errors'] == [], 'Unverified before runtime or cameras')
+          comparison = qa['beforeComparison']
+          require(comparison['path'] == 'evidence/before/QA.json' and comparison['sameCameraMatrices'] is True and comparison['screens'] == int(e['EXPECTED_BEFORE_SCREENS']) and comparison['sourceCommit'] == before['sourceCommit'] and comparison['buildSha'] == before['buildSha'], 'Candidate lacks paired views')
+          require(len(before['screens']) == len({x['name'] for x in before['screens']}) == int(e['EXPECTED_BEFORE_SCREENS']), 'Before screenshot coverage changed')
+          view_plan_hash = validate_before_scenes(before, qa, source, runtime_hash)
+          require(view_plan_hash == e['EXPECTED_VIEW_PLAN_SHA256'], 'Accepted actual paired view plan hash differs')
+          require(len(qa['targetedViews']) == qa['plannedScreens']['targeted'] == int(e['EXPECTED_TARGET_RECORDS']), 'Accepted target record count differs')
+          copies['evidence/before/QA.json'] = before_file
+          for screen in before['screens']:
+              require(re.fullmatch(r'[a-z0-9-]+', screen['name']), 'Unsafe before screenshot name')
+              relative = 'evidence/before/' + screen['name'] + '.png'
+              path = file(candidate, relative)
+              require(sha(path) == screen['sha256'] and path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'), 'Before screenshot hash/type mismatch')
+              copies[relative] = path
+          review_file = file(module, 'VISUAL_REVIEW.json')
+          require(sha(review_file) == e['EXPECTED_REVIEW_SHA256'], 'Independent review lock changed')
+          review = json.loads(review_file.read_text())
+          require(review['version'] == 'R14.0' and review['sourceCommit'] == source and review['status'] == 'ACCEPTED_SOURCE_CANDIDATE', 'Candidate not independently accepted')
+          require(review['independentReviewer'] == 'r14_review_priorities' and review['reviewerEditedProduction'] is False, 'Review is not independent from production')
+          require(review['humanApproval'] is False and review['userApproval'] is False, 'AI review cannot grant human approval')
+          require(review['decision']['sourceCandidateAccepted'] is True and review['decision']['blockingIssueIds'] == [], 'Independent review still blocks this source candidate')
+          reviewed = review['candidate']
+          require(str(reviewed['runId']) == e['CANDIDATE_RUN_ID'] and str(reviewed['artifactId']) == e['CANDIDATE_ARTIFACT_ID'] and reviewed['artifactDigest'] == e['CANDIDATE_ARTIFACT_DIGEST'], 'Review describes another artifact')
+          require(reviewed['viewPlanSha256'] == e['EXPECTED_VIEW_PLAN_SHA256'] and reviewed['r13ConstructionBeforeSha256'] == e['EXPECTED_R13_CONSTRUCTION_BEFORE_SHA256'], 'Independent review omits the actual view plan or same-script R13 negative')
+          require(reviewed['manifestSha256'] == e['EXPECTED_MANIFEST_SHA256'] and reviewed['runtimeSha256'] == runtime_hash and reviewed['geometrySha256'] == e['EXPECTED_GEOMETRY_SHA256'] and reviewed['materialQaSha256'] == e['EXPECTED_MATERIAL_QA_SHA256'] and reviewed['constructionQaSha256'] == e['EXPECTED_CONSTRUCTION_QA_SHA256'] and reviewed['constructionTestSha256'] == e['EXPECTED_CONSTRUCTION_TEST_SHA256'] and reviewed['constructionProducerHashesSha256'] == e['EXPECTED_CONSTRUCTION_PRODUCERS_SHA256'] and reviewed['qaSha256'] == e['EXPECTED_QA_SHA256'] and reviewed['beforeQaSha256'] == e['EXPECTED_BEFORE_QA_SHA256'], 'Review evidence binding differs')
+          # Drop earlier publication receipts: a new candidate is not yet publicly verified.
+          for relative in ('evidence/browser', 'evidence/before', 'evidence/public'):
+              target = module / relative
+              require(not target.is_symlink() and not target.parent.is_symlink(), 'Unsafe evidence destination')
+              if target.exists(): shutil.rmtree(target)
+          for relative in ('PUBLIC_URL.txt', 'RELEASE_RECEIPT.json'):
+              target = module / relative
+              require(not target.is_symlink(), 'Unsafe receipt destination')
+              if target.exists(): target.unlink()
+          for relative, path in copies.items():
+              target = module / relative
+              require(not target.is_symlink(), 'Unsafe output destination')
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(path, target)
+          receipt = {'version': 'R14.0', 'status': 'CANDIDATE_PROMOTED_PUBLIC_PENDING', 'sourceCommit': source,
+              'expectedParent': e['EXPECTED_HEAD'], 'candidateRunId': int(e['CANDIDATE_RUN_ID']),
+              'candidateArtifactId': artifact['id'], 'candidateArtifactDigest': artifact['digest'],
+              'runtime': manifest['runtime'], 'materialCoordinatesQaSha256': e['EXPECTED_MATERIAL_QA_SHA256'], 'materialCoordinatesPanels': int(e['EXPECTED_MATERIAL_PANELS']), 'constructionFlexQaSha256': e['EXPECTED_CONSTRUCTION_QA_SHA256'], 'constructionFlexTestSha256': e['EXPECTED_CONSTRUCTION_TEST_SHA256'], 'constructionProducerHashesSha256': e['EXPECTED_CONSTRUCTION_PRODUCERS_SHA256'], 'constructionLanes': construction['laneResults'], 'constructionChecksPassed': construction['summary']['passed'], 'targetedViewsVerified': int(e['EXPECTED_TARGET_RECORDS']), 'viewPlanSha256': view_plan_hash, 'r13ConstructionBeforeSha256': e['EXPECTED_R13_CONSTRUCTION_BEFORE_SHA256'], 'r13ConstructionBeforeSummary': negative['summary'], 'sourceReviewSha256': e['EXPECTED_REVIEW_SHA256'], 'sourceReviewStatus': 'ACCEPTED_SOURCE_CANDIDATE', 'independentSourceReviewer': 'r14_review_priorities', 'beforeQAHash': e['EXPECTED_BEFORE_QA_SHA256'], 'beforeScreenshotsVerified': int(e['EXPECTED_BEFORE_SCREENS']), 'projectCodeExecutedInWriteJob': False, 'publicVerified': False,
+              'visualHumanReview': False, 'manufacturingValidated': False}
+          require(not (module / 'PROMOTION_RECEIPT.json').is_symlink(), 'Unsafe promotion receipt destination')
+          (module / 'PROMOTION_RECEIPT.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          print('Validated locked candidate, current sources, all geometry/browser checks and every screenshot; copied data only.')
+          PY
+      - name: Commit only verified artifacts with an expected-head fast-forward guard
+        id: commit
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          test "$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | cut -f1)" = "$EXPECTED_HEAD"
+          git config core.hooksPath /dev/null
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$MODULE"
+          while IFS= read -r -d '' path; do
+            case "$path" in
+              "$MODULE/public-lite.html"|"$MODULE/BUILD_MANIFEST.json"|"$MODULE/PROMOTION_RECEIPT.json"|"$MODULE/RELEASE_RECEIPT.json"|"$MODULE/PUBLIC_URL.txt"|"$MODULE/evidence/GEOMETRY.json"|"$MODULE/evidence/MATERIAL_COORDINATES.json"|"$MODULE/evidence/CONSTRUCTION_FLEX.json"|"$MODULE/evidence/browser/QA.json"|"$MODULE/evidence/browser/"*.png|"$MODULE/evidence/before/QA.json"|"$MODULE/evidence/before/"*.png|"$MODULE/evidence/public/QA.json"|"$MODULE/evidence/public/"*.png) ;;
+              *) echo "Refusing unexpected staged path: $path"; exit 1 ;;
+            esac
+          done < <(git diff --cached --name-only -z)
+          git diff --cached --quiet && { echo 'No new promotion delta'; exit 1; }
+          git commit -m 'Publish reviewed R14 standalone candidate and bound evidence'
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+          echo "build=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  public_browser:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    permissions:
+      contents: read
+    outputs:
+      artifact_id: ${{ steps.evidence.outputs.artifact-id }}
+      artifact_digest: ${{ steps.evidence.outputs.artifact-digest }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      browser_attempt: ${{ steps.identity.outputs.browser_attempt }}
+    steps:
+      - name: Bind evidence identity to the browser job attempt
+        id: identity
+        run: |
+          echo "artifact_name=$PUBLIC_ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
+          echo "browser_attempt=$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.publish.outputs.build }}
+          sparse-checkout: shoe-workshop/r14
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: shoe-workshop/r14/package-lock.json
+      - name: Install the checked dependency lock
+        working-directory: shoe-workshop/r14
+        run: npm ci --ignore-scripts
+      - name: Chromium render environment
+        working-directory: shoe-workshop/r14
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get install --yes fonts-noto-cjk
+      - name: Test exact public bytes and live public controls
+        working-directory: shoe-workshop/r14
+        env:
+          PUBLIC_BUILD_SHA: ${{ needs.publish.outputs.build }}
+        run: node tests/browser.mjs --public
+      - name: Preserve public browser evidence
+        id: evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PUBLIC_ARTIFACT_NAME }}
+          path: shoe-workshop/r14/evidence/public/
+          if-no-files-found: error
+          retention-days: 14
+
+  receipt:
+    needs: [publish, public_browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.publish.outputs.build }}
+          sparse-checkout: |
+            shoe-workshop/r14
+            shoe-workshop/r13
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.public_browser.outputs.artifact_id }}
+          run-id: ${{ github.run_id }}
+          repository: ${{ env.REPOSITORY }}
+          github-token: ${{ github.token }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/r14-public
+      - name: Validate public evidence and write the URL receipt without project execution
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLIC_BUILD_SHA: ${{ needs.publish.outputs.build }}
+          PUBLIC_ARTIFACT_ID: ${{ needs.public_browser.outputs.artifact_id }}
+          PUBLIC_ARTIFACT_DIGEST: ${{ needs.public_browser.outputs.artifact_digest }}
+          PUBLIC_ARTIFACT_NAME: ${{ needs.public_browser.outputs.artifact_name }}
+          PUBLIC_BROWSER_ATTEMPT: ${{ needs.public_browser.outputs.browser_attempt }}
+          PUBLIC_EVIDENCE_DIR: ${{ runner.temp }}/r14-public
+        run: |
+          python -I - <<'PY'
+          import hashlib, json, math, os, pathlib, re, shutil, urllib.request
+          e = os.environ
+          repo = pathlib.Path(e['GITHUB_WORKSPACE']).resolve()
+          module = repo / e['MODULE']
+          evidence = pathlib.Path(e['PUBLIC_EVIDENCE_DIR']).resolve()
+          def require(ok, message):
+              if not ok: raise SystemExit(message)
+          def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+          def canonical_sha(value): return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False, allow_nan=False).encode()).hexdigest()
+          def expected_targets():
+              defaults = {'length': 1, 'width': 1, 'instep': 0, 'thickness': 1.35, 'bend': 0}
+              result = {}
+              def add(name, style, view, params=None, target=None, clay=False, section=False, part=None):
+                  result[name] = {'style': style, 'params': dict(defaults, **(params or {})), 'view': view,
+                                  'hardwareTarget': target, 'clay': clay, 'section': section,
+                                  'isolatedParts': [part] if part else []}
+              front = 'canvas-eyelet-1-4'
+              for bend, label in ((0, '00'), (15, '15'), (30, '30')):
+                  add('canvas-front-eyelet-default-bend' + label, 'canvas', 'hardware', {'bend': bend}, front)
+              for label, thickness in (('thin', .9), ('thick', 2.1)):
+                  add('canvas-front-eyelet-' + label + '-bend30', 'canvas', 'hardware', {'thickness': thickness, 'bend': 30}, front)
+              add('canvas-front-eyelet-default-bend30-section', 'canvas', 'hardware', {'bend': 30}, front, section=True)
+              add('canvas-front-eyelet-inner-default-bend30', 'canvas', 'hardware', {'bend': 30}, 'canvas-eyelet--1-4')
+              for label, thickness in (('default', 1.35), ('thin', .9), ('thick', 2.1)):
+                  add('canvas-row2-quarter-' + label + '-static', 'canvas', 'hardware', {'thickness': thickness}, 'canvas-eyelet-1-2', part='canvas-quarter-1')
+              add('canvas-row2-facing-default-static', 'canvas', 'hardware', target='canvas-eyelet-1-2', part='canvas-perforated-facing-1')
+              add('canvas-default-bend30-side', 'canvas', 'side', {'bend': 30})
+              add('canvas-default-bend30-hero-clay', 'canvas', 'hero', {'bend': 30}, clay=True)
+              for label, params in (('default', {}), ('all-low', {'length': .9, 'width': .88, 'instep': -5, 'thickness': .9}), ('all-high', {'length': 1.1, 'width': 1.15, 'instep': 8, 'thickness': 2.1})):
+                  for clay in (False, True):
+                      add('chelsea-' + label + '-side-' + ('clay' if clay else 'leather'), 'chelsea', 'side', params, clay=clay)
+              for clay in (False, True):
+                  add('chelsea-default-oblique-' + ('clay' if clay else 'leather'), 'chelsea', 'hero', clay=clay)
+              for label, thickness in (('default', 1.35), ('thin', .9), ('thick', 2.1)):
+                  for buckle in (0, 1):
+                      add('monk-buckle' + str(buckle) + '-' + label, 'monk', 'hardware', {'thickness': thickness}, 'monk-buckle-frame-' + str(buckle))
+              return result
+
+          def model_state(scene):
+              # R13 has no hardware-view preset. Actual camera equality is checked below;
+              # copying the old view label is intentionally not an acceptance condition.
+              return {k: scene['state'][k] for k in ('style', 'params', 'pair', 'compare', 'explode', 'clay', 'wire', 'section', 'seams', 'part')}
+
+          def validate_scene_shape(scene, source):
+              require(scene['source'] == source, 'Screenshot scene comes from another runtime source')
+              camera = scene['camera']
+              for key, length in (('position', 3), ('quaternion', 4), ('up', 3), ('matrixWorld', 16), ('matrixWorldInverse', 16), ('projectionMatrix', 16)):
+                  require(len(camera[key]) == length and all(type(v) in (int, float) and math.isfinite(v) for v in camera[key]), 'Invalid actual camera vector/matrix: ' + key)
+              for key in ('fov', 'near', 'far', 'aspect', 'zoom', 'filmGauge', 'filmOffset'):
+                  require(type(camera[key]) in (int, float) and math.isfinite(camera[key]), 'Invalid actual camera scalar: ' + key)
+              require(camera['near'] > 0 and camera['far'] > camera['near'] and camera['aspect'] > 0 and camera['zoom'] > 0, 'Invalid camera frustum')
+              require(len(scene['viewport']) == len(scene['stage']) == 2 and all(type(v) in (int, float) and math.isfinite(v) and v > 0 for v in scene['viewport'] + scene['stage']), 'Invalid actual viewport/stage')
+              # Reject non-finite values anywhere in rendering, clipping, model or bounds.
+              canonical_sha(scene)
+
+          def validate_targeted_views(qa, source):
+              targets = expected_targets()
+              require(len(targets) == 27, 'Internal target contract is incomplete')
+              require(qa['plannedScreens'] == {'retained': 39, 'targeted': 27, 'candidate': 66, 'before': 35}, 'Browser coverage plan differs')
+              screens = {x['name']: x for x in qa['screens']}
+              retained = {style + '-' + view for style in ('penny', 'chelsea', 'monk', 'canvas') for view in ('hero', 'side', 'top', 'front', 'back', 'detail', 'join')}
+              retained |= {'desktop-first-frame', 'monk-parameter-and-flex', 'canvas-pair', 'four-style-comparison', 'penny-exploded', 'penny-first-part', 'penny-section', 'chelsea-clay', 'retained-r10-original', 'retained-r10-p05', 'mobile-viewport'}
+              require(len(qa['screens']) == len(screens) == 66 and set(screens) == retained | set(targets), 'Actual screenshot inventory differs')
+              records = {x['name']: x for x in qa['targetedViews']}
+              require(len(qa['targetedViews']) == len(records) == 27 and set(records) == set(targets), 'Missing or duplicate targeted view record')
+              for name, screen in screens.items():
+                  require(type(screen['targeted']) is bool and screen['targeted'] == (name in targets), 'Targeted screenshot flag differs: ' + name)
+                  validate_scene_shape(screen['scene'], source)
+              for name, expected in targets.items():
+                  record, screen = records[name], screens[name]
+                  scene, state = screen['scene'], screen['scene']['state']
+                  require(screen['fullPage'] is False and isinstance(record['purpose'], str) and record['purpose'], 'Target screenshot framing or purpose is missing: ' + name)
+                  require({k: record[k] for k in expected} == expected, 'Target metadata parameters or selection differs: ' + name)
+                  require(state['style'] == expected['style'] and state['params'] == expected['params'] and state['view'] == expected['view'], 'Actual target model/camera preset differs: ' + name)
+                  require(state['clay'] is expected['clay'] and state['section'] is expected['section'] and scene['isolatedParts'] == expected['isolatedParts'], 'Actual target display mode differs: ' + name)
+                  require(all(state[k] is False for k in ('pair', 'compare', 'explode', 'wire')) and state['seams'] is True, 'Actual target mode is not the specified single assembled shoe: ' + name)
+                  require(state['part'] == (expected['isolatedParts'][0] if expected['isolatedParts'] else 'all'), 'Actual selected part differs: ' + name)
+                  if expected['isolatedParts']:
+                      require(scene['visibleParts'] == expected['isolatedParts'], 'Target part isolation differs: ' + name)
+                  if expected['view'] == 'hardware':
+                      target = scene['target']
+                      require(target['id'] == state['hardwareTarget'] == expected['hardwareTarget'] and target['vertexCount'] > 0, 'Actual hardware target differs: ' + name)
+                      lo, hi = target['ndcBounds']
+                      require(len(lo) == len(hi) == 3 and all(type(v) in (int, float) and math.isfinite(v) for v in lo + hi + target['pixelSpan']), 'Invalid projected hardware bounds: ' + name)
+                      require(lo[0] > -.92 and hi[0] < .92 and lo[1] > -.92 and hi[1] < .92 and lo[2] > -1 and hi[2] < 1, 'Actual hardware is clipped or outside inspection frame: ' + name)
+                      require(abs((lo[0] + hi[0]) / 2) < .15 and abs((lo[1] + hi[1]) / 2) < .15 and all(v > 60 for v in target['pixelSpan']), 'Actual hardware is not legibly framed: ' + name)
+                      if expected['section']:
+                          require(len(scene['clippingPlanes']) == len(target['clipRanges']) == 1 and target['clipRanges'][0]['min'] < 0 < target['clipRanges'][0]['max'], 'Section plane does not cut the actual hardware: ' + name)
+              paired_names = {style + '-' + view for style in ('penny', 'chelsea', 'monk', 'canvas') for view in ('back', 'join')} | set(targets)
+              plan = {'targets': sorted(qa['targetedViews'], key=lambda x: x['name']), 'screens': [{'name': name, 'targeted': screens[name]['targeted'], 'scene': screens[name]['scene']} for name in sorted(paired_names)]}
+              require(len(paired_names) == 35, 'Paired target plan is incomplete')
+              return screens, paired_names, canonical_sha(plan)
+
+          def validate_before_scenes(before, qa, source, runtime_hash):
+              screens, paired_names, plan_hash = validate_targeted_views(qa, source)
+              require(before['version'] == 'R14.0' and before['sourceCommit'] == '8b05ebd8b0755216743792034e3cbb58b8d9ff54' and before['buildSha'] == 'c979ae664e53cdc2f09bd33511be5be61415efce', 'Wrong R13 before version')
+              require(before['runtimeSha256'] == '7db6ec885c0d7d972b2fb0574039448d2115b98c6e8e428f297c7f989410535b' and before['runtimeBytes'] == 13746414, 'Wrong R13 before bytes')
+              require(before['candidateSourceCommit'] == source and before['candidateRuntimeSha256'] == runtime_hash, 'Before evidence refers to another candidate')
+              require(before['completed'] is True and not before.get('failure') and all(before[k] == [] for k in ('errors', 'consoleErrors', 'requestFailures', 'networkRequests')), 'Before render did not finish cleanly')
+              require(all(before[k] is True for k in ('sameCameraMatrices', 'sameModelState', 'sameRenderingSettings')), 'Before comparison is not fully paired')
+              require(len(before['screens']) == len({x['name'] for x in before['screens']}) == 35 and {x['name'] for x in before['screens']} == paired_names, 'Before views omit a regression or new construction target')
+              comparison = qa['beforeComparison']
+              require(comparison['path'] == 'evidence/before/QA.json' and comparison['sourceCommit'] == before['sourceCommit'] and comparison['buildSha'] == before['buildSha'] and comparison['runtimeSha256'] == before['runtimeSha256'], 'Candidate before baseline binding differs')
+              require(comparison['candidateSourceCommit'] == source and comparison['candidateRuntimeSha256'] == runtime_hash and comparison['screens'] == 35 and comparison['targetedScreens'] == 27 and all(comparison[k] is True for k in ('sameCameraMatrices', 'sameModelState', 'sameRenderingSettings')), 'Candidate before model/rendering binding differs')
+              for record in before['screens']:
+                  name = record['name']
+                  candidate = screens[name]
+                  require(record['candidateScreenshotSha256'] == candidate['sha256'] and record['targeted'] is candidate['targeted'] and record['requestedScene'] == candidate['scene'], 'Before screenshot is paired to a different candidate scene: ' + name)
+                  actual, requested = record['scene'], record['requestedScene']
+                  validate_scene_shape(actual, before['sourceCommit'])
+                  require(model_state(actual) == model_state(requested), 'Actual R13 before model parameters differ: ' + name)
+                  for key in ('camera', 'viewport', 'stage', 'isolatedParts', 'clippingPlanes', 'floor', 'rendering'):
+                      require(actual[key] == requested[key], 'Actual R13 before scene differs: ' + name + '/' + key)
+                  delta = max(abs(a - b) for key in ('matrixWorld', 'matrixWorldInverse', 'projectionMatrix') for a, b in zip(actual['camera'][key], requested['camera'][key]))
+                  require(record['matrixMaxAbsDelta'] == delta == 0 and all(record[k] is True for k in ('sameCameraMatrices', 'sameModelState', 'sameRenderingSettings')), 'Actual R13 before matrices or pairing flags differ: ' + name)
+              return plan_hash
+
+          def validate_public_scenes(qa, candidate_qa, before, source, runtime_hash):
+              candidate_plan = validate_before_scenes(before, candidate_qa, source, runtime_hash)
+              screens, names, public_plan = validate_targeted_views(qa, source)
+              require(public_plan == candidate_plan, 'Actual public target parameters, geometry projections, matrices or rendering differ from accepted file candidate')
+              require(qa['targetedViews'] == candidate_qa['targetedViews'], 'Public targeted records differ from accepted candidate')
+              comparison = qa['beforeComparison']
+              require(comparison['path'] == 'evidence/before/QA.json' and comparison['sourceCommit'] == before['sourceCommit'] and comparison['buildSha'] == before['buildSha'] and comparison['runtimeSha256'] == before['runtimeSha256'], 'Public before binding differs')
+              require(comparison['candidateSourceCommit'] == source and comparison['candidateRuntimeSha256'] == runtime_hash and comparison['screens'] == 35 and comparison['targetedScreens'] == 27, 'Public paired-target coverage differs')
+              return public_plan
+
+          def validate_r13_construction_negative(negative, construction, test_hash):
+              require(negative['schemaVersion'] == construction['schemaVersion'] == 2 and negative['task'] == construction['task'] == 'SHOE-R14-CONSTRUCTION-FLEX', 'Wrong R13 construction negative suite')
+              require(negative['sourceCommit'] == '8b05ebd8b0755216743792034e3cbb58b8d9ff54' and negative['requestedLane'] == construction['requestedLane'] == 'ALL', 'R13 construction negative is not the complete fixed baseline')
+              require(negative['testSha256'] == construction['testSha256'] == test_hash, 'R13 negative and candidate were not measured by the same frozen test')
+              require(negative['criteria'] == construction['criteria'] and negative['r13BaselineHashes'] == construction['r13BaselineHashes'], 'R13 negative criteria or reference source differs')
+              old_checks, new_checks = negative['checks'], construction['checks']
+              require(len(old_checks) == len(new_checks) == len({x['name'] for x in old_checks}) and {x['name'] for x in old_checks} == {x['name'] for x in new_checks}, 'R13 negative does not cover the same checks')
+              require(all(type(x['passed']) is bool and isinstance(x['failures'], list) and x['passed'] == (x['failures'] == []) for x in old_checks), 'R13 negative check outcomes are inconsistent')
+              passed = sum(x['passed'] for x in old_checks)
+              failed = len(old_checks) - passed
+              require(failed > 0 and negative['summary'] == {'passed': passed, 'failed': failed, 'checks': len(old_checks)}, 'R13 fixture is not an actual failing negative control')
+              require(set(negative['laneResults']) == set(construction['laneResults']) == {'A', 'B', 'C'}, 'R13 negative lane inventory differs')
+              for lane in ('A', 'B', 'C'):
+                  old, new = negative['laneResults'][lane], construction['laneResults'][lane]
+                  lane_checks = [x for x in old_checks if x.get('lane') == lane]
+                  lane_passed = sum(x['passed'] for x in lane_checks)
+                  require(old['implemented'] is True and old['requested'] is True, 'R13 negative lane was not run: ' + lane)
+                  require(old['expectedCases'] == old['actualCases'] == new['expectedCases'] == new['actualCases'], 'R13 negative parameter matrix differs: ' + lane)
+                  require(old['expectedCheckCount'] == old['checkCount'] == len(lane_checks) == new['expectedCheckCount'] == new['checkCount'], 'R13 negative lane check coverage differs: ' + lane)
+                  require(old['passedChecks'] == lane_passed and old['failedChecks'] == len(lane_checks) - lane_passed and old['complete'] == (old['failedChecks'] == 0), 'R13 negative lane summary differs: ' + lane)
+              require(negative['scope'] == construction['scope'] and negative['scope']['humanApproval'] is False and negative['scope']['userApproval'] is False, 'R13 negative scope claims differ')
+              return negative['summary']
+
+          def validate_material_records(material):
+              require(material['acceptanceCriteria']['maximumProducerReportRelativeDifference'] == .01, 'Material statistics tolerance changed')
+              identities = {(x['preset'], x['style'], x['part']) for x in material['results']}
+              require(len(identities) == len(material['results']), 'Duplicate material panel evidence')
+              for record in material['results']:
+                  identity = {'preset': record['preset'], 'style': record['style'], 'partId': record['part']}
+                  snapshot = record['producerSnapshot']
+                  require(snapshot['identity'] == identity and snapshot['capturedBeforeSeedBuild'] is True and snapshot['rawStatisticsUnchanged'] is True, 'Material producer snapshot has wrong identity or changed data')
+                  require(re.fullmatch(r'[a-f0-9]{64}', snapshot['sha256']), 'Invalid material producer snapshot digest')
+                  for phase in ('before', 'after'):
+                      comparison = record['reportComparison'][phase]
+                      expected_identity = dict(identity, phase=phase, snapshotSha256=snapshot['sha256'])
+                      require(comparison['identity'] == expected_identity and comparison['present'] is True and comparison['invalidCountsAgree'] is True and comparison['validTrianglesAgree'] is True, 'Material comparison has wrong identity or triangle counts')
+                      maximum = comparison['maximumRelativeDifference']
+                      require(type(maximum) in (int, float) and math.isfinite(maximum) and 0 <= maximum <= .01 and 0 <= comparison['maximumDifference']['relativeDifference'] <= .01, 'Material producer statistics differ from final triangles')
+                      actual, claimed = record[phase], snapshot['statistics'][phase]
+                      require(type(actual['validTriangles']) is int and actual['validTriangles'] > 0 and actual['validTriangles'] == claimed['validTriangles'], 'Actual material valid-triangle count differs')
+                      require(all(actual[k] == claimed[k] for k in ('invalidUVTriangles', 'invalidSurfaceTriangles')), 'Actual material invalid-triangle counts differ')
+                      a, b = actual['surfaceAreaMm2'], claimed['surfaceAreaMm2']
+                      require(all(type(x) in (int, float) and math.isfinite(x) and x > 0 for x in (a, b)), 'Invalid actual or reported material surface area')
+                      area_difference = abs(a - b) / max(abs(a), abs(b), 1e-12)
+                      require(area_difference <= .01 and area_difference <= maximum + 1e-12, 'Material surface area was omitted from the original 1% statistics gate')
+          def file(root, relative):
+              p = pathlib.PurePosixPath(relative)
+              require(not p.is_absolute() and '..' not in p.parts and p.as_posix() == relative, 'Unsafe evidence path')
+              target = root.joinpath(*p.parts)
+              require(target.resolve().is_relative_to(root) and target.is_file(), 'Missing or escaped evidence')
+              require(not any(root.joinpath(*p.parts[:i]).is_symlink() for i in range(1, len(p.parts) + 1)), 'Symlink evidence')
+              return target
+          require(re.fullmatch(r'[a-f0-9]{40}', e['PUBLIC_BUILD_SHA']), 'Invalid public build commit')
+          request = urllib.request.Request('https://api.github.com/repos/' + e['REPOSITORY'] + '/actions/artifacts/' + e['PUBLIC_ARTIFACT_ID'],
+              headers={'Authorization': 'Bearer ' + e['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+          with urllib.request.urlopen(request, timeout=45) as response: artifact = json.load(response)
+          public_artifact_digest = 'sha256:' + e['PUBLIC_ARTIFACT_DIGEST'].removeprefix('sha256:')
+          require(re.fullmatch(r'sha256:[a-f0-9]{64}', public_artifact_digest), 'Invalid public artifact digest')
+          require(str(artifact['id']) == e['PUBLIC_ARTIFACT_ID'] and artifact['name'] == e['PUBLIC_ARTIFACT_NAME'], 'Wrong public artifact')
+          require(not artifact['expired'] and artifact['digest'] == public_artifact_digest, 'Expired or changed public artifact')
+          require(str(artifact['workflow_run']['id']) == e['GITHUB_RUN_ID'] and artifact['workflow_run']['head_sha'] == e['EXPECTED_HEAD'], 'Public artifact is from another workflow run')
+          manifest_file = file(module, 'BUILD_MANIFEST.json')
+          candidate_qa_file = file(module, 'evidence/browser/QA.json')
+          require(sha(manifest_file) == e['EXPECTED_MANIFEST_SHA256'] and sha(candidate_qa_file) == e['EXPECTED_QA_SHA256'], 'Promoted evidence changed')
+          material_file = file(module, 'evidence/MATERIAL_COORDINATES.json')
+          require(sha(material_file) == e['EXPECTED_MATERIAL_QA_SHA256'], 'Promoted material diagnostic changed')
+          material = json.loads(material_file.read_text())
+          require(material['sourceCommit'] == e['SOURCE_COMMIT'] and material['success'] is True and material['numericIssues'] == [] and material['measuredPanels'] == len(material['results']) == int(e['EXPECTED_MATERIAL_PANELS']), 'Promoted material audit failed or changed')
+          require(material['testSha256'] == e['EXPECTED_MATERIAL_TEST_SHA256'] == sha(file(module, 'tests/material-coordinates-audit.mjs')), 'Promoted material test differs')
+          require(canonical_sha(material['acceptanceCriteria']) == e['EXPECTED_MATERIAL_CRITERIA_SHA256'], 'Promoted material criteria differ')
+          validate_material_records(material)
+          construction_file = file(module, 'evidence/CONSTRUCTION_FLEX.json')
+          require(sha(construction_file) == e['EXPECTED_CONSTRUCTION_QA_SHA256'], 'Promoted construction increment changed')
+          construction = json.loads(construction_file.read_text())
+          require(construction['sourceCommit'] == e['SOURCE_COMMIT'], 'Promoted construction source differs')
+          require(sha(file(module, 'tests/construction-flex.mjs')) == e['EXPECTED_CONSTRUCTION_TEST_SHA256'], 'Promoted construction test differs')
+          require(sha(file(module, 'tests/browser.mjs')) == e['EXPECTED_BROWSER_TEST_SHA256'], 'Promoted browser test differs')
+          manifest = json.loads(manifest_file.read_text())
+          candidate_qa = json.loads(candidate_qa_file.read_text())
+          qa_file = file(evidence, 'QA.json')
+          qa = json.loads(qa_file.read_text())
+          require(qa['version'] == manifest['version'] == 'R14.0', 'Wrong public version')
+          require(qa['sourceCommit'] == manifest['sourceCommit'] == e['SOURCE_COMMIT'] and qa['buildSha'] == e['PUBLIC_BUILD_SHA'], 'Public source/build mismatch')
+          require(construction['schemaVersion'] == 2 and construction['task'] == 'SHOE-R14-CONSTRUCTION-FLEX' and construction['requestedLane'] == 'ALL', 'Construction increment is not the complete R14 A/B/C suite')
+          require(construction['testSha256'] == e['EXPECTED_CONSTRUCTION_TEST_SHA256'], 'Construction increment test differs')
+          require(canonical_sha(construction['producerHashes']) == e['EXPECTED_CONSTRUCTION_PRODUCERS_SHA256'], 'Construction producer identity differs')
+          require(canonical_sha(construction['criteria']) == e['EXPECTED_CONSTRUCTION_CRITERIA_SHA256'], 'Construction acceptance criteria differ')
+          producer_paths = {'src/' + p.name for p in (module / 'src').glob('*.mjs')}
+          require(set(construction['producerHashes']) == producer_paths and len(producer_paths) == int(e['EXPECTED_CONSTRUCTION_PRODUCER_COUNT']), 'Construction producer source inventory differs')
+          for relative, digest in construction['producerHashes'].items():
+              require(sha(file(module, relative)) == digest, 'Construction producer changed: ' + relative)
+          require(set(construction['r13BaselineHashes']) == {'src/' + name + '.mjs' for name in ('kernel', 'main', 'materials', 'model', 'monk-canvas', 'penny-chelsea', 'soles', 'surface-coordinates')}, 'Construction baseline inventory differs')
+          for relative, digest in construction['r13BaselineHashes'].items():
+              require(sha(file(repo / 'shoe-workshop/r13', relative)) == digest, 'Construction baseline changed: ' + relative)
+          increment_checks = construction['checks']
+          require(len(increment_checks) == len({x['name'] for x in increment_checks}) == int(e['EXPECTED_CONSTRUCTION_CHECKS']), 'Construction increment check coverage differs')
+          require(all(x['passed'] is True and x['failures'] == [] for x in increment_checks), 'Construction increment has a failed check')
+          require(construction['summary'] == {'passed': len(increment_checks), 'failed': 0, 'checks': len(increment_checks)}, 'Construction increment summary differs')
+          require(len([x for x in increment_checks if x.get('lane') is None]) == int(e['EXPECTED_CONSTRUCTION_GLOBAL_CHECKS']) and all(x.get('lane') in (None, 'A', 'B', 'C') for x in increment_checks), 'Construction global checks differ')
+          require(sum(construction['laneResults'][lane]['checkCount'] for lane in ('A', 'B', 'C')) + int(e['EXPECTED_CONSTRUCTION_GLOBAL_CHECKS']) == len(increment_checks), 'Construction lane/global totals differ')
+          require(set(construction['laneResults']) == {'A', 'B', 'C'}, 'Construction lane inventory differs')
+          for lane, expected_cases in (('A', sorted('thickness=' + str(t) + '/bend=' + str(b) for t in (.9, 1.35, 2.1) for b in (0, 15, 30))), ('B', ['all-high', 'all-low', 'default']), ('C', sorted('thickness=' + str(t) + '/bend=0' for t in (.9, 1.35, 2.1)))):
+              result = construction['laneResults'][lane]
+              require(all(result[k] is True for k in ('implemented', 'requested', 'complete')), 'Construction lane is incomplete: ' + lane)
+              require(result['expectedCases'] == result['actualCases'] == expected_cases, 'Construction lane cases differ: ' + lane)
+              require(result['expectedCheckCount'] == result['checkCount'] == result['passedChecks'] == int(e['EXPECTED_LANE_' + lane + '_CHECKS']) and result['failedChecks'] == 0, 'Construction lane checks differ: ' + lane)
+          increment_cases = construction['cases']
+          require(len(increment_cases) == int(e['EXPECTED_CONSTRUCTION_CASES']) and {x['style'] for x in increment_cases} == {'canvas', 'chelsea', 'monk'}, 'Construction cases are missing or duplicated')
+          require({(x['params']['thickness'], x['params']['bend']) for x in increment_cases if x['style'] == 'canvas'} == {(t, b) for t in (.9, 1.35, 2.1) for b in (0, 15, 30)}, 'Canvas construction matrix differs')
+          require({x['parameterPreset'] for x in increment_cases if x['style'] == 'chelsea'} == {'default', 'all-low', 'all-high'}, 'Chelsea construction matrix differs')
+          require({(x['params']['thickness'], x['params']['bend']) for x in increment_cases if x['style'] == 'monk'} == {(t, 0) for t in (.9, 1.35, 2.1)}, 'Monk construction matrix differs')
+          require(all(construction['scope'][k] is True for k in ('independentIncrement', 'measuredFinalGeometry')), 'Construction acceptance was not independently measured')
+          require(all(construction['scope'][k] is False for k in ('rendered', 'visualAccepted', 'physicalSolver', 'manufacturingValidated', 'wearerFitValidated', 'humanApproval', 'userApproval')), 'Construction numeric evidence claims unsupported acceptance')
+          require(qa['completed'] is True and qa['phase'] == 'complete' and not qa.get('failure'), 'Public browser incomplete')
+          require(all(qa[k] == [] for k in ('errors', 'consoleErrors', 'requestFailures')), 'Public browser errors')
+          require(qa['final']['source'] == e['SOURCE_COMMIT'] and qa['final']['stats']['errors'] == [], 'Public runtime mismatch or errors')
+          require(qa['visualHumanReview'] is False and qa['manufacturingValidated'] is False, 'Machine QA cannot grant human or manufacturing acceptance')
+          checks = qa['checks']
+          require(len(checks) == len({x['name'] for x in checks}) == int(e['EXPECTED_BROWSER_CHECKS']) and all(x['passed'] is True for x in checks), 'Public checks did not all pass')
+          require({x['name'] for x in checks} == {x['name'] for x in candidate_qa['checks']}, 'Public test coverage differs from reviewed candidate')
+          raw = 'https://raw.githubusercontent.com/' + e['REPOSITORY'] + '/' + e['PUBLIC_BUILD_SHA'] + '/' + e['MODULE'] + '/public-lite.html'
+          url = 'https://htmlpreview.github.io/?' + raw
+          require(qa['url'] == url and qa['publicBytes']['raw'] == raw and qa['publicBytes']['matchesBuild'] is True, 'Public URL was not verified')
+          runtime = file(module, 'public-lite.html')
+          require(qa['publicBytes']['sha256'] == manifest['runtime']['sha256'] == e['EXPECTED_RUNTIME_SHA256'] == sha(runtime), 'Public bytes hash differs')
+          require(qa['publicBytes']['bytes'] == manifest['runtime']['bytes'] == int(e['EXPECTED_RUNTIME_BYTES']) == runtime.stat().st_size, 'Public byte count differs')
+          screens = qa['screens']
+          require(len(screens) == len({x['name'] for x in screens}) == int(e['EXPECTED_SCREENS']), 'Public screenshot coverage changed')
+          require({x['name'] for x in screens} == {x['name'] for x in candidate_qa['screens']}, 'Public views differ from reviewed candidate')
+          before_file = file(module, 'evidence/before/QA.json')
+          require(sha(before_file) == e['EXPECTED_BEFORE_QA_SHA256'], 'Actual promoted R13 before evidence changed')
+          before = json.loads(before_file.read_text())
+          view_plan_hash = validate_public_scenes(qa, candidate_qa, before, e['SOURCE_COMMIT'], e['EXPECTED_RUNTIME_SHA256'])
+          require(view_plan_hash == e['EXPECTED_VIEW_PLAN_SHA256'], 'Public actual paired view plan differs from the accepted lock')
+          require(len(qa['targetedViews']) == qa['plannedScreens']['targeted'] == int(e['EXPECTED_TARGET_RECORDS']) and len(before['screens']) == int(e['EXPECTED_BEFORE_SCREENS']), 'Public actual target/before counts differ')
+          negative_relative = 'tests/fixtures/r13-construction-flex-before.json'
+          negative_file = file(module, negative_relative)
+          require(sha(negative_file) == e['EXPECTED_R13_CONSTRUCTION_BEFORE_SHA256'], 'Promoted same-script R13 negative fixture changed')
+          negative = json.loads(negative_file.read_text())
+          validate_r13_construction_negative(negative, construction, e['EXPECTED_CONSTRUCTION_TEST_SHA256'])
+          for relative, digest in negative['producerHashes'].items():
+              require(sha(file(repo / 'shoe-workshop/r13', relative)) == digest, 'Promoted R13 negative producer differs: ' + relative)
+          copies = {'QA.json': qa_file}
+          for screen in screens:
+              require(re.fullmatch(r'[a-z0-9-]+', screen['name']), 'Unsafe public screenshot name')
+              relative = screen['name'] + '.png'
+              path = file(evidence, relative)
+              require(sha(path) == screen['sha256'] and path.read_bytes().startswith(b'\x89PNG\r\n\x1a\n'), 'Public screenshot hash/type mismatch: ' + relative)
+              copies[relative] = path
+          destination = module / 'evidence/public'
+          require(not destination.is_symlink() and not destination.parent.is_symlink(), 'Unsafe public evidence destination')
+          if destination.exists(): shutil.rmtree(destination)
+          destination.mkdir(parents=True)
+          for relative, path in copies.items(): shutil.copyfile(path, destination / relative)
+          receipt = {'version': 'R14.0', 'status': 'PUBLIC_VERIFIED_ACCEPTANCE_CANDIDATE', 'sourceCommit': e['SOURCE_COMMIT'],
+              'buildSha': e['PUBLIC_BUILD_SHA'], 'publicUrl': url, 'rawUrl': raw, 'runtime': manifest['runtime'],
+              'candidateRunId': int(e['CANDIDATE_RUN_ID']), 'candidateArtifactId': int(e['CANDIDATE_ARTIFACT_ID']),
+              'candidateArtifactDigest': e['CANDIDATE_ARTIFACT_DIGEST'], 'publicRunId': int(e['GITHUB_RUN_ID']),
+              'publicRunAttempt': int(e['PUBLIC_BROWSER_ATTEMPT']), 'publicArtifactId': artifact['id'], 'publicArtifactDigest': public_artifact_digest,
+              'publicQAHash': sha(qa_file), 'publicVerified': True, 'browserChecksPassed': len(checks),
+              'screenshotsVerified': len(screens), 'materialCoordinatesQaSha256': e['EXPECTED_MATERIAL_QA_SHA256'], 'materialCoordinatesPanels': int(e['EXPECTED_MATERIAL_PANELS']), 'constructionFlexQaSha256': e['EXPECTED_CONSTRUCTION_QA_SHA256'], 'constructionFlexTestSha256': e['EXPECTED_CONSTRUCTION_TEST_SHA256'], 'constructionProducerHashesSha256': e['EXPECTED_CONSTRUCTION_PRODUCERS_SHA256'], 'constructionLanes': construction['laneResults'], 'constructionChecksPassed': construction['summary']['passed'], 'targetedViewsVerified': int(e['EXPECTED_TARGET_RECORDS']), 'viewPlanSha256': view_plan_hash, 'r13ConstructionBeforeSha256': e['EXPECTED_R13_CONSTRUCTION_BEFORE_SHA256'], 'r13ConstructionBeforeSummary': negative['summary'], 'sourceReviewSha256': e['EXPECTED_REVIEW_SHA256'], 'sourceReviewStatus': 'ACCEPTED_SOURCE_CANDIDATE', 'independentSourceReviewer': 'r14_review_priorities', 'beforeQAHash': e['EXPECTED_BEFORE_QA_SHA256'], 'beforeScreenshotsVerified': int(e['EXPECTED_BEFORE_SCREENS']), 'environment': qa['environment'], 'projectCodeExecutedInWriteJob': False,
+              'visualHumanReview': False, 'userVisualApproval': False,
+              'manufacturingValidated': False, 'physicalSolver': False, 'wearerFit': False}
+          for name, text in (('PUBLIC_URL.txt', url + '\n'), ('RELEASE_RECEIPT.json', json.dumps(receipt, indent=2) + '\n')):
+              require(not (module / name).is_symlink(), 'Unsafe release destination')
+              (module / name).write_text(text)
+          print('Verified public immutable bytes, live browser checks and all screenshot hashes; human review is separately recorded.')
+          PY
+      - name: Commit public data with a build-head fast-forward guard
+        env:
+          PUBLIC_BUILD_SHA: ${{ needs.publish.outputs.build }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$PUBLIC_BUILD_SHA"
+          test "$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | cut -f1)" = "$PUBLIC_BUILD_SHA"
+          git config core.hooksPath /dev/null
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$MODULE/evidence/public" "$MODULE/PUBLIC_URL.txt" "$MODULE/RELEASE_RECEIPT.json"
+          while IFS= read -r -d '' path; do
+            case "$path" in
+              "$MODULE/PUBLIC_URL.txt"|"$MODULE/RELEASE_RECEIPT.json"|"$MODULE/evidence/public/QA.json"|"$MODULE/evidence/public/"*.png) ;;
+              *) echo "Refusing unexpected staged path: $path"; exit 1 ;;
+            esac
+          done < <(git diff --cached --name-only -z)
+          git diff --cached --quiet && { echo 'No new public receipt delta'; exit 1; }
+          git commit -m 'Record exact R14 public browser evidence and immutable URL'
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"

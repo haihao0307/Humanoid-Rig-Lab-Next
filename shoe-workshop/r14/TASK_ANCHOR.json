@@ -1,6 +1,6 @@
 {
   "taskId": "SHOE-R14-CONSTRUCTION-FLEX-20261018",
-  "status": "IN_PROGRESS",
+  "status": "SOURCE_ACCEPTED_PUBLIC_PENDING",
   "dispatchUtc": "2026-10-18T06:31:14.889569+00:00",
   "planCommit": "ec7d80c9f99dc978735245d463306075f5a287d5",
   "baseSha": "0f105165964795b4895c3a5d8d2440deac1add91",
@@ -8,9 +8,9 @@
   "acceptedBaselineBuild": "c979ae664e53cdc2f09bd33511be5be61415efce",
   "target": "shoe-workshop/r14",
   "lanes": {
-    "A": "PREFLIGHT_NUMERIC_PASS_FINAL_REVIEW_PENDING",
-    "B": "PREFLIGHT_NUMERIC_PASS_FINAL_REVIEW_PENDING",
-    "C": "PREFLIGHT_NUMERIC_PASS_MATERIAL_REPORT_REVIEW_PENDING"
+    "A": "SOURCE_ACCEPTED_PUBLIC_PENDING",
+    "B": "SOURCE_ACCEPTED_PUBLIC_PENDING",
+    "C": "SOURCE_ACCEPTED_PUBLIC_PENDING"
   },
   "protected": [
     "R13/R12/R10 files and public URLs",
@@ -26,10 +26,10 @@
     "merge or force push"
   ],
   "gates": {
-    "source": false,
-    "numeric": false,
-    "browser": false,
-    "independentVisual": false,
+    "source": true,
+    "numeric": true,
+    "browser": true,
+    "independentVisual": true,
     "public": false
   },
   "humanApproval": false,
@@ -37,7 +37,7 @@
   "physicalSolver": false,
   "manufacturingValidated": false,
   "wearerFitValidated": false,
-  "nextTaskPointer": "Source-bound CI in the locked Node 22 environment, complete material consistency including raw snapshots, 27 targeted views plus retained regressions and independent review; preserve unresolved report anomaly and its controls",
+  "nextTaskPointer": "Publish the independently accepted exact CI bytes, verify the fixed public URL and all 66 public scenes, obtain independent PUBLIC review; no production/source/test changes.",
   "schemaVersion": 1,
   "branch": "feature/shoe-r14-construction-and-flex-20261018",
   "taskMode": "AUTHORIZED_REFINEMENT",
@@ -81,11 +81,11 @@
   "agentsChecklist": [
     {
       "text": "没有用生成图片代替真实三维实现",
-      "status": "PENDING"
+      "status": "PASS"
     },
     {
       "text": "已实际修改生产源码",
-      "status": "PENDING"
+      "status": "PASS"
     },
     {
       "text": "用户看到的是可交互三维工作台",
@@ -97,7 +97,7 @@
     },
     {
       "text": "镜头、选择、动作或参数控制可以实际操作",
-      "status": "PENDING"
+      "status": "PASS"
     },
     {
       "text": "公网固定链接和真实浏览器已验证",
@@ -105,7 +105,53 @@
     },
     {
       "text": "如果只有截图而没有工作台，本轮判定失败",
-      "status": "PENDING"
+      "status": "PASS"
     }
-  ]
+  ],
+  "sourceCommit": "4306b375404a40b7b9842f29cfa5e53fcde70278",
+  "sourceReviewSha256": "054b1e86e92db2ba3b995273dd8a9f44f64d6339745ff57157e37177ace4399e",
+  "candidate": {
+    "runId": 39108047375,
+    "runAttempt": 1,
+    "workflowId": 388257468,
+    "sourceTree": "cd7075eb37926eafa90c9688512cd10ed7ab654d",
+    "artifactId": 12129576334,
+    "artifactName": "shoe-r14-candidate-39108047375",
+    "artifactDigest": "sha256:08ffe17d46740b631954a359168996f5b9b52a03dc3a82f683d21174ba96cadb",
+    "artifactBytes": 38881477,
+    "manifestSha256": "f197c2688ceadd4c1976ede9bc062f54259f40339be23bfe6f0813f1cb06d66c",
+    "runtimeSha256": "fdce5d544bf9816f331a1e8db16ad272d454780f9a6b8c255fee474f854a04e8",
+    "runtimeBytes": 13762029,
+    "geometrySha256": "e5142ee59d9c93a1772afaffe61d0f970c7272ce3099a4ad036beb2050c81f8b",
+    "constructionQaSha256": "a7ad9e7effc47f9fdd4a344556ddba98c6b89db0a052dd0fe6999f4065e22edf",
+    "constructionTestSha256": "dce8a66b9cd1b7049da98819a262f1732abfe6df004f1b3e446b974ae206fabf",
+    "constructionProducerHashesSha256": "75ea73fb2053edb40edd3ebdd9bbec657338f03fd4391eb7bc04fdaad7f35387",
+    "materialQaSha256": "1ee7af0182372edc511787ba42ae765d3a7c227cf3947a841c4196d5697971ef",
+    "materialTestSha256": "149e5304e79097a40fdd3237468031a6a819cd357218717826f3a7c81608d27a",
+    "qaSha256": "91b51f0633561664db0c682edc7896f2f295a3d52bf98c3fbf3a6f3663404601",
+    "beforeQaSha256": "15968811e2addadd8ee7e195353d97a8ad430ff209535c9ffbfa3a82c8a2efd2",
+    "viewPlanSha256": "1d6fe03cebe0f8335304f2ed450b8499a9c8652747d5592c1f88d8b289a11ae7",
+    "r13ConstructionBeforeSha256": "9c3dfad288ddf4ff7682a5ff4d83cb083a32cc53cf9c07861dcaec06c4312585",
+    "artifactDirectory": "/tmp/shoe-r14-candidate-4306b375",
+    "artifactZip": "/tmp/shoe-r14-candidate-39108047375.zip",
+    "zipDigestIndependentlyRecomputed": true,
+    "zipEntriesComparedToExtractedBytes": 148,
+    "coreFileHashesIndependentlyRecomputed": true,
+    "screenshotHashesIndependentlyRecomputed": 101,
+    "sourceHashesIndependentlyChecked": {
+      "manifest": 25,
+      "geometry": 13,
+      "material": 7,
+      "construction": 9,
+      "r13Construction": 8
+    },
+    "apiMetadata": {
+      "path": "/tmp/shoe-r14-candidate-metadata.json",
+      "sha256": "d5ee2a0ed7f275a997b8055899631623551edcb24e293d301bf83d18ce97312e",
+      "provenance": "Root retrieved and saved the actual GitHub run/artifact API responses. This reviewer independently read their run, attempt, workflow, head, tree, artifact and digest fields and compared the downloaded ZIP and committed files; this reviewer did not make a second API request.",
+      "runConclusion": "success",
+      "artifactExpired": false
+    },
+    "canonicalHashDefinition": "UTF-8 Python json.dumps(sort_keys=True,separators=(comma,colon),ensure_ascii=False,allow_nan=False). Producer hash input is the complete construction.producerHashes object. View input has targets sorted by name and the actual targeted/scene records for 27 targets plus 8 retained back/join names, sorted by name."
+  }
 }

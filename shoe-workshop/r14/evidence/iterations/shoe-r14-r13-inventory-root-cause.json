@@ -1,0 +1,197 @@
+{
+  "status": "PUBLISH_TOOL_ROOT_CAUSE_REVIEW_FIXED",
+  "sourceCommit": "4306b375404a40b7b9842f29cfa5e53fcde70278",
+  "actualConstructionQaSha256": "a7ad9e7effc47f9fdd4a344556ddba98c6b89db0a052dd0fe6999f4065e22edf",
+  "rootCause": "A caller retained an early three-file B diagnostic inventory without src/ prefixes, while the final schema-2 ALL report records all eight R13 producer files with complete src-relative paths. The old source path then prefixed an extra src/. The earlier component-only probe checked report equality but did not execute these caller inventory/path statements.",
+  "oldFailureReproducedFromActualReport": "Construction R13 reference source inventory differs",
+  "oldExpectedKeys": [
+    "kernel.mjs",
+    "model.mjs",
+    "penny-chelsea.mjs"
+  ],
+  "actualR13ReferenceFiles": [
+    {
+      "relative": "src/kernel.mjs",
+      "repositoryPath": "shoe-workshop/r13/src/kernel.mjs",
+      "sha256": "7156a5432fed1dd654905a967255f167e3c45bf7ed69fc674db25263de9dde06",
+      "bytes": 16968,
+      "matchesFixedCommitAndActualFile": true
+    },
+    {
+      "relative": "src/main.mjs",
+      "repositoryPath": "shoe-workshop/r13/src/main.mjs",
+      "sha256": "6da69f3f1a7478823f2ed93939b92a19e9ad4940748bc38fd791b4d28ec1d158",
+      "bytes": 18284,
+      "matchesFixedCommitAndActualFile": true
+    },
+    {
+      "relative": "src/materials.mjs",
+      "repositoryPath": "shoe-workshop/r13/src/materials.mjs",
+      "sha256": "9ea2a9c23c80be8cced25dec985bc20b2fa8df14190575db97c6c8444070be88",
+      "bytes": 22519,
+      "matchesFixedCommitAndActualFile": true
+    },
+    {
+      "relative": "src/model.mjs",
+      "repositoryPath": "shoe-workshop/r13/src/model.mjs",
+      "sha256": "d34f8b825f45667f8da384a198284ee2c4755568851d6a87a420a429db7b1e14",
+      "bytes": 1693,
+      "matchesFixedCommitAndActualFile": true
+    },
+    {
+      "relative": "src/monk-canvas.mjs",
+      "repositoryPath": "shoe-workshop/r13/src/monk-canvas.mjs",
+      "sha256": "4a73df17527e247bcb863a852064ce12638a5a78190e587784b2d496f43b1524",
+      "bytes": 24123,
+      "matchesFixedCommitAndActualFile": true
+    },
+    {
+      "relative": "src/penny-chelsea.mjs",
+      "repositoryPath": "shoe-workshop/r13/src/penny-chelsea.mjs",
+      "sha256": "b02cbdd1525c143badec36b11371bb44277a94acf865a6040e0fa399cc7fa70d",
+      "bytes": 11012,
+      "matchesFixedCommitAndActualFile": true
+    },
+    {
+      "relative": "src/soles.mjs",
+      "repositoryPath": "shoe-workshop/r13/src/soles.mjs",
+      "sha256": "fcc5d6ccae4e38e099e94019803a8aff4ed6dd42abbd6c6992f284382d0308fa",
+      "bytes": 7086,
+      "matchesFixedCommitAndActualFile": true
+    },
+    {
+      "relative": "src/surface-coordinates.mjs",
+      "repositoryPath": "shoe-workshop/r13/src/surface-coordinates.mjs",
+      "sha256": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970",
+      "bytes": 23826,
+      "matchesFixedCommitAndActualFile": true
+    }
+  ],
+  "contexts": [
+    {
+      "context": "prepare",
+      "originalStatements": "require(set(construction['r13BaselineHashes']) == {'src/' + name + '.mjs' for name in ('kernel', 'main', 'materials', 'model', 'monk-canvas', 'penny-chelsea', 'soles', 'surface-coordinates')}, 'Construction R13 reference source inventory differs')\nfor relative, digest in construction['r13BaselineHashes'].items():\n    require(sha_bytes(fixed_source_bytes('shoe-workshop/r13/' + relative)) == digest, 'Construction R13 reference differs: ' + relative)",
+      "actualPathsRead": [
+        "shoe-workshop/r13/src/kernel.mjs",
+        "shoe-workshop/r13/src/main.mjs",
+        "shoe-workshop/r13/src/materials.mjs",
+        "shoe-workshop/r13/src/model.mjs",
+        "shoe-workshop/r13/src/monk-canvas.mjs",
+        "shoe-workshop/r13/src/penny-chelsea.mjs",
+        "shoe-workshop/r13/src/soles.mjs",
+        "shoe-workshop/r13/src/surface-coordinates.mjs"
+      ],
+      "allEightHashComparisonsPassed": true
+    },
+    {
+      "context": "publish",
+      "originalStatements": "require(set(construction['r13BaselineHashes']) == {'src/' + name + '.mjs' for name in ('kernel', 'main', 'materials', 'model', 'monk-canvas', 'penny-chelsea', 'soles', 'surface-coordinates')}, 'Construction baseline inventory differs')\nfor relative, digest in construction['r13BaselineHashes'].items():\n    require(sha(file(repo / 'shoe-workshop/r13', relative)) == digest, 'Construction baseline changed: ' + relative)",
+      "actualPathsRead": [
+        "shoe-workshop/r13/src/kernel.mjs",
+        "shoe-workshop/r13/src/main.mjs",
+        "shoe-workshop/r13/src/materials.mjs",
+        "shoe-workshop/r13/src/model.mjs",
+        "shoe-workshop/r13/src/monk-canvas.mjs",
+        "shoe-workshop/r13/src/penny-chelsea.mjs",
+        "shoe-workshop/r13/src/soles.mjs",
+        "shoe-workshop/r13/src/surface-coordinates.mjs"
+      ],
+      "allEightHashComparisonsPassed": true
+    },
+    {
+      "context": "receipt",
+      "originalStatements": "require(set(construction['r13BaselineHashes']) == {'src/' + name + '.mjs' for name in ('kernel', 'main', 'materials', 'model', 'monk-canvas', 'penny-chelsea', 'soles', 'surface-coordinates')}, 'Construction baseline inventory differs')\nfor relative, digest in construction['r13BaselineHashes'].items():\n    require(sha(file(repo / 'shoe-workshop/r13', relative)) == digest, 'Construction baseline changed: ' + relative)",
+      "actualPathsRead": [
+        "shoe-workshop/r13/src/kernel.mjs",
+        "shoe-workshop/r13/src/main.mjs",
+        "shoe-workshop/r13/src/materials.mjs",
+        "shoe-workshop/r13/src/model.mjs",
+        "shoe-workshop/r13/src/monk-canvas.mjs",
+        "shoe-workshop/r13/src/penny-chelsea.mjs",
+        "shoe-workshop/r13/src/soles.mjs",
+        "shoe-workshop/r13/src/surface-coordinates.mjs"
+      ],
+      "allEightHashComparisonsPassed": true
+    }
+  ],
+  "sameClassInventoryAudit": [
+    {
+      "collection": "manifest.sources",
+      "pathBase": "repository root",
+      "records": 25,
+      "allActualPathsAndHashesMatch": true
+    },
+    {
+      "collection": "geometry.testedSourceFiles",
+      "pathBase": "shoe-workshop/r14/",
+      "records": 13,
+      "allActualPathsAndHashesMatch": true
+    },
+    {
+      "collection": "material.sourceHashes",
+      "pathBase": "shoe-workshop/r14/",
+      "records": 7,
+      "allActualPathsAndHashesMatch": true
+    },
+    {
+      "collection": "construction.producerHashes",
+      "pathBase": "shoe-workshop/r14/",
+      "records": 9,
+      "allActualPathsAndHashesMatch": true
+    },
+    {
+      "collection": "negative.producerHashes",
+      "pathBase": "shoe-workshop/r13/",
+      "records": 8,
+      "allActualPathsAndHashesMatch": true
+    },
+    {
+      "collection": "r13.preservation",
+      "pathBase": "shoe-workshop/r13/",
+      "records": 44,
+      "allActualPathsAndHashesMatch": true
+    },
+    {
+      "collection": "r12.preservation",
+      "pathBase": "shoe-workshop/r12/",
+      "records": 27,
+      "allActualPathsAndHashesMatch": true
+    }
+  ],
+  "oldSchemaPredicatesOrR13SrcPrefixRemainingInCurrentTools": false,
+  "wholePrepareExecuted": false,
+  "publisherExecuted": false,
+  "productionCIReexecuted": false,
+  "productionAndAcceptedReviewEdited": false,
+  "promotionReady": false,
+  "files": {
+    "/tmp/shoe-r14-prepare-publisher.py": {
+      "bytes": 49443,
+      "sha256": "67803744e6a6d3769e2410f513aeb83c8be75dcf1faaef825f7ae540e9fae491"
+    },
+    "/tmp/shoe-r14-publish.template.yml": {
+      "bytes": 93327,
+      "sha256": "6952a8c175cd0bbfd8a998dfed47469f1aa50092b19762a08ee6d6d68f98334a"
+    },
+    "/tmp/shoe-r14-make-publish-template.py": {
+      "bytes": 26113,
+      "sha256": "8287d64cdd47f44aec0e931aa78d27b6a8ee8736d7e42e91a3f783ce265872ae"
+    },
+    "/tmp/shoe-r14-publish.before-r13-inventory-fix.yml": {
+      "bytes": 93149,
+      "sha256": "4e88be4bd16fb72a4bf3ad6b978245e8c6d28405c94b84ff348343f5d0cb60f6"
+    },
+    "/tmp/shoe-r14-prepare-publisher.before-r13-inventory-fix.py": {
+      "bytes": 49354,
+      "sha256": "7198081cd75337feaabf7ecd4aa4bc42f76ac93a9dcd77e0373bf876f11bba8a"
+    },
+    "/tmp/shoe-r14-make-publish-template.before-r13-inventory-fix.py": {
+      "bytes": 26024,
+      "sha256": "ff6e91b27f781d3138850041def7d79d7aa9b25591cb681269ad366f7df9868e"
+    },
+    "/tmp/shoe-r14-r13-inventory-fix.diff": {
+      "bytes": 6045,
+      "sha256": "f1fcba22d1400864060035b523c9d8e3d08af6317ce74927002abb7930ff7b97"
+    }
+  }
+}

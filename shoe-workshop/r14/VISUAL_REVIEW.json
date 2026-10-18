@@ -1,0 +1,1150 @@
+{
+  "version": "R14.0",
+  "taskId": "SHOE-R14-CONSTRUCTION-FLEX-20261018",
+  "sourceCommit": "4306b375404a40b7b9842f29cfa5e53fcde70278",
+  "status": "ACCEPTED_SOURCE_CANDIDATE",
+  "reviewedAtUTC": "2026-10-18T08:03:40.103612Z",
+  "independentReviewer": "r14_review_priorities",
+  "independentReviewerCanonical": "/root/r14_review_priorities",
+  "reviewerType": "Independent AI geometry and actual-render reviewer",
+  "reviewerEditedProduction": false,
+  "reviewerAuthoredIncrementAcceptanceTests": true,
+  "reviewerAuthoredMaterialAreaAndCountGate": true,
+  "humanApproval": false,
+  "userApproval": false,
+  "candidate": {
+    "runId": 39108047375,
+    "runAttempt": 1,
+    "workflowId": 388257468,
+    "sourceTree": "cd7075eb37926eafa90c9688512cd10ed7ab654d",
+    "artifactId": 12129576334,
+    "artifactName": "shoe-r14-candidate-39108047375",
+    "artifactDigest": "sha256:08ffe17d46740b631954a359168996f5b9b52a03dc3a82f683d21174ba96cadb",
+    "artifactBytes": 38881477,
+    "manifestSha256": "f197c2688ceadd4c1976ede9bc062f54259f40339be23bfe6f0813f1cb06d66c",
+    "runtimeSha256": "fdce5d544bf9816f331a1e8db16ad272d454780f9a6b8c255fee474f854a04e8",
+    "runtimeBytes": 13762029,
+    "geometrySha256": "e5142ee59d9c93a1772afaffe61d0f970c7272ce3099a4ad036beb2050c81f8b",
+    "constructionQaSha256": "a7ad9e7effc47f9fdd4a344556ddba98c6b89db0a052dd0fe6999f4065e22edf",
+    "constructionTestSha256": "dce8a66b9cd1b7049da98819a262f1732abfe6df004f1b3e446b974ae206fabf",
+    "constructionProducerHashesSha256": "75ea73fb2053edb40edd3ebdd9bbec657338f03fd4391eb7bc04fdaad7f35387",
+    "materialQaSha256": "1ee7af0182372edc511787ba42ae765d3a7c227cf3947a841c4196d5697971ef",
+    "materialTestSha256": "149e5304e79097a40fdd3237468031a6a819cd357218717826f3a7c81608d27a",
+    "qaSha256": "91b51f0633561664db0c682edc7896f2f295a3d52bf98c3fbf3a6f3663404601",
+    "beforeQaSha256": "15968811e2addadd8ee7e195353d97a8ad430ff209535c9ffbfa3a82c8a2efd2",
+    "viewPlanSha256": "1d6fe03cebe0f8335304f2ed450b8499a9c8652747d5592c1f88d8b289a11ae7",
+    "r13ConstructionBeforeSha256": "9c3dfad288ddf4ff7682a5ff4d83cb083a32cc53cf9c07861dcaec06c4312585",
+    "artifactDirectory": "/tmp/shoe-r14-candidate-4306b375",
+    "artifactZip": "/tmp/shoe-r14-candidate-39108047375.zip",
+    "zipDigestIndependentlyRecomputed": true,
+    "zipEntriesComparedToExtractedBytes": 148,
+    "coreFileHashesIndependentlyRecomputed": true,
+    "screenshotHashesIndependentlyRecomputed": 101,
+    "sourceHashesIndependentlyChecked": {
+      "manifest": 25,
+      "geometry": 13,
+      "material": 7,
+      "construction": 9,
+      "r13Construction": 8
+    },
+    "apiMetadata": {
+      "path": "/tmp/shoe-r14-candidate-metadata.json",
+      "sha256": "d5ee2a0ed7f275a997b8055899631623551edcb24e293d301bf83d18ce97312e",
+      "provenance": "Root retrieved and saved the actual GitHub run/artifact API responses. This reviewer independently read their run, attempt, workflow, head, tree, artifact and digest fields and compared the downloaded ZIP and committed files; this reviewer did not make a second API request.",
+      "runConclusion": "success",
+      "artifactExpired": false
+    },
+    "canonicalHashDefinition": "UTF-8 Python json.dumps(sort_keys=True,separators=(comma,colon),ensure_ascii=False,allow_nan=False). Producer hash input is the complete construction.producerHashes object. View input has targets sorted by name and the actual targeted/scene records for 27 targets plus 8 retained back/join names, sorted by name."
+  },
+  "baseline": {
+    "handoffCommit": "0f105165964795b4895c3a5d8d2440deac1add91",
+    "sourceCommit": "8b05ebd8b0755216743792034e3cbb58b8d9ff54",
+    "buildSha": "c979ae664e53cdc2f09bd33511be5be61415efce",
+    "runtimeSha256": "7db6ec885c0d7d972b2fb0574039448d2115b98c6e8e428f297c7f989410535b",
+    "runtimeBytes": 13746414,
+    "sourceReviewSha256": "f3650396a28dad389234069c97d1b1f5616eaa56fa15bf79890b6f610e63c294",
+    "sameScriptNegativeFixture": "tests/fixtures/r13-construction-flex-before.json",
+    "negativeFixtureSha256": "9c3dfad288ddf4ff7682a5ff4d83cb083a32cc53cf9c07861dcaec06c4312585",
+    "negativeSummary": {
+      "passed": 24,
+      "failed": 43,
+      "checks": 67
+    },
+    "negativeLanes": {
+      "A": {
+        "passed": 19,
+        "failed": 27,
+        "checks": 46
+      },
+      "B": {
+        "passed": 3,
+        "failed": 3,
+        "checks": 6
+      },
+      "C": {
+        "passed": 1,
+        "failed": 12,
+        "checks": 13
+      }
+    },
+    "protection": "Git comparison of the R13/R12/R10 directories against the frozen handoff found no changed files. The retained R13 and R10 runtime hashes were also recomputed directly from this source commit.",
+    "negativeScope": "The fixture is an actual run of the same frozen increment script against protected R13 geometry. R13 had no new cloth folds in its nine orientation checks; A1 folds arose during the rejected R14 attempt and must not be assigned to R13."
+  },
+  "decision": {
+    "sourceCandidateAccepted": true,
+    "publishAllowed": true,
+    "publicDeliveryVerified": false,
+    "blockingIssueIds": [],
+    "reason": "本次冻结候选的三工位目标关系、保留几何、逐片材料门槛及实际同机位外观均通过独立审核。Canvas 金属、真实布孔和鞋带共同运动；Chelsea 过渡在灰模与皮料中均明显改善；Monk 扣针和静态支承修正可读，隐藏接触由实际网格检查支持。已覆盖范围内没有剩余具体源码候选阻断。",
+    "authorizationScope": "独立 AI 源码候选接受，供已获用户授权的同构建发布流程使用；不是人类或用户批准。公开运行文件和实际公网浏览器必须另行核验。",
+    "unresolvedObservationRetained": "普通本地 Node 24 运行曾出现两项冻结 raw 标量不一致，根因仍未定。本次未修改生产统计算法、未放宽门槛；接受绑定本次正常 Node 22 CI、实际 Chromium 渲染和精确源码，不推广到所有引擎或运行模式。"
+  },
+  "visualCoverage": {
+    "candidatePngCount": 66,
+    "beforePngCount": 35,
+    "targetSceneCount": 27,
+    "retainedComparisonSceneCount": 8,
+    "directlyViewedCandidateCount": 45,
+    "directlyViewedBeforeCount": 35,
+    "directlyViewedTotalCount": 80,
+    "directlyViewedCandidate": [
+      {
+        "name": "canvas-front-eyelet-default-bend30",
+        "path": "evidence/browser/canvas-front-eyelet-default-bend30.png",
+        "sha256": "aa0f7e52011d53954c903b6953e03bf6564d3be763d10ebcef5ba62c787cd266",
+        "targeted": true
+      },
+      {
+        "name": "canvas-default-bend30-side",
+        "path": "evidence/browser/canvas-default-bend30-side.png",
+        "sha256": "fa782792594dea63c926c74f813cf4976086896e7f40ca02aeb9629263158cbc",
+        "targeted": true
+      },
+      {
+        "name": "canvas-default-bend30-hero-clay",
+        "path": "evidence/browser/canvas-default-bend30-hero-clay.png",
+        "sha256": "b99263c77444c3c527e8fd017ea35b2694af55e5ce982008234c183385023292",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-default-bend30-section",
+        "path": "evidence/browser/canvas-front-eyelet-default-bend30-section.png",
+        "sha256": "aed2a43cc42271c164f80cb6a005724424ab99b67213628a00f938b7156a4a79",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-default-bend00",
+        "path": "evidence/browser/canvas-front-eyelet-default-bend00.png",
+        "sha256": "2340c872131a974de05d8c96d90b2b46d8d7a9220ba9f1e008efc4615a691161",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-default-bend15",
+        "path": "evidence/browser/canvas-front-eyelet-default-bend15.png",
+        "sha256": "b66d1209f65d7194537515a716ae8974feb1f8a7c986d09f59e1b8afe03abedd",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-thin-bend30",
+        "path": "evidence/browser/canvas-front-eyelet-thin-bend30.png",
+        "sha256": "6e9ab4b457fecd7f8bbaf0c402ad1c662c434b3cb80bdc0f5cb3c4849e2a965d",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-thick-bend30",
+        "path": "evidence/browser/canvas-front-eyelet-thick-bend30.png",
+        "sha256": "aacee6906021d7c2b5017aa17eb23698e024dd044cd1293e2d1af90fcf7a8e72",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-inner-default-bend30",
+        "path": "evidence/browser/canvas-front-eyelet-inner-default-bend30.png",
+        "sha256": "a962848dbf584671fdf3126ad82c20dee78eb3706ec77f9f25b486793eb2f110",
+        "targeted": true
+      },
+      {
+        "name": "canvas-row2-quarter-default-static",
+        "path": "evidence/browser/canvas-row2-quarter-default-static.png",
+        "sha256": "07891bd86bef4e50df39cdae8360a54ac5100c8594d7289e2889319ebc975d64",
+        "targeted": true
+      },
+      {
+        "name": "canvas-row2-facing-default-static",
+        "path": "evidence/browser/canvas-row2-facing-default-static.png",
+        "sha256": "5e09924281ba97364e0bf400d77faf725209bde8ff347fe6e63771597def3646",
+        "targeted": true
+      },
+      {
+        "name": "canvas-row2-quarter-thin-static",
+        "path": "evidence/browser/canvas-row2-quarter-thin-static.png",
+        "sha256": "a07187da24b8ef651a3535d514d03848f2c688f361df6a34adb7556d91e6ad3d",
+        "targeted": true
+      },
+      {
+        "name": "canvas-row2-quarter-thick-static",
+        "path": "evidence/browser/canvas-row2-quarter-thick-static.png",
+        "sha256": "dd86d6b821b4736cd616499e1f129957754857a3fb212d1f69bac793b076bce8",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-default-side-clay",
+        "path": "evidence/browser/chelsea-default-side-clay.png",
+        "sha256": "39ee3c501a89f0c6607d1dd4323d1934dd244f6f03b4bdfe6d71f89b0c2c9b2b",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-default-side-leather",
+        "path": "evidence/browser/chelsea-default-side-leather.png",
+        "sha256": "b35a643b202afb25cf64b7d27cc954a6ccfdf73a1660c8c672e76fdd2034c580",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-all-low-side-clay",
+        "path": "evidence/browser/chelsea-all-low-side-clay.png",
+        "sha256": "c0bc9c5cf7dae1491ff03f80e02492c1211d250356768a082f6a1a55cdeb60cb",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-all-low-side-leather",
+        "path": "evidence/browser/chelsea-all-low-side-leather.png",
+        "sha256": "a63ed70e4bfe1534d5ea39ec681a7093048548c6c0c217b8363915a15cf81d99",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-all-high-side-clay",
+        "path": "evidence/browser/chelsea-all-high-side-clay.png",
+        "sha256": "42eec9fac42dc3eb08f35acb1051f8403c09d1845f470034112a21647be96ece",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-all-high-side-leather",
+        "path": "evidence/browser/chelsea-all-high-side-leather.png",
+        "sha256": "334d9803407dc1563793326ffddacc5bd5d31f839b3d0b6ee926131afa48cb3c",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-default-oblique-clay",
+        "path": "evidence/browser/chelsea-default-oblique-clay.png",
+        "sha256": "30da3033c410d06d47be5954948f33ba0e71f6c9d1da5919304d44dcae7b5aa7",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-default-oblique-leather",
+        "path": "evidence/browser/chelsea-default-oblique-leather.png",
+        "sha256": "197633844064641b41b1a0d88cf6a6985e3867f56761a3ac26ec2c2efb4b6344",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle0-default",
+        "path": "evidence/browser/monk-buckle0-default.png",
+        "sha256": "d40f8522cbb45552ea5d587030ce2b0d8590797d630bf058b084463cc8e273d2",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle1-default",
+        "path": "evidence/browser/monk-buckle1-default.png",
+        "sha256": "e752c4c8aa5683c604e77ad2883100e56574a09cb2a446e11678d11343c8ffca",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle0-thin",
+        "path": "evidence/browser/monk-buckle0-thin.png",
+        "sha256": "ce61182bd9b8433114b37b197981f670467acf9bf133d3cf7dcf6b6667a840c2",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle1-thin",
+        "path": "evidence/browser/monk-buckle1-thin.png",
+        "sha256": "330e038352612e0d57405d65642d6e247937bfd38f0862aed10745054395d468",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle0-thick",
+        "path": "evidence/browser/monk-buckle0-thick.png",
+        "sha256": "277f7f8102e98faf8a8418a8dfedde73a05edf70569fa3fea53f77cdd155c775",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle1-thick",
+        "path": "evidence/browser/monk-buckle1-thick.png",
+        "sha256": "3b5d9485c551da0c55d64f0e059f6b7a1ac807a908924dea58bf3853cda32dec",
+        "targeted": true
+      },
+      {
+        "name": "penny-back",
+        "path": "evidence/browser/penny-back.png",
+        "sha256": "47c32239742e7ae0f675fd5376c3de377c96bd54e2e61c62e7385d5079e03cfa",
+        "targeted": false
+      },
+      {
+        "name": "penny-join",
+        "path": "evidence/browser/penny-join.png",
+        "sha256": "829addd777ecb553b447ddc913c6f4363a91f2bfffc14807ba5a4f9b25132ceb",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-back",
+        "path": "evidence/browser/chelsea-back.png",
+        "sha256": "031109ded2ba128797386b49b2bf80e6188798d1f53ba42b6c91112ecc471e38",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-join",
+        "path": "evidence/browser/chelsea-join.png",
+        "sha256": "a83db25bfc78be6985fd7ec3776727bbbfb5a22058095c763a281b8fd662a95b",
+        "targeted": false
+      },
+      {
+        "name": "monk-back",
+        "path": "evidence/browser/monk-back.png",
+        "sha256": "bfeb54f7f35d55b8641f38b0c9ebdc0efbf816051218cf2b243ab18f58a21bbf",
+        "targeted": false
+      },
+      {
+        "name": "monk-join",
+        "path": "evidence/browser/monk-join.png",
+        "sha256": "51ec3d59997cd133903cc7f9b13166440abd1f900167bcd1c42821d2460d5d09",
+        "targeted": false
+      },
+      {
+        "name": "canvas-back",
+        "path": "evidence/browser/canvas-back.png",
+        "sha256": "5f8e95ff6ad9675f74886d665ee2f5329f1afaa1afdafdc34d0060815b6b5389",
+        "targeted": false
+      },
+      {
+        "name": "canvas-join",
+        "path": "evidence/browser/canvas-join.png",
+        "sha256": "1f797b9cda2f849b6e1fead8f67d2dac4050c61b50224971073f64d8aa9059ee",
+        "targeted": false
+      },
+      {
+        "name": "penny-hero",
+        "path": "evidence/browser/penny-hero.png",
+        "sha256": "7f2f03643b1e813359e22e0db09b38cb3d175c83fbcd50bf46010c90b9cff785",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-hero",
+        "path": "evidence/browser/chelsea-hero.png",
+        "sha256": "197633844064641b41b1a0d88cf6a6985e3867f56761a3ac26ec2c2efb4b6344",
+        "targeted": false
+      },
+      {
+        "name": "monk-hero",
+        "path": "evidence/browser/monk-hero.png",
+        "sha256": "fcf285890bec802dcef13b718ab992b76627975560c847864823fbf228bcb9d6",
+        "targeted": false
+      },
+      {
+        "name": "canvas-hero",
+        "path": "evidence/browser/canvas-hero.png",
+        "sha256": "29e86400d6bea1ae443a03d3440ff81a3828704af396e19fb752a364b16b28c8",
+        "targeted": false
+      },
+      {
+        "name": "desktop-first-frame",
+        "path": "evidence/browser/desktop-first-frame.png",
+        "sha256": "8cbed9bc4701ecbef9b4578c63ad41b3752a7ce966437f6de676079ab16285e1",
+        "targeted": false
+      },
+      {
+        "name": "four-style-comparison",
+        "path": "evidence/browser/four-style-comparison.png",
+        "sha256": "235e7b5634eeb7c487114a718f1c41e1f55d32de53a7f29f7da7b361fee4bed6",
+        "targeted": false
+      },
+      {
+        "name": "mobile-viewport",
+        "path": "evidence/browser/mobile-viewport.png",
+        "sha256": "1bae1e6369bf086eb37e8082e64672eee40f32a2fd556068d1bf565868915f15",
+        "targeted": false
+      },
+      {
+        "name": "retained-r10-original",
+        "path": "evidence/browser/retained-r10-original.png",
+        "sha256": "b29bd30b12dfd6cb74513b92910bce0948365659b76130d24cf99b731d003527",
+        "targeted": false
+      },
+      {
+        "name": "retained-r10-p05",
+        "path": "evidence/browser/retained-r10-p05.png",
+        "sha256": "1e9fbdb16e9408599297342dbf3461c29fde28d5c4ad53eb38ed08d3948657aa",
+        "targeted": false
+      },
+      {
+        "name": "canvas-pair",
+        "path": "evidence/browser/canvas-pair.png",
+        "sha256": "6e3c66141bcf937ed18b2771c9a96984487e45e7445a255bcdf93795bf93569f",
+        "targeted": false
+      }
+    ],
+    "directlyViewedBefore": [
+      {
+        "name": "canvas-front-eyelet-default-bend30",
+        "path": "evidence/before/canvas-front-eyelet-default-bend30.png",
+        "sha256": "329b4a614e3cbd35955b3073dbb17a174eefef3d5e34a82ea5277a15a454e88f",
+        "targeted": true
+      },
+      {
+        "name": "canvas-default-bend30-side",
+        "path": "evidence/before/canvas-default-bend30-side.png",
+        "sha256": "ec5f21e9c5931090fc26bc10b6c6d2c0240131d1db9835154d17904efb91723b",
+        "targeted": true
+      },
+      {
+        "name": "canvas-default-bend30-hero-clay",
+        "path": "evidence/before/canvas-default-bend30-hero-clay.png",
+        "sha256": "4705517b2a4d2e0e7eea208d879584659dc413a837ceeef84be1a703b9bfcd04",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-default-bend30-section",
+        "path": "evidence/before/canvas-front-eyelet-default-bend30-section.png",
+        "sha256": "6921c47c2d77b66b08e9365ff592a0d48369c410d9a44fb208d60457ea7c0b88",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-default-bend00",
+        "path": "evidence/before/canvas-front-eyelet-default-bend00.png",
+        "sha256": "30bd12bbf7d7c41de80111f6e51ed6a939409ab0a99edcba042746b9a88bf929",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-default-bend15",
+        "path": "evidence/before/canvas-front-eyelet-default-bend15.png",
+        "sha256": "7457c4d49a52c3c10cff450cf63826cf972dbbac18045448e5128e56de6d62a2",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-thin-bend30",
+        "path": "evidence/before/canvas-front-eyelet-thin-bend30.png",
+        "sha256": "75148bb994b32df4fc2fc043bafab9661be2ddb4f008d8c952603ad062f73a62",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-thick-bend30",
+        "path": "evidence/before/canvas-front-eyelet-thick-bend30.png",
+        "sha256": "f3431ae4eac82dda8c823ecadeee11d2b94a1ff9910eb2f782396a95d9c4194a",
+        "targeted": true
+      },
+      {
+        "name": "canvas-front-eyelet-inner-default-bend30",
+        "path": "evidence/before/canvas-front-eyelet-inner-default-bend30.png",
+        "sha256": "c4fb4f8f1dc76b02fe790fd215822d732c6caa0b38bd1f6a98dc8e43a7554b5b",
+        "targeted": true
+      },
+      {
+        "name": "canvas-row2-quarter-default-static",
+        "path": "evidence/before/canvas-row2-quarter-default-static.png",
+        "sha256": "535a45c993fb3f9913e0a082e962ffb550ad00ba360158d0e18ff3507dc3c6a5",
+        "targeted": true
+      },
+      {
+        "name": "canvas-row2-facing-default-static",
+        "path": "evidence/before/canvas-row2-facing-default-static.png",
+        "sha256": "62617aafd3357fc439123439d5789c3f714098178adb28918e8dfb381042cd8b",
+        "targeted": true
+      },
+      {
+        "name": "canvas-row2-quarter-thin-static",
+        "path": "evidence/before/canvas-row2-quarter-thin-static.png",
+        "sha256": "e21b507325ec24447fdd3075fbcacfeffb04d657935715709508309ed3512060",
+        "targeted": true
+      },
+      {
+        "name": "canvas-row2-quarter-thick-static",
+        "path": "evidence/before/canvas-row2-quarter-thick-static.png",
+        "sha256": "f8e188b35feb0576a2da5a9b23b647ef78b2bd5764de8497c9a3d611641d8bfc",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-default-side-clay",
+        "path": "evidence/before/chelsea-default-side-clay.png",
+        "sha256": "43397d0ee46f50f87e3449b4917afca62c9e8d9e3ed1ca0788149236d004b7bc",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-default-side-leather",
+        "path": "evidence/before/chelsea-default-side-leather.png",
+        "sha256": "b8f59648d585993d32254907d54b8b3d8364fe5ab2f1291489f59b76cc5f14e4",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-all-low-side-clay",
+        "path": "evidence/before/chelsea-all-low-side-clay.png",
+        "sha256": "b394cf32a4fd3baf84796e74ee699e7c7ee4a0867706afae9b520eda154d3742",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-all-low-side-leather",
+        "path": "evidence/before/chelsea-all-low-side-leather.png",
+        "sha256": "8e28441fe99ace4fbb6fe7431134a147eec1675aee8ce3799f1e36d8c68b6281",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-all-high-side-clay",
+        "path": "evidence/before/chelsea-all-high-side-clay.png",
+        "sha256": "614508b02aff0a5cb423d5fe2abcc21a05615e9aac3bcd98f7fbe8dbe48aef61",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-all-high-side-leather",
+        "path": "evidence/before/chelsea-all-high-side-leather.png",
+        "sha256": "714e1ee9de6b7a996d866737cb8c0d0ce1a16b64a0fe114ae26b0b7c0427bc79",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-default-oblique-clay",
+        "path": "evidence/before/chelsea-default-oblique-clay.png",
+        "sha256": "327295aff8d34111172ee454010f201c7cafafb6efeaf75d88285b5e9f649e2f",
+        "targeted": true
+      },
+      {
+        "name": "chelsea-default-oblique-leather",
+        "path": "evidence/before/chelsea-default-oblique-leather.png",
+        "sha256": "347066128c020dc324b39e62a65adba865153f1a8d17593cf49ee17c859ebf82",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle0-default",
+        "path": "evidence/before/monk-buckle0-default.png",
+        "sha256": "3d63bcf6c167c880e6c3170bcda38b2ad9253878f31b535971c912d657fcfb6d",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle1-default",
+        "path": "evidence/before/monk-buckle1-default.png",
+        "sha256": "f2e511e94a0aa39fa11baf40fcabffe7fb39e9069a29f4094cc002e51541652b",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle0-thin",
+        "path": "evidence/before/monk-buckle0-thin.png",
+        "sha256": "5e17b4df54b3eebff54170340321439ac7c17dfd5805d838d59dff4619a9ad0f",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle1-thin",
+        "path": "evidence/before/monk-buckle1-thin.png",
+        "sha256": "c6d6f56713de220cfffc4327ce728d0d36485236ec8ff7aeb3db73d951c5cc0e",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle0-thick",
+        "path": "evidence/before/monk-buckle0-thick.png",
+        "sha256": "fdd4bf5efafa84f0901de80478ac4925013c5acc98bc2cbea99307b0626301a4",
+        "targeted": true
+      },
+      {
+        "name": "monk-buckle1-thick",
+        "path": "evidence/before/monk-buckle1-thick.png",
+        "sha256": "d1d9644b80693847524bfe9e794f46eee25ffe41060b0a08b2f1632b8d2a36e3",
+        "targeted": true
+      },
+      {
+        "name": "penny-back",
+        "path": "evidence/before/penny-back.png",
+        "sha256": "47c32239742e7ae0f675fd5376c3de377c96bd54e2e61c62e7385d5079e03cfa",
+        "targeted": false
+      },
+      {
+        "name": "penny-join",
+        "path": "evidence/before/penny-join.png",
+        "sha256": "829addd777ecb553b447ddc913c6f4363a91f2bfffc14807ba5a4f9b25132ceb",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-back",
+        "path": "evidence/before/chelsea-back.png",
+        "sha256": "e3fa79ec829bc0f417ea89ac8d75fc1079fe7978019699ca1d7d4de5b444109c",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-join",
+        "path": "evidence/before/chelsea-join.png",
+        "sha256": "02efe2b88b66ec037faa8417267c77881620993f3ec7744463d8d89fede4899f",
+        "targeted": false
+      },
+      {
+        "name": "monk-back",
+        "path": "evidence/before/monk-back.png",
+        "sha256": "031465642ad7b3f9ebd7926a4956fce99741b3a1514875317f732d86c98f8675",
+        "targeted": false
+      },
+      {
+        "name": "monk-join",
+        "path": "evidence/before/monk-join.png",
+        "sha256": "d6e652ae7ee8df1311449c0aa490f66a176a36c6dd52dd8d593cdd867b6466fa",
+        "targeted": false
+      },
+      {
+        "name": "canvas-back",
+        "path": "evidence/before/canvas-back.png",
+        "sha256": "ce336ebb64072a29e03fb039b5e0e2fc7f69facd716b5c410da833d39a2bcfc3",
+        "targeted": false
+      },
+      {
+        "name": "canvas-join",
+        "path": "evidence/before/canvas-join.png",
+        "sha256": "118945180e0880ab564e6aee047b06aa7a40e73c594cefa4d552ff18d63671b4",
+        "targeted": false
+      }
+    ],
+    "unviewedCandidateHashOnly": [
+      {
+        "name": "penny-side",
+        "path": "evidence/browser/penny-side.png",
+        "sha256": "49b794c92e457c28aedd38331208a7b156fbcc11db84de90c356558bd4929df9",
+        "targeted": false
+      },
+      {
+        "name": "penny-top",
+        "path": "evidence/browser/penny-top.png",
+        "sha256": "a3860cd73a4c096f4a46b19c8d0ffb03f478eb2cd72e149e5ce41e20a113e7f4",
+        "targeted": false
+      },
+      {
+        "name": "penny-front",
+        "path": "evidence/browser/penny-front.png",
+        "sha256": "a1c6df513e5a3f84a18562f871f176add749add180dc0744704263af3072ba67",
+        "targeted": false
+      },
+      {
+        "name": "penny-detail",
+        "path": "evidence/browser/penny-detail.png",
+        "sha256": "56054c8ac5ff40ac3ae6277c77a36a037caa4b9de5c724a50bc21fcf851b7f6e",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-side",
+        "path": "evidence/browser/chelsea-side.png",
+        "sha256": "b35a643b202afb25cf64b7d27cc954a6ccfdf73a1660c8c672e76fdd2034c580",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-top",
+        "path": "evidence/browser/chelsea-top.png",
+        "sha256": "0101e4c4733e758ab906b1391e2b19e161d89780bdfafe579e7215c198f8c78a",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-front",
+        "path": "evidence/browser/chelsea-front.png",
+        "sha256": "4306560d6630ef37747632c965a41f41fb8e82dfd77730f79b2dad217c4bb3e3",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-detail",
+        "path": "evidence/browser/chelsea-detail.png",
+        "sha256": "ca20bd82d0c9a79ec6802c5293c6666649ce0df5cc98f024062a7eb858ace6d0",
+        "targeted": false
+      },
+      {
+        "name": "monk-side",
+        "path": "evidence/browser/monk-side.png",
+        "sha256": "c2b2456b777f7d1549e325547dfb515e6255d07fdf077fc43ce56cc3fee3263f",
+        "targeted": false
+      },
+      {
+        "name": "monk-top",
+        "path": "evidence/browser/monk-top.png",
+        "sha256": "765cbdfe9c7b6b7ceca762d22aa5a58c7d850427ba83f324e3cdf806d5065a01",
+        "targeted": false
+      },
+      {
+        "name": "monk-front",
+        "path": "evidence/browser/monk-front.png",
+        "sha256": "937b8a6631634086680108b973b3e6044941e186802c867f75d4f975099bc94f",
+        "targeted": false
+      },
+      {
+        "name": "monk-detail",
+        "path": "evidence/browser/monk-detail.png",
+        "sha256": "9bfca6dae77ffcfeb835da018c922674845f8bf7ce20ab98986a534ccd93ea1b",
+        "targeted": false
+      },
+      {
+        "name": "canvas-side",
+        "path": "evidence/browser/canvas-side.png",
+        "sha256": "7486de88453d969e87bd1295964e8af85b7b2e86dbcd53ae3b3fa0b1b63640ba",
+        "targeted": false
+      },
+      {
+        "name": "canvas-top",
+        "path": "evidence/browser/canvas-top.png",
+        "sha256": "1859cb14ed943c72a7b75deaaace44aaaa5160e5dd0d2619c9498e71c0f81e62",
+        "targeted": false
+      },
+      {
+        "name": "canvas-front",
+        "path": "evidence/browser/canvas-front.png",
+        "sha256": "8923d8c2031bac2e16279333112395eda9bf64359fc2bf0d78c03496969aafa2",
+        "targeted": false
+      },
+      {
+        "name": "canvas-detail",
+        "path": "evidence/browser/canvas-detail.png",
+        "sha256": "6e58732130dad3ec571467206c6573227c7346ad3474e5348aa3e61d74929bf7",
+        "targeted": false
+      },
+      {
+        "name": "monk-parameter-and-flex",
+        "path": "evidence/browser/monk-parameter-and-flex.png",
+        "sha256": "3f69afa735733dcfd005073beb97d8927c777358c2d81f54abf2359aea096f96",
+        "targeted": false
+      },
+      {
+        "name": "penny-exploded",
+        "path": "evidence/browser/penny-exploded.png",
+        "sha256": "484e0a84b51d3da916849d9e698af28a6a02562c654de55c9935027dfe6092c7",
+        "targeted": false
+      },
+      {
+        "name": "penny-first-part",
+        "path": "evidence/browser/penny-first-part.png",
+        "sha256": "76890a3bf93b5fdf1f226db7b12a504131e478dce12be5cf7721557dc370b488",
+        "targeted": false
+      },
+      {
+        "name": "penny-section",
+        "path": "evidence/browser/penny-section.png",
+        "sha256": "4e5b1dbedf6cfa6b8964ddc767260e6abc8a22a27b5a586fd6dd8686a404a81e",
+        "targeted": false
+      },
+      {
+        "name": "chelsea-clay",
+        "path": "evidence/browser/chelsea-clay.png",
+        "sha256": "30da3033c410d06d47be5954948f33ba0e71f6c9d1da5919304d44dcae7b5aa7",
+        "targeted": false
+      }
+    ],
+    "method": "Original actual Chromium PNGs were displayed directly, without image synthesis, retouching or independent refitting. All 27 new target before/after pairs and all 8 retained back/join pairs were viewed. Ten additional candidate frames cover four whole shoes, the original shoe and P05, a mirrored pair, the full desktop first frame, four-style comparison and mobile viewport.",
+    "beforeMatch": "For all 35 pairs, actual camera matrices, full camera state, viewport/stage, model parameters, visibility/isolation, clipping, floor and rendering settings were independently compared. Matrix maximum absolute difference is exactly zero.",
+    "scopeLimit": "The 21 remaining candidate PNGs have independently checked hashes and passing recorded browser checks, but are not claimed as directly viewed. A raster view cannot prove hidden contact or all possible angles; numerical and visual observations are recorded separately.",
+    "sourceFramesGeneratedThisRound": true,
+    "noNewGeneratedIllustrationUsed": true
+  },
+  "observations": [
+    {
+      "lane": "A",
+      "status": "ACCEPTED_IN_COVERED_CASES",
+      "evidenceNames": [
+        "canvas-default-bend30-hero-clay",
+        "canvas-default-bend30-side",
+        "canvas-front-eyelet-default-bend00",
+        "canvas-front-eyelet-default-bend15",
+        "canvas-front-eyelet-default-bend30",
+        "canvas-front-eyelet-default-bend30-section",
+        "canvas-front-eyelet-inner-default-bend30",
+        "canvas-front-eyelet-thick-bend30",
+        "canvas-front-eyelet-thin-bend30",
+        "canvas-row2-facing-default-static",
+        "canvas-row2-quarter-default-static",
+        "canvas-row2-quarter-thick-static",
+        "canvas-row2-quarter-thin-static"
+      ],
+      "finding": "同机位 0/15/30° 及薄/厚近景清楚显示：R13 前排鞋眼受压变扁，R14 保持金属形状；两侧孔口、鞋带入孔和剖面层序没有出现已观察到的新脱位、封孔或悬浮。隔离后的 row 2 布孔从旧水滴状边界变为规则孔沿；默认、薄、厚均已直接查看。",
+      "wholeShoeFinding": "A2 实际影响整个原弯折带。新增 30° 整鞋侧视原材质和斜前灰模已直接比较，前帮/底件没有出现新的可见断裂或回折，光照过渡较旧场更连贯。",
+      "changeBoundary": "0° 的有限孔径反求也作了局部修正，不能说所有静态顶点不变；A2 仅在原弯折带外保持旧映射，不能把带内前帮/底件称作原封不动。",
+      "limits": "完整隐藏孔壁和法兰支承由实际几何关系、射线和距离门验证。宏观孔的屏幕宽度不作为三维刚性证据；共享规定角度场不是材料或受力模型。"
+    },
+    {
+      "lane": "B",
+      "status": "ACCEPTED_IN_COVERED_CASES",
+      "evidenceNames": [
+        "chelsea-all-high-side-clay",
+        "chelsea-all-high-side-leather",
+        "chelsea-all-low-side-clay",
+        "chelsea-all-low-side-leather",
+        "chelsea-default-oblique-clay",
+        "chelsea-default-oblique-leather",
+        "chelsea-default-side-clay",
+        "chelsea-default-side-leather"
+      ],
+      "finding": "默认、all-low、all-high 的侧视灰模与原皮料，以及默认斜前视，两种显示中原先脚背—靴筒根部横向硬肩线均明显变成宽而连续的转折；鞋头、松紧片尖端、后跟、踝口与拉环保持身份，未见新露衬、裂口或回折。保留的 back/join 视图也显示接缝仍连续。",
+      "limits": "使用旧端点与一阶切向的局部 Hermite 桥，不声明 C2 或解剖学半径。针脚随新的曲线弧长重新分布，不能称针脚数组长度与全部字节不变。"
+    },
+    {
+      "lane": "C",
+      "status": "ACCEPTED_STATIC_DISPLAY_CONSTRUCTION",
+      "evidenceNames": [
+        "monk-buckle0-default",
+        "monk-buckle0-thick",
+        "monk-buckle0-thin",
+        "monk-buckle1-default",
+        "monk-buckle1-thick",
+        "monk-buckle1-thin"
+      ],
+      "finding": "两个扣具在默认、0.9 mm、2.1 mm 的实际近景中，扣针均落入选定真实孔，带片与外移扣座形成可读层序；原扣框保留，近看和整体 join 视图未见新的横穿或悬浮外观。",
+      "hiddenContactBoundary": "本项目新增的静态柱大部被带片和扣框遮挡；本审核没有把正面截图写成看清全部隐藏连接。柱—框接触、柱—座孔/法兰和不穿自由带的结论来自最终真实网格、实际目标正对照和有限边/三角相交检查。",
+      "limits": "自有通用静态展示构造，不是 Lowndes 隐藏构造复原，也不代表开扣动作、缝合强度、承载、耐久或制造验证。"
+    },
+    {
+      "lane": "RETAINED",
+      "status": "NO_OBSERVED_REGRESSION_IN_REVIEWED_VIEWS",
+      "finding": "Penny 的后鞋口与前帮 U 形拼缝、Monk 后鞋口、Canvas 拼接和橡胶包边保持；四款完整轮廓彼此明确。实际原款及 P05 材质、左右镜像、桌面首帧/四款同看与手机视口均已查看，当前版本和 4306b37540 源码标记一致。",
+      "limits": "这些是本次保留项核验，旧 R13 领口修复不能算作新的 R14 改动；手机证据是 390×844 的浏览器视口，不是实机。"
+    }
+  ],
+  "machineEvidence": {
+    "geometry": {
+      "passed": 158,
+      "failed": 0,
+      "generatedCases": 104,
+      "validatedParameterCases": 100,
+      "extremeCornersPerStyle": 16
+    },
+    "construction": {
+      "summary": {
+        "passed": 67,
+        "failed": 0,
+        "checks": 67
+      },
+      "laneResults": {
+        "A": {
+          "implemented": true,
+          "requested": true,
+          "expectedCases": [
+            "thickness=0.9/bend=0",
+            "thickness=0.9/bend=15",
+            "thickness=0.9/bend=30",
+            "thickness=1.35/bend=0",
+            "thickness=1.35/bend=15",
+            "thickness=1.35/bend=30",
+            "thickness=2.1/bend=0",
+            "thickness=2.1/bend=15",
+            "thickness=2.1/bend=30"
+          ],
+          "actualCases": [
+            "thickness=0.9/bend=0",
+            "thickness=0.9/bend=15",
+            "thickness=0.9/bend=30",
+            "thickness=1.35/bend=0",
+            "thickness=1.35/bend=15",
+            "thickness=1.35/bend=30",
+            "thickness=2.1/bend=0",
+            "thickness=2.1/bend=15",
+            "thickness=2.1/bend=30"
+          ],
+          "expectedCheckCount": 46,
+          "checkCount": 46,
+          "passedChecks": 46,
+          "failedChecks": 0,
+          "complete": true
+        },
+        "B": {
+          "implemented": true,
+          "requested": true,
+          "expectedCases": [
+            "all-high",
+            "all-low",
+            "default"
+          ],
+          "actualCases": [
+            "all-high",
+            "all-low",
+            "default"
+          ],
+          "expectedCheckCount": 6,
+          "checkCount": 6,
+          "passedChecks": 6,
+          "failedChecks": 0,
+          "complete": true
+        },
+        "C": {
+          "implemented": true,
+          "requested": true,
+          "expectedCases": [
+            "thickness=0.9/bend=0",
+            "thickness=1.35/bend=0",
+            "thickness=2.1/bend=0"
+          ],
+          "actualCases": [
+            "thickness=0.9/bend=0",
+            "thickness=1.35/bend=0",
+            "thickness=2.1/bend=0"
+          ],
+          "expectedCheckCount": 13,
+          "checkCount": 13,
+          "passedChecks": 13,
+          "failedChecks": 0,
+          "complete": true
+        }
+      },
+      "criteria": {
+        "metalDistanceErrorMm": 0.01,
+        "attachmentPositionErrorMm": 0.01,
+        "normalTransportErrorDeg": 0.02,
+        "minimumFlangeOverlapMm": 0.1,
+        "minimumBoreClothClearanceMm": 0.1,
+        "maximumLaceEndpointCentreRadialMm": 0.03,
+        "minimumLaceBoreClearanceMm": 0.05,
+        "boreProbeRadiusMm": 1.65,
+        "expectedInnerLipDiameterMm": 4.3,
+        "monkSupportGapRangeMm": [
+          0,
+          0.25
+        ],
+        "monkPinExitBelowInnerRingMm": 0.05,
+        "monkPinRimClearanceMm": 0.05,
+        "monkMountFrameContactMm": 0.01,
+        "meshEdgeEndpointToleranceMm": 1e-05,
+        "meshPlaneContactToleranceMm": 2e-05,
+        "thicknessesMm": [
+          0.9,
+          1.35,
+          2.1
+        ],
+        "bendDegrees": [
+          0,
+          15,
+          30
+        ],
+        "comment": "Engineering geometry tolerances, not manufactured dimensions or material calibration. .01 mm rigidity is checked against repeat construction and Float32 rigid round trips."
+      },
+      "measuredIncrement": {
+        "A": {
+          "vertices": 497544,
+          "normals": 51936,
+          "minJacobian": 0.22175766518503737,
+          "maxPositionErrorMm": 7.781149639194582e-06,
+          "maxNormalErrorDeg": 4.7536104815230715e-06,
+          "maxMetalDistanceChangeMm": 3.825641653687484e-06,
+          "maxBoreChordChangeMm": 2.061059899638451e-06,
+          "precision": {
+            "repeatedStaticDistanceErrorMm": 0,
+            "rigidFloat32RoundTripDistanceErrorMm": 6.818958502741168e-06,
+            "staticBoreChordDeviationMm": 4.501639151222037e-06,
+            "gateMm": 0.01
+          }
+        },
+        "B": [
+          {
+            "case": "default",
+            "rows": 103,
+            "before": 0.3914674354930315,
+            "after": 0.022742925160580213,
+            "outsideDisplacement": 0
+          },
+          {
+            "case": "all-low",
+            "rows": 103,
+            "before": 0.40191275573347945,
+            "after": 0.0266828489838134,
+            "outsideDisplacement": 0
+          },
+          {
+            "case": "all-high",
+            "rows": 103,
+            "before": 0.36468302478269526,
+            "after": 0.018101871175961064,
+            "outsideDisplacement": 0
+          }
+        ],
+        "C": {
+          "pairs": 66,
+          "directions": 132,
+          "rawIntersections": 349,
+          "contact": 349,
+          "adjacentContacts": 104,
+          "transverse": 0,
+          "maxContactPlaneDeviationMm": 2.2936352550573247e-06,
+          "actualTargetPositiveControls": 42,
+          "maxTargetPositiveErrorMm": 1.4210854715202004e-14,
+          "controls": [
+            {
+              "name": "deep penetration",
+              "mustPenetrate": true,
+              "raw": 21,
+              "transverse": 21
+            },
+            {
+              "name": "0.001 mm penetration",
+              "mustPenetrate": true,
+              "raw": 17,
+              "transverse": 17
+            },
+            {
+              "name": "Float32-scale 0.000001 mm contact",
+              "mustPenetrate": false,
+              "raw": 11,
+              "transverse": 0
+            }
+          ],
+          "support": {
+            "buckle seat inner / quarter outer": {
+              "samples": 54,
+              "minGapMm": 0.14131924743850632,
+              "maxGapMm": 0.16309000372368132
+            },
+            "strap inner / overlap flap outer": {
+              "samples": 36,
+              "minGapMm": 0.08980649085008352,
+              "maxGapMm": 0.11940827945380406
+            }
+          }
+        }
+      }
+    },
+    "material": {
+      "measuredPanels": 66,
+      "numericIssues": [],
+      "rawComparisonsIndependentlyReplayed": 132,
+      "snapshotsIndependentlyRehashed": 66,
+      "comparisonIdentitiesIndependentlyChecked": 132,
+      "maximumProducerRelativeDifference": 0.007943408051314339,
+      "maximumAreaRelativeDifference": 1.3983629950083106e-07,
+      "validTrianglesComparedExactly": true,
+      "existingRelativeGate": 0.01,
+      "defaultQuarterThisCI": {
+        "actualAreaMm2": 16312.887407207667,
+        "producerAreaMm2": 16312.887428795644,
+        "actualLogStretchRms": 0.1732849708928557,
+        "producerLogStretchRms": 0.17328497059837294
+      },
+      "largestRemainingAnisotropy": {
+        "preset": "all-low",
+        "style": "monk",
+        "part": "monk-open-quarters",
+        "maximumAnisotropy": 159.38737144186956,
+        "areaFractionAnisotropyAbove10": 0.0014697883176249562,
+        "areaFractionAnisotropyAbove5": 0.0017030142949143266
+      },
+      "largestRemainingAreaFractionAbove10": {
+        "preset": "default",
+        "style": "penny",
+        "part": "penny-galosh",
+        "maximumAnisotropy": 119.01637611192037,
+        "areaFractionAnisotropyAbove10": 0.002045303508793772,
+        "areaFractionAnisotropyAbove5": 0.00438870056539223
+      }
+    },
+    "browser": {
+      "checksPassed": 8,
+      "completed": true,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "requestFailures": 0,
+      "standaloneHttpRequests": 0,
+      "actualRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "environment": {
+        "browser": "Chromium",
+        "renderer": "SwiftShader",
+        "os": "Ubuntu CI",
+        "desktopViewport": [
+          1512,
+          1100
+        ],
+        "mobileViewport": [
+          390,
+          844
+        ],
+        "realMobileDevice": false
+      },
+      "mobileRealDevice": false
+    },
+    "numericEnvironment": {
+      "construction": {
+        "node": "v22.23.3",
+        "v8": "12.4.254.21-node.57"
+      },
+      "material": {
+        "node": "v22.23.3",
+        "v8": "12.4.254.21-node.57",
+        "platform": "linux",
+        "arch": "x64",
+        "execArgv": []
+      }
+    },
+    "independentReadOnlyChecks": [
+      {
+        "path": "/tmp/r14-source-artifact-independent-check.json",
+        "sha256": "3391180cd3dd5213f92539b5c60b9e757c3e3636ca6087dbd247bba9010ce371"
+      },
+      {
+        "path": "/tmp/r14-source-material-snapshot-check.json",
+        "sha256": "b37f8a79300486ce7054539d3061e68294d620440bc0ccd3b859c70b464bd889"
+      }
+    ]
+  },
+  "residuals": [
+    {
+      "id": "R14-RESIDUAL-LOCAL-FACETING",
+      "status": "RETAINED_NONBLOCKING",
+      "observation": "极近看仍可见金属环离散分面、鞋底端部细分面和个别尖端的程序纹理方向集中。已查看的整鞋距离未见因此产生的新构造破口，不以微小分面启动全鞋重网格。"
+    },
+    {
+      "id": "R14-RESIDUAL-MATERIAL-CHART-TAIL",
+      "status": "RETAINED_NONBLOCKING",
+      "observation": "材料门是相对同曲面初始坐标的改善/不退化门。最终小片三角仍可出现高各向异性；本次最大值约 159.387，任何受检裁片超过 10 的面积占比最多约 0.20453%。不称已成为等距、可直接裁切或制造级展开。"
+    },
+    {
+      "id": "R14-RAW-STATISTICS-RUNTIME-SENSITIVITY",
+      "status": "ROOT_CAUSE_UNRESOLVED",
+      "observation": "保存的本地普通 Node 24.19.0 / V8 13.6 审计中，default Monk quarter.after 的面积及 RMS 与随后构造的 anchor0.before 两个标量相同，其余已保存最终三角指标和分位数保持对应 quarter。原失败仍有效。短 trace 未复现，不构成否定失败的证据。",
+      "boundedControls": "仅一次 --jitless 旧测试对照，以及一次 --no-maglev 新测试对照，66 面板均过。独立递归比较确认三次保存的最终 Float32 指标无差异，normal 与控制的 raw 仅两项不同，两个控制间全 raw 相同。控制与执行模式敏感性/Maglev 相关假说相容，但没有确定机制或复现频率。没有证明某个外部 Chromium issue 就是本项目根因。",
+      "originalFailure": {
+        "path": "evidence/iterations/preflight-material-linear-corners-attempt.json",
+        "sha256": "6cb466d31f95c0b38c9b01acf711183742c608ad5efdc06235608579708df0e8",
+        "testSha256": "402f2998a834536534da2e0e9a142c94bbb36c8c671bafab80e561dbf02c0f18"
+      },
+      "jitlessOnce": {
+        "path": "/tmp/shoe-r14-monk-producer/material-jitless-control.json",
+        "sha256": "915a585cf87147b504afdaf2baab5ddaf004bb9a42873187aeb9602f7a8ebd8b",
+        "testSha256": "402f2998a834536534da2e0e9a142c94bbb36c8c671bafab80e561dbf02c0f18"
+      },
+      "noMaglevOnce": {
+        "path": "/tmp/shoe-r14-monk-producer/material-no-maglev-control.json",
+        "sha256": "57f88104fa77ae61feefebfa0a4b1ff160fcc7e20a329c540e259739b8561e75",
+        "testSha256": "149e5304e79097a40fdd3237468031a6a819cd357218717826f3a7c81608d27a"
+      },
+      "independentStaticComparison": {
+        "path": "/tmp/r14-independent-material-controls-comparison.json",
+        "sha256": "55b5f39b19d1bd450be72dedad6895b46e35188b9cee289ff0e166c39c8e59d7"
+      },
+      "acceptanceBoundary": "本次正常 Node 22.23.3 CI 的全部 raw 值按新增面积和三角数量门通过，并由审核员重新比较。未以切换运行参数代替验收，也未声称生产统计根因修复或所有引擎统计正确；未来同门再失败时必须保留真实原值并阻断该失败候选。历史 R13 根因与此新失败的因果等同性亦未建立。"
+    }
+  ],
+  "iterationHistory": [
+    {
+      "stage": "A1 spatial blending",
+      "status": "REJECTED",
+      "record": "evidence/iterations/a1-local-folds.json",
+      "reason": "位置混合梯度导致新的负 Jacobian/翻折，未接受。仅换旋转框架未改善后停止空间权重微调；A2 改用可独立检查导数的共享角度场。"
+    },
+    {
+      "stage": "C collision diagnostic correction",
+      "status": "SUPERSEDED_DIAGNOSTICS_RETAINED",
+      "record": "evidence/iterations/independent-construction-test-revisions.json",
+      "reason": "无 group 的几何曾因材质数组导致反向射线遗漏，实际目标正对照揭示此问题。随后以实际局部三角足迹和共享边邻接处理 Float32 接触；未放宽原 2e-5 mm 平面门，0.001 mm 穿透负例仍检出。旧 producer 的 149 次接触不能充当完整双向验收。"
+    },
+    {
+      "stage": "C local material-hole fan repair",
+      "status": "ACCEPTED_IN_THIS_BOUND_CANDIDATE",
+      "record": "evidence/iterations/preflight-material-first-failure.json",
+      "reason": "新 anchor 孔周狭长三角放大 Float32 误差，首次 1.997485% 偏差真实失败。只为 anchor patch 采用参数 Jacobian corner 定向；原 1% 门和有效三角保留。此局部几何修复与之后另一次 raw 标量异常是两件事。"
+    },
+    {
+      "stage": "Existing scalar/count gate completion",
+      "status": "ACCEPTED_TEST_CHANGE",
+      "record": "evidence/iterations/material-comparison-scalar-count-controls.json",
+      "reason": "在已发现实际风险后，把既有面积和有效三角数纳入 producer/actual 比较；面积仍原 1%，三角数量 exact。保存旧脚本及失败原值，独立面积/数量负例仍拒绝。未更换 Jacobian 或生产快照机制。"
+    }
+  ],
+  "scope": {
+    "sourceCandidateGeometryAndCoveredAppearance": true,
+    "actualFileUrlBrowserEvidence": true,
+    "physicalSolver": false,
+    "materialPropertyCalibration": false,
+    "manufacturingValidated": false,
+    "wearerFitValidated": false,
+    "forceStrengthDurabilityValidated": false,
+    "humanApproval": false,
+    "userApproval": false,
+    "publicDeliveryVerified": false,
+    "finiteGeometryOnly": "规定弯折场、实际离散网格关系和有限静态接触检查；采样 Jacobian 为正不构成连续全局单射、全局无自交或所有参数证明。",
+    "performanceLimit": "本次正常 CI 构建、参数控制和实际渲染完成；没有在用户真实设备上测量延迟、内存或保证 FPS。"
+  },
+  "recordPolicy": "Freeze this SOURCE review and its candidate identities. Do not replace this file with a public-delivery assertion. A later PUBLIC_VISUAL_REVIEW.json must independently bind the exact accepted runtime, fixed public bytes, public browser results and this file SHA. Human/user approval remains false."
+}

@@ -1,0 +1,251 @@
+{
+  "scope": "One new complete --no-maglev control against the frozen stronger audit, compared with preserved earlier normal failure and one jitless control. No normal-mode rerun, PoC, producer edit, test edit, or publication configuration change.",
+  "sourceAndNewTestUnchangedDuringControl": true,
+  "sameSevenProducerSourceHashesAcrossAllRuns": true,
+  "actualMetricMeasurementImplementationByteIdenticalAcrossAuditVersions": true,
+  "actualMetricMeasurementImplementationSha256": "ac23f879475193103b1584312cf1a71725b365715b12241c4b6b6722007bf291",
+  "auditVersionDifference": "Earlier normal and jitless reports used 402f2998; no-maglev used 149e5304, which adds area and valid-triangle-count comparison gates. Producer sources and the final Float32 metric implementation are identical.",
+  "runs": {
+    "normal_failed": {
+      "path": "/workspace/scratch/e3aba5d62e5a/shoe-project/shoe-workshop/r14/evidence/iterations/preflight-material-linear-corners-attempt.json",
+      "sha256": "6cb466d31f95c0b38c9b01acf711183742c608ad5efdc06235608579708df0e8",
+      "environment": {
+        "node": "v24.19.0",
+        "v8": "13.6.233.17-node.51",
+        "platform": "linux",
+        "arch": "x64",
+        "execArgv": []
+      },
+      "testSha256": "402f2998a834536534da2e0e9a142c94bbb36c8c671bafab80e561dbf02c0f18",
+      "sourceHashes": [
+        {
+          "path": "src/deformation.mjs",
+          "sha256": "15a407659fca3a3cf6725c3f32acf9caf96a0302e20a382d4a155fabfe4600fa"
+        },
+        {
+          "path": "src/kernel.mjs",
+          "sha256": "366d03fca66cfc7744c32ff7a551a5e9bb73b7278699b5400eba6f94506d21af"
+        },
+        {
+          "path": "src/model.mjs",
+          "sha256": "0c4225b060e8efa91b37fcfadf0cda56191afedc8d64c3f9f34d1e3e600b6744"
+        },
+        {
+          "path": "src/penny-chelsea.mjs",
+          "sha256": "8eb285d95176fa46ab784ea4ab6d4601c6c741c28d923ef0f24e8654696ceb66"
+        },
+        {
+          "path": "src/monk-canvas.mjs",
+          "sha256": "62e0bcb5e83338b3464a0a0dea99a46d0ccb01cd89814ab811da4ba16264fe99"
+        },
+        {
+          "path": "src/soles.mjs",
+          "sha256": "fcc5d6ccae4e38e099e94019803a8aff4ed6dd42abbd6c6992f284382d0308fa"
+        },
+        {
+          "path": "src/surface-coordinates.mjs",
+          "sha256": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970"
+        }
+      ],
+      "success": false,
+      "panels": 66,
+      "numericIssues": [
+        "default/monk-open-quarters: producer after statistics absent or inconsistent with final buffers"
+      ],
+      "allRawStatisticsUnchangedAfterCapture": true,
+      "quarterActualFinal": {
+        "surfaceAreaMm2": 16312.887407207667,
+        "logStretchRms": 0.1732849708928557
+      },
+      "quarterFrozenProducerAfter": {
+        "surfaceAreaMm2": 595.9208436778644,
+        "logStretchRms": 0.4577755787341852
+      }
+    },
+    "jitless_once": {
+      "path": "/tmp/shoe-r14-monk-producer/material-jitless-control.json",
+      "sha256": "915a585cf87147b504afdaf2baab5ddaf004bb9a42873187aeb9602f7a8ebd8b",
+      "environment": {
+        "node": "v24.19.0",
+        "v8": "13.6.233.17-node.51",
+        "platform": "linux",
+        "arch": "x64",
+        "execArgv": [
+          "--jitless"
+        ]
+      },
+      "testSha256": "402f2998a834536534da2e0e9a142c94bbb36c8c671bafab80e561dbf02c0f18",
+      "sourceHashes": [
+        {
+          "path": "src/deformation.mjs",
+          "sha256": "15a407659fca3a3cf6725c3f32acf9caf96a0302e20a382d4a155fabfe4600fa"
+        },
+        {
+          "path": "src/kernel.mjs",
+          "sha256": "366d03fca66cfc7744c32ff7a551a5e9bb73b7278699b5400eba6f94506d21af"
+        },
+        {
+          "path": "src/model.mjs",
+          "sha256": "0c4225b060e8efa91b37fcfadf0cda56191afedc8d64c3f9f34d1e3e600b6744"
+        },
+        {
+          "path": "src/penny-chelsea.mjs",
+          "sha256": "8eb285d95176fa46ab784ea4ab6d4601c6c741c28d923ef0f24e8654696ceb66"
+        },
+        {
+          "path": "src/monk-canvas.mjs",
+          "sha256": "62e0bcb5e83338b3464a0a0dea99a46d0ccb01cd89814ab811da4ba16264fe99"
+        },
+        {
+          "path": "src/soles.mjs",
+          "sha256": "fcc5d6ccae4e38e099e94019803a8aff4ed6dd42abbd6c6992f284382d0308fa"
+        },
+        {
+          "path": "src/surface-coordinates.mjs",
+          "sha256": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970"
+        }
+      ],
+      "success": true,
+      "panels": 66,
+      "numericIssues": [],
+      "allRawStatisticsUnchangedAfterCapture": true,
+      "quarterActualFinal": {
+        "surfaceAreaMm2": 16312.887407207667,
+        "logStretchRms": 0.1732849708928557
+      },
+      "quarterFrozenProducerAfter": {
+        "surfaceAreaMm2": 16312.887428795671,
+        "logStretchRms": 0.17328497059838566
+      }
+    },
+    "no_maglev_once": {
+      "path": "/tmp/shoe-r14-monk-producer/material-no-maglev-control.json",
+      "sha256": "57f88104fa77ae61feefebfa0a4b1ff160fcc7e20a329c540e259739b8561e75",
+      "environment": {
+        "node": "v24.19.0",
+        "v8": "13.6.233.17-node.51",
+        "platform": "linux",
+        "arch": "x64",
+        "execArgv": [
+          "--no-maglev"
+        ]
+      },
+      "testSha256": "149e5304e79097a40fdd3237468031a6a819cd357218717826f3a7c81608d27a",
+      "sourceHashes": [
+        {
+          "path": "src/deformation.mjs",
+          "sha256": "15a407659fca3a3cf6725c3f32acf9caf96a0302e20a382d4a155fabfe4600fa"
+        },
+        {
+          "path": "src/kernel.mjs",
+          "sha256": "366d03fca66cfc7744c32ff7a551a5e9bb73b7278699b5400eba6f94506d21af"
+        },
+        {
+          "path": "src/model.mjs",
+          "sha256": "0c4225b060e8efa91b37fcfadf0cda56191afedc8d64c3f9f34d1e3e600b6744"
+        },
+        {
+          "path": "src/penny-chelsea.mjs",
+          "sha256": "8eb285d95176fa46ab784ea4ab6d4601c6c741c28d923ef0f24e8654696ceb66"
+        },
+        {
+          "path": "src/monk-canvas.mjs",
+          "sha256": "62e0bcb5e83338b3464a0a0dea99a46d0ccb01cd89814ab811da4ba16264fe99"
+        },
+        {
+          "path": "src/soles.mjs",
+          "sha256": "fcc5d6ccae4e38e099e94019803a8aff4ed6dd42abbd6c6992f284382d0308fa"
+        },
+        {
+          "path": "src/surface-coordinates.mjs",
+          "sha256": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970"
+        }
+      ],
+      "success": true,
+      "panels": 66,
+      "numericIssues": [],
+      "allRawStatisticsUnchangedAfterCapture": true,
+      "quarterActualFinal": {
+        "surfaceAreaMm2": 16312.887407207667,
+        "logStretchRms": 0.1732849708928557
+      },
+      "quarterFrozenProducerAfter": {
+        "surfaceAreaMm2": 16312.887428795671,
+        "logStretchRms": 0.17328497059838566
+      }
+    }
+  },
+  "noMaglevFlagEvidence": {
+    "path": "/tmp/shoe-r14-monk-producer/material-no-maglev-v8-options.txt",
+    "sha256": "f6832d684b249972eb69c66aaf732e57d29f754b890bb29e7016f415e4dd6c43",
+    "text": "  --maglev (enable the maglev optimizing compiler)\n        type: bool  default: --no-maglev\n--\n  --jitless (Disable runtime allocation of executable memory.)\n        type: bool  default: --no-jitless\n--\n  --sparkplug (enable Sparkplug baseline compiler)\n        type: bool  default: --sparkplug\n--\n  --turbofan (use the Turbofan optimizing compiler)\n        type: bool  default: --turbofan\n  --opt (alias for --turbofan)\n        type: bool  default: --opt\n"
+  },
+  "comparisons": [
+    {
+      "left": "normal_failed",
+      "right": "no_maglev_once",
+      "actualFinalMetricFields": [
+        "sourceGeometryIdentical",
+        "before",
+        "after",
+        "logStretchChange",
+        "tailAreaFraction",
+        "extremaRatios",
+        "residualTail",
+        "generatorSkipped",
+        "generatorReason"
+      ],
+      "actualFinalMetricsExactlyEqual": true,
+      "actualFinalMetricDifferenceCount": 0,
+      "actualFinalMetricDifferences": [],
+      "rawProducerStatisticDifferenceCount": 2,
+      "rawProducerStatisticDifferences": [
+        {
+          "path": "default/monk/monk-open-quarters/after/logStretchRms",
+          "a": 0.4577755787341852,
+          "b": 0.17328497059838566,
+          "absoluteDifference": 0.2844906081357995,
+          "relativeDifference": 0.6214630516605029
+        },
+        {
+          "path": "default/monk/monk-open-quarters/after/surfaceAreaMm2",
+          "a": 595.9208436778644,
+          "b": 16312.887428795671,
+          "absoluteDifference": 15716.966585117807,
+          "relativeDifference": 0.9634693216465199
+        }
+      ]
+    },
+    {
+      "left": "jitless_once",
+      "right": "no_maglev_once",
+      "actualFinalMetricFields": [
+        "sourceGeometryIdentical",
+        "before",
+        "after",
+        "logStretchChange",
+        "tailAreaFraction",
+        "extremaRatios",
+        "residualTail",
+        "generatorSkipped",
+        "generatorReason"
+      ],
+      "actualFinalMetricsExactlyEqual": true,
+      "actualFinalMetricDifferenceCount": 0,
+      "actualFinalMetricDifferences": [],
+      "rawProducerStatisticDifferenceCount": 0,
+      "rawProducerStatisticDifferences": []
+    }
+  ],
+  "interpretation": {
+    "observation": "This single no-maglev run completed all 66 panels without a numeric issue while Sparkplug and TurboFan remained enabled.",
+    "hypothesis": "The observations are compatible with execution-mode sensitivity, including a Maglev-related hypothesis, but do not identify the causal mechanism.",
+    "limitations": [
+      "Only one run per control mode; no reproduction frequency was measured.",
+      "The historical normal failure is preserved and not dismissed by either passing control.",
+      "The shorter panel-stage trace did not reproduce the corrupted scalars or find an alias/write path.",
+      "No public engine issue body or proof-of-concept was used to demonstrate that this project hits the same defect.",
+      "This is not a production fix or acceptance result. Unmodified Node22 CI and all frozen acceptance gates remain required."
+    ]
+  }
+}

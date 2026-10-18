@@ -1,0 +1,47 @@
+{
+  "purpose": "Minimal variable-scope replay using the actual successful candidate artifact API digest and the three real source-hash maps; not a public artifact approval or publisher execution",
+  "apiArtifactId": 12129576334,
+  "apiArtifactDigest": "sha256:08ffe17d46740b631954a359168996f5b9b52a03dc3a82f683d21174ba96cadb",
+  "old": {
+    "artifactVariable": "digest",
+    "sourceHashLoopsReplayed": 3,
+    "lastSourceDigest": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970",
+    "receiptFieldVariable": "digest",
+    "receiptPublicArtifactDigest": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970",
+    "matchesActualApiArtifactDigest": false
+  },
+  "fixed": {
+    "artifactVariable": "public_artifact_digest",
+    "sourceHashLoopsReplayed": 3,
+    "lastSourceDigest": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970",
+    "receiptFieldVariable": "public_artifact_digest",
+    "receiptPublicArtifactDigest": "sha256:08ffe17d46740b631954a359168996f5b9b52a03dc3a82f683d21174ba96cadb",
+    "matchesActualApiArtifactDigest": true
+  },
+  "yamlAndReceiptPythonSyntaxValid": true,
+  "helperAndEightSharedValidatorsUnchanged": true,
+  "promotionReady": false,
+  "publisherExecuted": false,
+  "files": {
+    "/tmp/shoe-r14-publish.before-receipt-digest-fix.yml": {
+      "bytes": 93085,
+      "sha256": "3ddb2b1a196d6e6dbfd6ccb70d7089d85bf11c0304456fe995ba18719582c389"
+    },
+    "/tmp/shoe-r14-publish.template.yml": {
+      "bytes": 93149,
+      "sha256": "4e88be4bd16fb72a4bf3ad6b978245e8c6d28405c94b84ff348343f5d0cb60f6"
+    },
+    "/tmp/shoe-r14-prepare-publisher.py": {
+      "bytes": 49354,
+      "sha256": "7198081cd75337feaabf7ecd4aa4bc42f76ac93a9dcd77e0373bf876f11bba8a"
+    },
+    "/tmp/shoe-r14-make-publish-template.py": {
+      "bytes": 26024,
+      "sha256": "ff6e91b27f781d3138850041def7d79d7aa9b25591cb681269ad366f7df9868e"
+    },
+    "/tmp/shoe-r14-receipt-digest-fix.diff": {
+      "bytes": 3525,
+      "sha256": "803ebde0a7b359a153a5911c0ec9e500a9cabd268e0b3f7e6d02e1fd12b560b9"
+    }
+  }
+}

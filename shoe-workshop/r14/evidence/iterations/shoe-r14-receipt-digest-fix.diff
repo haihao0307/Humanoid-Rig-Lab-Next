@@ -1,0 +1,25 @@
+--- shoe-r14-publish.before-receipt-digest-fix.yml
++++ shoe-r14-publish.template.yml
+@@ -789,10 +789,10 @@
+           request = urllib.request.Request('https://api.github.com/repos/' + e['REPOSITORY'] + '/actions/artifacts/' + e['PUBLIC_ARTIFACT_ID'],
+               headers={'Authorization': 'Bearer ' + e['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+           with urllib.request.urlopen(request, timeout=45) as response: artifact = json.load(response)
+-          digest = 'sha256:' + e['PUBLIC_ARTIFACT_DIGEST'].removeprefix('sha256:')
+-          require(re.fullmatch(r'sha256:[a-f0-9]{64}', digest), 'Invalid public artifact digest')
++          public_artifact_digest = 'sha256:' + e['PUBLIC_ARTIFACT_DIGEST'].removeprefix('sha256:')
++          require(re.fullmatch(r'sha256:[a-f0-9]{64}', public_artifact_digest), 'Invalid public artifact digest')
+           require(str(artifact['id']) == e['PUBLIC_ARTIFACT_ID'] and artifact['name'] == e['PUBLIC_ARTIFACT_NAME'], 'Wrong public artifact')
+-          require(not artifact['expired'] and artifact['digest'] == digest, 'Expired or changed public artifact')
++          require(not artifact['expired'] and artifact['digest'] == public_artifact_digest, 'Expired or changed public artifact')
+           require(str(artifact['workflow_run']['id']) == e['GITHUB_RUN_ID'] and artifact['workflow_run']['head_sha'] == e['EXPECTED_HEAD'], 'Public artifact is from another workflow run')
+           manifest_file = file(module, 'BUILD_MANIFEST.json')
+           candidate_qa_file = file(module, 'evidence/browser/QA.json')
+@@ -891,7 +891,7 @@
+               'buildSha': e['PUBLIC_BUILD_SHA'], 'publicUrl': url, 'rawUrl': raw, 'runtime': manifest['runtime'],
+               'candidateRunId': int(e['CANDIDATE_RUN_ID']), 'candidateArtifactId': int(e['CANDIDATE_ARTIFACT_ID']),
+               'candidateArtifactDigest': e['CANDIDATE_ARTIFACT_DIGEST'], 'publicRunId': int(e['GITHUB_RUN_ID']),
+-              'publicRunAttempt': int(e['PUBLIC_BROWSER_ATTEMPT']), 'publicArtifactId': artifact['id'], 'publicArtifactDigest': digest,
++              'publicRunAttempt': int(e['PUBLIC_BROWSER_ATTEMPT']), 'publicArtifactId': artifact['id'], 'publicArtifactDigest': public_artifact_digest,
+               'publicQAHash': sha(qa_file), 'publicVerified': True, 'browserChecksPassed': len(checks),
+               'screenshotsVerified': len(screens), 'materialCoordinatesQaSha256': e['EXPECTED_MATERIAL_QA_SHA256'], 'materialCoordinatesPanels': int(e['EXPECTED_MATERIAL_PANELS']), 'constructionFlexQaSha256': e['EXPECTED_CONSTRUCTION_QA_SHA256'], 'constructionFlexTestSha256': e['EXPECTED_CONSTRUCTION_TEST_SHA256'], 'constructionProducerHashesSha256': e['EXPECTED_CONSTRUCTION_PRODUCERS_SHA256'], 'constructionLanes': construction['laneResults'], 'constructionChecksPassed': construction['summary']['passed'], 'targetedViewsVerified': int(e['EXPECTED_TARGET_RECORDS']), 'viewPlanSha256': view_plan_hash, 'r13ConstructionBeforeSha256': e['EXPECTED_R13_CONSTRUCTION_BEFORE_SHA256'], 'r13ConstructionBeforeSummary': negative['summary'], 'sourceReviewSha256': e['EXPECTED_REVIEW_SHA256'], 'sourceReviewStatus': 'ACCEPTED_SOURCE_CANDIDATE', 'independentSourceReviewer': 'r14_review_priorities', 'beforeQAHash': e['EXPECTED_BEFORE_QA_SHA256'], 'beforeScreenshotsVerified': int(e['EXPECTED_BEFORE_SCREENS']), 'environment': qa['environment'], 'projectCodeExecutedInWriteJob': False,
+               'visualHumanReview': False, 'userVisualApproval': False,
