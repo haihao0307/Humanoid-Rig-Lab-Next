@@ -37,7 +37,8 @@ with sync_playwright() as p:
   check('human source is read-only and preserved',human['hostModified']==False and human['preservation']['geometry'] and human['preservation']['camera'] and human['preservation']['settings'])
   check('one original iframe after human load',s['iframeCount']==1 and s['frameGroup']=='s1')
   shot(page,'01-human-common-contract')
-  page.locator('[data-object="shoe-r12"]').click();started=time.monotonic();page.locator('#load').click();page.wait_for_function('window.__REALITY_FOUNDATION__.report().results["shoe-r12"]',timeout=300000);R['shoeLoadMs']=(time.monotonic()-started)*1000
+  page.locator('[data-object="shoe-r12"]').click();started=time.monotonic();page.locator('#load').click();page.wait_for_function('window.__REALITY_FOUNDATION__.report().results["shoe-r12"]||document.querySelector("#status").classList.contains("error")',timeout=300000);R['shoeLoadMs']=(time.monotonic()-started)*1000
+  check('shoe public read completed without transient matrix error','shoe-r12' in state()['results'],page.locator('#status').inner_text())
   s=state();shoe=s['results']['shoe-r12'];check('shoe reuses one S1 shell',s['iframeCount']==1 and s['frameGroup']=='s1')
   check('shoe millimeters converted once into meters',.1<next(x for x in shoe['measurements'] if x['definitionId']=='footwear.visible_bounds_z')['value']<.5)
   check('shoe last and size not guessed',next(x for x in shoe['measurements'] if x['definitionId']=='footwear.last_length')['value'] is None)
