@@ -1,0 +1,405 @@
+{
+  "schema": "kaopu/reality-bundle@1",
+  "build": {
+    "version": "REALITY-HC-S1",
+    "sourceCommit": "15486b8c5ff1b615783be6a003a76b46bfbfd7f6",
+    "coreVersion": "0.1.0",
+    "sourceFiles": {
+      "SCOPE_LOCK.json": "9679a1d7af51156ed60f020b61e527f18f3feb83b6d89c4ef511767e2b4414bf",
+      "catalog.json": "103128b0b214e52035a7ce0495f258a092168272c2b802d19614dd115f7559aa",
+      "core.js": "73ecbe74873cf0b16ad3c5ac4e915d01fa0999c00f449c1e1ccb901faff56ded",
+      "adapters.js": "d791c478c0e2563a10b7c8adbca85b8f44914fbe1d3f2a955d70e1b4a7840f1c",
+      "isolation.js": "e53657b1981eb92967305dfffb859c5d699e211b3d12f596ee463f578add9318",
+      "lab.html": "8248e527028e52eba3e1cdcf70505caa451a26e141bb6982d3a7c668c6f2f0df",
+      "lab.js": "c7120b9ea28dcc88863fbff0fe23d64e0866a74ccb914ed3cea8a42d30ad1020",
+      "tests/core.cjs": "7cfff4b6d350ee9c4b1f58b79c75435a3bb70c0dd877d8d398467c6b89cfeaf6",
+      "tests/browser.py": "e7196a877b44831e0809465993fa080d04d1be551f54bc4066ae3eb900395f04",
+      "build.py": "6b62ba6bb79cf78956bc6ccb9d1a7edc6f4689b035e73b9810db5098c4a7b7d7"
+    },
+    "scope": [
+      "human",
+      "garment",
+      "pattern",
+      "fabric",
+      "footwear"
+    ],
+    "nativeRuntimeModified": false,
+    "physicalCertification": false,
+    "productionReady": false
+  },
+  "document": {
+    "schema": "kaopu/reality-observation@1",
+    "assetId": "shoe-r12:penny",
+    "domain": "footwear",
+    "source": {
+      "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+      "commit": "d27ef0f200257741fa67f1c6291418cf771443e9",
+      "path": "shoe-workshop/r12/public-lite.html",
+      "sha256": "aaba719b65cbd4e53c19ffa74de335d90c81a8974ada4afa6460ada0a9d40a61"
+    },
+    "units": {
+      "geometry": "mm",
+      "scene": "m",
+      "geometryToScene": 0.001,
+      "basis": "source_declared"
+    },
+    "frame": {
+      "handedness": "right",
+      "up": "+Y",
+      "forward": "+Z",
+      "toCanonicalBasis": [
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "lateralMeaning": null,
+      "basis": "source_declared"
+    },
+    "dimensions": {
+      "xyz": [
+        0.12366934204101562,
+        0.07795091092586517,
+        0.28
+      ],
+      "unit": "m",
+      "basis": "runtime_computed",
+      "method": "CPU position attributes transformed by existing matrixWorld; not a readback of final vertex-shader deformation"
+    },
+    "camera": {
+      "projection": "perspective",
+      "fovYDeg": 31,
+      "aspect": 1.0609375,
+      "zoom": 1,
+      "near": 0.008046384814459542,
+      "far": 15,
+      "position": [
+        0.2706084495439208,
+        0.29520794185186316,
+        0.3871851968401339
+      ],
+      "worldMatrix": [
+        0.8221921916437785,
+        2.7755575615628914e-17,
+        -0.5692099788303084,
+        0,
+        -0.2725821806887515,
+        0.8778814192874448,
+        -0.3937298165504188,
+        0,
+        0.49969886408812764,
+        0.4788780780844552,
+        0.7217872481272951,
+        0,
+        0.2706084495439208,
+        0.29520794185186316,
+        0.3871851968401339,
+        1
+      ],
+      "projectionMatrix": [
+        3.3987709066376435,
+        0,
+        0,
+        0,
+        0,
+        3.605883508760875,
+        0,
+        0,
+        0,
+        0,
+        -1.001073427122441,
+        -1,
+        0,
+        0,
+        -0.01610140683661652,
+        0
+      ],
+      "bufferPx": [
+        679,
+        640
+      ],
+      "cssPx": [
+        677,
+        638
+      ],
+      "filmGaugeMetadata": 35,
+      "calibrated": false,
+      "method": "read current native camera; filmGauge alone is not lens calibration"
+    },
+    "color": {
+      "working": "srgb-linear",
+      "output": "srgb",
+      "toneMappingCode": 4,
+      "exposure": 1.08,
+      "basis": "read native renderer; no color transform applied"
+    },
+    "evidence": {
+      "confidence": null,
+      "confidenceMethod": null,
+      "uncertaintyM": null,
+      "method": "synchronous read-only native API and visible CPU geometry observation"
+    },
+    "preservation": {
+      "geometry": true,
+      "camera": true,
+      "settings": true
+    },
+    "observation": {
+      "capturedAt": "2026-10-18T04:47:15.312Z",
+      "nativeMeshCount": 18,
+      "vertices": 54588,
+      "triangles": 87896,
+      "boundsMin": [
+        -0.05927751159667969,
+        -0.0006499999761581421,
+        -0.14
+      ],
+      "boundsMax": [
+        0.06439183044433594,
+        0.07730091094970704,
+        0.14
+      ],
+      "guardBytes": 1837488,
+      "readMs": 11.60000000000582,
+      "checkedChannels": [
+        "position",
+        "normal where present",
+        "csRest where present",
+        "index",
+        "visible mesh world matrices",
+        "camera",
+        "head/body skin settings or R12 design state"
+      ],
+      "notChecked": [
+        "all application state",
+        "final shader displaced bounds",
+        "swept collision volume",
+        "anatomical dimensions",
+        "physical sample",
+        "manufacturing fit",
+        "display calibration"
+      ],
+      "authoritativeHostModified": false,
+      "presentation": {
+        "pair": false,
+        "compare": false,
+        "explode": false,
+        "part": "all"
+      },
+      "note": "场景包围范围可含成双、拆件或多款排布；不等于单鞋鞋长、脚长、鞋码或制鞋楦尺寸。length/width 参数是倍率，不是毫米。"
+    },
+    "nativeMeasurements": [
+      {
+        "id": "penny",
+        "xyz": [
+          123.66934204101562,
+          77.95091092586517,
+          280
+        ],
+        "unit": "mm",
+        "basis": "native_geometry_report",
+        "notPhysicalMeasurement": true
+      }
+    ]
+  },
+  "validation": {
+    "schema": "kaopu/reality-validation@1",
+    "version": "0.1.0",
+    "assetId": "shoe-r12:penny",
+    "domain": "footwear",
+    "status": "partial",
+    "counts": {
+      "pass": 25,
+      "fail": 0,
+      "unknown": 4
+    },
+    "rows": [
+      {
+        "id": "schema",
+        "status": "pass",
+        "message": "观察协议必须为 kaopu/reality-observation@1",
+        "detail": null
+      },
+      {
+        "id": "scope",
+        "status": "pass",
+        "message": "仅允许人物、成衣、裁片、布料、鞋履",
+        "detail": "footwear"
+      },
+      {
+        "id": "identity",
+        "status": "pass",
+        "message": "对象需要稳定标识",
+        "detail": null
+      },
+      {
+        "id": "source.commit",
+        "status": "pass",
+        "message": "源文件绑定完整不可变提交",
+        "detail": "d27ef0f200257741fa67f1c6291418cf771443e9"
+      },
+      {
+        "id": "source.path",
+        "status": "pass",
+        "message": "源文件路径必须明确且不越界",
+        "detail": null
+      },
+      {
+        "id": "source.repo",
+        "status": "pass",
+        "message": "源仓库声明",
+        "detail": null
+      },
+      {
+        "id": "source.digest",
+        "status": "pass",
+        "message": "文件 SHA-256 格式",
+        "detail": "aaba719b65cbd4e53c19ffa74de335d90c81a8974ada4afa6460ada0a9d40a61"
+      },
+      {
+        "id": "units.geometry",
+        "status": "pass",
+        "message": "geometry 长度单位",
+        "detail": "mm"
+      },
+      {
+        "id": "units.scene",
+        "status": "pass",
+        "message": "scene 长度单位",
+        "detail": "m"
+      },
+      {
+        "id": "units.transform",
+        "status": "pass",
+        "message": "只换算一次：源几何单位 → 场景单位",
+        "detail": {
+          "declared": 0.001,
+          "expected": 0.001
+        }
+      },
+      {
+        "id": "frame.axes",
+        "status": "pass",
+        "message": "向上与正面轴必须明确且不平行",
+        "detail": null
+      },
+      {
+        "id": "frame.handedness",
+        "status": "pass",
+        "message": "坐标手性",
+        "detail": null
+      },
+      {
+        "id": "frame.transform",
+        "status": "pass",
+        "message": "列主序轴转换必须正交，不能夹带第二次长度缩放",
+        "detail": null
+      },
+      {
+        "id": "frame.mapping",
+        "status": "pass",
+        "message": "声明的向上 / 正面轴必须映射到基准 +Y / +Z，不能只看矩阵行列式",
+        "detail": null
+      },
+      {
+        "id": "frame.lateral",
+        "status": "unknown",
+        "message": "对象解剖学左右未审核；不能仅凭 X 正负猜左脚或右脚",
+        "detail": null
+      },
+      {
+        "id": "dimensions.values",
+        "status": "pass",
+        "message": "包围范围 X / Y / Z 必须为正有限数值",
+        "detail": null
+      },
+      {
+        "id": "dimensions.unit",
+        "status": "pass",
+        "message": "尺寸结果单独声明单位",
+        "detail": null
+      },
+      {
+        "id": "dimensions.basis",
+        "status": "pass",
+        "message": "区分源声明、运行计算、实物测量与艺术设定",
+        "detail": "runtime_computed"
+      },
+      {
+        "id": "reality.measurement",
+        "status": "unknown",
+        "message": "数字几何尺寸不是实物测量，也不证明符合人体或制造规格",
+        "detail": null
+      },
+      {
+        "id": "camera.perspective",
+        "status": "pass",
+        "message": "透视相机的垂直视场、缩放、宽高比和裁剪面",
+        "detail": null
+      },
+      {
+        "id": "camera.position",
+        "status": "pass",
+        "message": "相机位置为三个有限值",
+        "detail": null
+      },
+      {
+        "id": "camera.buffer",
+        "status": "pass",
+        "message": "记录真正 drawing buffer 像素，而非只记录 CSS 宽度",
+        "detail": null
+      },
+      {
+        "id": "camera.aspect",
+        "status": "pass",
+        "message": "投影宽高比与实际画布比例相符",
+        "detail": null
+      },
+      {
+        "id": "camera.calibration",
+        "status": "unknown",
+        "message": "记录的是原台数字镜头，不是实物摄影标定；S1 不强改镜头",
+        "detail": null
+      },
+      {
+        "id": "color.output",
+        "status": "pass",
+        "message": "原生输出颜色空间",
+        "detail": "srgb"
+      },
+      {
+        "id": "color.calibration",
+        "status": "unknown",
+        "message": "本阶段只读记录曝光与色调映射，未更换灯光、未实施 ACES/OCIO 标定",
+        "detail": null
+      },
+      {
+        "id": "preservation.geometry",
+        "status": "pass",
+        "message": "本次同步读取前后 geometry 未改变",
+        "detail": null
+      },
+      {
+        "id": "preservation.camera",
+        "status": "pass",
+        "message": "本次同步读取前后 camera 未改变",
+        "detail": null
+      },
+      {
+        "id": "preservation.settings",
+        "status": "pass",
+        "message": "本次同步读取前后 settings 未改变",
+        "detail": null
+      }
+    ],
+    "hostModified": false,
+    "physicalCertification": false,
+    "visualAcceptance": false,
+    "productionReady": false
+  }
+}
