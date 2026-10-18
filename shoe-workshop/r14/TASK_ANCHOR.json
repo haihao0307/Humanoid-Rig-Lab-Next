@@ -1,0 +1,111 @@
+{
+  "taskId": "SHOE-R14-CONSTRUCTION-FLEX-20261018",
+  "status": "IN_PROGRESS",
+  "dispatchUtc": "2026-10-18T06:31:14.889569+00:00",
+  "planCommit": "ec7d80c9f99dc978735245d463306075f5a287d5",
+  "baseSha": "0f105165964795b4895c3a5d8d2440deac1add91",
+  "productionBaseline": "0f105165964795b4895c3a5d8d2440deac1add91",
+  "acceptedBaselineBuild": "c979ae664e53cdc2f09bd33511be5be61415efce",
+  "target": "shoe-workshop/r14",
+  "lanes": {
+    "A": "PREFLIGHT_NUMERIC_PASS_FINAL_REVIEW_PENDING",
+    "B": "PREFLIGHT_NUMERIC_PASS_FINAL_REVIEW_PENDING",
+    "C": "PREFLIGHT_NUMERIC_PASS_MATERIAL_REPORT_REVIEW_PENDING"
+  },
+  "protected": [
+    "R13/R12/R10 files and public URLs",
+    "original style and recipes",
+    "own procedural geometry",
+    "existing collar/seam/foxing regressions"
+  ],
+  "forbidden": [
+    "external whole-shoe mesh import",
+    "generated image substitution",
+    "lighting change to hide geometry",
+    "claiming force solution from geometric deformation",
+    "merge or force push"
+  ],
+  "gates": {
+    "source": false,
+    "numeric": false,
+    "browser": false,
+    "independentVisual": false,
+    "public": false
+  },
+  "humanApproval": false,
+  "userApproval": false,
+  "physicalSolver": false,
+  "manufacturingValidated": false,
+  "wearerFitValidated": false,
+  "nextTaskPointer": "Source-bound CI in the locked Node 22 environment, complete material consistency including raw snapshots, 27 targeted views plus retained regressions and independent review; preserve unresolved report anomaly and its controls",
+  "schemaVersion": 1,
+  "branch": "feature/shoe-r14-construction-and-flex-20261018",
+  "taskMode": "AUTHORIZED_REFINEMENT",
+  "creativeAuthorization": true,
+  "authorizationScope": "Continue the accepted R14 plan: own procedural construction, attachment flex, Chelsea shoulder and Monk static assembly; no commercial hidden construction claimed",
+  "acceptedBaseline": {
+    "path": "shoe-workshop/r13",
+    "sha": "0f105165964795b4895c3a5d8d2440deac1add91",
+    "publishedBuild": "c979ae664e53cdc2f09bd33511be5be61415efce"
+  },
+  "referenceSet": {
+    "beforeScreens": "R13 accepted source 8b05ebd8b0755216743792034e3cbb58b8d9ff54, fixed build c979ae664e53cdc2f09bd33511be5be61415efce; re-rendered under current paired cameras",
+    "styleReferences": [
+      "https://www.crockettandjones.com/products/boston-black-calf",
+      "https://www.crockettandjones.com/blogs/the-article/the-icons-chelsea-8",
+      "https://www.crockettandjones.com/products/lowndes-black-calf",
+      "https://www.superga.com/products/le-superga-unisex-2750-cotu-classic-black-s000010-999"
+    ],
+    "science": [
+      "https://www.satra.com/bulletin/article.php?id=2774",
+      "https://www.satra.com/test_methods/detail.php?id=140",
+      "https://us.crockettandjones.com/pages/in-the-making-closing",
+      "https://www.crockettandjones.com/blogs/the-article/a-guide-to-loafers",
+      "https://www.cs.jhu.edu/~misha/Fall09/Levy02.pdf",
+      "https://cs.harvard.edu/~sjg/papers/arap.pdf",
+      "https://matthias-research.github.io/pages/publications/XPBD.pdf",
+      "https://github.com/mrdoob/three.js/blob/r170/src/math/Matrix3.js"
+    ],
+    "noChineseWebsitesUsed": true,
+    "commercialDimensionsMeasured": false
+  },
+  "limitations": {
+    "physicalSolver": false,
+    "materialCalibrated": false,
+    "manufacturingValidated": false,
+    "wearerFitValidated": false,
+    "humanApproval": false,
+    "userApproval": false,
+    "realMobileDeviceTested": false
+  },
+  "agentsChecklist": [
+    {
+      "text": "没有用生成图片代替真实三维实现",
+      "status": "PENDING"
+    },
+    {
+      "text": "已实际修改生产源码",
+      "status": "PENDING"
+    },
+    {
+      "text": "用户看到的是可交互三维工作台",
+      "status": "PENDING"
+    },
+    {
+      "text": "人物/动物几何、骨骼和动作来自真实运行时；本轮仅鞋几何，人体骨骼不适用",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "text": "镜头、选择、动作或参数控制可以实际操作",
+      "status": "PENDING"
+    },
+    {
+      "text": "公网固定链接和真实浏览器已验证",
+      "status": "PENDING"
+    },
+    {
+      "text": "如果只有截图而没有工作台，本轮判定失败",
+      "status": "PENDING"
+    }
+  ]
+}

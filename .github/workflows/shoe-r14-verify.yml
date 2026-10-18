@@ -1,0 +1,99 @@
+name: Shoe R14 construction, flex and real browser
+on:
+  push:
+    branches: [feature/shoe-r14-construction-and-flex-20261018]
+    paths:
+      - 'shoe-workshop/r14/src/**'
+      - 'shoe-workshop/r14/tests/**'
+      - 'shoe-workshop/r14/tools/**'
+      - 'shoe-workshop/r14/index.html'
+      - 'shoe-workshop/r14/style.css'
+      - 'shoe-workshop/r14/package*.json'
+      - '.github/workflows/shoe-r14-verify.yml'
+permissions:
+  contents: read
+concurrency:
+  group: shoe-r14-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            shoe-workshop/r14
+            shoe-workshop/r13
+            shoe-workshop/r12
+            shoe-workshop/r10
+            shoe-workshop/r09/src
+            shoe-workshop/r07/src
+            shoe-workshop/r05/src
+            shoe-workshop/r04/src
+            shoe-workshop/r04/vendor
+            shoe-workshop/r06/src
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: shoe-workshop/r14/package-lock.json
+      - name: Install pinned dependencies
+        working-directory: shoe-workshop/r14
+        run: |
+          npm ci --ignore-scripts
+          ln -s ../r14/node_modules ../r13/node_modules
+      - name: Build source-labelled standalone runtime
+        working-directory: shoe-workshop/r14
+        run: npm run build
+      - name: Independent numerical structure and retained payload checks
+        id: geometry
+        continue-on-error: true
+        working-directory: shoe-workshop/r14
+        run: npm test
+      - name: Independent construction and flex from actual meshes
+        id: construction
+        continue-on-error: true
+        working-directory: shoe-workshop/r14
+        run: node tests/construction-flex.mjs --output evidence/CONSTRUCTION_FLEX.json
+      - name: Independent final-triangle material coordinates audit
+        id: material
+        continue-on-error: true
+        working-directory: shoe-workshop/r14
+        run: node tests/material-coordinates-audit.mjs evidence/MATERIAL_COORDINATES.json
+      - name: Chromium render environment
+        working-directory: shoe-workshop/r14
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get install --yes fonts-noto-cjk
+      - name: Actual file URL first frame, four shapes and controls
+        id: browser
+        continue-on-error: true
+        working-directory: shoe-workshop/r14
+        run: node tests/browser.mjs
+      - name: Preserve candidate and actual renders even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoe-r14-candidate-${{ github.run_id }}
+          path: |
+            shoe-workshop/r14/public-lite.html
+            shoe-workshop/r14/BUILD_MANIFEST.json
+            shoe-workshop/r14/evidence/
+            shoe-workshop/r14/tests/
+          retention-days: 14
+      - name: Geometry, construction, material coordinates and browser gates must pass
+        if: always()
+        env:
+          GEOMETRY_RESULT: ${{ steps.geometry.outcome }}
+          CONSTRUCTION_RESULT: ${{ steps.construction.outcome }}
+          MATERIAL_RESULT: ${{ steps.material.outcome }}
+          BROWSER_RESULT: ${{ steps.browser.outcome }}
+        run: |
+          test "$GEOMETRY_RESULT" = success
+          test "$CONSTRUCTION_RESULT" = success
+          test "$MATERIAL_RESULT" = success
+          test "$BROWSER_RESULT" = success

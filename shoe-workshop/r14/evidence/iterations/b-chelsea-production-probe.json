@@ -1,0 +1,3313 @@
+{
+  "taskId": "SHOE-R14-B-CHELSEA-SHAFT",
+  "status": "PRODUCER_NUMERIC_CANDIDATE",
+  "generatedUtc": "2026-10-18T06:46:19.053Z",
+  "node": "v24.19.0",
+  "sourceHashes": {
+    "r13/src/kernel.mjs": "7156a5432fed1dd654905a967255f167e3c45bf7ed69fc674db25263de9dde06",
+    "r14/src/kernel.mjs": "7156a5432fed1dd654905a967255f167e3c45bf7ed69fc674db25263de9dde06",
+    "r13/src/model.mjs": "d34f8b825f45667f8da384a198284ee2c4755568851d6a87a420a429db7b1e14",
+    "r14/src/model.mjs": "0c4225b060e8efa91b37fcfadf0cda56191afedc8d64c3f9f34d1e3e600b6744",
+    "r13/src/penny-chelsea.mjs": "b02cbdd1525c143badec36b11371bb44277a94acf865a6040e0fa399cc7fa70d",
+    "r14/src/penny-chelsea.mjs": "8eb285d95176fa46ab784ea4ab6d4601c6c741c28d923ef0f24e8654696ceb66",
+    "r13/src/surface-coordinates.mjs": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970",
+    "r14/src/surface-coordinates.mjs": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970",
+    "r14/src/deformation.mjs": "50a620cb2c1f8e88c5b3586459bfea78a81363320f6bf2a4ee13d2046f1b6c8b"
+  },
+  "sourceReference": "https://us.crockettandjones.com/products/chelsea-8-black-calf-city",
+  "measurementUnits": "design millimetres, not manufacturing or wearer calibration",
+  "executionScope": "Current integrated R14 buildStyle at zero bend, after root fixed structured-attachment filtering; local producer test, final independent CI and visuals remain necessary",
+  "impactDomain": {
+    "parameterV": [
+      0.36125,
+      0.6425
+    ],
+    "bothBoundaryRowsAlreadyPresent": true,
+    "unchanged": "Outside interval; original toe, lasting margin, upper shaft, ankle aperture, pull loop; original shared sample count and panel thickness"
+  },
+  "method": "Local cubic Hermite bridge using accepted endpoint positions and centred first derivatives; not a C2 claim or force solution",
+  "rejectedPrototype": {
+    "method": "quintic Hermite using piecewise second derivatives",
+    "productionWritten": false,
+    "reason": "Inherits transverse discontinuity in second derivative; 1.659 mm neighbour step versus 0.099 mm baseline, 110.177 degree adjacent-normal jump, negative baseline-normal dot -0.325376",
+    "source": "/tmp/r14-chelsea-bridge-probe.mjs",
+    "evidence": "/tmp/r14-chelsea-bridge-probe.json"
+  },
+  "cases": [
+    {
+      "name": "default",
+      "params": {},
+      "geometry": {
+        "beforeTriangles": 143352,
+        "afterTriangles": 142644,
+        "beforeGenerationMs": 524.492428,
+        "afterGenerationMs": 497.209692
+      },
+      "sections": [
+        {
+          "u": 0,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              1.0635389601901917,
+              85.7013798544413,
+              -14.29514153005493
+            ],
+            "curvaturePerMm": 1.0423193083902345,
+            "tangent": [
+              -0.3638017868845544,
+              93.3507612629114,
+              -9.698795917323364
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.517,
+            "position": [
+              1.2995426034159254,
+              87.67306099309802,
+              -11.306225247684637
+            ],
+            "curvaturePerMm": 0.022847804603979616,
+            "tangent": [
+              -5.10341828492411,
+              160.39188032479498,
+              -106.38578036292755
+            ]
+          },
+          "maxDisplacementMm": 10.387424569688756,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                1.0633567948869806,
+                85.79091529047737,
+                -14.299998049500267
+              ],
+              "curvaturePerMm": 1.2206670542584963,
+              "tangent": [
+                -0.007315764971593807,
+                89.36745578580484,
+                -0.19504089969757385
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                1.0633567170070113,
+                85.79448769072579,
+                -14.300000113118383
+              ],
+              "curvaturePerMm": 0.07096914276173534,
+              "tangent": [
+                -0.0004718842094852959,
+                89.30113649441294,
+                -0.011311658809631807
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                1.502829226455843,
+                81.72307080972985,
+                -6.589981522109265
+              ],
+              "curvaturePerMm": 0.019634554086133283,
+              "tangent": [
+                -5.883043992305214,
+                161.6982463389149,
+                -150.81451451059988
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                1.5025939217985984,
+                81.72953866970904,
+                -6.596012986716819
+              ],
+              "curvaturePerMm": 0.019640637375557417,
+              "tangent": [
+                -5.882188875105942,
+                161.69475346572423,
+                -150.75871902787694
+              ]
+            }
+          ]
+        },
+        {
+          "u": 0.4,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              14.159029582585019,
+              85.75007053356435,
+              -18.97998080534558
+            ],
+            "curvaturePerMm": 1.058663406620913,
+            "tangent": [
+              -3.751113955452467,
+              93.83326440044469,
+              -9.29162884109047
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.53,
+            "position": [
+              15.283333500820452,
+              89.78193343723864,
+              -17.325266915756607
+            ],
+            "curvaturePerMm": 0.021425975649822064,
+            "tangent": [
+              -30.79198881197342,
+              165.10279300803174,
+              -89.56603657335192
+            ]
+          },
+          "maxDisplacementMm": 11.093069572132537,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                14.15715130050008,
+                85.83984751764874,
+                -18.984633442283368
+              ],
+              "curvaturePerMm": 1.2598207876911838,
+              "tangent": [
+                -0.07543182629632382,
+                89.3771541861099,
+                -0.18685284874919714
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                14.157150537757271,
+                85.84342001404029,
+                -18.98463541583914
+              ],
+              "curvaturePerMm": 0.06599118999764457,
+              "tangent": [
+                -0.000838932301405748,
+                89.30105195688041,
+                -0.010493868529692916
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                17.445231878070665,
+                81.30259630844834,
+                -11.58492145289214
+              ],
+              "curvaturePerMm": 0.01616780847458538,
+              "tangent": [
+                -57.16415299641397,
+                175.91452680605354,
+                -144.14365123283088
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                17.442945806380916,
+                81.30963262167387,
+                -11.590686125221014
+              ],
+              "curvaturePerMm": 0.01617445882997979,
+              "tangent": [
+                -57.13943258101039,
+                175.90113589562858,
+                -144.08996822448114
+              ]
+            }
+          ]
+        },
+        {
+          "u": 0.8,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              22.721004754722298,
+              84.10793010553122,
+              -32.2948655199222
+            ],
+            "curvaturePerMm": 0.9719777620246287,
+            "tangent": [
+              -2.8897398799188063,
+              91.98171574951174,
+              -8.134410334648122
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.533,
+            "position": [
+              23.677803029988507,
+              89.65801234561599,
+              -30.957589118046794
+            ],
+            "curvaturePerMm": 0.024834658281876948,
+            "tangent": [
+              -22.945166269039415,
+              150.57418060280267,
+              -74.13087702357045
+            ]
+          },
+          "maxDisplacementMm": 9.198532929190836,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                22.719557803535995,
+                84.19677997229417,
+                -32.2989386979023
+              ],
+              "curvaturePerMm": 1.086695069623249,
+              "tangent": [
+                -0.05810884697865503,
+                89.33992123303368,
+                -0.1635814090406029
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                22.719557221875363,
+                84.20035209920863,
+                -32.298940415489874
+              ],
+              "curvaturePerMm": 0.051212243198226357,
+              "tangent": [
+                -5.451266105183094e-05,
+                89.30133893443325,
+                -0.008169608278763006
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                25.451238303252044,
+                81.47830901964093,
+                -25.781150058947812
+              ],
+              "curvaturePerMm": 0.017439492135314386,
+              "tangent": [
+                -45.17717109120411,
+                160.97913843537978,
+                -125.18424403165083
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                25.44943160730631,
+                81.48474789237078,
+                -25.78615647507523
+              ],
+              "curvaturePerMm": 0.017447946202609494,
+              "tangent": [
+                -45.15762698051872,
+                160.96449997888837,
+                -125.13656493364776
+              ]
+            }
+          ]
+        },
+        {
+          "u": 1.2,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              25.96857790890315,
+              79.91364491032104,
+              -52.137668145114986
+            ],
+            "curvaturePerMm": 0.7905066458818927,
+            "tangent": [
+              -1.3784253109605513,
+              90.06404037208425,
+              -6.409839758703128
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.52,
+            "position": [
+              26.2968514043588,
+              85.46193432911456,
+              -50.11117254500881
+            ],
+            "curvaturePerMm": 0.03911853148288343,
+            "tangent": [
+              -8.024174809762028,
+              123.20828837175667,
+              -63.43335687333251
+            ]
+          },
+          "maxDisplacementMm": 6.268417908498307,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                25.967887707606938,
+                80.00153459764763,
+                -52.14087777151553
+              ],
+              "curvaturePerMm": 0.8264230967122582,
+              "tangent": [
+                -0.027717978312580268,
+                89.30136248039842,
+                -0.12890063025849938
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                25.967887445464225,
+                80.00510634840089,
+                -52.14087910764083
+              ],
+              "curvaturePerMm": 0.030969258760852016,
+              "tangent": [
+                0.0015049716139969858,
+                89.30228334520505,
+                -0.004705828260398447
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                26.89467779110657,
+                80.57344118724214,
+                -46.937394990128624
+              ],
+              "curvaturePerMm": 0.029990753280937813,
+              "tangent": [
+                -22.6087232805483,
+                122.9193889976443,
+                -96.92956642446403
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                26.893773779060542,
+                80.57835785918994,
+                -46.941271398113464
+              ],
+              "curvaturePerMm": 0.030005601553716663,
+              "tangent": [
+                -22.591879871391992,
+                122.91421044494653,
+                -96.89083478789938
+              ]
+            }
+          ]
+        },
+        {
+          "u": 1.5707963267948966,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              26.4920823504171,
+              78.96650168705624,
+              -73.64272535270753
+            ],
+            "curvaturePerMm": 0.578808079441889,
+            "tangent": [
+              -0.7637495386347836,
+              88.93706361021712,
+              -4.54079990674927
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.493,
+            "position": [
+              27.00906504368688,
+              81.55480890198811,
+              -70.669308364037
+            ],
+            "curvaturePerMm": 0.04922180123533661,
+            "tangent": [
+              -6.267126794590182,
+              107.34334902480212,
+              -57.22184039598232
+            ]
+          },
+          "maxDisplacementMm": 4.533213334749439,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                26.491699913183606,
+                79.05382707263912,
+                -73.64499908681148
+              ],
+              "curvaturePerMm": 0.5808465813176202,
+              "tangent": [
+                -0.015358988747493639,
+                89.27870033161865,
+                -0.09131460245725974
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                26.491699781812187,
+                79.05739859634805,
+                -73.64500000951897
+              ],
+              "curvaturePerMm": 0.015155421661521735,
+              "tangent": [
+                0.0022225258078378825,
+                89.3022421173839,
+                -0.0009518835497601684
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                27.105700594616334,
+                80.17714545477375,
+                -69.86592308853432
+              ],
+              "curvaturePerMm": 0.04806067596146542,
+              "tangent": [
+                -8.595779287468018,
+                104.39776703847768,
+                -66.3079617154949
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                27.105356909973292,
+                80.18132152464823,
+                -69.8685748262843
+              ],
+              "curvaturePerMm": 0.04806783881728357,
+              "tangent": [
+                -8.5884530630409,
+                104.40572794223611,
+                -66.27892707911086
+              ]
+            }
+          ]
+        },
+        {
+          "u": 2,
+          "beforeMaximum": {
+            "v": 0.472,
+            "position": [
+              24.863820485759884,
+              82.6507330102483,
+              -98.26647902467674
+            ],
+            "curvaturePerMm": 0.35699742246967964,
+            "tangent": [
+              -6.478210491245306,
+              81.10911270691189,
+              -18.402109873960622
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.456,
+            "position": [
+              25.939019095223827,
+              82.92898726829789,
+              -95.31861554006166
+            ],
+            "curvaturePerMm": 0.06337675141620511,
+            "tangent": [
+              -12.046794272713155,
+              83.6041662772402,
+              -42.368434694850514
+            ]
+          },
+          "maxDisplacementMm": 3.022360860396031,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                24.837464781481934,
+                83.32994376343294,
+                -98.34123353337543
+              ],
+              "curvaturePerMm": 0.32046271097527307,
+              "tangent": [
+                -0.017001054963827752,
+                89.2642253305098,
+                -0.04814923215690214
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                24.837464628350933,
+                83.33351512604064,
+                -98.34123398129657
+              ],
+              "curvaturePerMm": 0.02356932999548041,
+              "tangent": [
+                0.0016887184983715995,
+                89.30060768790325,
+                0.003359304656669337
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                25.68437413238267,
+                85.01488909430698,
+                -96.1980060009459
+              ],
+              "curvaturePerMm": 0.058942287325933616,
+              "tangent": [
+                -9.195703819742105,
+                90.64309341368924,
+                -31.140827102404952
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                25.684006398906067,
+                85.01851508063537,
+                -96.1992512760557
+              ],
+              "curvaturePerMm": 0.058928397683564296,
+              "tangent": [
+                -9.190970024341992,
+                90.65622387467441,
+                -31.122928906768262
+              ]
+            }
+          ]
+        },
+        {
+          "u": 2.6,
+          "beforeMaximum": {
+            "v": 0.464,
+            "position": [
+              13.333376637862443,
+              88.89682533312299,
+              -124.48241872480104
+            ],
+            "curvaturePerMm": 0.2945321638569505,
+            "tangent": [
+              -25.565670652394342,
+              71.0844846572911,
+              -1.7726143866525488
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.439,
+            "position": [
+              15.938050973268956,
+              88.62984314872294,
+              -124.22004308726078
+            ],
+            "curvaturePerMm": 0.05073846968073588,
+            "tangent": [
+              -34.398097414012334,
+              77.01052963113851,
+              0.7026726265735305
+            ]
+          },
+          "maxDisplacementMm": 2.5542973317951305,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                13.121793036477884,
+                90.17173856578779,
+                -124.49706304435199
+              ],
+              "curvaturePerMm": 0.2215306310106266,
+              "tangent": [
+                -0.035210023963117,
+                89.26023541135918,
+                -0.0024327057701611916
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                13.121792698191532,
+                90.17530986434103,
+                -124.49706298942598
+              ],
+              "curvaturePerMm": 0.05043564017969682,
+              "tangent": [
+                0.0013830047329577153,
+                89.2981923769298,
+                0.007925292067056942
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                14.767579388917433,
+                91.9650074941629,
+                -124.0863657756409
+              ],
+              "curvaturePerMm": 0.04389820850259363,
+              "tangent": [
+                -22.97323367468351,
+                86.49264103723907,
+                6.1047529619884235
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                14.766660668111957,
+                91.96846742785581,
+                -124.08612146345718
+              ],
+              "curvaturePerMm": 0.043886145416769815,
+              "tangent": [
+                -22.96280686415741,
+                86.50404439194402,
+                6.110856529772945
+              ]
+            }
+          ]
+        },
+        {
+          "u": 3.141592653589793,
+          "beforeMaximum": {
+            "v": 0.435,
+            "position": [
+              5.140644188080102e-15,
+              86.90727275901526,
+              -133.51321406773158
+            ],
+            "curvaturePerMm": 0.5445888991093247,
+            "tangent": [
+              -2.0118046069799097e-13,
+              28.324063377027638,
+              20.91609398320315
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.362,
+            "position": [
+              2.179934274715617e-14,
+              85.13824915908448,
+              -135.41425467276795
+            ],
+            "curvaturePerMm": 0.12278897114161924,
+            "tangent": [
+              -1.929848628079024e-13,
+              38.540027390610014,
+              24.73626746848367
+            ]
+          },
+          "maxDisplacementMm": 2.401814236049058,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                1.2444791071295729e-21,
+                89.34200373659174,
+                -132.9900001241227
+              ],
+              "curvaturePerMm": 0.07793987556182673,
+              "tangent": [
+                -1.24442120555078e-16,
+                89.24687834763743,
+                0.012411693717240267
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                1.7119253713943548e-23,
+                89.3455749027527,
+                -132.98999990591957
+              ],
+              "curvaturePerMm": 0.05897933973801296,
+              "tangent": [
+                1.7118979359894187e-18,
+                89.29831083648308,
+                0.009407891354840102
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                5.897433352442245e-15,
+                91.66696164991424,
+                -133.14186465496013
+              ],
+              "curvaturePerMm": 0.007005304339993827,
+              "tangent": [
+                -8.266497123452898e-14,
+                76.21577994640914,
+                18.198591081386436
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                5.894127377937736e-15,
+                91.67001061961733,
+                -133.14113666585254
+              ],
+              "curvaturePerMm": 0.00699142256356001,
+              "tangent": [
+                -8.26337547777286e-14,
+                76.23270573660078,
+                18.200864869299945
+              ]
+            }
+          ]
+        }
+      ],
+      "protected": {
+        "outsideSamples": 2737,
+        "maxOutsidePositionDifferenceMm": 0,
+        "maxOutsideNormalAngleDegrees": 0,
+        "meridianContinuityComparisons": 60,
+        "maxMeridianJumpMm": 0.022713969029825254
+      },
+      "orientation": {
+        "samples": 20851,
+        "minimumSideOutwardNormal": 0.009957640515367275,
+        "minimumNormalAgreement": 0.7419898102390307,
+        "minimumVerticalDerivative": 40.32346102533779
+      },
+      "actualMesh": {
+        "frontBefore": {
+          "sampleRows": 103,
+          "maxNearestMm": 7.533381415170529e-06,
+          "maximum": {
+            "v": 0.47375,
+            "curvaturePerMm": 0.3914674354930315,
+            "position": [
+              1.0703396797180176,
+              85.15658569335938,
+              -14.113936424255371
+            ]
+          }
+        },
+        "frontAfter": {
+          "sampleRows": 103,
+          "maxNearestMm": 7.533381415170529e-06,
+          "maximum": {
+            "v": 0.5125,
+            "curvaturePerMm": 0.022742925160580213,
+            "position": [
+              1.3227182626724243,
+              86.95142364501953,
+              -10.81715202331543
+            ]
+          }
+        },
+        "rearBefore": {
+          "sampleRows": 103,
+          "maxNearestMm": 8.366206945194894e-06,
+          "maximum": {
+            "v": 0.43625,
+            "curvaturePerMm": 0.5365818935064814,
+            "position": [
+              4.891240034797951e-15,
+              86.94324493408203,
+              -133.48731994628906
+            ]
+          }
+        },
+        "rearAfter": {
+          "sampleRows": 103,
+          "maxNearestMm": 8.366206945194894e-06,
+          "maximum": {
+            "v": 0.3675,
+            "curvaturePerMm": 0.11663075996897189,
+            "position": [
+              2.0754335004606085e-14,
+              85.35353088378906,
+              -135.2806854248047
+            ]
+          }
+        },
+        "partComparison": [
+          {
+            "id": "chelsea-whole-vamp",
+            "verticesBefore": 12150,
+            "verticesAfter": 12150,
+            "changedVertices": 3866,
+            "maxPositionDifferenceMm": 11.296837267487218,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-back-quarter",
+            "verticesBefore": 12150,
+            "verticesAfter": 12150,
+            "changedVertices": 3856,
+            "maxPositionDifferenceMm": 3.8995482574885796,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-gore--1",
+            "verticesBefore": 4570,
+            "verticesAfter": 4570,
+            "changedVertices": 2096,
+            "maxPositionDifferenceMm": 5.301214034208508,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam--1--1",
+            "verticesBefore": 4165,
+            "verticesAfter": 4109,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam--1-1",
+            "verticesBefore": 3766,
+            "verticesAfter": 3619,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-gore-1",
+            "verticesBefore": 4570,
+            "verticesAfter": 4570,
+            "changedVertices": 2098,
+            "maxPositionDifferenceMm": 5.295892362715498,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam-1--1",
+            "verticesBefore": 3766,
+            "verticesAfter": 3619,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam-1-1",
+            "verticesBefore": 4165,
+            "verticesAfter": 4116,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-top-binding",
+            "verticesBefore": 2304,
+            "verticesAfter": 2304,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "chelsea-rear-join",
+            "verticesBefore": 4592,
+            "verticesAfter": 4578,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-pull-loop",
+            "verticesBefore": 1330,
+            "verticesAfter": 1330,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "outsole",
+            "verticesBefore": 990,
+            "verticesAfter": 990,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "insole",
+            "verticesBefore": 990,
+            "verticesAfter": 990,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "stacked-heel",
+            "verticesBefore": 370,
+            "verticesAfter": 370,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "heel-toplift",
+            "verticesBefore": 370,
+            "verticesAfter": 370,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt--1",
+            "verticesBefore": 3252,
+            "verticesAfter": 3252,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt-stitch--1",
+            "verticesBefore": 9058,
+            "verticesAfter": 9058,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt-1",
+            "verticesBefore": 3252,
+            "verticesAfter": 3252,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt-stitch-1",
+            "verticesBefore": 9135,
+            "verticesAfter": 9135,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "forefoot-tread",
+            "verticesBefore": 1008,
+            "verticesAfter": 1008,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          }
+        ]
+      },
+      "checks": {
+        "sideRays": {
+          "rays": 430,
+          "directions": [
+            "world +X",
+            "world -X"
+          ],
+          "innerFirstHits": 0,
+          "misses": 0,
+          "explicitR12FailureSamplesPerSide": 5
+        },
+        "goreStitches": [
+          {
+            "id": "gore-seam--1--1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 587,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 44,
+            "minimumVisibleClearanceMm": 0.033627865741498966,
+            "maximumHiddenClearanceMm": -0.01835704269477841,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          },
+          {
+            "id": "gore-seam--1-1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 517,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 39,
+            "minimumVisibleClearanceMm": 0.04112372789713045,
+            "maximumHiddenClearanceMm": -0.011592811570732175,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          },
+          {
+            "id": "gore-seam-1--1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 517,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 39,
+            "minimumVisibleClearanceMm": 0.03884344073011594,
+            "maximumHiddenClearanceMm": -0.016865771145275845,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          },
+          {
+            "id": "gore-seam-1-1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 588,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 44,
+            "minimumVisibleClearanceMm": 0.03536197423215574,
+            "maximumHiddenClearanceMm": -0.010470830959376277,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          }
+        ],
+        "toe": [
+          {
+            "backMm": 3,
+            "roofErrorMm": 0.8277977561138989
+          },
+          {
+            "backMm": 6,
+            "roofErrorMm": 0.16998667297593784
+          },
+          {
+            "backMm": 9,
+            "roofErrorMm": 0.2685219939619401
+          },
+          {
+            "backMm": 13,
+            "roofErrorMm": 0.09943941207679075
+          },
+          {
+            "backMm": 20,
+            "roofErrorMm": 0.036681642956310156
+          }
+        ]
+      }
+    },
+    {
+      "name": "all-low",
+      "params": {
+        "length": 0.9,
+        "width": 0.88,
+        "instep": -5,
+        "thickness": 0.9
+      },
+      "geometry": {
+        "beforeTriangles": 140136,
+        "afterTriangles": 139524,
+        "beforeGenerationMs": 485.83561400000053,
+        "afterGenerationMs": 542.1030800000008
+      },
+      "sections": [
+        {
+          "u": 0,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              1.0635389601901917,
+              81.33629358802567,
+              -12.865627377049439
+            ],
+            "curvaturePerMm": 0.958534310841232,
+            "tangent": [
+              -0.3638017868845544,
+              92.77655114274806,
+              -8.728916325573264
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.512,
+            "position": [
+              1.3253193146427367,
+              83.05801504877407,
+              -9.557460924497223
+            ],
+            "curvaturePerMm": 0.02675009945114646,
+            "tangent": [
+              -5.207337945190015,
+              154.53250653081338,
+              -97.83397012954607
+            ]
+          },
+          "maxDisplacementMm": 9.195366874398706,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                1.0633567948869806,
+                81.42554152278291,
+                -12.869998244550242
+              ],
+              "curvaturePerMm": 1.099208805911214,
+              "tangent": [
+                -0.007315764971593807,
+                89.35591057266377,
+                -0.17553680962123505
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                1.0633567170070113,
+                81.42911382048888,
+                -12.870000085830624
+              ],
+              "curvaturePerMm": 0.05388124640926067,
+              "tangent": [
+                -0.0004718842094852959,
+                89.30242798541597,
+                -0.008582926280809032
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                1.502829226455843,
+                78.15492948430833,
+                -5.868689568313284
+              ],
+              "curvaturePerMm": 0.023841456853984457,
+              "tangent": [
+                -5.883043992305214,
+                152.1793713131103,
+                -134.151449133979
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                1.5025939217985984,
+                78.16101668346823,
+                -5.874054600484475
+              ],
+              "curvaturePerMm": 0.023848078311427837,
+              "tangent": [
+                -5.882188875105942,
+                152.18058749013605,
+                -134.10016220234408
+              ]
+            }
+          ]
+        },
+        {
+          "u": 0.4,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              13.014688237702991,
+              81.32624288800592,
+              -17.081982724811027
+            ],
+            "curvaturePerMm": 0.9675099706276029,
+            "tangent": [
+              -3.2755445052323746,
+              93.32580558236712,
+              -8.362465957034713
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.524,
+            "position": [
+              14.105909487288944,
+              84.80054762430927,
+              -14.94679145476153
+            ],
+            "curvaturePerMm": 0.02432991183414708,
+            "tangent": [
+              -27.218497695891127,
+              162.0566818665736,
+              -82.56353360298617
+            ]
+          },
+          "maxDisplacementMm": 9.787196099210282,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                13.013048078187074,
+                81.41576579748374,
+                -17.08617009805503
+              ],
+              "curvaturePerMm": 1.129561360420967,
+              "tangent": [
+                -0.0658691286403723,
+                89.36695149017736,
+                -0.16816756378545958
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                13.01304741615294,
+                81.41933820493234,
+                -17.086171859540432
+              ],
+              "curvaturePerMm": 0.05002019757437875,
+              "tangent": [
+                -0.00033121541065384,
+                89.30236081639008,
+                -0.007973025262231202
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                15.747193578579907,
+                77.59060358653448,
+                -10.369052916795956
+              ],
+              "curvaturePerMm": 0.01954186360699938,
+              "tangent": [
+                -48.414285653652904,
+                166.97865268895382,
+                -128.27252321505608
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                15.745257450271373,
+                77.59728256366438,
+                -10.374182831648346
+              ],
+              "curvaturePerMm": 0.0195491575486012,
+              "tangent": [
+                -48.39213076053283,
+                166.97020516289737,
+                -128.22322205385814
+              ]
+            }
+          ]
+        },
+        {
+          "u": 0.8,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              21.26107533411443,
+              79.8870444522586,
+              -29.06537896792998
+            ],
+            "curvaturePerMm": 0.8755317493716774,
+            "tangent": [
+              -2.4243271383284077,
+              91.80859880970614,
+              -7.3209693010056744
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.525,
+            "position": [
+              22.288904979696092,
+              84.3604775690865,
+              -27.19198377659448
+            ],
+            "curvaturePerMm": 0.026229170271997053,
+            "tangent": [
+              -20.1765079825833,
+              151.5037255643392,
+              -70.14767275208554
+            ]
+          },
+          "maxDisplacementMm": 8.254816976255917,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                21.25986142072126,
+                79.97580765802532,
+                -29.069044828112073
+              ],
+              "curvaturePerMm": 0.9709318777684468,
+              "tangent": [
+                -0.04875031507367566,
+                89.33644185873389,
+                -0.14722326806548833
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                21.259860939128075,
+                79.97937976263229,
+                -29.069046362810358
+              ],
+              "curvaturePerMm": 0.03928766651070577,
+              "tangent": [
+                0.000593254512182284,
+                89.30258770334375,
+                -0.006239612027059137
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                23.55006765181704,
+                77.47024452503352,
+                -23.159634543538328
+              ],
+              "curvaturePerMm": 0.02055961669986094,
+              "tangent": [
+                -36.52915534892997,
+                156.55807375054562,
+                -111.56389859472425
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                23.54860681235894,
+                77.4765066534591,
+                -23.164096226289185
+              ],
+              "curvaturePerMm": 0.020567978922770232,
+              "tangent": [
+                -36.5128181591956,
+                156.54834927616432,
+                -111.5202412359295
+              ]
+            }
+          ]
+        },
+        {
+          "u": 1.2,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              25.079426912439043,
+              76.69699180205772,
+              -46.9239013306035
+            ],
+            "curvaturePerMm": 0.705788268246739,
+            "tangent": [
+              -1.088592881259842,
+              90.19849380393906,
+              -5.768855782761761
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.513,
+            "position": [
+              25.45223104774301,
+              81.24787203502525,
+              -44.637252156912425
+            ],
+            "curvaturePerMm": 0.03765369786726648,
+            "tangent": [
+              -6.993651915720988,
+              125.48990871366071,
+              -60.74165585125967
+            ]
+          },
+          "maxDisplacementMm": 5.637142358461814,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                25.078881834167504,
+                76.78494882651604,
+                -46.926789994363986
+              ],
+              "curvaturePerMm": 0.7399238680863333,
+              "tangent": [
+                -0.021889986712153583,
+                89.30406725227157,
+                -0.11601056719712231
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                25.07888163425261,
+                76.78852061383462,
+                -46.92679119108775
+              ],
+              "curvaturePerMm": 0.02582649214650511,
+              "tangent": [
+                0.0018994843031805428,
+                89.30323496798563,
+                -0.0036563548633239402
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                25.845173240034114,
+                77.14625744779514,
+                -42.22108284905679
+              ],
+              "curvaturePerMm": 0.03192327422746463,
+              "tangent": [
+                -17.193373844115452,
+                124.10166699652335,
+                -86.66349971164776
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                25.844485780287112,
+                77.15122146390104,
+                -42.224548684079146
+              ],
+              "curvaturePerMm": 0.031935614392138,
+              "tangent": [
+                -17.179614144779972,
+                124.09914021418443,
+                -86.62825315433052
+              ]
+            }
+          ]
+        },
+        {
+          "u": 1.5707963267948966,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              26.273263990160952,
+              77.00232441812689,
+              -66.27845281743679
+            ],
+            "curvaturePerMm": 0.5177480880766034,
+            "tangent": [
+              -0.6529313164804761,
+              89.101978450401,
+              -4.086719916074343
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.486,
+            "position": [
+              26.79801949228284,
+              78.67274191639461,
+              -63.226889579095314
+            ],
+            "curvaturePerMm": 0.045801389510628385,
+            "tangent": [
+              -5.583435231848454,
+              108.29950438022705,
+              -55.81433318937456
+            ]
+          },
+          "maxDisplacementMm": 4.057197253164793,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                26.272937039973485,
+                77.08973238461166,
+                -66.28049917813034
+              ],
+              "curvaturePerMm": 0.5220010999568524,
+              "tangent": [
+                -0.013130731701949115,
+                89.28201692910419,
+                -0.08218314206942522
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                26.272936931856485,
+                77.09330394729893,
+                -66.28050000856709
+              ],
+              "curvaturePerMm": 0.015499631321805098,
+              "tangent": [
+                0.0023196058407393134,
+                89.30282319283832,
+                -0.0008566956921640666
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                26.834280317384373,
+                78.02483794175707,
+                -62.8793307796829
+              ],
+              "curvaturePerMm": 0.04559152487945471,
+              "tangent": [
+                -6.46543457598625,
+                106.97616604176118,
+                -59.677165543803305
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                26.834021818037947,
+                78.02911715426067,
+                -62.88171734365789
+              ],
+              "curvaturePerMm": 0.04559439279055218,
+              "tangent": [
+                -6.459532848701598,
+                106.9844603883041,
+                -59.65103437119978
+              ]
+            }
+          ]
+        },
+        {
+          "u": 2,
+          "beforeMaximum": {
+            "v": 0.471,
+            "position": [
+              24.87068041066701,
+              81.65339263436898,
+              -88.42228650508375
+            ],
+            "curvaturePerMm": 0.3248775296995985,
+            "tangent": [
+              -7.239764103950107,
+              80.69128689172088,
+              -18.523303723583236
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.449,
+            "position": [
+              26.038809683734847,
+              81.34376737422008,
+              -85.51937485116436
+            ],
+            "curvaturePerMm": 0.05849422110193561,
+            "tangent": [
+              -12.840810450320815,
+              83.07743233686436,
+              -41.60821473391251
+            ]
+          },
+          "maxDisplacementMm": 2.79003162765376,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                24.837464781481934,
+                82.41570644298649,
+                -88.5071101800379
+              ],
+              "curvaturePerMm": 0.2921297420704137,
+              "tangent": [
+                -0.017001054963827752,
+                89.26549005536798,
+                -0.04333430894121192
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                24.837464628350933,
+                82.41927782094682,
+                -88.50711058981526
+              ],
+              "curvaturePerMm": 0.01818379136107762,
+              "tangent": [
+                0.0016887184983715995,
+                89.30087816452213,
+                0.002358552109171796
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                25.696991469845354,
+                84.04491693025308,
+                -86.60412876931686
+              ],
+              "curvaturePerMm": 0.05251105337529514,
+              "tangent": [
+                -9.229106524522022,
+                91.7753149671796,
+                -28.684928024347297
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                25.696622398625568,
+                84.0485882040943,
+                -86.60527585317425
+              ],
+              "curvaturePerMm": 0.05249659308816004,
+              "tangent": [
+                -9.224454470135866,
+                91.78837798060611,
+                -28.66926533968694
+              ]
+            }
+          ]
+        },
+        {
+          "u": 2.6,
+          "beforeMaximum": {
+            "v": 0.463,
+            "position": [
+              13.359653803747339,
+              88.5324603579544,
+              -112.03253673595091
+            ],
+            "curvaturePerMm": 0.29523153920324646,
+            "tangent": [
+              -26.98507486753598,
+              70.0395819364985,
+              -1.6846760956923388
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.437,
+            "position": [
+              16.007442135072118,
+              88.18973519433953,
+              -111.81285309069983
+            ],
+            "curvaturePerMm": 0.05008005215712393,
+            "tangent": [
+              -34.99365343060389,
+              76.52756181784069,
+              -0.11435326427999824
+            ]
+          },
+          "maxDisplacementMm": 2.5487957237580843,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                13.121793036477884,
+                89.87733217598068,
+                -112.04735673991681
+              ],
+              "curvaturePerMm": 0.22143131525020526,
+              "tangent": [
+                -0.035210023963117,
+                89.26014251358082,
+                -0.0021894358326335346
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                13.121792698191532,
+                89.88090347447591,
+                -112.04735670417301
+              ],
+              "curvaturePerMm": 0.037159846832676056,
+              "tangent": [
+                0.0013830047329577153,
+                89.2982794759689,
+                0.005763825328131133
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                14.767579388917433,
+                91.67572784847377,
+                -111.73110805605864
+              ],
+              "curvaturePerMm": 0.04264434996013613,
+              "tangent": [
+                -22.97323367468351,
+                86.4938154300887,
+                4.1390104804861485
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                14.766660668111957,
+                91.67918783167015,
+                -111.73094240413404
+              ],
+              "curvaturePerMm": 0.04263200226260846,
+              "tangent": [
+                -22.96280686415741,
+                86.50534517613549,
+                4.143585966431828
+              ]
+            }
+          ]
+        },
+        {
+          "u": 3.141592653589793,
+          "beforeMaximum": {
+            "v": 0.433,
+            "position": [
+              5.5481266052024204e-15,
+              86.67403065573376,
+              -120.20008941795714
+            ],
+            "curvaturePerMm": 0.5570523205464781,
+            "tangent": [
+              -2.062463565245648e-13,
+              26.680825341429678,
+              19.368116002027588
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.362,
+            "position": [
+              2.179934274715617e-14,
+              84.98298445535224,
+              -121.87282918536403
+            ],
+            "curvaturePerMm": 0.12253620981639089,
+            "tangent": [
+              -1.929848628079024e-13,
+              38.2357673025524,
+              22.26267314924257
+            ]
+          },
+          "maxDisplacementMm": 2.4124707525465063,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                1.2444791071295729e-21,
+                89.15705073074139,
+                -119.69100011171045
+              ],
+              "curvaturePerMm": 0.07014620017791484,
+              "tangent": [
+                -1.24442120555078e-16,
+                89.24672493151319,
+                0.011170524061299146
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                1.7119253713943548e-23,
+                89.16062189591531,
+                -119.69099993130354
+              ],
+              "curvaturePerMm": 0.043065903061082815,
+              "tangent": [
+                1.7118979359894187e-18,
+                89.29836555537916,
+                0.006869537116926948
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                5.897433352442245e-15,
+                91.49016181758827,
+                -119.88997199104985
+              ],
+              "curvaturePerMm": 0.009505438001409992,
+              "tangent": [
+                -8.266497123452898e-14,
+                76.160370949907,
+                14.797118045350997
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                5.894127377937736e-15,
+                91.49320857272872,
+                -119.88938008682862
+              ],
+              "curvaturePerMm": 0.009491791938498629,
+              "tangent": [
+                -8.26337547777286e-14,
+                76.1773866003068,
+                14.798093459233995
+              ]
+            }
+          ]
+        }
+      ],
+      "protected": {
+        "outsideSamples": 2737,
+        "maxOutsidePositionDifferenceMm": 0,
+        "maxOutsideNormalAngleDegrees": 0,
+        "meridianContinuityComparisons": 60,
+        "maxMeridianJumpMm": 0.019988292746246028
+      },
+      "orientation": {
+        "samples": 20851,
+        "minimumSideOutwardNormal": 0.008453369783276739,
+        "minimumNormalAgreement": 0.7594233410791804,
+        "minimumVerticalDerivative": 40.012747355433476
+      },
+      "actualMesh": {
+        "frontBefore": {
+          "sampleRows": 103,
+          "maxNearestMm": 7.419253730188548e-06,
+          "maximum": {
+            "v": 0.47375,
+            "curvaturePerMm": 0.40191275573347945,
+            "position": [
+              1.0703396797180176,
+              80.80226135253906,
+              -12.702543258666992
+            ]
+          }
+        },
+        "frontAfter": {
+          "sampleRows": 103,
+          "maxNearestMm": 7.419253730188548e-06,
+          "maximum": {
+            "v": 0.5125,
+            "curvaturePerMm": 0.0266828489838134,
+            "position": [
+              1.3227182626724243,
+              83.13529968261719,
+              -9.606254577636719
+            ]
+          }
+        },
+        "rearBefore": {
+          "sampleRows": 103,
+          "maxNearestMm": 8.237383425176015e-06,
+          "maximum": {
+            "v": 0.43625,
+            "curvaturePerMm": 0.5420022649380655,
+            "position": [
+              4.891240034797951e-15,
+              86.76441955566406,
+              -120.13858032226562
+            ]
+          }
+        },
+        "rearAfter": {
+          "sampleRows": 103,
+          "maxNearestMm": 8.237383425176015e-06,
+          "maximum": {
+            "v": 0.3675,
+            "curvaturePerMm": 0.11600300046216006,
+            "position": [
+              2.0754335004606085e-14,
+              85.19661712646484,
+              -121.75262451171875
+            ]
+          }
+        },
+        "partComparison": [
+          {
+            "id": "chelsea-whole-vamp",
+            "verticesBefore": 12150,
+            "verticesAfter": 12150,
+            "changedVertices": 3855,
+            "maxPositionDifferenceMm": 9.95633428809916,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-back-quarter",
+            "verticesBefore": 12150,
+            "verticesAfter": 12150,
+            "changedVertices": 3856,
+            "maxPositionDifferenceMm": 3.4978677114840675,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-gore--1",
+            "verticesBefore": 4570,
+            "verticesAfter": 4570,
+            "changedVertices": 2096,
+            "maxPositionDifferenceMm": 4.754630015053783,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam--1--1",
+            "verticesBefore": 4116,
+            "verticesAfter": 4067,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam--1-1",
+            "verticesBefore": 3794,
+            "verticesAfter": 3675,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-gore-1",
+            "verticesBefore": 4570,
+            "verticesAfter": 4570,
+            "changedVertices": 2102,
+            "maxPositionDifferenceMm": 4.749567750430439,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam-1--1",
+            "verticesBefore": 3801,
+            "verticesAfter": 3675,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam-1-1",
+            "verticesBefore": 4116,
+            "verticesAfter": 4067,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-top-binding",
+            "verticesBefore": 2304,
+            "verticesAfter": 2304,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "chelsea-rear-join",
+            "verticesBefore": 4543,
+            "verticesAfter": 4529,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-pull-loop",
+            "verticesBefore": 1330,
+            "verticesAfter": 1330,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "outsole",
+            "verticesBefore": 990,
+            "verticesAfter": 990,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "insole",
+            "verticesBefore": 990,
+            "verticesAfter": 990,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "stacked-heel",
+            "verticesBefore": 370,
+            "verticesAfter": 370,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "heel-toplift",
+            "verticesBefore": 370,
+            "verticesAfter": 370,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt--1",
+            "verticesBefore": 3252,
+            "verticesAfter": 3252,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt-stitch--1",
+            "verticesBefore": 8162,
+            "verticesAfter": 8162,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt-1",
+            "verticesBefore": 3252,
+            "verticesAfter": 3252,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt-stitch-1",
+            "verticesBefore": 8239,
+            "verticesAfter": 8239,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "forefoot-tread",
+            "verticesBefore": 1008,
+            "verticesAfter": 1008,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          }
+        ]
+      },
+      "checks": {
+        "sideRays": {
+          "rays": 430,
+          "directions": [
+            "world +X",
+            "world -X"
+          ],
+          "innerFirstHits": 0,
+          "misses": 0,
+          "explicitR12FailureSamplesPerSide": 5
+        },
+        "goreStitches": [
+          {
+            "id": "gore-seam--1--1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 581,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 44,
+            "minimumVisibleClearanceMm": 0.019542899498052015,
+            "maximumHiddenClearanceMm": -0.016106536280708492,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          },
+          {
+            "id": "gore-seam--1-1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 525,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 40,
+            "minimumVisibleClearanceMm": 0.043576464464212115,
+            "maximumHiddenClearanceMm": -0.019627116907063268,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          },
+          {
+            "id": "gore-seam-1--1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 525,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 40,
+            "minimumVisibleClearanceMm": 0.04053638426612243,
+            "maximumHiddenClearanceMm": -0.014576956370375656,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          },
+          {
+            "id": "gore-seam-1-1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 581,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 44,
+            "minimumVisibleClearanceMm": 0.02466502718638014,
+            "maximumHiddenClearanceMm": -0.012828714715407636,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          }
+        ],
+        "toe": [
+          {
+            "backMm": 3,
+            "roofErrorMm": 0.3753649942498356
+          },
+          {
+            "backMm": 6,
+            "roofErrorMm": 0.10015822384260531
+          },
+          {
+            "backMm": 9,
+            "roofErrorMm": 0.1931622763844274
+          },
+          {
+            "backMm": 13,
+            "roofErrorMm": 0.0019507457200589329
+          },
+          {
+            "backMm": 20,
+            "roofErrorMm": 0.008090559229948724
+          }
+        ]
+      }
+    },
+    {
+      "name": "all-high",
+      "params": {
+        "length": 1.1,
+        "width": 1.15,
+        "instep": 8,
+        "thickness": 2.1
+      },
+      "geometry": {
+        "beforeTriangles": 146496,
+        "afterTriangles": 145680,
+        "beforeGenerationMs": 420.0301209999998,
+        "afterGenerationMs": 390.638547999999
+      },
+      "sections": [
+        {
+          "u": 0,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              1.0635389601901917,
+              92.6855178807063,
+              -15.724655683060424
+            ],
+            "curvaturePerMm": 1.1098972461499785,
+            "tangent": [
+              -0.3638017868845544,
+              94.26949745474643,
+              -10.668675509073465
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.52,
+            "position": [
+              1.2843256050831924,
+              94.32406532299757,
+              -12.932445372491053
+            ],
+            "curvaturePerMm": 0.018174588663760174,
+            "tangent": [
+              -5.0412730967508415,
+              168.30005466275108,
+              -116.59386494304867
+            ]
+          },
+          "maxDisplacementMm": 11.868812693518752,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                1.0633567948869806,
+                92.7755133187885,
+                -15.729997854450296
+              ],
+              "curvaturePerMm": 1.341735853621706,
+              "tangent": [
+                -0.007315764971593807,
+                89.38592812839373,
+                -0.21454498959627696
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                1.0633567170070113,
+                92.77908588310483,
+                -15.730000140406142
+              ],
+              "curvaturePerMm": 0.08806842152530414,
+              "tangent": [
+                -0.0004718842094852959,
+                89.29907011037129,
+                -0.01404039124963674
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                1.502829226455843,
+                87.4320969304138,
+                -7.311273475904354
+              ],
+              "curvaturePerMm": 0.015247915187821847,
+              "tangent": [
+                -5.883043992305214,
+                176.92844637906543,
+                -167.47757988726516
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                1.5025939217985984,
+                87.43917384770383,
+                -7.317971372948273
+              ],
+              "curvaturePerMm": 0.015252817387958828,
+              "tangent": [
+                -5.882188875105942,
+                176.91741902368105,
+                -167.4172758533654
+              ]
+            }
+          ]
+        },
+        {
+          "u": 0.4,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              15.589456263687554,
+              92.82819476645786,
+              -20.87797888588014
+            ],
+            "curvaturePerMm": 1.1394599904069451,
+            "tangent": [
+              -4.345575768027742,
+              94.64519851007934,
+              -10.220791725323862
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.536,
+            "position": [
+              16.72944689727132,
+              97.21149046996854,
+              -19.81648445684517
+            ],
+            "curvaturePerMm": 0.017676490333144078,
+            "tangent": [
+              -35.354665389419885,
+              168.39526973342342,
+              -96.34325624379157
+            ]
+          },
+          "maxDisplacementMm": 12.72584006178605,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                15.587280328391335,
+                92.9183782699127,
+                -20.883096786511704
+              ],
+              "curvaturePerMm": 1.395591443967137,
+              "tangent": [
+                -0.08738519836626323,
+                89.39347850258626,
+                -0.205538133535299
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                15.587279439762689,
+                92.921950908613,
+                -20.883098972137855
+              ],
+              "curvaturePerMm": 0.08211039408385191,
+              "tangent": [
+                -0.001473578414845633,
+                89.29895778280182,
+                -0.013014711264247579
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                19.567779752433786,
+                87.24178466351181,
+                -12.800789988989019
+              ],
+              "curvaturePerMm": 0.012520627510611742,
+              "tangent": [
+                -68.101487175376,
+                190.21192539412365,
+                -160.01477925060567
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                19.565056251517507,
+                87.24939271449037,
+                -12.807189418794383
+              ],
+              "curvaturePerMm": 0.012526065291819806,
+              "tangent": [
+                -68.07355985678497,
+                190.19062506799852,
+                -159.95671439510414
+              ]
+            }
+          ]
+        },
+        {
+          "u": 0.8,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              24.54591653048213,
+              90.8613471507674,
+              -35.52435207191442
+            ],
+            "curvaturePerMm": 1.0677541102320813,
+            "tangent": [
+              -3.4715058076173473,
+              92.25870285405334,
+              -8.947851367935298
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.542,
+            "position": [
+              25.353832746864,
+              97.52390288846115,
+              -34.90960259987025
+            ],
+            "curvaturePerMm": 0.022734817626161582,
+            "tangent": [
+              -25.951719160310912,
+              147.29027081656906,
+              -77.2281515434514
+            ]
+          },
+          "maxDisplacementMm": 10.273698697693728,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                24.544178282054407,
+                90.95033567512431,
+                -35.52883256769253
+              ],
+              "curvaturePerMm": 1.2079726844255791,
+              "tangent": [
+                -0.06980701101610974,
+                89.34548823020803,
+                -0.17993954983808177
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                24.544177575309483,
+                90.9539078377308,
+                -35.52883446816939
+              ],
+              "curvaturePerMm": 0.06354486335019736,
+              "tangent": [
+                -0.0008642217608212376,
+                89.29934090247114,
+                -0.010099604708102559
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                27.827701617547255,
+                87.89121221100226,
+                -28.402665574356277
+              ],
+              "curvaturePerMm": 0.01359325383739333,
+              "tangent": [
+                -55.98719076846947,
+                168.0528419321092,
+                -138.8045894685774
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                27.82546260099198,
+                87.8979338746189,
+                -28.408216723860246
+              ],
+              "curvaturePerMm": 0.013601012291589921,
+              "tangent": [
+                -55.963638007661125,
+                168.0303411056627,
+                -138.75288863172128
+              ]
+            }
+          ]
+        },
+        {
+          "u": 1.2,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              27.080016654483277,
+              85.06028988354232,
+              -57.351434959626495
+            ],
+            "curvaturePerMm": 0.8803302064144163,
+            "tangent": [
+              -1.7407158484417093,
+              89.84891488168499,
+              -7.050823734644495
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.529,
+            "position": [
+              27.315292008667903,
+              91.85514060527898,
+              -55.783658681060324
+            ],
+            "curvaturePerMm": 0.041080083431769956,
+            "tangent": [
+              -8.473801169195381,
+              118.56850917624227,
+              -64.23162191211416
+            ]
+          },
+          "maxDisplacementMm": 6.924341064445837,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                27.079145049406225,
+                85.14807183145817,
+                -57.35496554866709
+              ],
+              "curvaturePerMm": 0.9155628469739352,
+              "tangent": [
+                -0.03500296781311362,
+                89.29703484596983,
+                -0.1417906929646051
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                27.079144709478747,
+                85.15164352370694,
+                -57.35496702419392
+              ],
+              "curvaturePerMm": 0.03663104445663807,
+              "tangent": [
+                0.0010118306192907765,
+                89.30076074875613,
+                -0.0057553016574729545
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                28.206558479947397,
+                86.05693517036035,
+                -51.653707131200456
+              ],
+              "curvaturePerMm": 0.026862811563912202,
+              "tangent": [
+                -29.377910075822907,
+                121.02774419844307,
+                -107.19563313799084
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                28.205383777527594,
+                86.06177609165519,
+                -51.65799411214778
+              ],
+              "curvaturePerMm": 0.026879664738606302,
+              "tangent": [
+                -29.35721202952379,
+                121.01832281388168,
+                -107.15341642111296
+              ]
+            }
+          ]
+        },
+        {
+          "u": 1.5707963267948966,
+          "beforeMaximum": {
+            "v": 0.479,
+            "position": [
+              26.76560530073729,
+              82.10918531734318,
+              -81.00699788797829
+            ],
+            "curvaturePerMm": 0.64317091184801,
+            "tangent": [
+              -0.9022723169493928,
+              88.67319986549658,
+              -4.99487989813474
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.5,
+            "position": [
+              27.263787612047345,
+              85.67114287258218,
+              -78.15906856367698
+            ],
+            "curvaturePerMm": 0.05370536219181852,
+            "tangent": [
+              -6.912878513887221,
+              104.83605557922714,
+              -57.90313215783271
+            ]
+          },
+          "maxDisplacementMm": 5.04271475204585,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                26.76515350469626,
+                82.19637857348307,
+                -81.00949899549263
+              ],
+              "curvaturePerMm": 0.640391830002983,
+              "tangent": [
+                -0.018144309876788608,
+                89.27339377606812,
+                -0.10044606284509426
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                26.765153344256806,
+                82.19995003482667,
+                -81.00950001047087
+              ],
+              "curvaturePerMm": 0.014716015699182928,
+              "tangent": [
+                0.0021011757667110938,
+                89.3013123977937,
+                -0.001047072117899006
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                27.444975941156358,
+                83.62083747560575,
+                -76.85251539738782
+              ],
+              "curvaturePerMm": 0.050346978946569705,
+              "tangent": [
+                -11.258710177663998,
+                100.27232863478729,
+                -72.93875788647595
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                27.444525774892547,
+                83.6248485172736,
+                -76.8554323089128
+              ],
+              "curvaturePerMm": 0.05035974115217501,
+              "tangent": [
+                -11.249603331187073,
+                100.27975602895366,
+                -72.90681978702194
+              ]
+            }
+          ]
+        },
+        {
+          "u": 2,
+          "beforeMaximum": {
+            "v": 0.472,
+            "position": [
+              24.863820485759884,
+              84.11665291179486,
+              -108.09312692714443
+            ],
+            "curvaturePerMm": 0.39349388138339536,
+            "tangent": [
+              -6.478210491245306,
+              80.33647422251987,
+              -20.24232086128563
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.462,
+            "position": [
+              25.852810792200422,
+              85.02043629284323,
+              -105.10469784425538
+            ],
+            "curvaturePerMm": 0.06920485066035803,
+            "tangent": [
+              -11.340739362530881,
+              83.33314592618989,
+              -42.939468490743586
+            ]
+          },
+          "maxDisplacementMm": 3.2797518188397192,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                24.837464781481934,
+                84.79272347614724,
+                -108.17535688671299
+              ],
+              "curvaturePerMm": 0.34912529593238995,
+              "tangent": [
+                -0.017001054963827752,
+                89.26220177301046,
+                -0.05296415537259235
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                24.837464628350933,
+                84.79629481419073,
+                -108.17535737277791
+              ],
+              "curvaturePerMm": 0.02931049909460471,
+              "tangent": [
+                0.0016887184983715995,
+                89.30017492687624,
+                0.0043600572041668775
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                25.668602460554137,
+                86.56684455679805,
+                -105.79188323257569
+              ],
+              "curvaturePerMm": 0.06620848556653315,
+              "tangent": [
+                -9.153950438367529,
+                88.83153892753624,
+                -33.596726181173146
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                25.668236399256518,
+                86.57039808310593,
+                -105.79322669893793
+              ],
+              "curvaturePerMm": 0.06619572440272342,
+              "tangent": [
+                -9.149114467099649,
+                88.8447773021994,
+                -33.57659247313904
+              ]
+            }
+          ]
+        },
+        {
+          "u": 2.6,
+          "beforeMaximum": {
+            "v": 0.464,
+            "position": [
+              13.333376637862443,
+              89.36696855062209,
+              -136.93066059728116
+            ],
+            "curvaturePerMm": 0.2933856868123251,
+            "tangent": [
+              -25.565670652394342,
+              71.19575753549155,
+              -1.949875824891478
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.442,
+            "position": [
+              15.836188730448201,
+              89.32098889380913,
+              -136.62249580410156
+            ],
+            "curvaturePerMm": 0.051505085219548094,
+            "tangent": [
+              -33.51138977292222,
+              77.74327920486711,
+              1.7685509405396258
+            ]
+          },
+          "maxDisplacementMm": 2.559901213173005,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                13.121793036477884,
+                90.6427887894792,
+                -136.9467693487872
+              ],
+              "curvaturePerMm": 0.22164001083438384,
+              "tangent": [
+                -0.035210023963117,
+                89.26038404553081,
+                -0.0026759764182315844
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                13.121792698191532,
+                90.64636008812525,
+                -136.946769274679
+              ],
+              "curvaturePerMm": 0.06382737017666454,
+              "tangent": [
+                0.0013830047329577153,
+                89.29805301676195,
+                0.010086758095440016
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                14.767579388917433,
+                92.42785492727107,
+                -136.44162349521827
+              ],
+              "curvaturePerMm": 0.04539878248738995,
+              "tangent": [
+                -22.97323367468351,
+                86.49076200981652,
+                8.07049544135907
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                14.766660668111957,
+                92.43131478175837,
+                -136.4413005227754
+              ],
+              "curvaturePerMm": 0.04538706968762316,
+              "tangent": [
+                -22.96280686415741,
+                86.50196314050616,
+                8.078127092403518
+              ]
+            }
+          ]
+        },
+        {
+          "u": 3.141592653589793,
+          "beforeMaximum": {
+            "v": 0.437,
+            "position": [
+              4.743627510685046e-15,
+              87.25182393614601,
+              -146.8192099049079
+            ],
+            "curvaturePerMm": 0.5263060694611086,
+            "tangent": [
+              -1.9578044306804028e-13,
+              30.215865071880895,
+              22.31278615738574
+            ]
+          },
+          "afterMaximum": {
+            "v": 0.362,
+            "position": [
+              2.179934274715617e-14,
+              85.38666163480762,
+              -148.95568016017205
+            ],
+            "curvaturePerMm": 0.12048297325238547,
+            "tangent": [
+              -1.929848628079024e-13,
+              39.0270289493344,
+              27.209861781329888
+            ]
+          },
+          "maxDisplacementMm": 2.386248423852064,
+          "joinBefore": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                1.2444791071295729e-21,
+                89.6379285459523,
+                -146.28900013653498
+              ],
+              "curvaturePerMm": 0.08573313377935096,
+              "tangent": [
+                -1.24442120555078e-16,
+                89.24712381102039,
+                0.013652862662638652
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                1.7119253713943548e-23,
+                89.64149971369254,
+                -146.28899988053558
+              ],
+              "curvaturePerMm": 0.07489273889069034,
+              "tangent": [
+                1.7118979359894187e-18,
+                89.29822328767044,
+                0.011946247013838727
+              ]
+            }
+          ],
+          "joinAfter": [
+            {
+              "v": 0.47997999999999996,
+              "position": [
+                5.897433352442245e-15,
+                91.94984189519384,
+                -146.39375731887682
+              ],
+              "curvaturePerMm": 0.004512911719167016,
+              "tangent": [
+                -8.266497123452898e-14,
+                76.3044638134147,
+                21.600064111737534
+              ]
+            },
+            {
+              "v": 0.48002,
+              "position": [
+                5.894127377937736e-15,
+                91.95289440937547,
+                -146.39289324488288
+              ],
+              "curvaturePerMm": 0.00449886051811878,
+              "tangent": [
+                -8.26337547777286e-14,
+                76.32124579544096,
+                21.60363628007644
+              ]
+            }
+          ]
+        }
+      ],
+      "protected": {
+        "outsideSamples": 2737,
+        "maxOutsidePositionDifferenceMm": 0,
+        "maxOutsideNormalAngleDegrees": 0,
+        "meridianContinuityComparisons": 60,
+        "maxMeridianJumpMm": 0.026121064384299064
+      },
+      "orientation": {
+        "samples": 20851,
+        "minimumSideOutwardNormal": 0.005867910663828351,
+        "minimumNormalAgreement": 0.7373998974454762,
+        "minimumVerticalDerivative": 40.82078872258421
+      },
+      "actualMesh": {
+        "frontBefore": {
+          "sampleRows": 103,
+          "maxNearestMm": 7.138341216029134e-06,
+          "maximum": {
+            "v": 0.47375,
+            "curvaturePerMm": 0.36468302478269526,
+            "position": [
+              1.0703396797180176,
+              92.12349700927734,
+              -15.525330543518066
+            ]
+          }
+        },
+        "frontAfter": {
+          "sampleRows": 103,
+          "maxNearestMm": 7.138341216029134e-06,
+          "maximum": {
+            "v": 0.5233333333333333,
+            "curvaturePerMm": 0.018101871175961064,
+            "position": [
+              1.2676361799240112,
+              94.88422393798828,
+              -13.315414428710938
+            ]
+          }
+        },
+        "rearBefore": {
+          "sampleRows": 103,
+          "maxNearestMm": 8.893725257686263e-06,
+          "maximum": {
+            "v": 0.43625,
+            "curvaturePerMm": 0.5206009133190149,
+            "position": [
+              4.891240034797951e-15,
+              87.22937774658203,
+              -146.83604431152344
+            ]
+          }
+        },
+        "rearAfter": {
+          "sampleRows": 103,
+          "maxNearestMm": 8.893725257686263e-06,
+          "maximum": {
+            "v": 0.3675,
+            "curvaturePerMm": 0.11483746074727577,
+            "position": [
+              2.0754335004606085e-14,
+              85.60456848144531,
+              -148.80874633789062
+            ]
+          }
+        },
+        "partComparison": [
+          {
+            "id": "chelsea-whole-vamp",
+            "verticesBefore": 12150,
+            "verticesAfter": 12150,
+            "changedVertices": 3872,
+            "maxPositionDifferenceMm": 12.986194911687091,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-back-quarter",
+            "verticesBefore": 12150,
+            "verticesAfter": 12150,
+            "changedVertices": 3870,
+            "maxPositionDifferenceMm": 4.341293100044749,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-gore--1",
+            "verticesBefore": 4570,
+            "verticesAfter": 4570,
+            "changedVertices": 2096,
+            "maxPositionDifferenceMm": 5.8814399381760545,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam--1--1",
+            "verticesBefore": 4200,
+            "verticesAfter": 4137,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam--1-1",
+            "verticesBefore": 3689,
+            "verticesAfter": 3521,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-gore-1",
+            "verticesBefore": 4570,
+            "verticesAfter": 4570,
+            "changedVertices": 2096,
+            "maxPositionDifferenceMm": 5.875973950163898,
+            "sameVertexCount": true,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam-1--1",
+            "verticesBefore": 3689,
+            "verticesAfter": 3521,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "gore-seam-1-1",
+            "verticesBefore": 4200,
+            "verticesAfter": 4137,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-top-binding",
+            "verticesBefore": 2304,
+            "verticesAfter": 2304,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "chelsea-rear-join",
+            "verticesBefore": 4648,
+            "verticesAfter": 4634,
+            "changedVertices": null,
+            "maxPositionDifferenceMm": null,
+            "sameVertexCount": false,
+            "positionsByteIdentical": false
+          },
+          {
+            "id": "chelsea-pull-loop",
+            "verticesBefore": 1330,
+            "verticesAfter": 1330,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "outsole",
+            "verticesBefore": 990,
+            "verticesAfter": 990,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "insole",
+            "verticesBefore": 990,
+            "verticesAfter": 990,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "stacked-heel",
+            "verticesBefore": 370,
+            "verticesAfter": 370,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "heel-toplift",
+            "verticesBefore": 370,
+            "verticesAfter": 370,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt--1",
+            "verticesBefore": 3252,
+            "verticesAfter": 3252,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt-stitch--1",
+            "verticesBefore": 9982,
+            "verticesAfter": 9982,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt-1",
+            "verticesBefore": 3252,
+            "verticesAfter": 3252,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "welt-stitch-1",
+            "verticesBefore": 10073,
+            "verticesAfter": 10073,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          },
+          {
+            "id": "forefoot-tread",
+            "verticesBefore": 1008,
+            "verticesAfter": 1008,
+            "changedVertices": 0,
+            "maxPositionDifferenceMm": 0,
+            "sameVertexCount": true,
+            "positionsByteIdentical": true
+          }
+        ]
+      },
+      "checks": {
+        "sideRays": {
+          "rays": 430,
+          "directions": [
+            "world +X",
+            "world -X"
+          ],
+          "innerFirstHits": 0,
+          "misses": 0,
+          "explicitR12FailureSamplesPerSide": 5
+        },
+        "goreStitches": [
+          {
+            "id": "gore-seam--1--1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 591,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 45,
+            "minimumVisibleClearanceMm": 0.02031545963219308,
+            "maximumHiddenClearanceMm": -0.011364983365470975,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          },
+          {
+            "id": "gore-seam--1-1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 503,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 38,
+            "minimumVisibleClearanceMm": 0.03819844345744881,
+            "maximumHiddenClearanceMm": -0.013935648673264179,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          },
+          {
+            "id": "gore-seam-1--1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 503,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 38,
+            "minimumVisibleClearanceMm": 0.03694769694623917,
+            "maximumHiddenClearanceMm": -0.01217776172169174,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          },
+          {
+            "id": "gore-seam-1-1",
+            "supportIds": [
+              "chelsea-whole-vamp",
+              "chelsea-back-quarter"
+            ],
+            "rings": 591,
+            "unsupportedCentres": 0,
+            "verifiedCompletePeriods": 45,
+            "minimumVisibleClearanceMm": 0.03810933282755174,
+            "maximumHiddenClearanceMm": -0.010950364628783717,
+            "method": "ray cast against actual exterior mesh; complete visible/hidden sections tested vertex by vertex in every full pitch period"
+          }
+        ],
+        "toe": [
+          {
+            "backMm": 3,
+            "roofErrorMm": 1.1769112542799363
+          },
+          {
+            "backMm": 6,
+            "roofErrorMm": 0.18627301860458445
+          },
+          {
+            "backMm": 9,
+            "roofErrorMm": 0.2066532512782473
+          },
+          {
+            "backMm": 13,
+            "roofErrorMm": 0.0963292837964147
+          },
+          {
+            "backMm": 20,
+            "roofErrorMm": 0.006953114822437101
+          }
+        ]
+      }
+    }
+  ],
+  "claims": {
+    "independentVisualAccepted": false,
+    "physicalSolver": false,
+    "manufacturingValidated": false,
+    "wearerFitValidated": false,
+    "userApproval": false
+  },
+  "pennySourceUnchanged": true,
+  "sourcesStillMatch": true,
+  "samplingNote": "The four leather/elastic shell grids retain their vertex counts and shared rows. Stitch curve lengths and resulting needle counts can change; different-length arrays are not called unchanged."
+}
