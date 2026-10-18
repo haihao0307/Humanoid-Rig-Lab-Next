@@ -1,0 +1,123 @@
+name: Reality HC S3 fabric semantics acceptance v2
+on:
+  push:
+    branches: [feature/reality-contract-hc-s3-20261018]
+    paths: [.github/workflows/reality-hc-s3-v2.yml, reality-lab/hc-s3/RUN_TRIGGER_V2.txt]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /reality-lab/hc-s3/
+            /.github/workflows/reality-hc-s3-v2.yml
+      - name: Materialize reviewed S3 source once
+        run: |
+          if [ -f reality-lab/hc-s3/.bootstrap/bundle.b64 ]; then
+            python -c "from pathlib import Path;import base64,gzip,json,hashlib,shutil;root=Path('reality-lab/hc-s3');e=(root/'.bootstrap/bundle.b64').read_text().strip();assert hashlib.sha256(e.encode()).hexdigest()=='05bea328a61d3336c4d83490b6574eb7dffdd08517bbfadc00b1a45b83e79f37';f=json.loads(gzip.decompress(base64.b64decode(e,validate=True)));assert set(f)=={'SCOPE_LOCK.json','BUILD_REQUEST.json','README.md','material-snapshots.json','contract.js','app.js','index.template.html','build.py','tests/protocol.cjs','tests/browser.py'};[(root/n).parent.mkdir(parents=True,exist_ok=True) or (root/n).write_text(t) for n,t in f.items()];shutil.rmtree(root/'.bootstrap')"
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git add reality-lab/hc-s3
+            git commit -m 'feat(reality): add read-only S3 fabric and leather semantics platform'
+            git push origin HEAD:refs/heads/feature/reality-contract-hc-s3-20261018
+          fi
+      - name: Enforce scope and run protocol checks
+        run: |
+          git fetch --filter=blob:none --depth=1 origin fba814d4b34147dc637841f4dfe252653f68988c
+          python - <<'PY'
+          import subprocess,json,ast
+          from pathlib import Path
+          changed=subprocess.check_output(['git','diff','--name-only','fba814d4b34147dc637841f4dfe252653f68988c','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s3/') or p.startswith('.github/workflows/reality-hc-s3') for p in changed),changed
+          root=Path('reality-lab/hc-s3');lock=json.loads((root/'SCOPE_LOCK.json').read_text())
+          assert set(lock['excludedDomains'])=={'architecture','aircraft','terrain','animals','vegetation','world'}
+          for p in root.rglob('*.py'):ast.parse(p.read_text(),filename=str(p))
+          q=root/'qa/local';q.mkdir(parents=True,exist_ok=True)
+          (q/'SCOPE_REPORT.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'sourceWorkbenchesModified':False,'excludedDomainsTouched':[]},indent=2))
+          PY
+          python reality-lab/hc-s3/build.py
+          node reality-lab/hc-s3/tests/protocol.cjs
+      - name: Install fixed Chromium
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Test local S3 page
+        env:
+          REALITY_URL: http://127.0.0.1:8765/preview.html
+          REALITY_QA: ${{ github.workspace }}/reality-lab/hc-s3/qa/local
+        run: |
+          python -m http.server 8765 --directory reality-lab/hc-s3 >/tmp/reality-s3-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER"' EXIT
+          python reality-lab/hc-s3/tests/browser.py
+      - name: Freeze tested runtime
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          q=Path('reality-lab/hc-s3/qa/local')
+          for n in ['SCOPE_REPORT.json','PROTOCOL_REPORT.json','BROWSER_REPORT.json']:assert json.loads((q/n).read_text())['passed'],n
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3/preview.html reality-lab/hc-s3/BUILD_MANIFEST.json reality-lab/hc-s3/material-snapshot.schema.json reality-lab/hc-s3/qa/local
+          git commit -m 'build(reality): freeze tested S3 fabric and leather standards platform'
+          git push origin HEAD:refs/heads/feature/reality-contract-hc-s3-20261018
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Verify fixed public bytes and browser
+        env:
+          BUILD_SHA: ${{ steps.freeze.outputs.sha }}
+          REALITY_QA: ${{ github.workspace }}/reality-lab/hc-s3/qa/public
+        run: |
+          export REALITY_URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$BUILD_SHA/reality-lab/hc-s3/preview.html"
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,hashlib,json,os,time
+          root=Path('reality-lab/hc-s3');m=json.loads((root/'BUILD_MANIFEST.json').read_text())
+          raw=f"https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/{os.environ['BUILD_SHA']}/reality-lab/hc-s3/preview.html"
+          b=None
+          for _ in range(20):
+            try:b=urllib.request.urlopen(raw,timeout=120).read();break
+            except Exception:time.sleep(3)
+          assert b and len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=root/'qa/public';q.mkdir(parents=True,exist_ok=True)
+          (q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'url':os.environ['REALITY_URL'],'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()},indent=2))
+          PY
+          python reality-lab/hc-s3/tests/browser.py
+      - name: Record delivery
+        env:
+          BUILD_SHA: ${{ steps.freeze.outputs.sha }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          root=Path('reality-lab/hc-s3');m=json.loads((root/'BUILD_MANIFEST.json').read_text());d=json.loads((root/'material-snapshots.json').read_text());r=json.loads((root/'qa/public/BROWSER_REPORT.json').read_text());b=json.loads((root/'qa/public/PUBLIC_BYTES.json').read_text());p=json.loads((root/'qa/local/PROTOCOL_REPORT.json').read_text())
+          assert r['passed'] and r['publicBrowserVerified'] and b['passed'] and p['passed']
+          url=f"https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/{os.environ['BUILD_SHA']}/reality-lab/hc-s3/preview.html"
+          x={'version':'REALITY-HC-S3','status':'S3_PUBLIC_BROWSER_VERIFIED_AWAITING_USER','fixedURL':url,'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['RUN_ID'],'htmlBytes':m['html']['bytes'],'htmlSHA256':m['html']['sha256'],'protocolChecks':p['count'],'publicBrowserChecks':len(r['checks']),'actualObjects':[o['id'] for o in d['objects']],'sourceWorkbenchesModified':False,'shadersChanged':False,'lightingChanged':False,'geometryChanged':False,'physicsChanged':False,'S2PatternWarningsChanged':False,'automaticRepair':False,'privateCredentialPublished':False,'physicalCertification':False,'manufacturingCertification':False,'garmentFitVerified':False,'userVisualAcceptance':False,'physicalDeviceTested':False,'productionReady':False,'registeredOnly':d['registeredOnly'],'nextStep':'S3.1: add explicit read-only export manifests to denim, knit and leather, then regenerate without source shader or physics changes and connect garment host.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (root/'DELIVERY.json').write_text(json.dumps(x,ensure_ascii=False,indent=2));(root/'TASK_STATE.json').write_text(json.dumps({'task':'REALITY-HC-S3-20261018','status':x['status'],'fixedURL':url,'sourceCommit':x['sourceCommit'],'publicCommit':x['publicCommit'],'next':x['nextStep'],'userAccepted':False},ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-contract-hc-s3-20261018
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3/DELIVERY.json reality-lab/hc-s3/TASK_STATE.json reality-lab/hc-s3/qa/public
+          git commit -m 'docs(reality): record exact public S3 material semantics evidence'
+          git push origin HEAD:refs/heads/feature/reality-contract-hc-s3-20261018
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-hc-s3-complete-evidence
+          path: |
+            reality-lab/hc-s3/qa/local/
+            reality-lab/hc-s3/qa/public/
+          retention-days: 30
