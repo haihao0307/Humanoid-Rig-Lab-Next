@@ -1,0 +1,98 @@
+{
+  "task": "R14 existing material report scalar/count gate completion",
+  "newTestSha256": "149e5304e79097a40fdd3237468031a6a819cd357218717826f3a7c81608d27a",
+  "originalTestSha256": "402f2998a834536534da2e0e9a142c94bbb36c8c671bafab80e561dbf02c0f18",
+  "success": true,
+  "acceptance": {
+    "surfaceAreaRelativeDifference": 0.01,
+    "validTriangles": "exact"
+  },
+  "replays": [
+    {
+      "path": "evidence/iterations/preflight-material-linear-corners-attempt.json",
+      "inputSha256": "6cb466d31f95c0b38c9b01acf711183742c608ad5efdc06235608579708df0e8",
+      "executedOriginalTestSha256": "402f2998a834536534da2e0e9a142c94bbb36c8c671bafab80e561dbf02c0f18",
+      "panels": 66,
+      "comparisons": 132,
+      "failed": [
+        {
+          "id": "default/monk-open-quarters/after",
+          "result": {
+            "identity": {
+              "preset": "default",
+              "partId": "monk-open-quarters",
+              "phase": "after"
+            },
+            "present": true,
+            "maximumRelativeDifference": 0.9634693215981762,
+            "invalidCountsAgree": true,
+            "validTrianglesAgree": true,
+            "maximumDifference": {
+              "field": "surfaceAreaMm2",
+              "actual": 16312.887407207667,
+              "claimed": 595.9208436778644,
+              "relativeDifference": 0.9634693215981762
+            },
+            "note": "Producer measures pre-Float32 doubles; this diagnostic measures the buffers submitted for rendering."
+          }
+        }
+      ]
+    },
+    {
+      "path": "/tmp/shoe-r14-monk-producer/material-jitless-control.json",
+      "inputSha256": "915a585cf87147b504afdaf2baab5ddaf004bb9a42873187aeb9602f7a8ebd8b",
+      "executedOriginalTestSha256": "402f2998a834536534da2e0e9a142c94bbb36c8c671bafab80e561dbf02c0f18",
+      "panels": 66,
+      "comparisons": 132,
+      "failed": []
+    }
+  ],
+  "controls": [
+    {
+      "name": "wrong surface area only",
+      "result": {
+        "identity": {
+          "control": "wrong surface area only"
+        },
+        "present": true,
+        "maximumRelativeDifference": 0.9634693215981762,
+        "invalidCountsAgree": true,
+        "validTrianglesAgree": true,
+        "maximumDifference": {
+          "field": "surfaceAreaMm2",
+          "actual": 16312.887407207667,
+          "claimed": 595.9208436778644,
+          "relativeDifference": 0.9634693215981762
+        },
+        "note": "Producer measures pre-Float32 doubles; this diagnostic measures the buffers submitted for rendering."
+      }
+    },
+    {
+      "name": "one wrong valid triangle only",
+      "result": {
+        "identity": {
+          "control": "one wrong valid triangle only"
+        },
+        "present": true,
+        "maximumRelativeDifference": 0.00001595140144376306,
+        "invalidCountsAgree": true,
+        "validTrianglesAgree": false,
+        "maximumDifference": {
+          "field": "u.min",
+          "actual": 0.3696839851189826,
+          "claimed": 0.36967808814132863,
+          "relativeDifference": 0.00001595140144376306
+        },
+        "note": "Producer measures pre-Float32 doubles; this diagnostic measures the buffers submitted for rendering."
+      }
+    }
+  ],
+  "scope": {
+    "rawReportsUnmodified": true,
+    "productionModelsRegenerated": false,
+    "jacobianChanged": false,
+    "thresholdsChanged": false,
+    "snapshotLifecycleChanged": false,
+    "note": "Replays compare the preserved raw statistics and actual-buffer summaries. The --jitless input is a diagnostic control, not final source/CI/material acceptance or proof of a JIT cause."
+  }
+}

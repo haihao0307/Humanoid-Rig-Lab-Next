@@ -1,0 +1,124 @@
+{
+  "suite": "R13-REGRESSIONS-ON-RETAINED-R12-BEFORE",
+  "sourceCommit": "7fd5527f475908d615db4f1fd36357f47e68ce46",
+  "parameterScope": "four defaults only",
+  "testModuleSha256": "62ca367b11c88dd5d829c253315f4295d415a4b536e87d562132e2337aa877e4",
+  "testedSourceFiles": [
+    {
+      "path": "src/kernel.mjs",
+      "sha256": "17054230c46172172ac5ff2226d33bbbe8fd32490d5f54dd2be17a677bb911d5"
+    },
+    {
+      "path": "src/penny-chelsea.mjs",
+      "sha256": "7343b8fecffb62dc3c8e58e506a5d500b028765d7e352fd278ae548b376d0ec4"
+    },
+    {
+      "path": "src/monk-canvas.mjs",
+      "sha256": "adac7924c187a215f33cf8cd7f26d73d391e59a65b1127544871f70d0babb647"
+    },
+    {
+      "path": "src/soles.mjs",
+      "sha256": "b7a3602232c31271cf0f37c28e26ff81b455026d0799a7895b11a7d97c3e7230"
+    },
+    {
+      "path": "src/model.mjs",
+      "sha256": "d34f8b825f45667f8da384a198284ee2c4755568851d6a87a420a429db7b1e14"
+    }
+  ],
+  "passed": 0,
+  "failed": 14,
+  "results": [
+    {
+      "style": "penny",
+      "name": "stitch sections remain continuous without neck collapse",
+      "passed": false,
+      "error": "saddle-edge-0.492: adjacent section 6/7 turns over 60 degrees (axis dot -0.9986798344942318) at -39.4831657409668,43.51177342732747,-2.155958890914917"
+    },
+    {
+      "style": "penny",
+      "name": "welt stitches stay supported and penetrate every period",
+      "passed": false,
+      "error": "welt-stitch--1: 76/726 actual ring centres have no support-sheet projection; first ring 0\n\n76 !== 0\n"
+    },
+    {
+      "style": "penny",
+      "name": "rear collar curvature converges to a round join",
+      "passed": false,
+      "error": "rear collar keeps sharpening toward its join: radius range 1.665348876999254–2.6294465013566337 mm, convergence 0.6333457920288683"
+    },
+    {
+      "style": "penny",
+      "name": "apron U seam is continuous and has real panel support",
+      "passed": false,
+      "error": "Penny U seam consists of 2 disconnected actual mesh components\n\n2 !== 1\n"
+    },
+    {
+      "style": "chelsea",
+      "name": "stitch sections remain continuous without neck collapse",
+      "passed": false,
+      "error": "gore-seam--1--1: adjacent section 83/84 turns over 60 degrees (axis dot 0.15408711553064536) at -25.904522577921547,81.35209655761719,-87.02794138590494"
+    },
+    {
+      "style": "chelsea",
+      "name": "welt stitches stay supported and penetrate every period",
+      "passed": false,
+      "error": "welt-stitch--1: 76/740 actual ring centres have no support-sheet projection; first ring 0\n\n76 !== 0\n"
+    },
+    {
+      "style": "chelsea",
+      "name": "side rays encounter exterior without inner surfaces or gaps",
+      "passed": false,
+      "error": "Chelsea side -1: first visible hit is chelsea-back-quarter INNER surface at u=-1.6710307772728514, v=0.41000000000000003, world y/z=78.51958673819061/-70.06434445388167"
+    },
+    {
+      "style": "chelsea",
+      "name": "gore stitches penetrate actual leather",
+      "passed": false,
+      "error": "gore-seam--1--1: stitch period 0 has no genuinely fully buried section against actual exterior triangles"
+    },
+    {
+      "style": "monk",
+      "name": "stitch sections remain continuous without neck collapse",
+      "passed": false,
+      "error": "monk-flap-edge-0: adjacent section 4/5 turns over 60 degrees (axis dot -0.9984176454668574) at -34.26994514465332,52.13689041137695,-53.55994669596354"
+    },
+    {
+      "style": "monk",
+      "name": "welt stitches stay supported and penetrate every period",
+      "passed": false,
+      "error": "welt-stitch--1: 76/745 actual ring centres have no support-sheet projection; first ring 0\n\n76 !== 0\n"
+    },
+    {
+      "style": "monk",
+      "name": "rear collar curvature converges to a round join",
+      "passed": false,
+      "error": "rear collar keeps sharpening toward its join: radius range 1.6010555099324437–2.5265058865706442 mm, convergence 0.6337034552116712"
+    },
+    {
+      "style": "canvas",
+      "name": "stitch sections remain continuous without neck collapse",
+      "passed": false,
+      "error": "canvas-facing-stitch--1: adjacent section 5/6 turns over 60 degrees (axis dot 0.43291831872247677) at -33.869511922200516,49.66019058227539,-46.158745447794594"
+    },
+    {
+      "style": "canvas",
+      "name": "rear collar curvature converges to a round join",
+      "passed": false,
+      "error": "rear collar keeps sharpening toward its join: radius range 2.034868666022053–3.20030924782838 mm, convergence 0.6358350110705223"
+    },
+    {
+      "style": "canvas",
+      "name": "foxing and upper bead form physical closed loops",
+      "passed": false,
+      "error": "Canvas foxing outer sheet has 2 disconnected components\n\n2 !== 1\n"
+    }
+  ],
+  "scope": {
+    "readOnly": true,
+    "rendered": false,
+    "humanReview": false,
+    "wearerFit": false,
+    "physicalSolver": false,
+    "manufacturing": false
+  }
+}

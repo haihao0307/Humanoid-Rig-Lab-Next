@@ -1,0 +1,54 @@
+--- shoe-r14-publish.before-r13-inventory-fix.yml
++++ shoe-r14-publish.template.yml
+@@ -368,9 +368,9 @@
+           require(set(construction['producerHashes']) == producer_paths and len(producer_paths) == int(e['EXPECTED_CONSTRUCTION_PRODUCER_COUNT']), 'Construction producer source inventory differs')
+           for relative, digest in construction['producerHashes'].items():
+               require(sha(file(module, relative)) == digest, 'Construction producer changed: ' + relative)
+-          require(set(construction['r13BaselineHashes']) == {'model.mjs', 'kernel.mjs', 'penny-chelsea.mjs'}, 'Construction baseline inventory differs')
++          require(set(construction['r13BaselineHashes']) == {'src/' + name + '.mjs' for name in ('kernel', 'main', 'materials', 'model', 'monk-canvas', 'penny-chelsea', 'soles', 'surface-coordinates')}, 'Construction baseline inventory differs')
+           for relative, digest in construction['r13BaselineHashes'].items():
+-              require(sha(file(repo / 'shoe-workshop/r13/src', relative)) == digest, 'Construction baseline changed: ' + relative)
++              require(sha(file(repo / 'shoe-workshop/r13', relative)) == digest, 'Construction baseline changed: ' + relative)
+           increment_checks = construction['checks']
+           require(len(increment_checks) == len({x['name'] for x in increment_checks}) == int(e['EXPECTED_CONSTRUCTION_CHECKS']), 'Construction increment check coverage differs')
+           require(all(x['passed'] is True and x['failures'] == [] for x in increment_checks), 'Construction increment has a failed check')
+@@ -824,9 +824,9 @@
+           require(set(construction['producerHashes']) == producer_paths and len(producer_paths) == int(e['EXPECTED_CONSTRUCTION_PRODUCER_COUNT']), 'Construction producer source inventory differs')
+           for relative, digest in construction['producerHashes'].items():
+               require(sha(file(module, relative)) == digest, 'Construction producer changed: ' + relative)
+-          require(set(construction['r13BaselineHashes']) == {'model.mjs', 'kernel.mjs', 'penny-chelsea.mjs'}, 'Construction baseline inventory differs')
++          require(set(construction['r13BaselineHashes']) == {'src/' + name + '.mjs' for name in ('kernel', 'main', 'materials', 'model', 'monk-canvas', 'penny-chelsea', 'soles', 'surface-coordinates')}, 'Construction baseline inventory differs')
+           for relative, digest in construction['r13BaselineHashes'].items():
+-              require(sha(file(repo / 'shoe-workshop/r13/src', relative)) == digest, 'Construction baseline changed: ' + relative)
++              require(sha(file(repo / 'shoe-workshop/r13', relative)) == digest, 'Construction baseline changed: ' + relative)
+           increment_checks = construction['checks']
+           require(len(increment_checks) == len({x['name'] for x in increment_checks}) == int(e['EXPECTED_CONSTRUCTION_CHECKS']), 'Construction increment check coverage differs')
+           require(all(x['passed'] is True and x['failures'] == [] for x in increment_checks), 'Construction increment has a failed check')
+--- shoe-r14-prepare-publisher.before-r13-inventory-fix.py
++++ shoe-r14-prepare-publisher.py
+@@ -477,9 +477,9 @@
+     require(set(construction['producerHashes']) == source_producers, 'Construction report does not bind all actual producer modules')
+     for relative, digest in construction['producerHashes'].items():
+         require(sha_bytes(fixed_source_bytes(MODULE + '/' + relative)) == digest, 'Actual construction producer differs: ' + relative)
+-    require(set(construction['r13BaselineHashes']) == {'model.mjs', 'kernel.mjs', 'penny-chelsea.mjs'}, 'Construction R13 reference source inventory differs')
++    require(set(construction['r13BaselineHashes']) == {'src/' + name + '.mjs' for name in ('kernel', 'main', 'materials', 'model', 'monk-canvas', 'penny-chelsea', 'soles', 'surface-coordinates')}, 'Construction R13 reference source inventory differs')
+     for relative, digest in construction['r13BaselineHashes'].items():
+-        require(sha_bytes(fixed_source_bytes('shoe-workshop/r13/src/' + relative)) == digest, 'Construction R13 reference differs: ' + relative)
++        require(sha_bytes(fixed_source_bytes('shoe-workshop/r13/' + relative)) == digest, 'Construction R13 reference differs: ' + relative)
+     for relative, digest in negative['producerHashes'].items():
+         require(sha_bytes(fixed_source_bytes('shoe-workshop/r13/' + relative)) == digest, 'Actual R13 negative producer differs: ' + relative)
+     for name, digest in test_hashes.items():
+--- shoe-r14-make-publish-template.before-r13-inventory-fix.py
++++ shoe-r14-make-publish-template.py
+@@ -34,9 +34,9 @@
+ require(set(construction['producerHashes']) == producer_paths and len(producer_paths) == 9, 'Construction producer source inventory differs')
+ for relative, digest in construction['producerHashes'].items():
+     require(sha(file(module, relative)) == digest, 'Construction producer changed: ' + relative)
+-require(set(construction['r13BaselineHashes']) == {'model.mjs', 'kernel.mjs', 'penny-chelsea.mjs'}, 'Construction baseline inventory differs')
++require(set(construction['r13BaselineHashes']) == {'src/' + name + '.mjs' for name in ('kernel', 'main', 'materials', 'model', 'monk-canvas', 'penny-chelsea', 'soles', 'surface-coordinates')}, 'Construction baseline inventory differs')
+ for relative, digest in construction['r13BaselineHashes'].items():
+-    require(sha(file(repo / 'shoe-workshop/r13/src', relative)) == digest, 'Construction baseline changed: ' + relative)
++    require(sha(file(repo / 'shoe-workshop/r13', relative)) == digest, 'Construction baseline changed: ' + relative)
+ increment_checks = construction['checks']
+ require(len(increment_checks) == len({x['name'] for x in increment_checks}) == int(e['EXPECTED_CONSTRUCTION_CHECKS']), 'Construction increment check coverage differs')
+ require(all(x['passed'] is True and x['failures'] == [] for x in increment_checks), 'Construction increment has a failed check')

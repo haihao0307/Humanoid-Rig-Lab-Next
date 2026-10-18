@@ -1,0 +1,14 @@
+{
+  "status": "ITERATION_HISTORY_NOT_SOURCE_OR_PUBLIC_ACCEPTANCE",
+  "a2-superseded-original-band-oracle.json": "The old A1 far-field contract was retained within the bend band by the test. A2 intentionally replaces that interior with a shared angle field; the rejected output remains explicit. The new test reconstructs that field independently from actual mesh unions and retains the same .01 mm and .02 degree tolerances.",
+  "c1-ray-material-positive-control-failure.json": "Real post-flange rays exposed a test bug: THREE material arrays silently skip ungrouped geometry. The helper now uses a single material for group-free targets. The original producer diagnostic had the same reverse-target limitation and cannot support complete bidirectional acceptance.",
+  "c2-unresolved-whole-edge-contact.json": "True two-way rays expose 349 raw static frame/post intersections across three thickness cases. Checking the endpoints of the entire extended frame edge against a small post-face plane misclassifies local contacts; these unresolved failures remain archived.",
+  "c3-unresolved-sharp-edge-contact.json": "Clipping to the actual triangle footprint resolves coplanar top-face contacts but still misclassifies the adjacent side faces at sharp contact edges. A synthetic 0.000001 mm contact reproduces the false positive; deep and 0.001 mm penetrations are correctly rejected.",
+  "c4-local-shared-edge-contact-probe.json": "Actual shared-edge adjacency resolves sharp-edge contacts using the unchanged 2e-5 mm tolerance. Raw 349/contact349/transverse0; 104 contacts need actual adjacent-face evidence. Largest local plane deviation is 2.294e-6 mm. All 42 actual targets have positive ray controls. Deep and 0.001 mm penetrating closed meshes remain rejected. A later final test additionally requires the adjacent clipped footprint to lie within 2e-5 mm of the specific hit, not another location along the extended edge.",
+  "limits": [
+    "These reports are diagnostic iterations; final source-bound ALL matrix, material/regression gates and independent SOURCE/PUBLIC browser review remain necessary.",
+    "Finite edge/triangle tests and local geometric contact tolerances do not establish global force equilibrium, manufacturing compliance, opening mechanics, durability or fit."
+  ],
+  "c5-pre-material-repair-locality-confirmed.json": "The final adjacent-face predicate also requires its clipped footprint to be within 2e-5 mm of the specific raw hit. C still passes 15/15 including all synthetic/real positive and negative controls, on the pre-material-repair source. This is not final C SOURCE acceptance; re-run the frozen ALL script after the separate anchor material-coordinate repair.",
+  "frozenTestSha256": "dce8a66b9cd1b7049da98819a262f1732abfe6df004f1b3e446b974ae206fabf"
+}

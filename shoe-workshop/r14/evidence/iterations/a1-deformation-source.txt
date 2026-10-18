@@ -1,0 +1,98 @@
+import * as T from 'three';
+
+// Geometric inspection only. Rest construction remains independent of this
+// runtime map; none of these distances or angles are a material force solution.
+const CORE_MM = 4.25;
+const OUTER_MM = 12;
+const mul = (a, v) => [a[0]*v[0]+a[1]*v[1]+a[2]*v[2], a[3]*v[0]+a[4]*v[1]+a[5]*v[2], a[6]*v[0]+a[7]*v[1]+a[8]*v[2]];
+const det = a => a[0]*(a[4]*a[8]-a[5]*a[7])-a[1]*(a[3]*a[8]-a[5]*a[6])+a[2]*(a[3]*a[7]-a[4]*a[6]);
+
+function normalMap(n, j) {
+  // Cofactor matrix / determinant = J^{-T}, including the variable-angle and
+  // attachment-weight derivatives. Rotating the old normal alone is incorrect.
+  const c = [j[4]*j[8]-j[5]*j[7], j[5]*j[6]-j[3]*j[8], j[3]*j[7]-j[4]*j[6],
+    j[2]*j[7]-j[1]*j[8], j[0]*j[8]-j[2]*j[6], j[1]*j[6]-j[0]*j[7],
+    j[1]*j[5]-j[2]*j[4], j[2]*j[3]-j[0]*j[5], j[0]*j[4]-j[1]*j[3]];
+  const v = mul(c,n), sign = Math.sign(det(j)), length = Math.hypot(...v);
+  if (!length || !sign) throw Error('Singular geometric flex differential');
+  return v.map(x => x*sign/length);
+}
+
+export function createFlexContext(last, angleDeg, attachmentSpecs = []) {
+  const angle = angleDeg*Math.PI/180, axis = last.L*.13, band = last.L*.09, base = last.soleTop(.63);
+  const global = p => {
+    const u = Math.max(0,Math.min(1,(p[2]-(axis-band))/(2*band)));
+    const phi = angle*u*u*(3-2*u), dp = angle*6*u*(1-u)/(2*band);
+    const c = Math.cos(phi), s = Math.sin(phi), y = p[1]-base, z = p[2]-axis;
+    const Y = y*c+z*s, Z = z*c-y*s;
+    return {p:[p[0],base+Y,axis+Z],j:[1,0,0,0,c,s+dp*Z,0,-s,c-dp*Y]};
+  };
+  const attachments = attachmentSpecs.map(spec => {
+    const frame = spec.frame, at = global(frame.center);
+    const n = new T.Vector3(...normalMap(frame.normal,at.j));
+    const across = new T.Vector3(...mul(at.j,frame.across)).normalize();
+    const along = n.clone().cross(across).normalize(); across.copy(along).cross(n).normalize();
+    const rest = new T.Matrix3().set(...[
+      frame.across[0],frame.along[0],frame.normal[0],
+      frame.across[1],frame.along[1],frame.normal[1],
+      frame.across[2],frame.along[2],frame.normal[2]]);
+    const current = new T.Matrix3().set(across.x,along.x,n.x,across.y,along.y,n.y,across.z,along.z,n.z);
+    const e = current.multiply(rest.transpose()).elements;
+    const r = [e[0],e[3],e[6],e[1],e[4],e[7],e[2],e[5],e[8]];
+    return {...spec,center:frame.center,currentCenter:at.p,r,currentFrame:{center:at.p,across:across.toArray(),along:along.toArray(),normal:n.toArray()}};
+  });
+  const byId = new Map(attachments.map(a => [a.id,a]));
+  const rigid = (p,a) => {const q = mul(a.r,p.map((x,i)=>x-a.center[i]));return {p:q.map((x,i)=>x+a.currentCenter[i]),j:a.r};};
+  const evaluate = (p, ids = []) => {
+    const f = global(p), candidates = [];
+    for (const id of ids) {
+      const a = byId.get(id); if(!a)throw Error('Missing rest attachment '+id);
+      const delta = p.map((x,i)=>x-a.center[i]), radius = Math.hypot(...delta);
+      if(radius >= OUTER_MM)continue;
+      if(radius <= CORE_MM)return rigid(p,a);
+      const u = (radius-CORE_MM)/(OUTER_MM-CORE_MM);
+      // Quintic compact kernel has zero first and second derivatives at both
+      // ends. Odds-normalised weights preserve each rigid core even where the
+      // finite outer neighbourhoods of neighbouring eyelets overlap.
+      const fade = u*u*u*(10+u*(-15+6*u));
+      if(fade < 1e-14)return rigid(p,a);
+      const alpha = (1-fade)/fade, dAlpha = -30*u*u*(u-1)*(u-1)/((OUTER_MM-CORE_MM)*fade*fade);
+      candidates.push({a,alpha,gradient:delta.map(x=>x/radius*dAlpha),g:rigid(p,a).p});
+    }
+    if(!candidates.length)return f;
+    let denominator = 1; const numerator = [...f.p];
+    for(const q of candidates){denominator+=q.alpha;for(let k=0;k<3;k++)numerator[k]+=q.alpha*q.g[k];}
+    const result = numerator.map(x=>x/denominator), j = [...f.j];
+    for(const q of candidates)for(let row=0;row<3;row++)for(let col=0;col<3;col++)
+      j[row*3+col]+=q.alpha*q.a.r[row*3+col]+(q.g[row]-result[row])*q.gradient[col];
+    return {p:result,j:j.map(x=>x/denominator)};
+  };
+  return {angleDeg,attachments,byId,global,evaluate,rigid,normalMap,coreRadiusMm:CORE_MM,outerRadiusMm:OUTER_MM};
+}
+
+export function flexPart(part, context) {
+  const g = part.geometry, mode = part.deformation ?? {role:'flexible',attachmentIds:[]};
+  if(!context.angleDeg)return;
+  const attachment = mode.role==='rigid' ? context.byId.get(mode.attachmentId) : null;
+  if(mode.role==='rigid'&&!attachment)throw Error('Rigid part has no attachment '+part.id);
+  const evaluate = p => attachment ? context.rigid(p,attachment) : context.evaluate(p,mode.attachmentIds);
+  const pos = g.attributes.position, normal = g.attributes.normal;let minDeterminant = Infinity;
+  for(let i=0;i<pos.count;i++){
+    const q = evaluate([pos.getX(i),pos.getY(i),pos.getZ(i)]);
+    const n = context.normalMap([normal.getX(i),normal.getY(i),normal.getZ(i)],q.j);
+    minDeterminant=Math.min(minDeterminant,det(q.j));pos.setXYZ(i,...q.p);normal.setXYZ(i,...n);
+  }
+  // Runtime inspection metadata is transformed with the actual geometry. The
+  // rest frame and rest UV diagnostics are kept as rest construction records.
+  for(const hole of g.userData.apertures ?? []){
+    const q=evaluate(hole.centre);hole.centre=q.p;hole.axis=context.normalMap(hole.axis,q.j);
+  }
+  if(g.userData.supportPoints){
+    const points=g.userData.supportPoints,normals=g.userData.supportNormals;
+    g.userData.supportPoints=points.map((p,i)=>{const q=evaluate(p);if(normals?.[i])normals[i]=context.normalMap(normals[i],q.j);return q.p;});
+  }
+  if(attachment){part.apertureCenter=attachment.currentCenter;part.apertureAxis=attachment.currentFrame.normal;part.runtimeAttachmentFrame=attachment.currentFrame;}
+  pos.needsUpdate=normal.needsUpdate=true;g.computeBoundingBox();
+  g.userData.flexMode='geometric inspection with rest-frame attachments; not calibrated anatomy';
+  g.userData.flexDiagnostics={role:mode.role,minJacobianDeterminant:minDeterminant,normalMethod:'analytic full-field inverse transpose',coreRadiusMm:context.coreRadiusMm,outerRadiusMm:context.outerRadiusMm};
+}

@@ -1,0 +1,2316 @@
+{
+  "schemaVersion": 1,
+  "id": "R13-LOW-COLLAR-REAR-GAPS",
+  "sourceCommit": "961996dca84b110191405a1e5b840cec51de0a65",
+  "runId": 39095317681,
+  "artifactId": 12124905197,
+  "artifactDigest": "sha256:764ef599cb8fa4c16ef5e86fe2daaf9712646342b5ca1415338dde012196242f",
+  "worldSamples": {
+    "lateralOffsetsMm": [
+      -1,
+      -0.5,
+      0,
+      0.5,
+      1
+    ],
+    "belowActualBindingRearMm": [
+      0.75,
+      1.5,
+      2.5,
+      4
+    ],
+    "direction": [
+      0,
+      0,
+      1
+    ],
+    "originBehindMm": 20,
+    "maxAcceptedDistanceMm": 40
+  },
+  "testedSourceFiles": [
+    {
+      "path": "shoe-workshop/r13/src/surface-coordinates.mjs",
+      "sha256": "8731903981979d96d49f5d92e5f2804acd25c26f9272d3ef10736c1d6b3e8970"
+    },
+    {
+      "path": "shoe-workshop/r13/src/kernel.mjs",
+      "sha256": "7156a5432fed1dd654905a967255f167e3c45bf7ed69fc674db25263de9dde06"
+    },
+    {
+      "path": "shoe-workshop/r13/src/penny-chelsea.mjs",
+      "sha256": "b7c072c9591c042a46d017e82dac05d54a24b4732f241d23e91aa68fda194f8b"
+    },
+    {
+      "path": "shoe-workshop/r13/src/monk-canvas.mjs",
+      "sha256": "b04e89aa1df41787b5596ea9acc90bac3ea77c708d9510f39f9a7c27e45f9dde"
+    },
+    {
+      "path": "shoe-workshop/r13/src/soles.mjs",
+      "sha256": "fcc5d6ccae4e38e099e94019803a8aff4ed6dd42abbd6c6992f284382d0308fa"
+    },
+    {
+      "path": "shoe-workshop/r13/src/model.mjs",
+      "sha256": "d34f8b825f45667f8da384a198284ee2c4755568851d6a87a420a429db7b1e14"
+    },
+    {
+      "path": "shoe-workshop/r13/src/materials.mjs",
+      "sha256": "9ea2a9c23c80be8cced25dec985bc20b2fa8df14190575db97c6c8444070be88"
+    },
+    {
+      "path": "shoe-workshop/r13/src/main.mjs",
+      "sha256": "6da69f3f1a7478823f2ed93939b92a19e9ad4940748bc38fd791b4d28ec1d158"
+    }
+  ],
+  "method": "Exact candidate source reconstructed in /tmp and all eight source hashes verified against the CI manifest; no production file or old R12 evidence changed.",
+  "scope": {
+    "numericOnly": true,
+    "physicalSolver": false,
+    "manufacturing": false
+  },
+  "views": {
+    "penny": {
+      "image": {
+        "path": "evidence/browser/penny-back.png",
+        "sha256": "95b1e639f3e31b30a0716e2408a96a6cc47a49c1afd9e6d311c4e7a3369d218b",
+        "size": [
+          962,
+          640
+        ]
+      },
+      "camera": {
+        "id": "penny",
+        "view": "back",
+        "position": [
+          0.04425220738701817,
+          0.15752628834249344,
+          -0.5211947752600895
+        ],
+        "quaternion": [
+          -0.0044871678844160216,
+          0.9928661691110663,
+          0.1123583975623449,
+          0.039651305858881505
+        ],
+        "up": [
+          0,
+          1,
+          0
+        ],
+        "fov": 31,
+        "near": 0.008046384814459542,
+        "far": 15,
+        "aspect": 1.503125
+      },
+      "pixels": [
+        [
+          519,
+          304
+        ],
+        [
+          519,
+          306
+        ],
+        [
+          519,
+          308
+        ],
+        [
+          518,
+          309
+        ],
+        [
+          520,
+          309
+        ],
+        [
+          519,
+          311
+        ],
+        [
+          522,
+          306
+        ],
+        [
+          513,
+          307
+        ],
+        [
+          525,
+          307
+        ]
+      ]
+    },
+    "monk": {
+      "image": {
+        "path": "evidence/browser/monk-back.png",
+        "sha256": "404ae362deff744793d4dd76be00f23ca591ec7bbbfc9c2fdd52f751c5fbce2e",
+        "size": [
+          962,
+          640
+        ]
+      },
+      "camera": {
+        "id": "monk",
+        "view": "back",
+        "position": [
+          0.046006789435716094,
+          0.17184085333406246,
+          -0.5431653809469386
+        ],
+        "quaternion": [
+          -0.0044871678844160216,
+          0.9928661691110663,
+          0.11235839756234489,
+          0.039651305858881505
+        ],
+        "up": [
+          0,
+          1,
+          0
+        ],
+        "fov": 31,
+        "near": 0.008384976965281274,
+        "far": 15,
+        "aspect": 1.503125
+      },
+      "pixels": [
+        [
+          516,
+          313
+        ],
+        [
+          517,
+          313
+        ],
+        [
+          518,
+          313
+        ],
+        [
+          517,
+          314
+        ],
+        [
+          516,
+          315
+        ],
+        [
+          519,
+          315
+        ]
+      ]
+    }
+  },
+  "testModuleSha256": "62ca367b11c88dd5d829c253315f4295d415a4b536e87d562132e2337aa877e4",
+  "beforeCases": [
+    {
+      "style": "penny",
+      "case": "default",
+      "params": {
+        "length": 1,
+        "width": 1,
+        "instep": 0,
+        "thickness": 1.35,
+        "bend": 0
+      },
+      "rearPartId": "penny-galosh",
+      "actualBindingRearMm": [
+        0,
+        73.64942932128906,
+        -131.63348388671875
+      ],
+      "worldRays": 20,
+      "fixedCameraRays": 9,
+      "worldSamples": [
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.068571677375758,
+          "firstPointMm": [
+            -1,
+            71.14942932128906,
+            -132.564912209343
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.278076910851354,
+          "firstPointMm": [
+            -1,
+            69.64942932128906,
+            -133.3554069758674
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.058561447665767,
+          "firstPointMm": [
+            -0.5,
+            71.14942932128906,
+            -132.57492243905298
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.269377606346097,
+          "firstPointMm": [
+            -0.5,
+            69.64942932128906,
+            -133.36410628037265
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.26485139233415,
+          "firstPointMm": [
+            0,
+            69.64942932128906,
+            -133.3686324943846
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.058561447665767,
+          "firstPointMm": [
+            0.5,
+            71.14942932128906,
+            -132.57492243905298
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.269377606346097,
+          "firstPointMm": [
+            0.5,
+            69.64942932128906,
+            -133.36410628037265
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.068571677375758,
+          "firstPointMm": [
+            1,
+            71.14942932128906,
+            -132.564912209343
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.278076910851354,
+          "firstPointMm": [
+            1,
+            69.64942932128906,
+            -133.3554069758674
+          ]
+        }
+      ],
+      "fixedCameraSamples": [
+        {
+          "pixel": [
+            519,
+            304
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18558,
+          "firstPointMm": [
+            -29.542083567672606,
+            17.951045148544466,
+            123.64254845161497
+          ]
+        },
+        {
+          "pixel": [
+            519,
+            306
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18560,
+          "firstPointMm": [
+            -29.584103022955716,
+            16.710955091662726,
+            123.93257426803223
+          ]
+        },
+        {
+          "pixel": [
+            519,
+            308
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18563,
+          "firstPointMm": [
+            -29.613752792850665,
+            15.492683835878383,
+            124.11440509444014
+          ]
+        },
+        {
+          "pixel": [
+            518,
+            309
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18608,
+          "firstPointMm": [
+            -29.10131391967245,
+            14.791595556397539,
+            124.66461606793575
+          ]
+        },
+        {
+          "pixel": [
+            520,
+            309
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18563,
+          "firstPointMm": [
+            -30.14790720230647,
+            14.988108502320813,
+            123.68360902691757
+          ]
+        },
+        {
+          "pixel": [
+            519,
+            311
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18565,
+          "firstPointMm": [
+            -29.642422602148688,
+            13.693080113872128,
+            124.24890475486065
+          ]
+        },
+        {
+          "pixel": [
+            522,
+            306
+          ],
+          "passed": true,
+          "firstLayer": 0,
+          "firstFace": 88,
+          "firstPointMm": [
+            -1.3828178679677734,
+            72.47666911902031,
+            -131.63402739760426
+          ]
+        },
+        {
+          "pixel": [
+            513,
+            307
+          ],
+          "passed": true,
+          "firstLayer": 0,
+          "firstFace": 705,
+          "firstPointMm": [
+            1.777210500217592,
+            72.20956363001652,
+            -131.78913157148682
+          ]
+        },
+        {
+          "pixel": [
+            525,
+            307
+          ],
+          "passed": true,
+          "firstLayer": 0,
+          "firstFace": 91,
+          "firstPointMm": [
+            -2.4168479744977844,
+            72.13635363367993,
+            -131.7875927558278
+          ]
+        }
+      ],
+      "failures": [
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "pixel": [
+            519,
+            304
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18558,
+          "firstPointMm": [
+            -29.542083567672606,
+            17.951045148544466,
+            123.64254845161497
+          ]
+        },
+        {
+          "pixel": [
+            519,
+            306
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18560,
+          "firstPointMm": [
+            -29.584103022955716,
+            16.710955091662726,
+            123.93257426803223
+          ]
+        },
+        {
+          "pixel": [
+            519,
+            308
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18563,
+          "firstPointMm": [
+            -29.613752792850665,
+            15.492683835878383,
+            124.11440509444014
+          ]
+        },
+        {
+          "pixel": [
+            518,
+            309
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18608,
+          "firstPointMm": [
+            -29.10131391967245,
+            14.791595556397539,
+            124.66461606793575
+          ]
+        },
+        {
+          "pixel": [
+            520,
+            309
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18563,
+          "firstPointMm": [
+            -30.14790720230647,
+            14.988108502320813,
+            123.68360902691757
+          ]
+        },
+        {
+          "pixel": [
+            519,
+            311
+          ],
+          "passed": false,
+          "firstLayer": 1,
+          "firstFace": 18565,
+          "firstPointMm": [
+            -29.642422602148688,
+            13.693080113872128,
+            124.24890475486065
+          ]
+        }
+      ],
+      "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+    },
+    {
+      "style": "penny",
+      "case": "all-low",
+      "params": {
+        "length": 0.9,
+        "width": 0.88,
+        "instep": -5,
+        "thickness": 0.9,
+        "bend": 0
+      },
+      "rearPartId": "penny-galosh",
+      "actualBindingRearMm": [
+        0,
+        73.36516571044922,
+        -118.5647964477539
+      ],
+      "worldRays": 20,
+      "fixedCameraRays": 0,
+      "worldSamples": [
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.806323434580136,
+          "firstPointMm": [
+            -1,
+            71.86516571044922,
+            -118.75847301317377
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.174838615983703,
+          "firstPointMm": [
+            -1,
+            70.86516571044922,
+            -119.3899578317702
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.505523949057405,
+          "firstPointMm": [
+            -1,
+            69.36516571044922,
+            -120.0592724986965
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.16578175562364,
+          "firstPointMm": [
+            -0.5,
+            70.86516571044922,
+            -119.39901469213027
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.497634207665413,
+          "firstPointMm": [
+            -0.5,
+            69.36516571044922,
+            -120.06716224008849
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.49355376913421,
+          "firstPointMm": [
+            0,
+            69.36516571044922,
+            -120.0712426786197
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.16578175562364,
+          "firstPointMm": [
+            0.5,
+            70.86516571044922,
+            -119.39901469213027
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.497634207665413,
+          "firstPointMm": [
+            0.5,
+            69.36516571044922,
+            -120.06716224008849
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.806323434580136,
+          "firstPointMm": [
+            1,
+            71.86516571044922,
+            -118.75847301317377
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.174838615983703,
+          "firstPointMm": [
+            1,
+            70.86516571044922,
+            -119.3899578317702
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.505523949057405,
+          "firstPointMm": [
+            1,
+            69.36516571044922,
+            -120.0592724986965
+          ]
+        }
+      ],
+      "fixedCameraSamples": [],
+      "failures": [
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        }
+      ],
+      "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+    },
+    {
+      "style": "penny",
+      "case": "all-high",
+      "params": {
+        "length": 1.1,
+        "width": 1.15,
+        "instep": 8,
+        "thickness": 2.1,
+        "bend": 0
+      },
+      "rearPartId": "penny-galosh",
+      "actualBindingRearMm": [
+        0,
+        74.0322494506836,
+        -144.68992614746094
+      ],
+      "worldRays": 20,
+      "fixedCameraRays": 0,
+      "worldSamples": [
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.970098683191736,
+          "firstPointMm": [
+            -1,
+            71.5322494506836,
+            -145.7198274642692
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.050541344927268,
+          "firstPointMm": [
+            -1,
+            70.0322494506836,
+            -146.63938480253367
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.041057825553253,
+          "firstPointMm": [
+            -0.5,
+            70.0322494506836,
+            -146.64886832190768
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.036091877667502,
+          "firstPointMm": [
+            0,
+            70.0322494506836,
+            -146.65383426979344
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.041057825553253,
+          "firstPointMm": [
+            0.5,
+            70.0322494506836,
+            -146.64886832190768
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.970098683191736,
+          "firstPointMm": [
+            1,
+            71.5322494506836,
+            -145.7198274642692
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.050541344927268,
+          "firstPointMm": [
+            1,
+            70.0322494506836,
+            -146.63938480253367
+          ]
+        }
+      ],
+      "fixedCameraSamples": [],
+      "failures": [
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 2.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 1.5,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        }
+      ],
+      "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+    },
+    {
+      "style": "monk",
+      "case": "default",
+      "params": {
+        "length": 1,
+        "width": 1,
+        "instep": 0,
+        "thickness": 1.35,
+        "bend": 0
+      },
+      "rearPartId": "monk-open-quarters",
+      "actualBindingRearMm": [
+        0.011315647512674332,
+        81.05484008789062,
+        -136.05413818359375
+      ],
+      "worldRays": 20,
+      "fixedCameraRays": 6,
+      "worldSamples": [
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.17937026120387,
+          "firstPointMm": [
+            -0.9886843524873257,
+            80.30484008789062,
+            -135.87476792238988
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.582661926403432,
+          "firstPointMm": [
+            -0.9886843524873257,
+            79.55484008789062,
+            -136.47147625719032
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.057080330788267,
+          "firstPointMm": [
+            -0.9886843524873257,
+            78.55484008789062,
+            -136.99705785280548
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.268472063303278,
+          "firstPointMm": [
+            -0.9886843524873257,
+            77.05484008789062,
+            -137.78566612029047
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.10805636171841,
+          "firstPointMm": [
+            -0.48868435248732567,
+            80.30484008789062,
+            -135.94608182187534
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.558159754808628,
+          "firstPointMm": [
+            -0.48868435248732567,
+            79.55484008789062,
+            -136.49597842878512
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.032403167690177,
+          "firstPointMm": [
+            -0.48868435248732567,
+            78.55484008789062,
+            -137.02173501590357
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.2430488877786,
+          "firstPointMm": [
+            -0.48868435248732567,
+            77.05484008789062,
+            -137.81108929581515
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.53436689754477,
+          "firstPointMm": [
+            0.011315647512674332,
+            79.55484008789062,
+            -136.51977128604898
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.008130710937053,
+          "firstPointMm": [
+            0.011315647512674332,
+            78.55484008789062,
+            -137.0460074726567
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.218776431025447,
+          "firstPointMm": [
+            0.011315647512674332,
+            77.05484008789062,
+            -137.8353617525683
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.111284213515745,
+          "firstPointMm": [
+            0.5113156475126743,
+            80.30484008789062,
+            -135.942853970078
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.559268786556856,
+          "firstPointMm": [
+            0.5113156475126743,
+            79.55484008789062,
+            -136.4948693970369
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.033553886461732,
+          "firstPointMm": [
+            0.5113156475126743,
+            78.55484008789062,
+            -137.02058429713202
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.244199606550154,
+          "firstPointMm": [
+            0.5113156475126743,
+            77.05484008789062,
+            -137.8099385770436
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.182598113001205,
+          "firstPointMm": [
+            1.0113156475126743,
+            80.30484008789062,
+            -135.87154007059254
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.58377095815169,
+          "firstPointMm": [
+            1.0113156475126743,
+            79.55484008789062,
+            -136.47036722544206
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.058189362536524,
+          "firstPointMm": [
+            1.0113156475126743,
+            78.55484008789062,
+            -136.99594882105723
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.269622782074833,
+          "firstPointMm": [
+            1.0113156475126743,
+            77.05484008789062,
+            -137.78451540151892
+          ]
+        }
+      ],
+      "fixedCameraSamples": [
+        {
+          "pixel": [
+            516,
+            313
+          ],
+          "passed": false,
+          "firstLayer": null,
+          "firstFace": null,
+          "firstPointMm": null
+        },
+        {
+          "pixel": [
+            517,
+            313
+          ],
+          "passed": false,
+          "firstLayer": null,
+          "firstFace": null,
+          "firstPointMm": null
+        },
+        {
+          "pixel": [
+            518,
+            313
+          ],
+          "passed": false,
+          "firstLayer": null,
+          "firstFace": null,
+          "firstPointMm": null
+        },
+        {
+          "pixel": [
+            517,
+            314
+          ],
+          "passed": true,
+          "firstLayer": 0,
+          "firstFace": 1569,
+          "firstPointMm": [
+            0.14323085772095823,
+            80.05777031763705,
+            -136.24857627776544
+          ]
+        },
+        {
+          "pixel": [
+            516,
+            315
+          ],
+          "passed": true,
+          "firstLayer": 0,
+          "firstFace": 1569,
+          "firstPointMm": [
+            0.5236036987443171,
+            79.72685356009343,
+            -136.40386011396956
+          ]
+        },
+        {
+          "pixel": [
+            519,
+            315
+          ],
+          "passed": true,
+          "firstLayer": 0,
+          "firstFace": 57,
+          "firstPointMm": [
+            -0.5722944609725715,
+            79.70877302701263,
+            -136.41097685057332
+          ]
+        }
+      ],
+      "failures": [
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "pixel": [
+            516,
+            313
+          ],
+          "passed": false,
+          "firstLayer": null,
+          "firstFace": null,
+          "firstPointMm": null
+        },
+        {
+          "pixel": [
+            517,
+            313
+          ],
+          "passed": false,
+          "firstLayer": null,
+          "firstFace": null,
+          "firstPointMm": null
+        },
+        {
+          "pixel": [
+            518,
+            313
+          ],
+          "passed": false,
+          "firstLayer": null,
+          "firstFace": null,
+          "firstPointMm": null
+        }
+      ],
+      "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+    },
+    {
+      "style": "monk",
+      "case": "all-low",
+      "params": {
+        "length": 0.9,
+        "width": 0.88,
+        "instep": -5,
+        "thickness": 0.9,
+        "bend": 0
+      },
+      "rearPartId": "monk-open-quarters",
+      "actualBindingRearMm": [
+        0.010100306943058968,
+        80.52364349365234,
+        -122.32350158691406
+      ],
+      "worldRays": 20,
+      "fixedCameraRays": 0,
+      "worldSamples": [
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.19973871124087,
+          "firstPointMm": [
+            -0.989899693056941,
+            79.77364349365234,
+            -122.1237628756732
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.69278516470885,
+          "firstPointMm": [
+            -0.989899693056941,
+            79.02364349365234,
+            -122.63071642220521
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.217400852825918,
+          "firstPointMm": [
+            -0.989899693056941,
+            78.02364349365234,
+            -123.10610073408814
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.504039737899404,
+          "firstPointMm": [
+            -0.989899693056941,
+            76.52364349365234,
+            -123.81946184901466
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.13419042715799,
+          "firstPointMm": [
+            -0.48989969305694103,
+            79.77364349365234,
+            -122.18931115975607
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.67073521060611,
+          "firstPointMm": [
+            -0.48989969305694103,
+            79.02364349365234,
+            -122.65276637630795
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.195137818360948,
+          "firstPointMm": [
+            -0.48989969305694103,
+            78.02364349365234,
+            -123.12836376855311
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.481052653387678,
+          "firstPointMm": [
+            -0.48989969305694103,
+            76.52364349365234,
+            -123.84244893352638
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.649136216935247,
+          "firstPointMm": [
+            0.010100306943058968,
+            79.02364349365234,
+            -122.67436536997882
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.173079440286415,
+          "firstPointMm": [
+            0.010100306943058968,
+            78.02364349365234,
+            -123.15042214662765
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.458994275313145,
+          "firstPointMm": [
+            0.010100306943058968,
+            76.52364349365234,
+            -123.86450731160092
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.13683865831331,
+          "firstPointMm": [
+            0.510100306943059,
+            79.77364349365234,
+            -122.18666292860075
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.671626055824177,
+          "firstPointMm": [
+            0.510100306943059,
+            79.02364349365234,
+            -122.65187553108989
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.196066524798127,
+          "firstPointMm": [
+            0.510100306943059,
+            78.02364349365234,
+            -123.12743506211594
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.481981359824857,
+          "firstPointMm": [
+            0.510100306943059,
+            76.52364349365234,
+            -123.8415202270892
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.20238694239619,
+          "firstPointMm": [
+            1.010100306943059,
+            79.77364349365234,
+            -122.12111464451787
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.693676009926918,
+          "firstPointMm": [
+            1.010100306943059,
+            79.02364349365234,
+            -122.62982557698714
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.218291698043984,
+          "firstPointMm": [
+            1.010100306943059,
+            78.02364349365234,
+            -123.10520988887008
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.504968444336583,
+          "firstPointMm": [
+            1.010100306943059,
+            76.52364349365234,
+            -123.81853314257748
+          ]
+        }
+      ],
+      "fixedCameraSamples": [],
+      "failures": [
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        }
+      ],
+      "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+    },
+    {
+      "style": "monk",
+      "case": "all-high",
+      "params": {
+        "length": 1.1,
+        "width": 1.15,
+        "instep": 8,
+        "thickness": 2.1,
+        "bend": 0
+      },
+      "rearPartId": "monk-open-quarters",
+      "actualBindingRearMm": [
+        0.012545973062515259,
+        81.9318618774414,
+        -149.9711456298828
+      ],
+      "worldRays": 20,
+      "fixedCameraRays": 0,
+      "worldSamples": [
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.180631188441765,
+          "firstPointMm": [
+            -0.9874540269374847,
+            81.1818618774414,
+            -149.79051444144105
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.469665970597532,
+          "firstPointMm": [
+            -0.9874540269374847,
+            80.4318618774414,
+            -150.50147965928528
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.89622856935668,
+          "firstPointMm": [
+            -0.9874540269374847,
+            79.4318618774414,
+            -151.07491706052613
+          ]
+        },
+        {
+          "lateralMm": -1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.035923679330693,
+          "firstPointMm": [
+            -0.9874540269374847,
+            77.9318618774414,
+            -151.93522195055212
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.44271805436867,
+          "firstPointMm": [
+            -0.48745402693748474,
+            80.4318618774414,
+            -150.52842757551414
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.869173980248462,
+          "firstPointMm": [
+            -0.48745402693748474,
+            79.4318618774414,
+            -151.10197164963435
+          ]
+        },
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.00817280328394,
+          "firstPointMm": [
+            -0.48745402693748474,
+            77.9318618774414,
+            -151.96297282659887
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.4168165358181,
+          "firstPointMm": [
+            0.012545973062515259,
+            80.4318618774414,
+            -150.5543290940647
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.842815751175067,
+          "firstPointMm": [
+            0.012545973062515259,
+            79.4318618774414,
+            -151.12832987870775
+          ]
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 17.981814574210546,
+          "firstPointMm": [
+            0.012545973062515259,
+            77.9318618774414,
+            -151.98933105567227
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.444070405693083,
+          "firstPointMm": [
+            0.5125459730625153,
+            80.4318618774414,
+            -150.52707522418973
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.870566627221848,
+          "firstPointMm": [
+            0.5125459730625153,
+            79.4318618774414,
+            -151.10057900266096
+          ]
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.0095654502573,
+          "firstPointMm": [
+            0.5125459730625153,
+            77.9318618774414,
+            -151.9615801796255
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 0.75,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 20.184448078401374,
+          "firstPointMm": [
+            1.0125459730625153,
+            81.1818618774414,
+            -149.78669755148144
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 1.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 19.471018321921918,
+          "firstPointMm": [
+            1.0125459730625153,
+            80.4318618774414,
+            -150.5001273079609
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 2.5,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.897580920681065,
+          "firstPointMm": [
+            1.0125459730625153,
+            79.4318618774414,
+            -151.07356470920175
+          ]
+        },
+        {
+          "lateralMm": 1,
+          "belowBindingMm": 4,
+          "passed": true,
+          "firstLayer": 0,
+          "firstDistanceMm": 18.03731632630405,
+          "firstPointMm": [
+            1.0125459730625153,
+            77.9318618774414,
+            -151.93382930357876
+          ]
+        }
+      ],
+      "fixedCameraSamples": [],
+      "failures": [
+        {
+          "lateralMm": -0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        },
+        {
+          "lateralMm": 0.5,
+          "belowBindingMm": 0.75,
+          "passed": false,
+          "firstLayer": null,
+          "firstDistanceMm": null,
+          "firstPointMm": null
+        }
+      ],
+      "method": "actual rear upper first hits below actual binding vertices, plus exact failing CI camera pixels for the default; no coverage inferred from a design formula"
+    }
+  ],
+  "recordedResult": {
+    "passed": 0,
+    "failed": 6,
+    "totalRays": 135,
+    "failedRays": 47
+  },
+  "fullAssemblyFirstHits": [
+    {
+      "style": "monk",
+      "pixel": [
+        516,
+        313
+      ],
+      "part": "monk-integral-vamp-tongue",
+      "layer": 1,
+      "face": 4669,
+      "pointMm": [
+        -28.80272188790982,
+        21.54226487119496,
+        125.94069869383759
+      ]
+    },
+    {
+      "style": "monk",
+      "pixel": [
+        517,
+        313
+      ],
+      "part": "monk-integral-vamp-tongue",
+      "layer": 1,
+      "face": 4669,
+      "pointMm": [
+        -29.32475195842759,
+        21.689011703330777,
+        125.23979874560496
+      ]
+    },
+    {
+      "style": "monk",
+      "pixel": [
+        518,
+        313
+      ],
+      "part": "monk-integral-vamp-tongue",
+      "layer": 1,
+      "face": 4669,
+      "pointMm": [
+        -29.845763635666692,
+        21.83547225696336,
+        124.54026613583916
+      ]
+    }
+  ]
+}

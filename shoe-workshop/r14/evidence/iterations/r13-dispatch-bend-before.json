@@ -1,0 +1,5764 @@
+{
+  "diagnostic": "R13 existing geometric bend / rigid hardware and normal transport",
+  "readOnly": true,
+  "fullTestSuiteRun": false,
+  "generatedAtUtc": "2026-10-18T06:31:13.422Z",
+  "runtime": {
+    "node": "v24.19.0",
+    "v8": "13.6.233.17-node.51"
+  },
+  "sourceRoot": "/workspace/scratch/e3aba5d62e5a/shoe-project/shoe-workshop/r13",
+  "sourceHead": "ec7d80c9f99dc978735245d463306075f5a287d5",
+  "sourceHashes": {
+    "src/model.mjs": "d34f8b825f45667f8da384a198284ee2c4755568851d6a87a420a429db7b1e14",
+    "src/kernel.mjs": "7156a5432fed1dd654905a967255f167e3c45bf7ed69fc674db25263de9dde06",
+    "src/monk-canvas.mjs": "4a73df17527e247bcb863a852064ce12638a5a78190e587784b2d496f43b1524"
+  },
+  "method": "Build each default rest model once. Clone only selected real BufferGeometries and call the exact existing bendGeometry(clone,last,30). All other parameters remain at default. No renderer or physical solver is involved.",
+  "limits": [
+    "Only default shoe parameters and bend 0 / 30 degrees are measured.",
+    "Rigid metal treatment is a design constraint; no real material strength or wearer-fit claims.",
+    "Normal comparison is exact smooth deformation differential versus stored normal; not rendered pixels or triangle-normal fitting.",
+    "Antipodal chord samples identify geometric distortion; they do not certify a manufactured hole size."
+  ],
+  "styles": [
+    {
+      "styleId": "canvas",
+      "params": {
+        "length": 1,
+        "width": 1,
+        "instep": 0,
+        "thickness": 1.35,
+        "bend": 0
+      },
+      "Lmm": 279,
+      "transitionS": [
+        0.54,
+        0.72
+      ],
+      "transitionZMm": [
+        11.16,
+        61.38
+      ],
+      "parts": [
+        {
+          "partId": "canvas-eyelet--1-0",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            -42.65610885620117,
+            -35.87713623046875
+          ],
+          "restSRange": [
+            0.34711072094551554,
+            0.3714081138692876
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                25
+              ],
+              "beforeVerticesMm": [
+                [
+                  -31.24981117248535,
+                  62.405784606933594,
+                  -39.28446578979492
+                ],
+                [
+                  -31.285844802856445,
+                  62.797157287597656,
+                  -39.30518341064453
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -31.24981117248535,
+                  62.405784606933594,
+                  -39.28446578979492
+                ],
+                [
+                  -31.285844802856445,
+                  62.797157287597656,
+                  -39.30518341064453
+                ]
+              ],
+              "beforeLengthMm": 0.3935736493994014,
+              "afterLengthMm": 0.3935736493994014,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.0000019090959104164224,
+          "worstNormal": {
+            "index": 28,
+            "beforeVertexMm": [
+              -31.368846893310547,
+              62.04172134399414,
+              -41.06119918823242
+            ],
+            "afterVertexMm": [
+              -31.368846893310547,
+              62.04172134399414,
+              -41.06119918823242
+            ],
+            "beforeNormal": [
+              -0.8958286046981812,
+              0.4186524450778961,
+              -0.14906781911849976
+            ],
+            "actualAfterNormal": [
+              -0.8958286165849595,
+              0.41865245063300877,
+              -0.14906782109648542
+            ],
+            "expectedDifferentialNormal": [
+              -0.8958286165849595,
+              0.41865245063300877,
+              -0.14906782109648542
+            ],
+            "errorDeg": 0.0000019090959104164224,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "4a5c7ff6665ad3366def2fed80f8b8c9a677799c169ecced7095a155fc15e4b1",
+            "after": "4a5c7ff6665ad3366def2fed80f8b8c9a677799c169ecced7095a155fc15e4b1"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.2999979552060275,
+                4.300002779193857
+              ],
+              "afterChordRangeMm": [
+                4.2999979552060275,
+                4.300002779193857
+              ],
+              "minimumPair": {
+                "indices": [
+                  4,
+                  16
+                ],
+                "anglesDeg": [
+                  60,
+                  240
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -31.450044631958008,
+                    61.328067779541016,
+                    -41.13404083251953
+                  ],
+                  [
+                    -32.646514892578125,
+                    59.491031646728516,
+                    -37.43488693237305
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -31.450044631958008,
+                    61.328067779541016,
+                    -41.13404083251953
+                  ],
+                  [
+                    -32.646514892578125,
+                    59.491031646728516,
+                    -37.43488693237305
+                  ]
+                ],
+                "beforeChordMm": 4.2999979552060275,
+                "afterChordMm": 4.2999979552060275
+              }
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299998159300116,
+                4.30000253423282
+              ],
+              "afterChordRangeMm": [
+                4.299998159300116,
+                4.30000253423282
+              ],
+              "minimumPair": {
+                "indices": [
+                  160,
+                  172
+                ],
+                "anglesDeg": [
+                  150,
+                  330
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -30.82637596130371,
+                    57.915428161621094,
+                    -40.12785339355469
+                  ],
+                  [
+                    -29.673175811767578,
+                    61.46491622924805,
+                    -37.99214553833008
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -30.82637596130371,
+                    57.915428161621094,
+                    -40.12785339355469
+                  ],
+                  [
+                    -29.673175811767578,
+                    61.46491622924805,
+                    -37.99214553833008
+                  ]
+                ],
+                "beforeChordMm": 4.299998159300116,
+                "afterChordMm": 4.299998159300116
+              }
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799998742256836,
+              6.800001159737907
+            ],
+            "afterChordRangeMm": [
+              6.799998742256836,
+              6.800001159737907
+            ],
+            "minimumPair": {
+              "indices": [
+                58,
+                70
+              ],
+              "anglesDeg": [
+                120,
+                300
+              ],
+              "beforeVerticesMm": [
+                [
+                  -32.318809509277344,
+                  58.68681335449219,
+                  -42.20362091064453
+                ],
+                [
+                  -31.685516357421875,
+                  62.09539794921875,
+                  -36.35379409790039
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -32.318809509277344,
+                  58.68681335449219,
+                  -42.20362091064453
+                ],
+                [
+                  -31.685516357421875,
+                  62.09539794921875,
+                  -36.35379409790039
+                ]
+              ],
+              "beforeChordMm": 6.799998742256836,
+              "afterChordMm": 6.799998742256836
+            }
+          }
+        },
+        {
+          "partId": "canvas-eyelet--1-1",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            -27.389999389648438,
+            -20.589521408081055
+          ],
+          "restSRange": [
+            0.4018279591768873,
+            0.42620243222910015
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                25
+              ],
+              "beforeVerticesMm": [
+                [
+                  -28.001081466674805,
+                  69.77040100097656,
+                  -23.989395141601562
+                ],
+                [
+                  -27.933698654174805,
+                  70.15816497802734,
+                  -23.988969802856445
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -28.001081466674805,
+                  69.77040100097656,
+                  -23.989395141601562
+                ],
+                [
+                  -27.933698654174805,
+                  70.15816497802734,
+                  -23.988969802856445
+                ]
+              ],
+              "beforeLengthMm": 0.39357531202007207,
+              "afterLengthMm": 0.39357531202007207,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.0000017075472925031877,
+          "worstNormal": {
+            "index": 71,
+            "beforeVertexMm": [
+              -27.803436279296875,
+              69.93962097167969,
+              -21.585355758666992
+            ],
+            "afterVertexMm": [
+              -27.803436279296875,
+              69.93962097167969,
+              -21.585355758666992
+            ],
+            "beforeNormal": [
+              -0.5164429545402527,
+              0.7920580506324768,
+              0.325469970703125
+            ],
+            "actualAfterNormal": [
+              -0.5164429590086521,
+              0.79205805748557,
+              0.3254699735191762
+            ],
+            "expectedDifferentialNormal": [
+              -0.5164429590086521,
+              0.79205805748557,
+              0.3254699735191762
+            ],
+            "errorDeg": 0.0000017075472925031877,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "7c3e5f8c9e0eab6183a41b5f8c7710017568f8d5415ce9bde7c7f9a437cdce15",
+            "after": "7c3e5f8c9e0eab6183a41b5f8c7710017568f8d5415ce9bde7c7f9a437cdce15"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.2999962212413605,
+                4.300004501639151
+              ],
+              "afterChordRangeMm": [
+                4.2999962212413605,
+                4.300004501639151
+              ],
+              "minimumPair": {
+                "indices": [
+                  10,
+                  22
+                ],
+                "anglesDeg": [
+                  150,
+                  330
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -30.421701431274414,
+                    66.57096862792969,
+                    -25.06439208984375
+                  ],
+                  [
+                    -28.17270278930664,
+                    69.53904724121094,
+                    -22.914396286010742
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -30.421701431274414,
+                    66.57096862792969,
+                    -25.06439208984375
+                  ],
+                  [
+                    -28.17270278930664,
+                    69.53904724121094,
+                    -22.914396286010742
+                  ]
+                ],
+                "beforeChordMm": 4.2999962212413605,
+                "afterChordMm": 4.2999962212413605
+              }
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.29999603713324,
+                4.300003524938355
+              ],
+              "afterChordRangeMm": [
+                4.29999603713324,
+                4.300003524938355
+              ],
+              "minimumPair": {
+                "indices": [
+                  150,
+                  162
+                ],
+                "anglesDeg": [
+                  0,
+                  180
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -26.44526481628418,
+                    68.5948486328125,
+                    -23.993999481201172
+                  ],
+                  [
+                    -29.037508010864258,
+                    65.16407012939453,
+                    -23.993999481201172
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -26.44526481628418,
+                    68.5948486328125,
+                    -23.993999481201172
+                  ],
+                  [
+                    -29.037508010864258,
+                    65.16407012939453,
+                    -23.993999481201172
+                  ]
+                ],
+                "beforeChordMm": 4.29999603713324,
+                "afterChordMm": 4.29999603713324
+              }
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799999339373629,
+              6.80000335796688
+            ],
+            "afterChordRangeMm": [
+              6.799999339373629,
+              6.80000335796688
+            ],
+            "minimumPair": {
+              "indices": [
+                61,
+                73
+              ],
+              "anglesDeg": [
+                165,
+                345
+              ],
+              "beforeVerticesMm": [
+                [
+                  -31.238805770874023,
+                  65.40583801269531,
+                  -24.869495391845703
+                ],
+                [
+                  -27.27581214904785,
+                  70.64389038085938,
+                  -23.109529495239258
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -31.238805770874023,
+                  65.40583801269531,
+                  -24.869495391845703
+                ],
+                [
+                  -27.27581214904785,
+                  70.64389038085938,
+                  -23.109529495239258
+                ]
+              ],
+              "beforeChordMm": 6.799999339373629,
+              "afterChordMm": 6.799999339373629
+            }
+          }
+        },
+        {
+          "partId": "canvas-eyelet--1-2",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            -11.58141040802002,
+            -5.091855049133301
+          ],
+          "restSRange": [
+            0.45848956843003574,
+            0.481749623479809
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                25
+              ],
+              "beforeVerticesMm": [
+                [
+                  -15.520307540893555,
+                  74.70881652832031,
+                  -8.285567283630371
+                ],
+                [
+                  -15.271370887756348,
+                  75.0078353881836,
+                  -8.226265907287598
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -15.520307540893555,
+                  74.70881652832031,
+                  -8.285567283630371
+                ],
+                [
+                  -15.271370887756348,
+                  75.0078353881836,
+                  -8.226265907287598
+                ]
+              ],
+              "beforeLengthMm": 0.3935713265282902,
+              "afterLengthMm": 0.3935713265282902,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.0000017075472925031877,
+          "worstNormal": {
+            "index": 47,
+            "beforeVertexMm": [
+              -15.406963348388672,
+              74.49462127685547,
+              -7.046050548553467
+            ],
+            "afterVertexMm": [
+              -15.406963348388672,
+              74.49462127685547,
+              -7.046050548553467
+            ],
+            "beforeNormal": [
+              -0.338381826877594,
+              0.8646092414855957,
+              0.37141430377960205
+            ],
+            "actualAfterNormal": [
+              -0.33838182919967136,
+              0.8646092474188031,
+              0.3714143063283582
+            ],
+            "expectedDifferentialNormal": [
+              -0.33838182919967136,
+              0.8646092474188031,
+              0.3714143063283582
+            ],
+            "errorDeg": 0.0000017075472925031877,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "c9e9ba3a3d547a401c78bfe3c36f18c89bc0289d9a86fbb0ae6d6db7ff578cfa",
+            "after": "c9e9ba3a3d547a401c78bfe3c36f18c89bc0289d9a86fbb0ae6d6db7ff578cfa"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.29999830527619,
+                4.300001638805924
+              ],
+              "afterChordRangeMm": [
+                4.29999830527619,
+                4.300001638805924
+              ],
+              "minimumPair": {
+                "indices": [
+                  5,
+                  17
+                ],
+                "anglesDeg": [
+                  75,
+                  255
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -17.25420379638672,
+                    74.67594146728516,
+                    -10.246367454528809
+                  ],
+                  [
+                    -17.704748153686523,
+                    72.97064208984375,
+                    -6.324767112731934
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -17.25420379638672,
+                    74.67594146728516,
+                    -10.246367454528809
+                  ],
+                  [
+                    -17.704748153686523,
+                    72.97064208984375,
+                    -6.324767112731934
+                  ]
+                ],
+                "beforeChordMm": 4.29999830527619,
+                "afterChordMm": 4.29999830527619
+              }
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299998560084231,
+                4.300001367150818
+              ],
+              "afterChordRangeMm": [
+                4.299998560084231,
+                4.300001367150818
+              ],
+              "minimumPair": {
+                "indices": [
+                  150,
+                  162
+                ],
+                "anglesDeg": [
+                  0,
+                  180
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -14.761994361877441,
+                    73.03109741210938,
+                    -8.928000450134277
+                  ],
+                  [
+                    -18.68033218383789,
+                    71.26004791259766,
+                    -8.928000450134277
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -14.761994361877441,
+                    73.03109741210938,
+                    -8.928000450134277
+                  ],
+                  [
+                    -18.68033218383789,
+                    71.26004791259766,
+                    -8.928000450134277
+                  ]
+                ],
+                "beforeChordMm": 4.299998560084231,
+                "afterChordMm": 4.299998560084231
+              }
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799997732588522,
+              6.8000015994474765
+            ],
+            "afterChordRangeMm": [
+              6.799997732588522,
+              6.8000015994474765
+            ],
+            "minimumPair": {
+              "indices": [
+                51,
+                63
+              ],
+              "anglesDeg": [
+                15,
+                195
+              ],
+              "beforeVerticesMm": [
+                [
+                  -14.586788177490234,
+                  75.39710235595703,
+                  -9.13289737701416
+                ],
+                [
+                  -20.333276748657227,
+                  72.16344451904297,
+                  -7.471182823181152
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -14.586788177490234,
+                  75.39710235595703,
+                  -9.13289737701416
+                ],
+                [
+                  -20.333276748657227,
+                  72.16344451904297,
+                  -7.471182823181152
+                ]
+              ],
+              "beforeChordMm": 6.799997732588522,
+              "afterChordMm": 6.799997732588522
+            }
+          }
+        },
+        {
+          "partId": "canvas-eyelet--1-3",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            3.4456892013549805,
+            9.96402645111084
+          ],
+          "restSRange": [
+            0.5123501405066486,
+            0.5357133564555944
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                25
+              ],
+              "beforeVerticesMm": [
+                [
+                  -16.24122428894043,
+                  68.51133728027344,
+                  6.7538065910339355
+                ],
+                [
+                  -15.973225593566895,
+                  68.79390716552734,
+                  6.81065034866333
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -16.24122428894043,
+                  68.51133728027344,
+                  6.7538065910339355
+                ],
+                [
+                  -15.973225593566895,
+                  68.79390716552734,
+                  6.81065034866333
+                ]
+              ],
+              "beforeLengthMm": 0.3935736952030102,
+              "afterLengthMm": 0.3935736952030102,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.0000017075472925031877,
+          "worstNormal": {
+            "index": 116,
+            "beforeVertexMm": [
+              -19.094039916992188,
+              66.40470886230469,
+              8.72977066040039
+            ],
+            "afterVertexMm": [
+              -19.094039916992188,
+              66.40470886230469,
+              8.72977066040039
+            ],
+            "beforeNormal": [
+              -0.18139952421188354,
+              -0.8292661309242249,
+              0.5285942554473877
+            ],
+            "actualAfterNormal": [
+              -0.1813995251030713,
+              -0.829266134998281,
+              0.5285942580442894
+            ],
+            "expectedDifferentialNormal": [
+              -0.1813995251030713,
+              -0.829266134998281,
+              0.5285942580442894
+            ],
+            "errorDeg": 0.0000017075472925031877,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "f2e735e335f6b1a485a668fc91019819c1b47bb8dc395ccf5c7121528e971349",
+            "after": "f2e735e335f6b1a485a668fc91019819c1b47bb8dc395ccf5c7121528e971349"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.2999967594367705,
+                4.300003038065723
+              ],
+              "afterChordRangeMm": [
+                4.2999967594367705,
+                4.300003038065723
+              ],
+              "minimumPair": {
+                "indices": [
+                  0,
+                  12
+                ],
+                "anglesDeg": [
+                  0,
+                  180
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -16.24122428894043,
+                    68.51133728027344,
+                    6.7538065910339355
+                  ],
+                  [
+                    -20.26877784729004,
+                    67.00508880615234,
+                    6.7538065910339355
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -16.24122428894043,
+                    68.51133728027344,
+                    6.7538065910339355
+                  ],
+                  [
+                    -20.26877784729004,
+                    67.00508880615234,
+                    6.7538065910339355
+                  ]
+                ],
+                "beforeChordMm": 4.2999967594367705,
+                "afterChordMm": 4.2999967594367705
+              }
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299998337863716,
+                4.300000859001031
+              ],
+              "afterChordRangeMm": [
+                4.299998337863716,
+                4.300000859001031
+              ],
+              "minimumPair": {
+                "indices": [
+                  151,
+                  163
+                ],
+                "anglesDeg": [
+                  15,
+                  195
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -15.723284721374512,
+                    66.91728973388672,
+                    5.610015392303467
+                  ],
+                  [
+                    -19.490489959716797,
+                    65.13317108154297,
+                    6.665984630584717
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -15.723284721374512,
+                    66.91728973388672,
+                    5.610015392303467
+                  ],
+                  [
+                    -19.490489959716797,
+                    65.13317108154297,
+                    6.665984630584717
+                  ]
+                ],
+                "beforeChordMm": 4.299998337863716,
+                "afterChordMm": 4.299998337863716
+              }
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799998394302413,
+              6.800002963492193
+            ],
+            "afterChordRangeMm": [
+              6.799998394302413,
+              6.800002963492193
+            ],
+            "minimumPair": {
+              "indices": [
+                51,
+                63
+              ],
+              "anglesDeg": [
+                15,
+                195
+              ],
+              "beforeVerticesMm": [
+                [
+                  -15.259661674499512,
+                  69.12447357177734,
+                  5.903063774108887
+                ],
+                [
+                  -21.217103958129883,
+                  66.3030776977539,
+                  7.572969436645508
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -15.259661674499512,
+                  69.12447357177734,
+                  5.903063774108887
+                ],
+                [
+                  -21.217103958129883,
+                  66.3030776977539,
+                  7.572969436645508
+                ]
+              ],
+              "beforeChordMm": 6.799998394302413,
+              "afterChordMm": 6.799998394302413
+            }
+          }
+        },
+        {
+          "partId": "canvas-eyelet--1-4",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            18.61992645263672,
+            25.055917739868164
+          ],
+          "restSRange": [
+            0.5667380876438592,
+            0.5898061567737211
+          ],
+          "transitionVertices": 175,
+          "positionsByteIdentical": false,
+          "normalsByteIdentical": false,
+          "changedVertices": 175,
+          "maxDisplacementMm": 4.690127164009118,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 0.437656310373232,
+            "maxLengthRatio": 1.007313474474904,
+            "maxAbsoluteChangeMm": 0.47593403380603205,
+            "minimumRatioEdge": {
+              "indices": [
+                18,
+                43
+              ],
+              "beforeVerticesMm": [
+                [
+                  -18.78399658203125,
+                  60.97186279296875,
+                  23.904123306274414
+                ],
+                [
+                  -18.797229766845703,
+                  61.0146598815918,
+                  24.29513931274414
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -18.78399658203125,
+                  59.76805114746094,
+                  20.004817962646484
+                ],
+                [
+                  -18.797229766845703,
+                  59.76873016357422,
+                  20.176557540893555
+                ]
+              ],
+              "beforeLengthMm": 0.3935736592945158,
+              "afterLengthMm": 0.17224999558692927,
+              "ratio": 0.437656310373232
+            }
+          },
+          "minimumJacobianDeterminant": 0.4168475425360053,
+          "maxSmoothNormalTransportErrorDeg": 29.52222020168634,
+          "worstNormal": {
+            "index": 44,
+            "beforeVertexMm": [
+              -18.187946319580078,
+              61.23454284667969,
+              24.215442657470703
+            ],
+            "afterVertexMm": [
+              -18.187946319580078,
+              59.9962272644043,
+              20.121889114379883
+            ],
+            "beforeNormal": [
+              -0.26718175411224365,
+              0.8702337741851807,
+              0.41389262676239014
+            ],
+            "actualAfterNormal": [
+              -0.26718175249453074,
+              0.9031610434207654,
+              0.33602684532796706
+            ],
+            "expectedDifferentialNormal": [
+              -0.17263248440537138,
+              0.6309970685873425,
+              0.7563337390082568
+            ],
+            "errorDeg": 29.52222020168634,
+            "phiRadians": 0.08775913727235005,
+            "phiDerivativeRadiansPerMm": 0.01203483979850744,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0.9961516377641195,
+                -0.10669339583490722
+              ],
+              [
+                0,
+                -0.08764653204698078,
+                0.4425944136490184
+              ]
+            ],
+            "determinant": 0.4315398438844744
+          },
+          "positionSha256": {
+            "before": "69d5708709eb13c6efdf3b46f5a5b25af312d04baef4f86d34f41fc7ddf22bb9",
+            "after": "1a09bf7fbdd368eec4f1bea971f8f2c107682e71e4e53a8b6a72cacbd91da580"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299998164551921,
+                4.300001659453323
+              ],
+              "afterChordRangeMm": [
+                2.9114871766684973,
+                4.300001620550654
+              ],
+              "minimumPair": {
+                "indices": [
+                  6,
+                  18
+                ],
+                "anglesDeg": [
+                  90,
+                  270
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -19.23259735107422,
+                    62.42267990112305,
+                    19.881202697753906
+                  ],
+                  [
+                    -18.78399658203125,
+                    60.97186279296875,
+                    23.904123306274414
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -19.23259735107422,
+                    61.69392395019531,
+                    17.867874145507812
+                  ],
+                  [
+                    -18.78399658203125,
+                    59.76805114746094,
+                    20.004817962646484
+                  ]
+                ],
+                "beforeChordMm": 4.3000003667160485,
+                "afterChordMm": 2.9114871766684973
+              },
+              "oppositePairSamples": [
+                {
+                  "indices": [
+                    0,
+                    12
+                  ],
+                  "anglesDeg": [
+                    0,
+                    180
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -16.954246520996094,
+                      62.332393646240234,
+                      21.892662048339844
+                    ],
+                    [
+                      -21.062347412109375,
+                      61.06214904785156,
+                      21.892662048339844
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -16.954246520996094,
+                      61.35699462890625,
+                      18.9482479095459
+                    ],
+                    [
+                      -21.062347412109375,
+                      60.08915328979492,
+                      19.02634620666504
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001659453323,
+                  "afterChordMm": 4.300001620550654
+                },
+                {
+                  "indices": [
+                    1,
+                    13
+                  ],
+                  "anglesDeg": [
+                    15,
+                    195
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -17.082290649414062,
+                      62.49850082397461,
+                      21.372058868408203
+                    ],
+                    [
+                      -20.934303283691406,
+                      60.89604187011719,
+                      22.413267135620117
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -17.082290649414062,
+                      61.58604049682617,
+                      18.673925399780273
+                    ],
+                    [
+                      -20.934303283691406,
+                      59.861595153808594,
+                      19.300556182861328
+                    ]
+                  ],
+                  "beforeChordMm": 4.299998917341787,
+                  "afterChordMm": 4.266659022466182
+                },
+                {
+                  "indices": [
+                    2,
+                    14
+                  ],
+                  "anglesDeg": [
+                    30,
+                    210
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -17.34158706665039,
+                      62.610008239746094,
+                      20.886932373046875
+                    ],
+                    [
+                      -20.675006866455078,
+                      60.7845344543457,
+                      22.898391723632812
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -17.34158706665039,
+                      61.75692367553711,
+                      18.41368293762207
+                    ],
+                    [
+                      -20.675006866455078,
+                      59.693939208984375,
+                      19.547069549560547
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001258368834,
+                  "afterChordMm": 4.080705537414967
+                },
+                {
+                  "indices": [
+                    3,
+                    15
+                  ],
+                  "anglesDeg": [
+                    45,
+                    225
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -17.714468002319336,
+                      62.6593132019043,
+                      20.470346450805664
+                    ],
+                    [
+                      -20.302125930786133,
+                      60.7352294921875,
+                      23.314979553222656
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -17.714468002319336,
+                      61.857566833496094,
+                      18.186548233032227
+                    ],
+                    [
+                      -20.302125930786133,
+                      59.597381591796875,
+                      19.750524520874023
+                    ]
+                  ],
+                  "beforeChordMm": 4.3000010655953504,
+                  "afterChordMm": 3.7749745311039433
+                },
+                {
+                  "indices": [
+                    4,
+                    16
+                  ],
+                  "anglesDeg": [
+                    60,
+                    240
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -18.175521850585938,
+                      62.6430549621582,
+                      20.150686264038086
+                    ],
+                    [
+                      -19.84107208251953,
+                      60.751487731933594,
+                      23.6346378326416
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -18.175521850585938,
+                      61.88082504272461,
+                      18.010601043701172
+                    ],
+                    [
+                      -19.84107208251953,
+                      59.57795715332031,
+                      19.899181365966797
+                    ]
+                  ],
+                  "beforeChordMm": 4.3000003132474935,
+                  "afterChordMm": 3.4123296623849786
+                },
+                {
+                  "indices": [
+                    5,
+                    17
+                  ],
+                  "anglesDeg": [
+                    75,
+                    255
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -18.693326950073242,
+                      62.56234359741211,
+                      19.94974136352539
+                    ],
+                    [
+                      -19.323266983032227,
+                      60.83219909667969,
+                      23.83558464050293
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -18.693326950073242,
+                      61.825008392333984,
+                      17.900983810424805
+                    ],
+                    [
+                      -19.323266983032227,
+                      59.6363410949707,
+                      19.985227584838867
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000280438426,
+                  "afterChordMm": 3.0872578601172322
+                },
+                {
+                  "indices": [
+                    6,
+                    18
+                  ],
+                  "anglesDeg": [
+                    90,
+                    270
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -19.23259735107422,
+                      62.42267990112305,
+                      19.881202697753906
+                    ],
+                    [
+                      -18.78399658203125,
+                      60.97186279296875,
+                      23.904123306274414
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -19.23259735107422,
+                      61.69392395019531,
+                      17.867874145507812
+                    ],
+                    [
+                      -18.78399658203125,
+                      59.76805114746094,
+                      20.004817962646484
+                    ]
+                  ],
+                  "beforeChordMm": 4.3000003667160485,
+                  "afterChordMm": 2.9114871766684973
+                },
+                {
+                  "indices": [
+                    7,
+                    19
+                  ],
+                  "anglesDeg": [
+                    105,
+                    285
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -19.756580352783203,
+                      62.23358154296875,
+                      19.94974136352539
+                    ],
+                    [
+                      -18.260011672973633,
+                      61.16096115112305,
+                      23.83558464050293
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -19.756580352783203,
+                      61.49654006958008,
+                      17.914953231811523
+                    ],
+                    [
+                      -18.260011672973633,
+                      59.963966369628906,
+                      19.957895278930664
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001196700035,
+                  "afterChordMm": 2.960086513441175
+                },
+                {
+                  "indices": [
+                    8,
+                    20
+                  ],
+                  "anglesDeg": [
+                    120,
+                    300
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -20.229570388793945,
+                      62.007930755615234,
+                      20.150686264038086
+                    ],
+                    [
+                      -17.787023544311523,
+                      61.3866081237793,
+                      23.6346378326416
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -20.229570388793945,
+                      61.2463264465332,
+                      18.03874969482422
+                    ],
+                    [
+                      -17.787023544311523,
+                      60.211002349853516,
+                      19.84787368774414
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999468918277,
+                  "afterChordMm": 3.211052894988678
+                },
+                {
+                  "indices": [
+                    9,
+                    21
+                  ],
+                  "anglesDeg": [
+                    135,
+                    315
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -20.619333267211914,
+                      61.761112213134766,
+                      20.470346450805664
+                    ],
+                    [
+                      -17.397260665893555,
+                      61.633426666259766,
+                      23.314979553222656
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -20.619333267211914,
+                      60.96036911010742,
+                      18.22903060913086
+                    ],
+                    [
+                      -17.397260665893555,
+                      60.49290466308594,
+                      19.6812801361084
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999178420125,
+                  "afterChordMm": 3.565011016252551
+                },
+                {
+                  "indices": [
+                    10,
+                    22
+                  ],
+                  "anglesDeg": [
+                    150,
+                    330
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -20.89930534362793,
+                      61.509944915771484,
+                      20.886932373046875
+                    ],
+                    [
+                      -17.11728858947754,
+                      61.88459777832031,
+                      22.898391723632812
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -20.89930534362793,
+                      60.65830612182617,
+                      18.470111846923828
+                    ],
+                    [
+                      -17.11728858947754,
+                      60.79111862182617,
+                      19.467443466186523
+                    ]
+                  ],
+                  "beforeChordMm": 4.299998164551921,
+                  "afterChordMm": 3.9135610698712306
+                },
+                {
+                  "indices": [
+                    11,
+                    23
+                  ],
+                  "anglesDeg": [
+                    165,
+                    345
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -21.0504093170166,
+                      61.27153778076172,
+                      21.372058868408203
+                    ],
+                    [
+                      -16.966184616088867,
+                      62.12300109863281,
+                      22.413267135620117
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -21.0504093170166,
+                      60.36101150512695,
+                      18.742778778076172
+                    ],
+                    [
+                      -16.966184616088867,
+                      61.085792541503906,
+                      19.21830177307129
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999516867267,
+                  "afterChordMm": 4.175203118068511
+                }
+              ]
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.29999977976625,
+                4.300001196700035
+              ],
+              "afterChordRangeMm": [
+                3.0279571989539473,
+                4.29999935351396
+              ],
+              "minimumPair": {
+                "indices": [
+                  156,
+                  168
+                ],
+                "anglesDeg": [
+                  90,
+                  270
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -18.693674087524414,
+                    60.67974853515625,
+                    19.19253921508789
+                  ],
+                  [
+                    -18.245075225830078,
+                    59.22893142700195,
+                    23.2154598236084
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -18.693674087524414,
+                    60.03670883178711,
+                    17.52806854248047
+                  ],
+                  [
+                    -18.245075225830078,
+                    58.106658935546875,
+                    19.817651748657227
+                  ]
+                ],
+                "beforeChordMm": 4.300000167730888,
+                "afterChordMm": 3.0279571989539473
+              },
+              "oppositePairSamples": [
+                {
+                  "indices": [
+                    150,
+                    162
+                  ],
+                  "anglesDeg": [
+                    0,
+                    180
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -16.415325164794922,
+                      60.58946228027344,
+                      21.20400047302246
+                    ],
+                    [
+                      -20.52342414855957,
+                      59.319217681884766,
+                      21.20400047302246
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -16.415325164794922,
+                      59.700401306152344,
+                      18.690589904785156
+                    ],
+                    [
+                      -20.52342414855957,
+                      58.43204116821289,
+                      18.75972557067871
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999837226013,
+                  "afterChordMm": 4.29999935351396
+                },
+                {
+                  "indices": [
+                    151,
+                    163
+                  ],
+                  "anglesDeg": [
+                    15,
+                    195
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -16.543367385864258,
+                      60.75556945800781,
+                      20.683395385742188
+                    ],
+                    [
+                      -20.395381927490234,
+                      59.15311050415039,
+                      21.7246036529541
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -16.543367385864258,
+                      59.929832458496094,
+                      18.396106719970703
+                    ],
+                    [
+                      -20.395381927490234,
+                      58.203704833984375,
+                      19.05359649658203
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000625977424,
+                  "afterChordMm": 4.271981438553879
+                },
+                {
+                  "indices": [
+                    152,
+                    164
+                  ],
+                  "anglesDeg": [
+                    30,
+                    210
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -16.80266571044922,
+                      60.8670768737793,
+                      20.198270797729492
+                    ],
+                    [
+                      -20.136083602905273,
+                      59.041603088378906,
+                      22.20973014831543
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -16.80266571044922,
+                      60.100746154785156,
+                      18.116640090942383
+                    ],
+                    [
+                      -20.136083602905273,
+                      58.035072326660156,
+                      19.31861114501953
+                    ]
+                  ],
+                  "beforeChordMm": 4.29999977976625,
+                  "afterChordMm": 4.101635969315913
+                },
+                {
+                  "indices": [
+                    153,
+                    165
+                  ],
+                  "anglesDeg": [
+                    45,
+                    225
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -17.175546646118164,
+                      60.9163818359375,
+                      19.78168296813965
+                    ],
+                    [
+                      -19.763202667236328,
+                      58.9922981262207,
+                      22.626317977905273
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -17.175546646118164,
+                      60.2011604309082,
+                      17.87259864807129
+                    ],
+                    [
+                      -19.763202667236328,
+                      57.937503814697266,
+                      19.538211822509766
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001179582503,
+                  "afterChordMm": 3.8202581335045487
+                },
+                {
+                  "indices": [
+                    154,
+                    166
+                  ],
+                  "anglesDeg": [
+                    60,
+                    240
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -17.636598587036133,
+                      60.900123596191406,
+                      19.462024688720703
+                    ],
+                    [
+                      -19.30215072631836,
+                      59.0085563659668,
+                      22.94597625732422
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -17.636598587036133,
+                      60.22406768798828,
+                      17.683303833007812
+                    ],
+                    [
+                      -19.30215072631836,
+                      57.9172248840332,
+                      19.699630737304688
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001052034999,
+                  "afterChordMm": 3.4872857404890625
+                },
+                {
+                  "indices": [
+                    155,
+                    167
+                  ],
+                  "anglesDeg": [
+                    75,
+                    255
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -18.154403686523438,
+                      60.81941223144531,
+                      19.261077880859375
+                    ],
+                    [
+                      -18.784343719482422,
+                      59.08926773071289,
+                      23.146921157836914
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -18.154403686523438,
+                      60.167938232421875,
+                      17.564857482910156
+                    ],
+                    [
+                      -18.784343719482422,
+                      57.97507095336914,
+                      19.79424285888672
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000280438426,
+                  "afterChordMm": 3.1899295451910326
+                },
+                {
+                  "indices": [
+                    156,
+                    168
+                  ],
+                  "anglesDeg": [
+                    90,
+                    270
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -18.693674087524414,
+                      60.67974853515625,
+                      19.19253921508789
+                    ],
+                    [
+                      -18.245075225830078,
+                      59.22893142700195,
+                      23.2154598236084
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -18.693674087524414,
+                      60.03670883178711,
+                      17.52806854248047
+                    ],
+                    [
+                      -18.245075225830078,
+                      58.106658935546875,
+                      19.817651748657227
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000167730888,
+                  "afterChordMm": 3.0279571989539473
+                },
+                {
+                  "indices": [
+                    157,
+                    169
+                  ],
+                  "anglesDeg": [
+                    105,
+                    285
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -19.21765899658203,
+                      60.49065017700195,
+                      19.261077880859375
+                    ],
+                    [
+                      -17.72109031677246,
+                      59.41802978515625,
+                      23.146921157836914
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -19.21765899658203,
+                      59.839393615722656,
+                      17.576847076416016
+                    ],
+                    [
+                      -17.72109031677246,
+                      58.30290222167969,
+                      19.769527435302734
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001196700035,
+                  "afterChordMm": 3.067306762226865
+                },
+                {
+                  "indices": [
+                    158,
+                    170
+                  ],
+                  "anglesDeg": [
+                    120,
+                    300
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -19.690649032592773,
+                      60.2650032043457,
+                      19.462024688720703
+                    ],
+                    [
+                      -17.24810028076172,
+                      59.643680572509766,
+                      22.94597625732422
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -19.690649032592773,
+                      59.58940887451172,
+                      17.707555770874023
+                    ],
+                    [
+                      -17.24810028076172,
+                      58.5506591796875,
+                      19.6533203125
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000552357857,
+                  "afterChordMm": 3.2910552995988684
+                },
+                {
+                  "indices": [
+                    159,
+                    171
+                  ],
+                  "anglesDeg": [
+                    135,
+                    315
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -20.08041000366211,
+                      60.018184661865234,
+                      19.78168296813965
+                    ],
+                    [
+                      -16.85833740234375,
+                      59.890499114990234,
+                      22.626317977905273
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -20.08041000366211,
+                      59.30371856689453,
+                      17.909414291381836
+                    ],
+                    [
+                      -16.85833740234375,
+                      58.83354187011719,
+                      19.475906372070312
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000440212942,
+                  "afterChordMm": 3.6134077286155555
+                },
+                {
+                  "indices": [
+                    160,
+                    172
+                  ],
+                  "anglesDeg": [
+                    150,
+                    330
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -20.360383987426758,
+                      59.76701354980469,
+                      20.198270797729492
+                    ],
+                    [
+                      -16.578365325927734,
+                      60.141666412353516,
+                      22.20973014831543
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -20.360383987426758,
+                      59.00178527832031,
+                      18.165878295898438
+                    ],
+                    [
+                      -16.578365325927734,
+                      59.13282012939453,
+                      19.247278213500977
+                    ]
+                  ],
+                  "beforeChordMm": 4.2999998421398224,
+                  "afterChordMm": 3.9357668973039655
+                },
+                {
+                  "indices": [
+                    161,
+                    173
+                  ],
+                  "anglesDeg": [
+                    165,
+                    345
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      -20.51148796081543,
+                      59.52861022949219,
+                      20.683395385742188
+                    ],
+                    [
+                      -16.427261352539062,
+                      60.380069732666016,
+                      21.7246036529541
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      -20.51148796081543,
+                      58.70436477661133,
+                      18.456626892089844
+                    ],
+                    [
+                      -16.427261352539062,
+                      59.428470611572266,
+                      18.98031234741211
+                    ]
+                  ],
+                  "beforeChordMm": 4.3000005731404425,
+                  "afterChordMm": 4.180847127567958
+                }
+              ]
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799998649424427,
+              6.800001998786166
+            ],
+            "afterChordRangeMm": [
+              4.614427796925298,
+              6.799999900278303
+            ],
+            "minimumPair": {
+              "indices": [
+                56,
+                68
+              ],
+              "anglesDeg": [
+                90,
+                270
+              ],
+              "beforeVerticesMm": [
+                [
+                  -19.349185943603516,
+                  62.799739837646484,
+                  18.694091796875
+                ],
+                [
+                  -18.639772415161133,
+                  60.50542068481445,
+                  25.055917739868164
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  -19.349185943603516,
+                  62.21591567993164,
+                  17.150571823120117
+                ],
+                [
+                  -18.639772415161133,
+                  59.18379592895508,
+                  20.555850982666016
+                ]
+              ],
+              "beforeChordMm": 6.799999798406601,
+              "afterChordMm": 4.614427796925298
+            },
+            "oppositePairSamples": [
+              {
+                "indices": [
+                  50,
+                  62
+                ],
+                "anglesDeg": [
+                  0,
+                  180
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -15.746213912963867,
+                    62.656959533691406,
+                    21.875003814697266
+                  ],
+                  [
+                    -22.24274253845215,
+                    60.64820098876953,
+                    21.875003814697266
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -15.746213912963867,
+                    61.683082580566406,
+                    18.919513702392578
+                  ],
+                  [
+                    -22.24274253845215,
+                    59.6781005859375,
+                    19.042646408081055
+                  ]
+                ],
+                "beforeChordMm": 6.799999637763615,
+                "afterChordMm": 6.799999900278303
+              },
+              {
+                "indices": [
+                  51,
+                  63
+                ],
+                "anglesDeg": [
+                  15,
+                  195
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -15.948700904846191,
+                    62.91964340209961,
+                    21.05172348022461
+                  ],
+                  [
+                    -22.04025650024414,
+                    60.38551712036133,
+                    22.698286056518555
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -15.948700904846191,
+                    62.04584884643555,
+                    18.48450469970703
+                  ],
+                  [
+                    -22.04025650024414,
+                    59.31902313232422,
+                    19.477331161499023
+                  ]
+                ],
+                "beforeChordMm": 6.800001022152313,
+                "afterChordMm": 6.74746859423571
+              },
+              {
+                "indices": [
+                  52,
+                  64
+                ],
+                "anglesDeg": [
+                  30,
+                  210
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -16.35875129699707,
+                    63.095977783203125,
+                    20.284547805786133
+                  ],
+                  [
+                    -21.630205154418945,
+                    60.20918273925781,
+                    23.46546173095703
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -16.35875129699707,
+                    62.316734313964844,
+                    18.06443214416504
+                  ],
+                  [
+                    -21.630205154418945,
+                    59.056114196777344,
+                    19.862953186035156
+                  ]
+                ],
+                "beforeChordMm": 6.8000018232366175,
+                "afterChordMm": 6.454033410014653
+              },
+              {
+                "indices": [
+                  53,
+                  65
+                ],
+                "anglesDeg": [
+                  45,
+                  225
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -16.948423385620117,
+                    63.173946380615234,
+                    19.62575912475586
+                  ],
+                  [
+                    -21.0405330657959,
+                    60.1312141418457,
+                    24.124250411987305
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -16.948423385620117,
+                    62.47606658935547,
+                    17.691015243530273
+                  ],
+                  [
+                    -21.0405330657959,
+                    58.90679931640625,
+                    20.17691421508789
+                  ]
+                ],
+                "beforeChordMm": 6.800000365642123,
+                "afterChordMm": 5.971994993059346
+              },
+              {
+                "indices": [
+                  54,
+                  66
+                ],
+                "anglesDeg": [
+                  60,
+                  240
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -17.67753028869629,
+                    63.14823913574219,
+                    19.12025260925293
+                  ],
+                  [
+                    -20.311426162719727,
+                    60.15692138671875,
+                    24.629756927490234
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -17.67753028869629,
+                    62.512447357177734,
+                    17.396591186523438
+                  ],
+                  [
+                    -20.311426162719727,
+                    58.87971496582031,
+                    20.402801513671875
+                  ]
+                ],
+                "beforeChordMm": 6.800001998786166,
+                "afterChordMm": 5.401060324924082
+              },
+              {
+                "indices": [
+                  55,
+                  67
+                ],
+                "anglesDeg": [
+                  75,
+                  255
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -18.49638557434082,
+                    63.02060317993164,
+                    18.802478790283203
+                  ],
+                  [
+                    -19.492570877075195,
+                    60.2845573425293,
+                    24.94753074645996
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -18.49638557434082,
+                    62.42355728149414,
+                    17.20975685119629
+                  ],
+                  [
+                    -19.492570877075195,
+                    58.974727630615234,
+                    20.530481338500977
+                  ]
+                ],
+                "beforeChordMm": 6.799999671019292,
+                "afterChordMm": 4.890196543979647
+              },
+              {
+                "indices": [
+                  56,
+                  68
+                ],
+                "anglesDeg": [
+                  90,
+                  270
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -19.349185943603516,
+                    62.799739837646484,
+                    18.694091796875
+                  ],
+                  [
+                    -18.639772415161133,
+                    60.50542068481445,
+                    25.055917739868164
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -19.349185943603516,
+                    62.21591567993164,
+                    17.150571823120117
+                  ],
+                  [
+                    -18.639772415161133,
+                    59.18379592895508,
+                    20.555850982666016
+                  ]
+                ],
+                "beforeChordMm": 6.799999798406601,
+                "afterChordMm": 4.614427796925298
+              },
+              {
+                "indices": [
+                  57,
+                  69
+                ],
+                "anglesDeg": [
+                  105,
+                  285
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -20.177810668945312,
+                    62.50069808959961,
+                    18.802478790283203
+                  ],
+                  [
+                    -17.811145782470703,
+                    60.80446243286133,
+                    24.94753074645996
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -20.177810668945312,
+                    61.9039306640625,
+                    17.226747512817383
+                  ],
+                  [
+                    -17.811145782470703,
+                    59.49220275878906,
+                    20.480270385742188
+                  ]
+                ],
+                "beforeChordMm": 6.799998649424427,
+                "afterChordMm": 4.69072971493683
+              },
+              {
+                "indices": [
+                  58,
+                  70
+                ],
+                "anglesDeg": [
+                  120,
+                  300
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -20.925796508789062,
+                    62.14385986328125,
+                    19.12025260925293
+                  ],
+                  [
+                    -17.063161849975586,
+                    61.16130065917969,
+                    24.629756927490234
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -20.925796508789062,
+                    61.50869369506836,
+                    17.43203353881836
+                  ],
+                  [
+                    -17.063161849975586,
+                    59.8797721862793,
+                    20.30973243713379
+                  ]
+                ],
+                "beforeChordMm": 6.800000509537282,
+                "afterChordMm": 5.084730350631052
+              },
+              {
+                "indices": [
+                  59,
+                  71
+                ],
+                "anglesDeg": [
+                  135,
+                  315
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -21.542163848876953,
+                    61.7535400390625,
+                    19.62575912475586
+                  ],
+                  [
+                    -16.446792602539062,
+                    61.55162048339844,
+                    24.124250411987305
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -21.542163848876953,
+                    61.0567741394043,
+                    17.747278213500977
+                  ],
+                  [
+                    -16.446792602539062,
+                    60.321876525878906,
+                    20.05396842956543
+                  ]
+                ],
+                "beforeChordMm": 6.800000257813506,
+                "afterChordMm": 5.641250073632594
+              },
+              {
+                "indices": [
+                  60,
+                  72
+                ],
+                "anglesDeg": [
+                  150,
+                  330
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -21.98491096496582,
+                    61.35634231567383,
+                    20.284547805786133
+                  ],
+                  [
+                    -16.004045486450195,
+                    61.94881820678711,
+                    23.46546173095703
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -21.98491096496582,
+                    60.57890701293945,
+                    18.143686294555664
+                  ],
+                  [
+                    -16.004045486450195,
+                    60.790340423583984,
+                    19.725830078125
+                  ]
+                ],
+                "beforeChordMm": 6.799999481837962,
+                "afterChordMm": 6.190204755185713
+              },
+              {
+                "indices": [
+                  61,
+                  73
+                ],
+                "anglesDeg": [
+                  165,
+                  345
+                ],
+                "beforeVerticesMm": [
+                  [
+                    -22.223865509033203,
+                    60.979331970214844,
+                    21.05172348022461
+                  ],
+                  [
+                    -15.765090942382812,
+                    62.325828552246094,
+                    22.698286056518555
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    -22.223865509033203,
+                    60.10825729370117,
+                    18.587173461914062
+                  ],
+                  [
+                    -15.765090942382812,
+                    61.254554748535156,
+                    19.341197967529297
+                  ]
+                ],
+                "beforeChordMm": 6.799999284256105,
+                "afterChordMm": 6.602902370385094
+              }
+            ]
+          }
+        },
+        {
+          "partId": "canvas-eyelet-1-0",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            -42.69801330566406,
+            -35.938560485839844
+          ],
+          "restSRange": [
+            0.34696052578615033,
+            0.37118795524788584
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                25
+              ],
+              "beforeVerticesMm": [
+                [
+                  33.19289779663086,
+                  58.40589141845703,
+                  -39.34059143066406
+                ],
+                [
+                  33.487796783447266,
+                  58.14653778076172,
+                  -39.36648941040039
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  33.19289779663086,
+                  58.40589141845703,
+                  -39.34059143066406
+                ],
+                [
+                  33.487796783447266,
+                  58.14653778076172,
+                  -39.36648941040039
+                ]
+              ],
+              "beforeLengthMm": 0.39357391575860007,
+              "afterLengthMm": 0.39357391575860007,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.0000017075472925031877,
+          "worstNormal": {
+            "index": 131,
+            "beforeVertexMm": [
+              30.27081871032715,
+              59.55718231201172,
+              -41.53398513793945
+            ],
+            "afterVertexMm": [
+              30.27081871032715,
+              59.55718231201172,
+              -41.53398513793945
+            ],
+            "beforeNormal": [
+              -0.3386249840259552,
+              -0.0883416160941124,
+              -0.9367651343345642
+            ],
+            "actualAfterNormal": [
+              -0.33862497761823057,
+              -0.08834161442244381,
+              -0.9367651166083677
+            ],
+            "expectedDifferentialNormal": [
+              -0.33862497761823057,
+              -0.08834161442244381,
+              -0.9367651166083677
+            ],
+            "errorDeg": 0.0000017075472925031877,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "3d3459af03173d10a604dbb87add6674825d04214c972bf47707f03fcbff4483",
+            "after": "3d3459af03173d10a604dbb87add6674825d04214c972bf47707f03fcbff4483"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299996272970926,
+                4.300001464357898
+              ],
+              "afterChordRangeMm": [
+                4.299996272970926,
+                4.300001464357898
+              ],
+              "minimumPair": {
+                "indices": [
+                  9,
+                  21
+                ],
+                "anglesDeg": [
+                  135,
+                  315
+                ],
+                "beforeVerticesMm": [
+                  [
+                    31.632762908935547,
+                    61.73527145385742,
+                    -40.84504699707031
+                  ],
+                  [
+                    33.163352966308594,
+                    59.07187271118164,
+                    -37.83613204956055
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    31.632762908935547,
+                    61.73527145385742,
+                    -40.84504699707031
+                  ],
+                  [
+                    33.163352966308594,
+                    59.07187271118164,
+                    -37.83613204956055
+                  ]
+                ],
+                "beforeChordMm": 4.299996272970926,
+                "afterChordMm": 4.299996272970926
+              }
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299997951046886,
+                4.300001974933636
+              ],
+              "afterChordRangeMm": [
+                4.299997951046886,
+                4.300001974933636
+              ],
+              "minimumPair": {
+                "indices": [
+                  158,
+                  170
+                ],
+                "anglesDeg": [
+                  120,
+                  300
+                ],
+                "beforeVerticesMm": [
+                  [
+                    29.958703994750977,
+                    60.5899658203125,
+                    -40.9025764465332
+                  ],
+                  [
+                    31.251422882080078,
+                    58.790382385253906,
+                    -37.21742248535156
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    29.958703994750977,
+                    60.5899658203125,
+                    -40.9025764465332
+                  ],
+                  [
+                    31.251422882080078,
+                    58.790382385253906,
+                    -37.21742248535156
+                  ]
+                ],
+                "beforeChordMm": 4.299997951046886,
+                "afterChordMm": 4.299997951046886
+              }
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799998058898736,
+              6.800002309861075
+            ],
+            "afterChordRangeMm": [
+              6.799998058898736,
+              6.800002309861075
+            ],
+            "minimumPair": {
+              "indices": [
+                50,
+                62
+              ],
+              "anglesDeg": [
+                0,
+                180
+              ],
+              "beforeVerticesMm": [
+                [
+                  33.609039306640625,
+                  57.226158142089844,
+                  -39.333396911621094
+                ],
+                [
+                  31.09512710571289,
+                  63.544403076171875,
+                  -39.333396911621094
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  33.609039306640625,
+                  57.226158142089844,
+                  -39.333396911621094
+                ],
+                [
+                  31.09512710571289,
+                  63.544403076171875,
+                  -39.333396911621094
+                ]
+              ],
+              "beforeChordMm": 6.799998058898736,
+              "afterChordMm": 6.799998058898736
+            }
+          }
+        },
+        {
+          "partId": "canvas-eyelet-1-1",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            -27.465627670288086,
+            -20.662614822387695
+          ],
+          "restSRange": [
+            0.40155689007065204,
+            0.4259404486652771
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                25
+              ],
+              "beforeVerticesMm": [
+                [
+                  31.6085147857666,
+                  66.32078552246094,
+                  -24.07017707824707
+                ],
+                [
+                  31.961933135986328,
+                  66.14774322509766,
+                  -24.077207565307617
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  31.6085147857666,
+                  66.32078552246094,
+                  -24.07017707824707
+                ],
+                [
+                  31.961933135986328,
+                  66.14774322509766,
+                  -24.077207565307617
+                ]
+              ],
+              "beforeLengthMm": 0.3935703173476172,
+              "afterLengthMm": 0.3935703173476172,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.0000019090959104164224,
+          "worstNormal": {
+            "index": 126,
+            "beforeVertexMm": [
+              30.1845645904541,
+              64.92855072021484,
+              -24.640554428100586
+            ],
+            "afterVertexMm": [
+              30.1845645904541,
+              64.92855072021484,
+              -24.640554428100586
+            ],
+            "beforeNormal": [
+              0.3809434771537781,
+              -0.8792171478271484,
+              -0.28611060976982117
+            ],
+            "actualAfterNormal": [
+              0.38094347585053695,
+              -0.8792171448192694,
+              -0.28611060879101163
+            ],
+            "expectedDifferentialNormal": [
+              0.38094347585053695,
+              -0.8792171448192694,
+              -0.28611060879101163
+            ],
+            "errorDeg": 0.0000019090959104164224,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "268763bba18110a3cf7e458a626d1d17809398aecd360337783b572ef5b5e641",
+            "after": "268763bba18110a3cf7e458a626d1d17809398aecd360337783b572ef5b5e641"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299997573444371,
+                4.30000345078837
+              ],
+              "afterChordRangeMm": [
+                4.299997573444371,
+                4.30000345078837
+              ],
+              "minimumPair": {
+                "indices": [
+                  3,
+                  15
+                ],
+                "anglesDeg": [
+                  45,
+                  225
+                ],
+                "beforeVerticesMm": [
+                  [
+                    31.184450149536133,
+                    66.79009246826172,
+                    -25.589296340942383
+                  ],
+                  [
+                    29.46198081970215,
+                    69.29851531982422,
+                    -22.551057815551758
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    31.184450149536133,
+                    66.79009246826172,
+                    -25.589296340942383
+                  ],
+                  [
+                    29.46198081970215,
+                    69.29851531982422,
+                    -22.551057815551758
+                  ]
+                ],
+                "beforeChordMm": 4.299997573444371,
+                "afterChordMm": 4.299997573444371
+              }
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299995879096331,
+                4.300003136179588
+              ],
+              "afterChordRangeMm": [
+                4.299995879096331,
+                4.300003136179588
+              ],
+              "minimumPair": {
+                "indices": [
+                  161,
+                  173
+                ],
+                "anglesDeg": [
+                  165,
+                  345
+                ],
+                "beforeVerticesMm": [
+                  [
+                    27.502290725708008,
+                    68.53125,
+                    -24.55003547668457
+                  ],
+                  [
+                    30.02014923095703,
+                    65.22766876220703,
+                    -23.437963485717773
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    27.502290725708008,
+                    68.53125,
+                    -24.55003547668457
+                  ],
+                  [
+                    30.02014923095703,
+                    65.22766876220703,
+                    -23.437963485717773
+                  ]
+                ],
+                "beforeChordMm": 4.299995879096331,
+                "afterChordMm": 4.299995879096331
+              }
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799998987740464,
+              6.800002838587595
+            ],
+            "afterChordRangeMm": [
+              6.799998987740464,
+              6.800002838587595
+            ],
+            "minimumPair": {
+              "indices": [
+                52,
+                64
+              ],
+              "anglesDeg": [
+                30,
+                210
+              ],
+              "beforeVerticesMm": [
+                [
+                  31.99018096923828,
+                  65.61433410644531,
+                  -25.766925811767578
+                ],
+                [
+                  28.576148986816406,
+                  70.41454315185547,
+                  -22.36952018737793
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  31.99018096923828,
+                  65.61433410644531,
+                  -25.766925811767578
+                ],
+                [
+                  28.576148986816406,
+                  70.41454315185547,
+                  -22.36952018737793
+                ]
+              ],
+              "beforeChordMm": 6.799998987740464,
+              "afterChordMm": 6.799998987740464
+            }
+          }
+        },
+        {
+          "partId": "canvas-eyelet-1-2",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            -11.65184211730957,
+            -5.110880374908447
+          ],
+          "restSRange": [
+            0.45823712502756425,
+            0.4816814323479984
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                25
+              ],
+              "beforeVerticesMm": [
+                [
+                  21.570161819458008,
+                  72.92939758300781,
+                  -8.334157943725586
+                ],
+                [
+                  21.959800720214844,
+                  72.93816375732422,
+                  -8.279341697692871
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  21.570161819458008,
+                  72.92939758300781,
+                  -8.334157943725586
+                ],
+                [
+                  21.959800720214844,
+                  72.93816375732422,
+                  -8.279341697692871
+                ]
+              ],
+              "beforeLengthMm": 0.39357355046326503,
+              "afterLengthMm": 0.39357355046326503,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.000002091309789151873,
+          "worstNormal": {
+            "index": 66,
+            "beforeVertexMm": [
+              17.679243087768555,
+              73.68767547607422,
+              -5.54475736618042
+            ],
+            "afterVertexMm": [
+              17.679243087768555,
+              73.68767547607422,
+              -5.54475736618042
+            ],
+            "beforeNormal": [
+              0.09735993295907974,
+              0.7572514414787292,
+              0.6458260416984558
+            ],
+            "actualAfterNormal": [
+              0.09735993401527412,
+              0.757251449693656,
+              0.6458260487046011
+            ],
+            "expectedDifferentialNormal": [
+              0.09735993401527412,
+              0.757251449693656,
+              0.6458260487046011
+            ],
+            "errorDeg": 0.000002091309789151873,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "0dc562c0580c52435c29a78f387ffc8f8bd072e62c93ca3d58b11aeebca7424a",
+            "after": "0dc562c0580c52435c29a78f387ffc8f8bd072e62c93ca3d58b11aeebca7424a"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.29999706871479,
+                4.3000007524277315
+              ],
+              "afterChordRangeMm": [
+                4.29999706871479,
+                4.3000007524277315
+              ],
+              "minimumPair": {
+                "indices": [
+                  1,
+                  13
+                ],
+                "anglesDeg": [
+                  15,
+                  195
+                ],
+                "beforeVerticesMm": [
+                  [
+                    21.574769973754883,
+                    73.11396026611328,
+                    -8.864188194274902
+                  ],
+                  [
+                    17.662403106689453,
+                    74.54910278320312,
+                    -7.804128646850586
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    21.574769973754883,
+                    73.11396026611328,
+                    -8.864188194274902
+                  ],
+                  [
+                    17.662403106689453,
+                    74.54910278320312,
+                    -7.804128646850586
+                  ]
+                ],
+                "beforeChordMm": 4.29999706871479,
+                "afterChordMm": 4.29999706871479
+              }
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299997879784345,
+                4.30000135047069
+              ],
+              "afterChordRangeMm": [
+                4.299997879784345,
+                4.30000135047069
+              ],
+              "minimumPair": {
+                "indices": [
+                  150,
+                  162
+                ],
+                "anglesDeg": [
+                  0,
+                  180
+                ],
+                "beforeVerticesMm": [
+                  [
+                    20.790809631347656,
+                    71.24343872070312,
+                    -8.928000450134277
+                  ],
+                  [
+                    16.887657165527344,
+                    73.0477066040039,
+                    -8.928000450134277
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    20.790809631347656,
+                    71.24343872070312,
+                    -8.928000450134277
+                  ],
+                  [
+                    16.887657165527344,
+                    73.0477066040039,
+                    -8.928000450134277
+                  ]
+                ],
+                "beforeChordMm": 4.299997879784345,
+                "afterChordMm": 4.299997879784345
+              }
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799997698195048,
+              6.800001999792762
+            ],
+            "afterChordRangeMm": [
+              6.799997698195048,
+              6.800001999792762
+            ],
+            "minimumPair": {
+              "indices": [
+                60,
+                72
+              ],
+              "anglesDeg": [
+                150,
+                330
+              ],
+              "beforeVerticesMm": [
+                [
+                  17.14309310913086,
+                  75.49372863769531,
+                  -9.968637466430664
+                ],
+                [
+                  22.05411148071289,
+                  72.08287048339844,
+                  -6.730132579803467
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  17.14309310913086,
+                  75.49372863769531,
+                  -9.968637466430664
+                ],
+                [
+                  22.05411148071289,
+                  72.08287048339844,
+                  -6.730132579803467
+                ]
+              ],
+              "beforeChordMm": 6.799997698195048,
+              "afterChordMm": 6.799997698195048
+            }
+          }
+        },
+        {
+          "partId": "canvas-eyelet-1-3",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            3.3905746936798096,
+            9.948030471801758
+          ],
+          "restSRange": [
+            0.5121525974683864,
+            0.535656023196422
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                25
+              ],
+              "beforeVerticesMm": [
+                [
+                  23.348167419433594,
+                  66.98857879638672,
+                  6.715181350708008
+                ],
+                [
+                  23.736600875854492,
+                  67.02293395996094,
+                  6.768459796905518
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  23.348167419433594,
+                  66.98857879638672,
+                  6.715181350708008
+                ],
+                [
+                  23.736600875854492,
+                  67.02293395996094,
+                  6.768459796905518
+                ]
+              ],
+              "beforeLengthMm": 0.3935726364478586,
+              "afterLengthMm": 0.3935726364478586,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.0000017075472925031877,
+          "worstNormal": {
+            "index": 15,
+            "beforeVertexMm": [
+              19.762104034423828,
+              67.89057922363281,
+              8.167338371276855
+            ],
+            "afterVertexMm": [
+              19.762104034423828,
+              67.89057922363281,
+              8.167338371276855
+            ],
+            "beforeNormal": [
+              0.7617759704589844,
+              0.10865481197834015,
+              -0.6386638283729553
+            ],
+            "actualAfterNormal": [
+              0.7617759769314996,
+              0.10865481290153797,
+              -0.6386638337994343
+            ],
+            "expectedDifferentialNormal": [
+              0.7617759769314996,
+              0.10865481290153797,
+              -0.6386638337994343
+            ],
+            "errorDeg": 0.0000017075472925031877,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "ddc2b85f2cb24c171194f98308c5af3be5fd055bc17ffaf7ea9806f1372577ae",
+            "after": "ddc2b85f2cb24c171194f98308c5af3be5fd055bc17ffaf7ea9806f1372577ae"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299997737367132,
+                4.300002217644896
+              ],
+              "afterChordRangeMm": [
+                4.299997737367132,
+                4.300002217644896
+              ],
+              "minimumPair": {
+                "indices": [
+                  11,
+                  23
+                ],
+                "anglesDeg": [
+                  165,
+                  345
+                ],
+                "beforeVerticesMm": [
+                  [
+                    19.46435546875,
+                    68.6644287109375,
+                    6.18365478515625
+                  ],
+                  [
+                    23.22050666809082,
+                    66.86131286621094,
+                    7.246707916259766
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    19.46435546875,
+                    68.6644287109375,
+                    6.18365478515625
+                  ],
+                  [
+                    23.22050666809082,
+                    66.86131286621094,
+                    7.246707916259766
+                  ]
+                ],
+                "beforeChordMm": 4.299997737367132,
+                "afterChordMm": 4.299997737367132
+              }
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299997737367132,
+                4.300000781143117
+              ],
+              "afterChordRangeMm": [
+                4.299997737367132,
+                4.300000781143117
+              ],
+              "minimumPair": {
+                "indices": [
+                  161,
+                  173
+                ],
+                "anglesDeg": [
+                  165,
+                  345
+                ],
+                "beforeVerticesMm": [
+                  [
+                    18.793561935424805,
+                    66.92678833007812,
+                    5.606473445892334
+                  ],
+                  [
+                    22.549713134765625,
+                    65.12367248535156,
+                    6.66952657699585
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    18.793561935424805,
+                    66.92678833007812,
+                    5.606473445892334
+                  ],
+                  [
+                    22.549713134765625,
+                    65.12367248535156,
+                    6.66952657699585
+                  ]
+                ],
+                "beforeChordMm": 4.299997737367132,
+                "afterChordMm": 4.299997737367132
+              }
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799997240002636,
+              6.800001997337394
+            ],
+            "afterChordRangeMm": [
+              6.799997240002636,
+              6.800001997337394
+            ],
+            "minimumPair": {
+              "indices": [
+                58,
+                70
+              ],
+              "anglesDeg": [
+                120,
+                300
+              ],
+              "beforeVerticesMm": [
+                [
+                  20.053171157836914,
+                  69.14360046386719,
+                  3.8878352642059326
+                ],
+                [
+                  22.5972900390625,
+                  66.29302978515625,
+                  9.512928009033203
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  20.053171157836914,
+                  69.14360046386719,
+                  3.8878352642059326
+                ],
+                [
+                  22.5972900390625,
+                  66.29302978515625,
+                  9.512928009033203
+                ]
+              ],
+              "beforeChordMm": 6.799997240002636,
+              "afterChordMm": 6.799997240002636
+            }
+          }
+        },
+        {
+          "partId": "canvas-eyelet-1-4",
+          "kind": "eyelet",
+          "vertexCount": 175,
+          "restZRangeMm": [
+            18.58656120300293,
+            25.048681259155273
+          ],
+          "restSRange": [
+            0.5666184989354943,
+            0.5897802195668648
+          ],
+          "transitionVertices": 175,
+          "positionsByteIdentical": false,
+          "normalsByteIdentical": false,
+          "changedVertices": 175,
+          "maxDisplacementMm": 4.689986808117258,
+          "edgeMetric": {
+            "uniqueIndexEdges": 511,
+            "measuredEdges": 511,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 0.4366810793328842,
+            "maxLengthRatio": 1.007032132846208,
+            "maxAbsoluteChangeMm": 0.4675456913641429,
+            "minimumRatioEdge": {
+              "indices": [
+                18,
+                43
+              ],
+              "beforeVerticesMm": [
+                [
+                  22.611867904663086,
+                  60.99919128417969,
+                  23.89107894897461
+                ],
+                [
+                  22.627023696899414,
+                  61.046321868896484,
+                  24.281526565551758
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  22.611867904663086,
+                  59.79670333862305,
+                  19.996601104736328
+                ],
+                [
+                  22.627023696899414,
+                  59.80170822143555,
+                  20.167724609375
+                ]
+              ],
+              "beforeLengthMm": 0.3935737940270336,
+              "afterLengthMm": 0.17186622917286326,
+              "ratio": 0.4366810793328842
+            }
+          },
+          "minimumJacobianDeterminant": 0.4164242411231257,
+          "maxSmoothNormalTransportErrorDeg": 29.588057649368615,
+          "worstNormal": {
+            "index": 42,
+            "beforeVertexMm": [
+              22.019956588745117,
+              61.272125244140625,
+              24.201473236083984
+            ],
+            "afterVertexMm": [
+              22.019956588745117,
+              60.03515625,
+              20.112415313720703
+            ],
+            "beforeNormal": [
+              0.25122079253196716,
+              0.8834600448608398,
+              0.39545732736587524
+            ],
+            "actualAfterNormal": [
+              0.2512207886824631,
+              0.9146674135242022,
+              0.3166569720860525
+            ],
+            "expectedDifferentialNormal": [
+              0.16505385226922528,
+              0.6479702188229236,
+              0.7435669582288209
+            ],
+            "errorDeg": 29.588057649368615,
+            "phiRadians": 0.0875910758946741,
+            "phiDerivativeRadiansPerMm": 0.012026481247508608,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0.996166353693009,
+                -0.10683976524222871
+              ],
+              [
+                0,
+                -0.08747911619338031,
+                0.4425254063489623
+              ]
+            ],
+            "determinant": 0.4314826722214645
+          },
+          "positionSha256": {
+            "before": "d34dc42d139fd0b77d7f676f1b2bf570b5cc61c2260429ea904f466b2ef2ea95",
+            "after": "0d28392058b80b33950669468dddc83deb8122222a3cf5220ea103d93c0f049a"
+          },
+          "boreRims": [
+            {
+              "role": "upper inner bore lip, profile [2.15,+0.30]",
+              "profileRow": 0,
+              "ringStartIndex": 0,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.2999983229766565,
+                4.300001133048114
+              ],
+              "afterChordRangeMm": [
+                2.8859292417910978,
+                4.2999999163173666
+              ],
+              "minimumPair": {
+                "indices": [
+                  6,
+                  18
+                ],
+                "anglesDeg": [
+                  90,
+                  270
+                ],
+                "beforeVerticesMm": [
+                  [
+                    23.061870574951172,
+                    62.3985710144043,
+                    19.850135803222656
+                  ],
+                  [
+                    22.611867904663086,
+                    60.99919128417969,
+                    23.89107894897461
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    23.061870574951172,
+                    61.673667907714844,
+                    17.851119995117188
+                  ],
+                  [
+                    22.611867904663086,
+                    59.79670333862305,
+                    19.996601104736328
+                  ]
+                ],
+                "beforeChordMm": 4.299998551142733,
+                "afterChordMm": 2.8859292417910978
+              },
+              "oppositePairSamples": [
+                {
+                  "indices": [
+                    0,
+                    12
+                  ],
+                  "anglesDeg": [
+                    0,
+                    180
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      24.883644104003906,
+                      61.04069519042969,
+                      21.870607376098633
+                    ],
+                    [
+                      20.79009246826172,
+                      62.3570671081543,
+                      21.870607376098633
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      24.883644104003906,
+                      60.07038497924805,
+                      19.016324996948242
+                    ],
+                    [
+                      20.79009246826172,
+                      61.38428497314453,
+                      18.93569564819336
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000002355988,
+                  "afterChordMm": 4.2999999163173666
+                },
+                {
+                  "indices": [
+                    1,
+                    13
+                  ],
+                  "anglesDeg": [
+                    15,
+                    195
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      24.87213706970215,
+                      61.24421310424805,
+                      21.347671508789062
+                    ],
+                    [
+                      20.80160140991211,
+                      62.15354537963867,
+                      22.393543243408203
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      24.87213706970215,
+                      60.336692810058594,
+                      18.73140525817871
+                    ],
+                    [
+                      20.80160140991211,
+                      61.11860656738281,
+                      19.206676483154297
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999236042336,
+                  "afterChordMm": 4.172113663217362
+                },
+                {
+                  "indices": [
+                    2,
+                    14
+                  ],
+                  "anglesDeg": [
+                    30,
+                    210
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      24.7219295501709,
+                      61.47871780395508,
+                      20.860370635986328
+                    ],
+                    [
+                      20.95180892944336,
+                      61.91904067993164,
+                      22.880844116210938
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      24.7219295501709,
+                      60.63037872314453,
+                      18.457275390625
+                    ],
+                    [
+                      20.95180892944336,
+                      60.82750701904297,
+                      19.45665168762207
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000792352743,
+                  "afterChordMm": 3.9053069076422666
+                },
+                {
+                  "indices": [
+                    3,
+                    15
+                  ],
+                  "anglesDeg": [
+                    45,
+                    225
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      24.44325828552246,
+                      61.72822952270508,
+                      20.441917419433594
+                    ],
+                    [
+                      21.230480194091797,
+                      61.669532775878906,
+                      23.299297332763672
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      24.44325828552246,
+                      60.931026458740234,
+                      18.214778900146484
+                    ],
+                    [
+                      21.230480194091797,
+                      60.53068161010742,
+                      19.67123031616211
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000969996058,
+                  "afterChordMm": 3.5501365874875304
+                },
+                {
+                  "indices": [
+                    4,
+                    16
+                  ],
+                  "anglesDeg": [
+                    60,
+                    240
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      24.055112838745117,
+                      61.97573471069336,
+                      20.120826721191406
+                    ],
+                    [
+                      21.618623733520508,
+                      61.42202377319336,
+                      23.62038803100586
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      24.055112838745117,
+                      61.21784210205078,
+                      18.023292541503906
+                    ],
+                    [
+                      21.618623733520508,
+                      60.247886657714844,
+                      19.838502883911133
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000502713413,
+                  "afterChordMm": 3.1894014032506637
+                },
+                {
+                  "indices": [
+                    5,
+                    17
+                  ],
+                  "anglesDeg": [
+                    75,
+                    255
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      23.583948135375977,
+                      62.204376220703125,
+                      19.918981552124023
+                    ],
+                    [
+                      22.08979034423828,
+                      61.193382263183594,
+                      23.822233200073242
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      23.583948135375977,
+                      61.471153259277344,
+                      17.898632049560547
+                    ],
+                    [
+                      22.08979034423828,
+                      59.997737884521484,
+                      19.949142456054688
+                    ]
+                  ],
+                  "beforeChordMm": 4.299998803973876,
+                  "afterChordMm": 2.9339484144281047
+                },
+                {
+                  "indices": [
+                    6,
+                    18
+                  ],
+                  "anglesDeg": [
+                    90,
+                    270
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      23.061870574951172,
+                      62.3985710144043,
+                      19.850135803222656
+                    ],
+                    [
+                      22.611867904663086,
+                      60.99919128417969,
+                      23.89107894897461
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      23.061870574951172,
+                      61.673667907714844,
+                      17.851119995117188
+                    ],
+                    [
+                      22.611867904663086,
+                      59.79670333862305,
+                      19.996601104736328
+                    ]
+                  ],
+                  "beforeChordMm": 4.299998551142733,
+                  "afterChordMm": 2.8859292417910978
+                },
+                {
+                  "indices": [
+                    7,
+                    19
+                  ],
+                  "anglesDeg": [
+                    105,
+                    285
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      22.524457931518555,
+                      62.54507827758789,
+                      19.918981552124023
+                    ],
+                    [
+                      23.14927864074707,
+                      60.85268020629883,
+                      23.822233200073242
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      22.524457931518555,
+                      61.811553955078125,
+                      17.88425064086914
+                    ],
+                    [
+                      23.14927864074707,
+                      59.65821075439453,
+                      19.977413177490234
+                    ]
+                  ],
+                  "beforeChordMm": 4.2999983229766565,
+                  "afterChordMm": 3.067346942118733
+                },
+                {
+                  "indices": [
+                    8,
+                    20
+                  ],
+                  "anglesDeg": [
+                    120,
+                    300
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      22.008337020874023,
+                      62.6339225769043,
+                      20.120826721191406
+                    ],
+                    [
+                      23.6653995513916,
+                      60.76383590698242,
+                      23.62038803100586
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      22.008337020874023,
+                      61.875389099121094,
+                      17.994300842285156
+                    ],
+                    [
+                      23.6653995513916,
+                      59.59183883666992,
+                      19.891565322875977
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001133048114,
+                  "afterChordMm": 3.400010373586776
+                },
+                {
+                  "indices": [
+                    9,
+                    21
+                  ],
+                  "anglesDeg": [
+                    135,
+                    315
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      21.54867935180664,
+                      62.65904235839844,
+                      20.441917419433594
+                    ],
+                    [
+                      24.125057220458984,
+                      60.73871612548828,
+                      23.299297332763672
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      21.54867935180664,
+                      61.860809326171875,
+                      18.171003341674805
+                    ],
+                    [
+                      24.125057220458984,
+                      59.602622985839844,
+                      19.74282455444336
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999503719357,
+                  "afterChordMm": 3.7693169665939448
+                },
+                {
+                  "indices": [
+                    10,
+                    22
+                  ],
+                  "anglesDeg": [
+                    150,
+                    330
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      21.176809310913086,
+                      62.61873245239258,
+                      20.860370635986328
+                    ],
+                    [
+                      24.49692726135254,
+                      60.779029846191406,
+                      22.880844116210938
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      21.176809310913086,
+                      61.76890563964844,
+                      18.399091720581055
+                    ],
+                    [
+                      24.49692726135254,
+                      59.690467834472656,
+                      19.538944244384766
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000228881925,
+                  "afterChordMm": 4.079503730950112
+                },
+                {
+                  "indices": [
+                    11,
+                    23
+                  ],
+                  "anglesDeg": [
+                    165,
+                    345
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      20.91806983947754,
+                      62.51573181152344,
+                      21.347671508789062
+                    ],
+                    [
+                      24.75566864013672,
+                      60.88202667236328,
+                      22.393543243408203
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      20.91806983947754,
+                      61.60622787475586,
+                      18.660364151000977
+                    ],
+                    [
+                      24.75566864013672,
+                      59.84992980957031,
+                      19.29164695739746
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000549048144,
+                  "afterChordMm": 4.267348758918948
+                }
+              ]
+            },
+            {
+              "role": "lower inner sleeve rim, profile [2.15,-sleeveDepth]",
+              "profileRow": 6,
+              "ringStartIndex": 150,
+              "ringUniqueVertices": 24,
+              "nominalRadiusMm": 2.15,
+              "nominalDiameterMm": 4.3,
+              "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+              "beforeChordRangeMm": [
+                4.299999310724131,
+                4.300001555734163
+              ],
+              "afterChordRangeMm": [
+                3.0024415647490112,
+                4.299999435122296
+              ],
+              "minimumPair": {
+                "indices": [
+                  156,
+                  168
+                ],
+                "anglesDeg": [
+                  90,
+                  270
+                ],
+                "beforeVerticesMm": [
+                  [
+                    22.500873565673828,
+                    60.654029846191406,
+                    19.18352699279785
+                  ],
+                  [
+                    22.050872802734375,
+                    59.2546501159668,
+                    23.224472045898438
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    22.500873565673828,
+                    60.01210403442383,
+                    17.523468017578125
+                  ],
+                  [
+                    22.050872802734375,
+                    58.13129806518555,
+                    19.820144653320312
+                  ]
+                ],
+                "beforeChordMm": 4.300000143975311,
+                "afterChordMm": 3.0024415647490112
+              },
+              "oppositePairSamples": [
+                {
+                  "indices": [
+                    150,
+                    162
+                  ],
+                  "anglesDeg": [
+                    0,
+                    180
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      24.322649002075195,
+                      59.2961540222168,
+                      21.20400047302246
+                    ],
+                    [
+                      20.229097366333008,
+                      60.612525939941406,
+                      21.20400047302246
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      24.322649002075195,
+                      58.40901184082031,
+                      18.760982513427734
+                    ],
+                    [
+                      20.229097366333008,
+                      59.72343063354492,
+                      18.689334869384766
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000002355988,
+                  "afterChordMm": 4.299999435122296
+                },
+                {
+                  "indices": [
+                    151,
+                    163
+                  ],
+                  "anglesDeg": [
+                    15,
+                    195
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      24.311141967773438,
+                      59.49967575073242,
+                      20.681062698364258
+                    ],
+                    [
+                      20.2406063079834,
+                      60.40900802612305,
+                      21.72693634033203
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      24.311141967773438,
+                      58.675750732421875,
+                      18.45672607421875
+                    ],
+                    [
+                      20.2406063079834,
+                      59.45708084106445,
+                      18.979808807373047
+                    ]
+                  ],
+                  "beforeChordMm": 4.2999996999595655,
+                  "afterChordMm": 4.177721010553232
+                },
+                {
+                  "indices": [
+                    152,
+                    164
+                  ],
+                  "anglesDeg": [
+                    30,
+                    210
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      24.160934448242188,
+                      59.73418045043945,
+                      20.193763732910156
+                    ],
+                    [
+                      20.39081382751465,
+                      60.17449951171875,
+                      22.214235305786133
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      24.160934448242188,
+                      58.96953582763672,
+                      18.164714813232422
+                    ],
+                    [
+                      20.39081382751465,
+                      59.16505432128906,
+                      19.247459411621094
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999505507043,
+                  "afterChordMm": 3.9273875339129614
+                },
+                {
+                  "indices": [
+                    153,
+                    165
+                  ],
+                  "anglesDeg": [
+                    45,
+                    225
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      23.882261276245117,
+                      59.98368835449219,
+                      19.775310516357422
+                    ],
+                    [
+                      20.669485092163086,
+                      59.924991607666016,
+                      22.6326904296875
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      23.882261276245117,
+                      59.2700309753418,
+                      17.907026290893555
+                    ],
+                    [
+                      20.669485092163086,
+                      58.86721420288086,
+                      19.47671890258789
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999544906357,
+                  "afterChordMm": 3.5983506022048948
+                },
+                {
+                  "indices": [
+                    154,
+                    166
+                  ],
+                  "anglesDeg": [
+                    60,
+                    240
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      23.494117736816406,
+                      60.231197357177734,
+                      19.454219818115234
+                    ],
+                    [
+                      21.057628631591797,
+                      59.67748260498047,
+                      22.953781127929688
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      23.494117736816406,
+                      59.55657958984375,
+                      17.704116821289062
+                    ],
+                    [
+                      21.057628631591797,
+                      58.58348083496094,
+                      19.654727935791016
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000993933531,
+                  "afterChordMm": 3.269294123606998
+                },
+                {
+                  "indices": [
+                    155,
+                    167
+                  ],
+                  "anglesDeg": [
+                    75,
+                    255
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      23.022953033447266,
+                      60.4598388671875,
+                      19.25237274169922
+                    ],
+                    [
+                      21.52879524230957,
+                      59.4488410949707,
+                      23.15562629699707
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      23.022953033447266,
+                      59.809661865234375,
+                      17.57264518737793
+                    ],
+                    [
+                      21.52879524230957,
+                      58.332645416259766,
+                      19.771503448486328
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001432231172,
+                  "afterChordMm": 3.0412271779338833
+                },
+                {
+                  "indices": [
+                    156,
+                    168
+                  ],
+                  "anglesDeg": [
+                    90,
+                    270
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      22.500873565673828,
+                      60.654029846191406,
+                      19.18352699279785
+                    ],
+                    [
+                      22.050872802734375,
+                      59.2546501159668,
+                      23.224472045898438
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      22.500873565673828,
+                      60.01210403442383,
+                      17.523468017578125
+                    ],
+                    [
+                      22.050872802734375,
+                      58.13129806518555,
+                      19.820144653320312
+                    ]
+                  ],
+                  "beforeChordMm": 4.300000143975311,
+                  "afterChordMm": 3.0024415647490112
+                },
+                {
+                  "indices": [
+                    157,
+                    169
+                  ],
+                  "anglesDeg": [
+                    105,
+                    285
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      21.963462829589844,
+                      60.800540924072266,
+                      19.25237274169922
+                    ],
+                    [
+                      22.58828353881836,
+                      59.10813903808594,
+                      23.15562629699707
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      21.963462829589844,
+                      60.15013885498047,
+                      17.560245513916016
+                    ],
+                    [
+                      22.58828353881836,
+                      57.99291229248047,
+                      19.797151565551758
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001555734163,
+                  "afterChordMm": 3.169822714992275
+                },
+                {
+                  "indices": [
+                    158,
+                    170
+                  ],
+                  "anglesDeg": [
+                    120,
+                    300
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      21.447341918945312,
+                      60.889381408691406,
+                      19.454219818115234
+                    ],
+                    [
+                      23.10440444946289,
+                      59.0192985534668,
+                      22.953781127929688
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      21.447341918945312,
+                      60.21428680419922,
+                      17.679025650024414
+                    ],
+                    [
+                      23.10440444946289,
+                      57.92705535888672,
+                      19.702777862548828
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999474023293,
+                  "afterChordMm": 3.474601694031862
+                },
+                {
+                  "indices": [
+                    159,
+                    171
+                  ],
+                  "anglesDeg": [
+                    135,
+                    315
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      20.98768424987793,
+                      60.91450500488281,
+                      19.775310516357422
+                    ],
+                    [
+                      23.564062118530273,
+                      58.99417495727539,
+                      22.6326904296875
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      20.98768424987793,
+                      60.20006561279297,
+                      17.868927001953125
+                    ],
+                    [
+                      23.564062118530273,
+                      57.93864440917969,
+                      19.541351318359375
+                    ]
+                  ],
+                  "beforeChordMm": 4.300001207317008,
+                  "afterChordMm": 3.814282616212418
+                },
+                {
+                  "indices": [
+                    160,
+                    172
+                  ],
+                  "anglesDeg": [
+                    150,
+                    330
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      20.615814208984375,
+                      60.87419128417969,
+                      20.193763732910156
+                    ],
+                    [
+                      23.935932159423828,
+                      59.034488677978516,
+                      22.214235305786133
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      20.615814208984375,
+                      60.1084098815918,
+                      18.113737106323242
+                    ],
+                    [
+                      23.935932159423828,
+                      58.02744674682617,
+                      19.32143783569336
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999332661993,
+                  "afterChordMm": 4.1002599703927265
+                },
+                {
+                  "indices": [
+                    161,
+                    173
+                  ],
+                  "anglesDeg": [
+                    165,
+                    345
+                  ],
+                  "beforeVerticesMm": [
+                    [
+                      20.357074737548828,
+                      60.77119445800781,
+                      20.681062698364258
+                    ],
+                    [
+                      24.194671630859375,
+                      59.137489318847656,
+                      21.72693634033203
+                    ]
+                  ],
+                  "afterVerticesMm": [
+                    [
+                      20.357074737548828,
+                      59.94572448730469,
+                      18.39403533935547
+                    ],
+                    [
+                      24.194671630859375,
+                      58.18783187866211,
+                      19.055788040161133
+                    ]
+                  ],
+                  "beforeChordMm": 4.299999310724131,
+                  "afterChordMm": 4.2726166427717995
+                }
+              ]
+            }
+          ],
+          "outerFlangeContrast": {
+            "role": "outer flange, profile [3.40,+0.25]; NOT bore",
+            "profileRow": 2,
+            "ringStartIndex": 50,
+            "ringUniqueVertices": 24,
+            "nominalRadiusMm": 3.4,
+            "nominalDiameterMm": 6.8,
+            "measurement": "3D chord between rest-rim antipodes; minimum of 12 samples, not a fitted ellipse or calibrated clear-bore measurement",
+            "beforeChordRangeMm": [
+              6.799999816001579,
+              6.800001262675569
+            ],
+            "afterChordRangeMm": [
+              4.574311354267062,
+              6.799999792742856
+            ],
+            "minimumPair": {
+              "indices": [
+                56,
+                68
+              ],
+              "anglesDeg": [
+                90,
+                270
+              ],
+              "beforeVerticesMm": [
+                [
+                  23.178298950195312,
+                  62.76063537597656,
+                  18.658349990844727
+                ],
+                [
+                  22.4666690826416,
+                  60.54766082763672,
+                  25.048681259155273
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  23.178298950195312,
+                  62.18114471435547,
+                  17.12980079650879
+                ],
+                [
+                  22.4666690826416,
+                  59.22654724121094,
+                  20.54861068725586
+                ]
+              ],
+              "beforeChordMm": 6.800000524907475,
+              "afterChordMm": 4.574311354267062
+            },
+            "oppositePairSamples": [
+              {
+                "indices": [
+                  50,
+                  62
+                ],
+                "anglesDeg": [
+                  0,
+                  180
+                ],
+                "beforeVerticesMm": [
+                  [
+                    26.059246063232422,
+                    60.61329650878906,
+                    21.853515625
+                  ],
+                  [
+                    19.585721969604492,
+                    62.69499969482422,
+                    21.853515625
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    26.059246063232422,
+                    59.64583206176758,
+                    19.033628463745117
+                  ],
+                  [
+                    19.585721969604492,
+                    61.72364807128906,
+                    18.906492233276367
+                  ]
+                ],
+                "beforeChordMm": 6.800000172465456,
+                "afterChordMm": 6.799999792742856
+              },
+              {
+                "indices": [
+                  51,
+                  63
+                ],
+                "anglesDeg": [
+                  15,
+                  195
+                ],
+                "beforeVerticesMm": [
+                  [
+                    26.041048049926758,
+                    60.935142517089844,
+                    21.02654457092285
+                  ],
+                  [
+                    19.603919982910156,
+                    62.37315368652344,
+                    22.680484771728516
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    26.041048049926758,
+                    60.06719970703125,
+                    18.575834274291992
+                  ],
+                  [
+                    19.603919982910156,
+                    61.30385208129883,
+                    19.329437255859375
+                  ]
+                ],
+                "beforeChordMm": 6.800000886943305,
+                "afterChordMm": 6.598018210021989
+              },
+              {
+                "indices": [
+                  52,
+                  64
+                ],
+                "anglesDeg": [
+                  30,
+                  210
+                ],
+                "beforeVerticesMm": [
+                  [
+                    25.803510665893555,
+                    61.30598831176758,
+                    20.255931854248047
+                  ],
+                  [
+                    19.841459274291992,
+                    62.0023078918457,
+                    23.45109748840332
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    25.803510665893555,
+                    60.53212356567383,
+                    18.129762649536133
+                  ],
+                  [
+                    19.841459274291992,
+                    60.845279693603516,
+                    19.715076446533203
+                  ]
+                ],
+                "beforeChordMm": 6.800000087013616,
+                "afterChordMm": 6.177163053660419
+              },
+              {
+                "indices": [
+                  53,
+                  65
+                ],
+                "anglesDeg": [
+                  45,
+                  225
+                ],
+                "beforeVerticesMm": [
+                  [
+                    25.36281967163086,
+                    61.700557708740234,
+                    19.594192504882812
+                  ],
+                  [
+                    20.282148361206055,
+                    61.60773849487305,
+                    24.112838745117188
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    25.36281967163086,
+                    61.00770950317383,
+                    17.730825424194336
+                  ],
+                  [
+                    20.282148361206055,
+                    60.37901306152344,
+                    20.044082641601562
+                  ]
+                ],
+                "beforeChordMm": 6.800000015839771,
+                "afterChordMm": 5.6177966440771225
+              },
+              {
+                "indices": [
+                  54,
+                  66
+                ],
+                "anglesDeg": [
+                  60,
+                  240
+                ],
+                "beforeVerticesMm": [
+                  [
+                    24.74901008605957,
+                    62.09196853637695,
+                    19.0864200592041
+                  ],
+                  [
+                    20.895957946777344,
+                    61.21632766723633,
+                    24.620609283447266
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    24.74901008605957,
+                    61.46095657348633,
+                    17.413427352905273
+                  ],
+                  [
+                    20.895957946777344,
+                    59.935508728027344,
+                    20.300683975219727
+                  ]
+                ],
+                "beforeChordMm": 6.800000594813639,
+                "afterChordMm": 5.050668541920116
+              },
+              {
+                "indices": [
+                  55,
+                  67
+                ],
+                "anglesDeg": [
+                  75,
+                  255
+                ],
+                "beforeVerticesMm": [
+                  [
+                    24.0039119720459,
+                    62.45354080200195,
+                    18.767221450805664
+                  ],
+                  [
+                    21.64105796813965,
+                    60.85475540161133,
+                    24.939807891845703
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    24.0039119720459,
+                    61.861061096191406,
+                    17.20664405822754
+                  ],
+                  [
+                    21.64105796813965,
+                    59.543033599853516,
+                    20.472108840942383
+                  ]
+                ],
+                "beforeChordMm": 6.800001262675569,
+                "afterChordMm": 4.649687168477596
+              },
+              {
+                "indices": [
+                  56,
+                  68
+                ],
+                "anglesDeg": [
+                  90,
+                  270
+                ],
+                "beforeVerticesMm": [
+                  [
+                    23.178298950195312,
+                    62.76063537597656,
+                    18.658349990844727
+                  ],
+                  [
+                    22.4666690826416,
+                    60.54766082763672,
+                    25.048681259155273
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    23.178298950195312,
+                    62.18114471435547,
+                    17.12980079650879
+                  ],
+                  [
+                    22.4666690826416,
+                    59.22654724121094,
+                    20.54861068725586
+                  ]
+                ],
+                "beforeChordMm": 6.800000524907475,
+                "afterChordMm": 4.574311354267062
+              },
+              {
+                "indices": [
+                  57,
+                  69
+                ],
+                "anglesDeg": [
+                  105,
+                  285
+                ],
+                "beforeVerticesMm": [
+                  [
+                    22.328439712524414,
+                    62.99232482910156,
+                    18.767221450805664
+                  ],
+                  [
+                    23.3165283203125,
+                    60.31597137451172,
+                    24.939807891845703
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    22.328439712524414,
+                    62.39956283569336,
+                    17.18918800354004
+                  ],
+                  [
+                    23.3165283203125,
+                    59.00676345825195,
+                    20.524089813232422
+                  ]
+                ],
+                "beforeChordMm": 6.800000756091644,
+                "afterChordMm": 4.858906954521451
+              },
+              {
+                "indices": [
+                  58,
+                  70
+                ],
+                "anglesDeg": [
+                  120,
+                  300
+                ],
+                "beforeVerticesMm": [
+                  [
+                    21.512248992919922,
+                    63.13282012939453,
+                    19.0864200592041
+                  ],
+                  [
+                    24.132719039916992,
+                    60.17547607421875,
+                    24.620609283447266
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    21.512248992919922,
+                    62.50117111206055,
+                    17.376991271972656
+                  ],
+                  [
+                    24.132719039916992,
+                    58.89912414550781,
+                    20.397016525268555
+                  ]
+                ],
+                "beforeChordMm": 6.799999816001579,
+                "afterChordMm": 5.381650132348399
+              },
+              {
+                "indices": [
+                  59,
+                  71
+                ],
+                "anglesDeg": [
+                  135,
+                  315
+                ],
+                "beforeVerticesMm": [
+                  [
+                    20.78534698486328,
+                    63.17254638671875,
+                    19.594192504882812
+                  ],
+                  [
+                    24.859621047973633,
+                    60.13574981689453,
+                    24.112838745117188
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    20.78534698486328,
+                    62.47855758666992,
+                    17.67292594909668
+                  ],
+                  [
+                    24.859621047973633,
+                    58.912532806396484,
+                    20.17129135131836
+                  ]
+                ],
+                "beforeChordMm": 6.8000004700157275,
+                "afterChordMm": 5.963058909475593
+              },
+              {
+                "indices": [
+                  60,
+                  72
+                ],
+                "anglesDeg": [
+                  150,
+                  330
+                ],
+                "beforeVerticesMm": [
+                  [
+                    20.19727325439453,
+                    63.108795166015625,
+                    20.255931854248047
+                  ],
+                  [
+                    25.447694778442383,
+                    60.199501037597656,
+                    23.45109748840332
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    20.19727325439453,
+                    62.33308029174805,
+                    18.04810905456543
+                  ],
+                  [
+                    25.447694778442383,
+                    59.04806137084961,
+                    19.856882095336914
+                  ]
+                ],
+                "beforeChordMm": 6.80000014231758,
+                "afterChordMm": 6.452126424975523
+              },
+              {
+                "indices": [
+                  61,
+                  73
+                ],
+                "anglesDeg": [
+                  165,
+                  345
+                ],
+                "beforeVerticesMm": [
+                  [
+                    19.788105010986328,
+                    62.94591522216797,
+                    21.02654457092285
+                  ],
+                  [
+                    25.85686492919922,
+                    60.36238098144531,
+                    22.680484771728516
+                  ]
+                ],
+                "afterVerticesMm": [
+                  [
+                    19.788105010986328,
+                    62.0751838684082,
+                    18.46993637084961
+                  ],
+                  [
+                    25.85686492919922,
+                    59.298004150390625,
+                    19.470117568969727
+                  ]
+                ],
+                "beforeChordMm": 6.800001051892183,
+                "afterChordMm": 6.748550700717045
+              }
+            ]
+          }
+        },
+        {
+          "partId": "canvas-rounded-vamp",
+          "kind": "panel",
+          "vertexCount": 2902,
+          "restZRangeMm": [
+            23.963367462158203,
+            139.51930236816406
+          ],
+          "restSRange": [
+            0.5858902059575563,
+            1.0000691841152833
+          ],
+          "transitionVertices": 470,
+          "positionsByteIdentical": false,
+          "normalsByteIdentical": false,
+          "changedVertices": 2902,
+          "maxDisplacementMm": 53.65046805193214,
+          "edgeMetric": {
+            "uniqueIndexEdges": 7368,
+            "measuredEdges": 7368,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 0.43298561361032323,
+            "maxLengthRatio": 1.0103237383107386,
+            "maxAbsoluteChangeMm": 2.376916900026526,
+            "minimumRatioEdge": {
+              "indices": [
+                157,
+                178
+              ],
+              "beforeVerticesMm": [
+                [
+                  2.564615488052368,
+                  55.769290924072266,
+                  39.21625900268555
+                ],
+                [
+                  2.5684070587158203,
+                  55.068359375,
+                  41.34971618652344
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  2.564615488052368,
+                  54.700172424316406,
+                  26.428749084472656
+                ],
+                [
+                  2.5684070587158203,
+                  54.40999984741211,
+                  27.356769561767578
+                ]
+              ],
+              "beforeLengthMm": 2.2456533498655675,
+              "afterLengthMm": 0.9723355936476206,
+              "ratio": 0.43298561361032323
+            }
+          },
+          "minimumJacobianDeterminant": 0.32303933807932717,
+          "maxSmoothNormalTransportErrorDeg": 33.770851866015725,
+          "worstNormal": {
+            "index": 73,
+            "beforeVertexMm": [
+              2.4891357421875,
+              58.97290802001953,
+              30.682018280029297
+            ],
+            "afterVertexMm": [
+              2.4891357421875,
+              57.30174255371094,
+              22.900373458862305
+            ],
+            "beforeNormal": [
+              0,
+              0.9266714453697205,
+              0.37587234377861023
+            ],
+            "actualAfterNormal": [
+              0,
+              0.9781376802987061,
+              0.20795835732152212
+            ],
+            "expectedDifferentialNormal": [
+              0,
+              0.6974955400342802,
+              0.7165891233002968
+            ],
+            "errorDeg": 33.770851866015725,
+            "phiRadians": 0.17585075599063305,
+            "phiDerivativeRadiansPerMm": 0.014864636239141471,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0.9845780590162265,
+                -0.02378880862029606
+              ],
+              [
+                0,
+                -0.17494583648615347,
+                0.34091338072728306
+              ]
+            ],
+            "determinant": 0.33149408166604155
+          },
+          "positionSha256": {
+            "before": "55c155163582fbd3d1f79323654114e49be8e0447861be193910607c18103c13",
+            "after": "d89042e4a795cdd99ff3412af3344aa144ec0315deb8b98917d3be59e8b94ded"
+          }
+        }
+      ]
+    },
+    {
+      "styleId": "monk",
+      "params": {
+        "length": 1,
+        "width": 1,
+        "instep": 0,
+        "thickness": 1.35,
+        "bend": 0
+      },
+      "Lmm": 289,
+      "transitionS": [
+        0.54,
+        0.72
+      ],
+      "transitionZMm": [
+        11.56,
+        63.58
+      ],
+      "parts": [
+        {
+          "partId": "monk-buckle-frame-0",
+          "kind": "buckle",
+          "vertexCount": 1728,
+          "restZRangeMm": [
+            -53.8091926574707,
+            -32.795352935791016
+          ],
+          "restSRange": [
+            0.31380902194646815,
+            0.3865212701183702
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 1728,
+            "measuredEdges": 1728,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                1
+              ],
+              "beforeVerticesMm": [
+                [
+                  30.824932098388672,
+                  70.22270202636719,
+                  -50.15909194946289
+                ],
+                [
+                  31.46869659423828,
+                  70.45394897460938,
+                  -36.37605667114258
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  30.824932098388672,
+                  70.22270202636719,
+                  -50.15909194946289
+                ],
+                [
+                  31.46869659423828,
+                  70.45394897460938,
+                  -36.37605667114258
+                ]
+              ],
+              "beforeLengthMm": 13.799998889877136,
+              "afterLengthMm": 13.799998889877136,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.0000017075472925031877,
+          "worstNormal": {
+            "index": 339,
+            "beforeVertexMm": [
+              36.45616149902344,
+              60.28397750854492,
+              -33.2654914855957
+            ],
+            "afterVertexMm": [
+              36.45616149902344,
+              60.28397750854492,
+              -33.2654914855957
+            ],
+            "beforeNormal": [
+              0.5223565101623535,
+              -0.19906479120254517,
+              0.8291664123535156
+            ],
+            "actualAfterNormal": [
+              0.5223564960115319,
+              -0.19906478580980994,
+              0.8291663898911057
+            ],
+            "expectedDifferentialNormal": [
+              0.5223564960115319,
+              -0.19906478580980994,
+              0.8291663898911057
+            ],
+            "errorDeg": 0.0000017075472925031877,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "c011009fde408e3d00d026d8b1d1a87367e814bf8cee54109bb4b38ee2f2acff",
+            "after": "c011009fde408e3d00d026d8b1d1a87367e814bf8cee54109bb4b38ee2f2acff"
+          }
+        },
+        {
+          "partId": "monk-buckle-frame-1",
+          "kind": "buckle",
+          "vertexCount": 1728,
+          "restZRangeMm": [
+            -25.88569450378418,
+            -4.876955509185791
+          ],
+          "restSRange": [
+            0.4104301228242762,
+            0.4831247214215025
+          ],
+          "transitionVertices": 0,
+          "positionsByteIdentical": true,
+          "normalsByteIdentical": true,
+          "changedVertices": 0,
+          "maxDisplacementMm": 0,
+          "edgeMetric": {
+            "uniqueIndexEdges": 1728,
+            "measuredEdges": 1728,
+            "omittedRestEdgesShorterThanMm": 0.0001,
+            "minLengthRatio": 1,
+            "maxLengthRatio": 1,
+            "maxAbsoluteChangeMm": 0,
+            "minimumRatioEdge": {
+              "indices": [
+                0,
+                1
+              ],
+              "beforeVerticesMm": [
+                [
+                  36.413455963134766,
+                  60.27547836303711,
+                  -22.27147102355957
+                ],
+                [
+                  36.57898712158203,
+                  60.35201644897461,
+                  -8.472676277160645
+                ]
+              ],
+              "afterVerticesMm": [
+                [
+                  36.413455963134766,
+                  60.27547836303711,
+                  -22.27147102355957
+                ],
+                [
+                  36.57898712158203,
+                  60.35201644897461,
+                  -8.472676277160645
+                ]
+              ],
+              "beforeLengthMm": 13.79999982232835,
+              "afterLengthMm": 13.79999982232835,
+              "ratio": 1
+            }
+          },
+          "minimumJacobianDeterminant": 1,
+          "maxSmoothNormalTransportErrorDeg": 0.0000017075472925031877,
+          "worstNormal": {
+            "index": 609,
+            "beforeVertexMm": [
+              41.383636474609375,
+              52.0338249206543,
+              -25.88569450378418
+            ],
+            "afterVertexMm": [
+              41.383636474609375,
+              52.0338249206543,
+              -25.88569450378418
+            ],
+            "beforeNormal": [
+              0.3791232109069824,
+              0.06289596110582352,
+              -0.9232062101364136
+            ],
+            "actualAfterNormal": [
+              0.3791232076074191,
+              0.062895960558431,
+              -0.9232062021016183
+            ],
+            "expectedDifferentialNormal": [
+              0.3791232076074191,
+              0.062895960558431,
+              -0.9232062021016183
+            ],
+            "errorDeg": 0.0000017075472925031877,
+            "phiRadians": 0,
+            "phiDerivativeRadiansPerMm": 0,
+            "jacobian": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "determinant": 1
+          },
+          "positionSha256": {
+            "before": "a1aa944aab4f88c44d8c58a27cfb8e293be1c0a1afa42e24e52d2b413589146b",
+            "after": "a1aa944aab4f88c44d8c58a27cfb8e293be1c0a1afa42e24e52d2b413589146b"
+          }
+        }
+      ]
+    }
+  ]
+}
