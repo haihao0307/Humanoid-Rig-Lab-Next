@@ -1,0 +1,298 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kaopu:reality:observation:1",
+  "title": "KAOPU human and clothing read-only observation",
+  "type": "object",
+  "required": [
+    "schema",
+    "assetId",
+    "domain"
+  ],
+  "properties": {
+    "schema": {
+      "const": "kaopu/reality-observation@1"
+    },
+    "assetId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.:-]{1,128}$"
+    },
+    "domain": {
+      "enum": [
+        "human",
+        "garment",
+        "pattern",
+        "fabric",
+        "footwear"
+      ]
+    },
+    "source": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "repository",
+            "commit",
+            "path"
+          ],
+          "properties": {
+            "repository": {
+              "type": "string",
+              "pattern": "^[\\w.-]+/[\\w.-]+$"
+            },
+            "commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "units": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "geometry": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "m",
+                    "cm",
+                    "mm",
+                    "in",
+                    "ft"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "scene": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "m",
+                    "cm",
+                    "mm",
+                    "in",
+                    "ft"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "geometryToScene": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "dimensions": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "xyz",
+            "unit",
+            "basis",
+            "method"
+          ],
+          "properties": {
+            "xyz": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "unit": {
+              "type": "string",
+              "enum": [
+                "m",
+                "cm",
+                "mm",
+                "in",
+                "ft"
+              ]
+            },
+            "basis": {
+              "enum": [
+                "source_declared",
+                "runtime_computed",
+                "physical_measured",
+                "artistic",
+                "unknown",
+                "test_fixture"
+              ]
+            },
+            "method": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "frame": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "up",
+            "forward",
+            "handedness"
+          ],
+          "properties": {
+            "up": {
+              "enum": [
+                "+X",
+                "-X",
+                "+Y",
+                "-Y",
+                "+Z",
+                "-Z"
+              ]
+            },
+            "forward": {
+              "enum": [
+                "+X",
+                "-X",
+                "+Y",
+                "-Y",
+                "+Z",
+                "-Z"
+              ]
+            },
+            "handedness": {
+              "enum": [
+                "left",
+                "right"
+              ]
+            },
+            "toCanonicalBasis": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 9,
+                  "maxItems": 9
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "camera": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "projection": {
+              "enum": [
+                "perspective",
+                "orthographic",
+                "unknown"
+              ]
+            },
+            "bufferPx": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "color": {
+      "anyOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidence": {
+      "anyOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "preservation": {
+      "type": "object",
+      "properties": {
+        "geometry": {
+          "type": "boolean"
+        },
+        "camera": {
+          "type": "boolean"
+        },
+        "settings": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$comment": "Structure only. core.js adds dimensional consistency, scope, basis orthogonality, camera aspect, source safety and evidence semantics. Validation never grants physical, aesthetic or manufacturing approval."
+}

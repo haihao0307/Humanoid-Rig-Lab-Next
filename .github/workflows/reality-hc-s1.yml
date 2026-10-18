@@ -1,0 +1,150 @@
+name: Reality HC S1 scoped lab acceptance
+on:
+  push:
+    branches: [feature/reality-contract-hc-s1-20261018]
+    paths: [.github/workflows/reality-hc-s1.yml, reality-lab/hc-s1/BUILD_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.publish.outputs.sha }}
+      url: ${{ steps.publish.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: reality-lab/hc-s1
+      - name: Finalize own storage guard source once and enforce strict scope
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          if ! grep -q 'RealityIsolation.wrap' reality-lab/hc-s1/lab.js; then
+            python reality-lab/hc-s1/prepare.py
+            git add reality-lab/hc-s1/lab.js reality-lab/hc-s1/lab.html reality-lab/hc-s1/build.py reality-lab/hc-s1/README.md reality-lab/hc-s1/tests/browser.py
+            git commit -m 'fix(reality): finalize explicit volatile storage boundary in readable S1 source'
+            git push origin HEAD:refs/heads/feature/reality-contract-hc-s1-20261018
+          fi
+          git fetch --filter=blob:none --depth=1 origin fda12bf2fe0262e4d02f1b08508128d17959e0c8
+          python - <<'PY'
+          import subprocess,json,ast
+          from pathlib import Path
+          changed=subprocess.check_output(['git','diff','--name-only','fda12bf2fe0262e4d02f1b08508128d17959e0c8','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s1/') or p=='.github/workflows/reality-hc-s1.yml' for p in changed),changed
+          root=Path('reality-lab/hc-s1')
+          for p in root.rglob('*.py'):ast.parse(p.read_text(),filename=str(p))
+          q=root/'qa/local';q.mkdir(parents=True,exist_ok=True)
+          (q/'SCOPE_REPORT.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'oldRuntimePathsChanged':[],'excludedDomainsTouched':[]},indent=2))
+          PY
+      - name: Build and run independent pure logic regressions
+        run: |
+          python reality-lab/hc-s1/build.py
+          node reality-lab/hc-s1/tests/core.cjs
+          node reality-lab/hc-s1/tests/hardening.cjs
+      - name: Install fixed browser tools
+        run: |
+          python -m pip install playwright==1.56.0 pillow==11.3.0 jsonschema==4.25.1
+          python -m playwright install --with-deps chromium
+      - name: Run actual calibration human and footwear browser gates
+        env:
+          REALITY_URL: http://127.0.0.1:8765/preview.html
+        run: |
+          python -m http.server 8765 --directory reality-lab/hc-s1 >/tmp/reality-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER"' EXIT
+          python reality-lab/hc-s1/tests/browser.py
+      - name: Freeze successful build at its own public commit
+        id: publish
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          q=Path('reality-lab/hc-s1/qa/local')
+          for name in ['SCOPE_REPORT.json','CORE_REPORT.json','HARDENING_REPORT.json','BROWSER_REPORT.json']:assert json.loads((q/name).read_text())['passed'],name
+          PY
+          BEFORE=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-contract-hc-s1-20261018
+          test "$(git rev-parse FETCH_HEAD)" = "$BEFORE"
+          git add -f reality-lab/hc-s1/preview.html reality-lab/hc-s1/BUILD_MANIFEST.json reality-lab/hc-s1/reality-observation.schema.json reality-lab/hc-s1/qa/local
+          git commit -m 'build(reality): freeze tested HC S1 interactive lab and native observation evidence'
+          git push origin HEAD:refs/heads/feature/reality-contract-hc-s1-20261018
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s1/preview.html" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-hc-s1-local-evidence
+          path: reality-lab/hc-s1/qa/local/
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s1
+      - name: Independently verify the exact public HTML bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          REALITY_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,urllib.request,hashlib
+          root=Path('reality-lab/hc-s1');m=json.loads((root/'BUILD_MANIFEST.json').read_text())
+          raw='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s1/preview.html'
+          b=urllib.request.urlopen(raw,timeout=120).read()
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=root/'qa/public';q.mkdir(parents=True,exist_ok=True)
+          (q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'publicURL':os.environ['REALITY_URL'],'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()},indent=2))
+          PY
+      - name: Install independent fixed Chromium
+        run: |
+          python -m pip install playwright==1.56.0 pillow==11.3.0 jsonschema==4.25.1
+          python -m playwright install --with-deps chromium
+      - name: Exercise actual HTTPS application and both original native views
+        env:
+          REALITY_URL: ${{ needs.build.outputs.url }}
+          REALITY_QA: ${{ github.workspace }}/reality-lab/hc-s1/qa/public
+        run: python reality-lab/hc-s1/tests/browser.py
+      - name: Save permanent delivery state without changing the frozen web runtime
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          REALITY_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          root=Path('reality-lab/hc-s1');q=root/'qa/public';r=json.loads((q/'BROWSER_REPORT.json').read_text());b=json.loads((q/'PUBLIC_BYTES.json').read_text());m=json.loads((root/'BUILD_MANIFEST.json').read_text())
+          assert r['passed'] and r['publicBrowserVerified'] and b['passed']
+          assert set(r['nativeObservations'])=={'human-r07','shoe-r12'}
+          assert r['sourceCommit']==m['sourceCommit']==b['sourceCommit']
+          for v in r['nativeObservations'].values():assert v['preservation']=={'geometry':True,'camera':True,'settings':True}
+          d={'version':'REALITY-HC-S1','status':'S1_PUBLIC_BROWSER_VERIFIED','fixedURL':os.environ['REALITY_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'htmlSHA256':m['html']['sha256'],'htmlBytes':m['html']['bytes'],'completedScope':['portable executable contract','unit and camera calculator','actual WebGL metric calibrator','fixed-source R07 read-only observation','fixed-source R12 read-only observation','volatile Web Storage separation','local JSON draft and report','R12 design export intake'],'registeredOnly':['garment','pattern','fabric'],'excluded':['architecture','aircraft','terrain','animals','vegetation','world'],'nativeFilesChanged':False,'canonicalBranchesChanged':False,'shaderPhysicsLightingChanged':False,'webStorageIsolationVerified':True,'notHostileCodeSandbox':True,'unitChecks':json.loads((root/'qa/local/CORE_REPORT.json').read_text())['count'],'hardeningChecks':json.loads((root/'qa/local/HARDENING_REPORT.json').read_text())['count'],'publicBrowserChecks':len(r['checks']),'nativeDimensions':{k:v['dimensions'] for k,v in r['nativeObservations'].items()},'boundsAreAnatomicalMeasurements':False,'finalShaderBoundsVerified':False,'colorCalibration':False,'physicalCertification':False,'userVisualAcceptance':False,'productionReady':False,'realPhoneTested':False,'nextStep':'S2: private-source read-only pattern adapter; separate net pattern and seam allowance, 2D mm and 3D m, and referenced human proportion version. Then fabric material-space measurements and real garment host.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (root/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          (root/'TASK_STATE.json').write_text(json.dumps({'task':'REALITY-HC-S1-20261018','currentStep':'S1','status':d['status'],'fixedURL':d['fixedURL'],'effects':d['completedScope'],'registeredOnly':d['registeredOnly'],'next':d['nextStep'],'boundaries':d['excluded'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'workflowRun':d['workflowRun'],'userAccepted':False},ensure_ascii=False,indent=2))
+          print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-contract-hc-s1-20261018
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s1/DELIVERY.json reality-lab/hc-s1/TASK_STATE.json reality-lab/hc-s1/qa/public
+          git commit -m 'docs(reality): record exact public human-clothing S1 evidence and S2 direction'
+          git push origin HEAD:refs/heads/feature/reality-contract-hc-s1-20261018
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-hc-s1-public-evidence
+          path: reality-lab/hc-s1/qa/public/
+          retention-days: 30
