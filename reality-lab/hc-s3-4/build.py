@@ -1,0 +1,15 @@
+from pathlib import Path
+import json,hashlib,subprocess,os
+R=Path(__file__).resolve().parent;P=R.parent/'hc-s2-1';PREV=R.parent/'hc-s3-3';sha=lambda b:hashlib.sha256(b).hexdigest()
+data=json.loads((R/'diagnosis.json').read_text());assert data['passed'] and not data['repairApplied'] and not data['sourceFitAccepted']
+for name,h in data['captureCode']['files'].items():assert sha((R/name).read_bytes())==h,('DIAGNOSTIC_CODE_DRIFT',name)
+assert all(x['identical'] for x in data['comparisons'].values()) and not data['trace']['errors'] and not data['trace']['truncated']
+patterns=json.loads((PREV/'runtime-observation.json').read_text());assert patterns['source']['commit']==data['source']['commit']
+protocol=(P/'protocol.js').read_bytes();assert hashlib.sha1(b'blob '+str(len(protocol)).encode()+b'\0'+protocol).hexdigest()=='74e1f859fa2001456286e6a4081ef639124699d2'
+small={'source':patterns['source'],'capture':patterns['capture'],'pieces':[{'role':p['role'],'presetId':p['presetId'],'panels':[{'id':q['id'],'boundaryMm':q['boundaryMm']} for q in p['panels']]} for p in patterns['pieces']]}
+sourceCommit=subprocess.check_output(['git','-C',str(R),'rev-parse','HEAD'],text=True).strip()
+names=['TASK_ANCHOR.json','observer.mjs','instrument.py','capture.py','summary.js','index.template.html','app.js','build.py','tests/protocol.cjs','tests/browser.py','README.md']
+build={'version':'REALITY-HC-S3.4','sourceCommit':sourceCommit,'sourceFiles':{n:sha((R/n).read_bytes()) for n in names},'diagnosticRun':os.environ['DIAGNOSTIC_RUN_ID'],'diagnosticSourceCommit':data['captureCode']['commit'],'diagnosisSHA256':sha((R/'diagnosis.json').read_bytes()),'source':data['source'],'sharedProtocolSHA256':sha(protocol),'patternReferenceSHA256':sha((PREV/'runtime-observation.json').read_bytes()),'live':False,'repairApplied':False,'sourceFitAccepted':False,'physicalCertification':False,'rootCauseProven':False,'publicBrowserVerified':False}
+js='const RF34_BUILD='+json.dumps(build,ensure_ascii=False)+';\nconst RF34_DATA='+json.dumps(data,ensure_ascii=False)+';\nconst RF34_PATTERNS='+json.dumps(small,ensure_ascii=False)+';\nconst RF34_DICTIONARY='+(P/'measurement-dictionary.json').read_text()+';\n'+protocol.decode()+'\n'+(R/'summary.js').read_text()+'\n'+(R/'app.js').read_text();assert '</script' not in js.lower()
+g=R/'_generated';g.mkdir(exist_ok=True);(g/'bundle.js').write_text(js);subprocess.run(['node','--check',str(g/'bundle.js')],check=True)
+html=(R/'index.template.html').read_text();assert html.count('<!-- RF34_SCRIPTS -->')==1;html=html.replace('<!-- RF34_SCRIPTS -->','<script>\n'+js+'\n</script>');(R/'preview.html').write_text(html);build['html']={'bytes':len(html.encode()),'sha256':sha(html.encode())};(R/'BUILD_MANIFEST.json').write_text(json.dumps(build,ensure_ascii=False,indent=2));print(json.dumps(build['html'],indent=2))
