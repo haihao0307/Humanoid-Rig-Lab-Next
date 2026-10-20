@@ -9,7 +9,10 @@ permissions:
 jobs:
   capture:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: platform
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,10 +31,10 @@ jobs:
         run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
-      - name: Read actual D03 without changing original runtime
+      - name: Read actual prepared D03 and retain original outcome
         env:
           GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-        run: python platform/reality-lab/hc-s3-3/capture.py
+        run: python reality-lab/hc-s3-3/capture.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
