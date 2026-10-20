@@ -1,0 +1,807 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><link rel="icon" href="data:,"><title>KAOPU 世界规范 · S3.1 原生读取</title><style>
+:root{color-scheme:dark;--bg:#0e171c;--card:#18262d;--line:#32454e;--ink:#e9f2ee;--muted:#a6bbc2;--green:#8ee0c4;--amber:#efc779;--blue:#adc4e8}*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.65 system-ui,-apple-system,'Segoe UI',sans-serif}h1{font-size:25px;margin:4px 0}h2{font-size:19px;margin:0 0 9px}h3{font-size:15px;margin:0 0 10px}p{margin:6px 0}a{color:var(--green)}button,input{font:inherit}button{cursor:pointer;background:#263b44;color:var(--ink);border:1px solid #49636c;border-radius:7px;padding:8px 12px}button:hover{border-color:var(--green)}button:disabled{opacity:.4;cursor:not-allowed}button.primary{background:var(--green);color:#12372e;font-weight:700}header{padding:20px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:20px}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--green)}.muted,small{color:var(--muted)}.badge{padding:5px 12px;border:1px solid #477e6d;background:#17372e;border-radius:20px;font-size:12px}.layout{display:grid;grid-template-columns:230px minmax(0,1fr)}aside{padding:18px 13px;border-right:1px solid var(--line)}aside nav{display:grid;gap:8px}aside button{text-align:left;width:100%;font-size:12px;background:transparent}.side-note{font-size:12px;padding:13px;border:1px solid var(--line);border-radius:8px;margin-top:16px}main{padding:22px;min-width:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}.card{padding:17px;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:16px;min-width:0}.counts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.count{text-align:center;padding:9px;background:#112027;border:1px solid var(--line);border-radius:7px}.count b{display:block;font-size:23px}.count small{font-size:11px}.PASS{color:var(--green)}.FAIL,.error{color:#fa9b96}.WARNING{color:var(--amber)}.UNKNOWN{color:var(--blue)}.NOT_APPLICABLE{color:#aab3b8}.split{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(250px,.8fr);gap:16px}.table-wrap{overflow:auto;max-height:520px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;vertical-align:top;padding:9px;border-bottom:1px solid var(--line)}td:nth-child(2),td:nth-child(3){white-space:nowrap}th{color:var(--muted);background:#132027;position:sticky;top:0}.issue{border-top:1px solid var(--line);padding:10px 0;font-size:12px}.issue code{font-size:10px;color:var(--muted);overflow-wrap:anywhere}.issue b{float:right;font-size:10px}.issue p{clear:both}.issue p{color:var(--ink)}#issues{max-height:520px;overflow:auto}#host:empty::before{content:'原生牛仔尚未启动。点击上方按钮即可查看原来的三维裤装，不会重新下载或生成替身。';display:block;padding:42px 18px;color:var(--muted)}#host iframe{display:block;width:100%;height:760px;border:0;background:#0a1016}#status{padding:10px 14px;border:1px solid var(--line);border-radius:7px;background:#132a2b;font-size:12px;margin:12px 0;overflow-wrap:anywhere}pre{font:11px/1.65 ui-monospace,monospace;background:#0e1a20;border:1px solid var(--line);border-radius:8px;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:350px;overflow:auto}label{font-size:12px}#changes{font-size:12px;overflow-wrap:anywhere}.notice{color:var(--amber);font-size:12px}details summary{cursor:pointer;color:var(--green)}footer{border-top:1px solid var(--line);padding:14px 20px;font-size:11px;color:var(--muted)}input[type=file]{max-width:100%;font-size:12px}#mode{display:inline-block;margin-bottom:8px}#object{overflow-wrap:anywhere}#preservation,#caption{font-size:12px}
+@media(max-width:1100px){.split{grid-template-columns:1fr}.layout{grid-template-columns:200px 1fr}main{padding:16px}}@media(max-width:650px){header{padding:15px;display:block}h1{font-size:21px}.layout{display:block}aside{border-right:0;border-bottom:1px solid var(--line);padding:12px}aside nav{display:flex;overflow:auto}aside nav button{min-width:170px}.side-note{display:none}main{padding:12px}.counts{grid-template-columns:repeat(5,minmax(48px,1fr))}.count{padding:6px 3px}.count b{font-size:20px}.card{padding:12px}.toolbar button{font-size:12px}#host iframe{height:820px}table{font-size:11px}}
+</style></head><body><header><div><div class="eyebrow">KAOPU / RF01 / REALITY FOUNDATION</div><h1>世界规范 · 原生清单与缺失检查</h1><p class="muted">S3.1-A：让规范读取当前代码实际使用的数值，而不只重复历史声明。</p></div><span class="badge">人物与服装限定 · 不自动修源</span></header><div class="layout"><aside><h3>本轮实时接入</h3><button id="load" class="primary">加载原生牛仔 R17.2</button><div class="side-note">原画面、几何、着色器、灯光不改。新增的只读接口只安装在本页候选副本，原工作台主线仍保留。</div><h3 style="margin-top:20px">S3 材料历史</h3><nav id="history-nav"></nav><div class="side-note">针织、皮革等仍是历史快照，不冒充实时接入。人物、鞋、裁片保留在下方原共同入口。</div><p><a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/553eb76103068ae76cb39995eba227b5d7497c10/reality-lab/hc-s2-1/preview.html" target="_blank" rel="noopener noreferrer">人物 / 鞋 / 裁片 S2.1 ↗</a></p></aside><main><span id="mode" class="badge"></span><h2 id="object"></h2><div id="counts" class="counts"></div><div class="toolbar"><button id="read" disabled class="primary">读取当前原生清单</button><label><input id="auto" type="checkbox" checked> 原控件变化后自动重读</label><button id="restore-live" disabled>回到实时读取</button><button id="close" disabled>关闭原生副本</button></div><div id="status" role="status"></div><section class="card"><h3>原生三维画面</h3><p id="caption" class="muted"></p><div id="host"></div><p id="preservation" class="muted"></p></section><div class="split"><section class="card"><h3>当前值、单位与测量方法</h3><div class="table-wrap"><table><thead><tr><th>规范项目</th><th>当前值</th><th>状态</th><th>方法 / 边界</th></tr></thead><tbody id="measurements"></tbody></table></div><p class="notice">读取GPU参数 ≠ 实物标定。可见缝线代理不等于纱线直径或Tex；物理厚度仍需独立证据。</p></section><section class="card"><h3>缺失与风险</h3><label><input id="missing-only" type="checkbox" checked> 只看风险、冲突和未确认</label><div id="issues"></div></section></div><section class="card"><h3>相邻两次清单的变化</h3><div id="changes"></div><p class="muted">先改原生“织纹尺度”或“针脚节距”，再比较。本页没有替你修改原生参数。</p></section><section class="card"><h3>共用协议与安全交接</h3><div class="toolbar"><button id="export-native" disabled>导出原生清单</button><button id="export-common">导出 S2.1 共同对象</button><button id="export-review">导出复验包</button><button id="export-defects">导出缺失派单</button><button id="bad-unit">测试错误单位拦截</button><label>导入旧清单 <input id="file" type="file" accept=".json,application/json"></label></div><p class="muted">导入文件不上传，不自动写回，不变成实时证据。原子校验失败时保留当前有效清单。风险由责任工作台处理，规范层不拥有修复或合并权限。</p><pre id="source"></pre></section><details class="card"><summary>当前完成边界</summary><p>已实施方向：牛仔实时只读导出、S3历史到S2.1共同协议的显式桥接、差异和导入可信度检查。针织、皮革实时导出和成衣关联尚未完成。</p><p>本页使用相同原生生成程序，没有新模型或静态图替代。旧工作台不被覆盖；帧内保护检查仅覆盖声明的字段，不承诺所有驱动状态或实物制造正确。</p><p class="muted">读取参考：MDN structuredClone / Transferable objects、Three.js/现有原生实现。读取结果只复制小型数据，不转移原生GPU或几何缓冲所有权。</p></details></main></div><footer><span id="build"></span> · 不涉及其他工作者的建筑、飞机或世界 · 移动视口不是实机认证 · 本页自包含原生牛仔与规范核心；其他旧入口是外部导航。</footer><script>
+const RF31_BUILD={"version": "REALITY-HC-S3.1-A", "sourceCommit": "42a501c74294dc07ef2ef82cc87c7936c1123214", "sharedProtocolVersion": "0.2.0", "sourceFiles": {"TASK_ANCHOR.json": "f7bb49a4f60a091cf257ad6f50406240ff74a4056f0062202d1f7f9c658bf451", "native-exporter.js": "2488cb2ba9eb4bdaf664dc091b45c0508d3f3c9cf73f6816a732098d4173f9af", "bridge.js": "1c9dbac4688e6957275d37205b0a224461d2e1ef398e069214929a8a8feaede8", "app.js": "dd1c53a3a83e1e898a3f9b0f711c401a5fe06f6619ebcc87ac23bd01f250ad70", "index.template.html": "c6154544e081d1b5e0f39e090640250399e897b27e8f6d160cd8f05b6ad74769", "build.py": "2bd1035f3c126fe37e227ae1a4e4cb217206efaa8a36e6d918aefc261f5f69e4", "tests/protocol.cjs": "8049cbcd085a961a7218719a5b68852bd7b3f60d306d14897eea3f2ffc76807d", "tests/browser.py": "a85bcea33acff0aafdbf408b20f0eaf9313dcf63e2f594b33443bad918fb2abf", "README.md": "42b6cd7cd79fa2b4834d896e7019e3c97014c2f9ab9aa62780d0913ee4842cfc"}, "dependencies": {"protocolSHA256": "dc08e602e34271d016e46c6a8f32a0349861da193742c9c1509f15710d5cc8bd", "dictionarySHA256": "2d24ebf8feb06746de6e69090c0a2ac02977636a41fe88e5975ffebc06dde305", "S3SnapshotSHA256": "2184ed1dd61151595d44f50a2f3fff1b4d5c8f8532d324add6ac7ecae7d32a2b"}, "native": {"source": {"repository": "haihao0307/Humanoid-Rig-Lab-Next", "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915", "path": "denim-workshop/r17-scale/preview-v3.html", "sha256": "2a77a3b19852522cb5e52271bf4665d0230bc2b70b070ff60be461e2790e19b4", "basePage": {"commit": "a5af1e0140c935703dec7c4d4da4f5549449b657", "path": "denim-workshop/r17-scale/index.html", "sha256": "60c49adec887ac81ebe4b9f1b0807fbddab4c035dc030b65ad9f6e21701fc817"}, "assembledOriginalSHA256": "533df4565b9d913fe6a762302b887f2bc0110f3b26b3d48aa58ed6463a826bb6"}, "originalHTMLSHA256": "533df4565b9d913fe6a762302b887f2bc0110f3b26b3d48aa58ed6463a826bb6", "augmentedHTMLSHA256": "8b7fafd63ba66722db421f65e771a48cab44d02a6d7c0bf6ecca6ed3b1568887", "insertionSHA256": "98d594535ed0348ad8f3da6c65e176641e1a4e33a9f06a62a6fd508ca8ef2643", "additiveRemovalRestoresOriginal": true}, "coverage": {"liveNative": ["denim"], "historical": ["denim", "knit", "leather", "silk", "cotton", "acrylic", "linen"], "productionExporterInstalled": false}, "privateCredentialsIncluded": false, "originalShadersChanged": false, "originalGeometryChanged": false, "originalPhysicsChanged": false, "publicBrowserVerified": false, "physicalCertification": false};
+const RF31_DICTIONARY={
+  "schema": "kaopu/reality-measurement-dictionary@1",
+  "version": "0.2.0",
+  "canonicalLengthUnit": "m",
+  "statusVocabulary": ["PASS", "FAIL", "WARNING", "UNKNOWN", "NOT_APPLICABLE"],
+  "basisVocabulary": ["source_declared", "runtime_computed", "physical_measured", "artistic", "unknown"],
+  "measurements": [
+    {
+      "id": "human.visible_bounds_x",
+      "domain": "human",
+      "label": "当前可见数字几何 X 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前观察状态中，受检可见 CPU 网格经已有世界矩阵变换后的 X 方向包围范围。",
+      "notEquivalentTo": ["肩宽", "臂展", "身体宽度实测"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "human.visible_bounds_y",
+      "domain": "human",
+      "label": "当前可见数字几何 Y 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前观察状态中，受检可见 CPU 网格经已有世界矩阵变换后的 Y 方向包围范围。",
+      "notEquivalentTo": ["人体身高", "真人身高实测", "最终顶点着色器轮廓"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "human.visible_bounds_z",
+      "domain": "human",
+      "label": "当前可见数字几何 Z 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前观察状态中，受检可见 CPU 网格经已有世界矩阵变换后的 Z 方向包围范围。",
+      "notEquivalentTo": ["胸厚", "骨盆厚度实测"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "human.body_height",
+      "domain": "human",
+      "label": "人体身高",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "从定义明确的头顶点到足底支撑平面的语义距离，必须引用人物比例版本和测量方法。",
+      "requiredEvidence": ["proportion_revision", "top_landmark", "support_plane", "measurement_method"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "human.shoulder_width",
+      "domain": "human",
+      "label": "肩宽",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "在指定比例版本和姿态中，两个语义肩点之间的距离；不得从整体包围盒猜测。",
+      "requiredEvidence": ["proportion_revision", "left_shoulder_landmark", "right_shoulder_landmark"],
+      "owner": "human-workbench"
+    },
+    {
+      "id": "footwear.visible_bounds_x",
+      "domain": "footwear",
+      "label": "当前可见鞋几何 X 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前鞋台显示状态的可见几何 X 方向包围范围。成双、拆件或款式比较会影响结果。",
+      "notEquivalentTo": ["鞋楦宽", "脚宽", "标准鞋码"],
+      "owner": "shoe-workbench"
+    },
+    {
+      "id": "footwear.visible_bounds_y",
+      "domain": "footwear",
+      "label": "当前可见鞋几何 Y 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前鞋台显示状态的可见几何 Y 方向包围范围。",
+      "notEquivalentTo": ["鞋帮高度制造值", "脚背高度"],
+      "owner": "shoe-workbench"
+    },
+    {
+      "id": "footwear.visible_bounds_z",
+      "domain": "footwear",
+      "label": "当前可见鞋几何 Z 范围",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "当前鞋台显示状态的可见几何 Z 方向包围范围。",
+      "notEquivalentTo": ["脚长", "鞋内长", "鞋码"],
+      "owner": "shoe-workbench"
+    },
+    {
+      "id": "footwear.last_length",
+      "domain": "footwear",
+      "label": "鞋楦长度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定鞋楦版本的制造语义长度，必须引用鞋楦身份和测量方法。",
+      "requiredEvidence": ["last_id", "last_revision", "measurement_method"],
+      "owner": "shoe-workbench"
+    },
+    {
+      "id": "pattern.panel_count",
+      "domain": "pattern",
+      "label": "裁片数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "当前固定批次中具有独立身份的裁片数量。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.seam_count",
+      "domain": "pattern",
+      "label": "有向配缝数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "按原始有向配缝路径登记的接缝关系数量；不是命名边数量。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.net_vertices",
+      "domain": "pattern",
+      "label": "净样顶点数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "缝合线/净样基础几何中的顶点总数。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.material_vertices",
+      "domain": "pattern",
+      "label": "材料裁片顶点数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "包含缝份与折边材料后的顶点总数。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.net_triangles",
+      "domain": "pattern",
+      "label": "净样三角形数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "净样基础网格三角形总数。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.material_triangles",
+      "domain": "pattern",
+      "label": "材料三角形数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "包含缝份与折边材料后的三角形总数。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.reduced_vertices",
+      "domain": "pattern",
+      "label": "记录化缩减顶点数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "实际材料偏移小于该处标称留量的已记录顶点数量。它是检查提示，不自动等于制造缺陷。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.zero_offset_panel_count",
+      "domain": "pattern",
+      "label": "含局部零偏移端点的裁片数量",
+      "quantity": "count",
+      "unit": "1",
+      "definition": "至少存在一个端点法向偏移为零的裁片数；不表示整片全部缝份为零。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.max_seam_declaration_error",
+      "domain": "pattern",
+      "label": "最大接缝声明残差",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "原始有向配缝路径复算长度与声明长度之间的最大绝对残差。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.max_paired_edge_mismatch",
+      "domain": "pattern",
+      "label": "最大配对边长差",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "一条接缝两侧有向路径复算长度的最大绝对差。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.panel.cut_width",
+      "domain": "pattern",
+      "label": "裁片实际裁切宽度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定裁片实际裁切线在本地 U 方向的包围范围。动态实例必须携带 panel_id。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.panel.cut_height",
+      "domain": "pattern",
+      "label": "裁片实际裁切高度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定裁片实际裁切线在本地 V 方向的包围范围。动态实例必须携带 panel_id。",
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.waist_seam_length",
+      "domain": "pattern",
+      "label": "腰线净样长度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "由明确语义腰线段组成的净样长度，必须引用组成路径和方向。",
+      "requiredEvidence": ["panel_ids", "directed_path_ids", "pattern_revision"],
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.outseam_length",
+      "domain": "pattern",
+      "label": "侧缝净样长度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定裁片和方向的侧缝净样路径长度；局部开口段必须分开。",
+      "requiredEvidence": ["panel_id", "directed_path_id", "pattern_revision"],
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "pattern.inseam_length",
+      "domain": "pattern",
+      "label": "内缝净样长度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "指定裁片和方向的内缝净样路径长度。",
+      "requiredEvidence": ["panel_id", "directed_path_id", "pattern_revision"],
+      "owner": "tailor-workbench"
+    },
+    {
+      "id": "fabric.thickness",
+      "domain": "fabric",
+      "label": "布料厚度",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "在明确压强、方法与材料状态下的厚度；不得由着色法线幅度或双面间距自动替代。",
+      "requiredEvidence": ["material_id", "measurement_method", "condition"],
+      "owner": "fabric-workbench"
+    },
+    {
+      "id": "fabric.yarn_spacing_warp",
+      "domain": "fabric",
+      "label": "经纱中心间距",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "材料空间中相邻经纱中心的现实距离。Tex 是线密度，不能直接替代该长度。",
+      "requiredEvidence": ["material_id", "material_axis", "source"],
+      "owner": "fabric-workbench"
+    },
+    {
+      "id": "fabric.yarn_spacing_weft",
+      "domain": "fabric",
+      "label": "纬纱中心间距",
+      "quantity": "length",
+      "unit": "m",
+      "definition": "材料空间中相邻纬纱中心的现实距离。",
+      "requiredEvidence": ["material_id", "material_axis", "source"],
+      "owner": "fabric-workbench"
+    }
+  ]
+}
+;
+const RF31_HISTORY={
+  "schema": "kaopu/reality-material-snapshot-set@1",
+  "version": "REALITY-HC-S3",
+  "previousFoundation": {
+    "version": "REALITY-HC-S2.1",
+    "publicCommit": "553eb76103068ae76cb39995eba227b5d7497c10",
+    "fixedURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/553eb76103068ae76cb39995eba227b5d7497c10/reality-lab/hc-s2-1/preview.html"
+  },
+  "statusVocabulary": ["PASS", "FAIL", "WARNING", "UNKNOWN", "NOT_APPLICABLE"],
+  "objects": [
+    {
+      "id": "fabric-denim-r17-2",
+      "family": "denim",
+      "name": "牛仔 · R17.2 现实尺度 + R15 物理候选",
+      "priority": 1,
+      "mode": "fixed-multi-source-snapshot",
+      "summary": "R17.2 提供毫米级织纹与针脚显示尺度；R03/R15 提供另一版本的物理候选。两者尚未绑定为同一运行时。",
+      "source": {
+        "owner": "denim-workshop",
+        "visual": {
+          "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+          "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "path": "denim-workshop/r17-scale/scale.mjs",
+          "publicURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/22cdb3f4c3bfd101bd86f0ffa246d255b561d915/denim-workshop/r17-scale/preview-v3.html"
+        },
+        "physics": {
+          "repository": "haihao0307/Human-Fabric-Workbench",
+          "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+          "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+          "path": "fabric-workbench/r03/evidence/public/REPORT.json"
+        }
+      },
+      "measurements": [
+        {"definitionId":"material.warp_spacing_m","label":"经纱中心间距","value":0.0004233333333333333,"unit":"m","status":"PASS","basis":"derived_from_declared_count","sourceRef":"R17.2: 60 ends/in","note":"25.4 mm / 60。是显示尺度声明的精确换算，不是本轮实物显微测量。"},
+        {"definitionId":"material.weft_spacing_m","label":"纬纱中心间距","value":0.000635,"unit":"m","status":"PASS","basis":"derived_from_declared_count","sourceRef":"R17.2: 40 picks/in","note":"25.4 mm / 40。是固定源码声明的换算。"},
+        {"definitionId":"material.twill_repeat_m","label":"3×1 斜纹重复尺度","value":0.0016933333333333332,"unit":"m","status":"PASS","basis":"derived_from_visual_contract","sourceRef":"R17.2 scale.mjs","note":"四个经纱节距的显示重复尺度。"},
+        {"definitionId":"material.stitch_pitch_m","label":"可见针脚节距","value":0.0027272727272727275,"unit":"m","status":"PASS","basis":"derived_from_visual_contract","sourceRef":"R17.2: 11 stitches / 30 mm","note":"用于视觉针脚节奏；没有制造工艺认证。"},
+        {"definitionId":"material.visible_thread_width_m","label":"可见缝线宽度代理","value":0.00045,"unit":"m","status":"WARNING","basis":"display_proxy","sourceRef":"R17.2 visible thread proxy","note":"显示代理，不是 Tex、纤维显微直径或实物缝线压扁后的测量。"},
+        {"definitionId":"material.thickness_m","label":"布料厚度候选","value":0.0007,"unit":"m","status":"WARNING","basis":"engineering_candidate","sourceRef":"R03/R15 denim physics snapshot","note":"来自不同版本的物理候选，未与 R17.2 视觉尺度绑定，也未实物标定。"},
+        {"definitionId":"material.areal_density_kg_m2","label":"面密度候选","value":0.45,"unit":"kg/m2","status":"WARNING","basis":"engineering_candidate","sourceRef":"R03/R15 denim physics snapshot","note":"工程候选，physicalCalibration=false。"},
+        {"definitionId":"material.linear_density_tex","label":"缝线或纱线 Tex","value":null,"unit":"tex","status":"UNKNOWN","basis":"missing","sourceRef":null,"note":"Tex 不能由 0.45 mm 显示代理直接反推。"},
+        {"definitionId":"material.material_axis_u","label":"材料 U 轴对应经/纬方向","value":null,"unit":"axis","status":"UNKNOWN","basis":"not_exported","sourceRef":null,"note":"当前固定证据没有一个跨服装裁片可复用的材料坐标声明。"}
+      ],
+      "nativeParameters": [
+        {"name":"warpEndsPerInch","value":60,"unit":"ends/in","semantic":"declared construction density"},
+        {"name":"weftPicksPerInch","value":40,"unit":"picks/in","semantic":"declared construction density"},
+        {"name":"visibleThreadProxy","value":0.45,"unit":"mm","semantic":"display proxy, not physical thread diameter"}
+      ],
+      "checks": [
+        {"code":"DENIM_SCALE_EXPLICIT","status":"PASS","message":"R17.2 的经纬节距和针脚节奏具有明确毫米换算。"},
+        {"code":"DENIM_VISUAL_PHYSICS_VERSION_SPLIT","status":"WARNING","message":"R17.2 视觉尺度与 R03/R15 物理来自不同固定版本，不能冒充同一已标定运行时。"},
+        {"code":"DENIM_PHYSICAL_CALIBRATION","status":"WARNING","message":"厚度与面密度仍是工程候选，没有实物标定证据。"},
+        {"code":"DENIM_TEX_DECLARATION","status":"UNKNOWN","message":"Tex/Denier 未声明，显示宽度不能替代线密度。"}
+      ],
+      "defects": [
+        {"id":"denim-version-unbound","code":"CROSS_VERSION_UNBOUND","status":"WARNING","owner":"denim-workshop","expected":"同一固定版本同时声明视觉尺度、材料坐标和物理参数","observed":"视觉尺度来自 R17.2，物理候选来自 R03/R15","repairAuthorized":false,"verificationRequired":true},
+        {"id":"denim-thread-proxy","code":"DISPLAY_PROXY_NOT_PHYSICAL","status":"WARNING","owner":"denim-workshop","expected":"显示宽度、几何直径和 Tex 分栏输出","observed":"当前只有 0.45 mm 显示代理，Tex 缺失","repairAuthorized":false,"verificationRequired":true}
+      ]
+    },
+    {
+      "id": "fabric-knit-r15",
+      "family": "knit",
+      "name": "针织 / 毛衣 · RayWave R15",
+      "priority": 2,
+      "mode": "retained-public-browser-evidence",
+      "summary": "原针织几何、光学和物理保持不变；当前可读数值主要是工程候选，不能直接提升为实物针号、线径或物性。",
+      "source": {
+        "owner": "knit-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=knit"
+      },
+      "measurements": [
+        {"definitionId":"material.loop_pitch_m","label":"原生针目节距参数","value":0.0055,"unit":"m","status":"WARNING","basis":"native_engineering_parameter","sourceRef":"R15 knitDesign.pitch","note":"原生工程参数。尚未证明等于实物针织横密、纵密或标准机号。"},
+        {"definitionId":"material.thickness_m","label":"厚度估计","value":0.002970454374010845,"unit":"m","status":"WARNING","basis":"engineering_estimate","sourceRef":"R03 public browser report","note":"求解器估计，不是压脚压力、含水率和测试方法明确的实物厚度。"},
+        {"definitionId":"material.areal_density_kg_m2","label":"面密度估计","value":0.6545454545452325,"unit":"kg/m2","status":"WARNING","basis":"engineering_estimate","sourceRef":"R03 public browser report","note":"工程估计，未实物标定。"},
+        {"definitionId":"physics.stretch_warp_N_m","label":"方向一拉伸参数","value":150,"unit":"N/m","status":"WARNING","basis":"solver_parameter","sourceRef":"R15 mechanics","note":"仅在当前求解器定义内有意义。"},
+        {"definitionId":"physics.stretch_weft_N_m","label":"方向二拉伸参数","value":320,"unit":"N/m","status":"WARNING","basis":"solver_parameter","sourceRef":"R15 mechanics","note":"仅在当前求解器定义内有意义。"},
+        {"definitionId":"physics.shear_N_m","label":"剪切参数","value":42,"unit":"N/m","status":"WARNING","basis":"solver_parameter","sourceRef":"R15 mechanics","note":"未与标准试验方法绑定。"},
+        {"definitionId":"physics.friction","label":"摩擦参数","value":0.7,"unit":"1","status":"WARNING","basis":"solver_parameter","sourceRef":"R15 mechanics","note":"无量纲求解器参数，不等同于指定接触副的实测摩擦系数。"},
+        {"definitionId":"material.yarn_diameter_m","label":"纱线几何直径","value":null,"unit":"m","status":"UNKNOWN","basis":"unmapped_native_control","sourceRef":"native yarn-size=0.85","note":"原生 yarn-size 没有公开到米的映射，不能把 0.85 当毫米。"},
+        {"definitionId":"material.knit_gauge","label":"标准针织机号 / 横密","value":null,"unit":"gauge","status":"UNKNOWN","basis":"unmapped_native_control","sourceRef":"native gauge=5.5","note":"原生 gauge 控件未证明符合标准针号或每英寸针数。"},
+        {"definitionId":"material.linear_density_tex","label":"纱线 Tex","value":null,"unit":"tex","status":"UNKNOWN","basis":"missing","sourceRef":null,"note":"没有线密度声明。"}
+      ],
+      "nativeParameters": [
+        {"name":"gauge","value":5.5,"unit":"native-control","semantic":"unmapped control; not standard machine gauge"},
+        {"name":"yarn-size","value":0.85,"unit":"native-control","semantic":"unmapped control; not millimetres"},
+        {"name":"yarnContactCalibrated","value":false,"unit":"boolean","semantic":"contact calibration state"}
+      ],
+      "checks": [
+        {"code":"KNIT_NATIVE_GEOMETRY_RETAINED","status":"PASS","message":"S3 只解释固定证据，没有改变原针织几何、光学或物理。"},
+        {"code":"KNIT_MECHANICS_ENGINEERING_ONLY","status":"WARNING","message":"厚度、面密度和力学参数仍是求解器工程候选。"},
+        {"code":"KNIT_GAUGE_MAPPING","status":"UNKNOWN","message":"原生 gauge 没有到标准针号或针数/英寸的明确映射。"},
+        {"code":"KNIT_YARN_DIAMETER","status":"UNKNOWN","message":"yarn-size 没有到几何线径的明确映射。"}
+      ],
+      "defects": [
+        {"id":"knit-control-unmapped","code":"NATIVE_CONTROL_DIMENSION_UNKNOWN","status":"UNKNOWN","owner":"knit-workbench","expected":"gauge、yarn-size、线径和 Tex 分别声明定义与单位","observed":"只有无量纲原生控件与工程估计","repairAuthorized":false,"verificationRequired":true},
+        {"id":"knit-contact-uncalibrated","code":"CONTACT_CALIBRATION_MISSING","status":"WARNING","owner":"knit-workbench","expected":"指定纱线与接触试验的标定记录","observed":"yarnContactCalibrated=false","repairAuthorized":false,"verificationRequired":true}
+      ]
+    },
+    {
+      "id": "fabric-leather-r17",
+      "family": "leather",
+      "name": "皮革 · R17",
+      "priority": 3,
+      "mode": "fixed-source-and-retained-evidence",
+      "summary": "缝线节距和可见线径配置可追溯；绝对皮革厚度、皮纹材料尺度和物性标定仍缺失。",
+      "source": {
+        "owner": "leather-workshop",
+        "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+        "commit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+        "path": "leather-workshop/r17/public-lite.html",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=leather"
+      },
+      "measurements": [
+        {"definitionId":"material.stitch_pitch_m","label":"缝线节距配置","value":0.0034,"unit":"m","status":"WARNING","basis":"source_config_and_geometry_audit","sourceRef":"R17 config pitch=3.4 mm","note":"源配置与审计平均值一致，但没有制造样本和公差认证。"},
+        {"definitionId":"material.visible_thread_width_m","label":"可见线体直径配置","value":0.00032,"unit":"m","status":"WARNING","basis":"source_geometry_config","sourceRef":"R17 threadDiameter=0.32 mm","note":"是数字几何配置，不等于 Tex 或受压后实物线宽。"},
+        {"definitionId":"material.thickness_m","label":"皮革绝对厚度","value":null,"unit":"m","status":"UNKNOWN","basis":"relative_scale_only","sourceRef":"thicknessScale=1","note":"thicknessScale 是相对倍率，不能当 1 mm。"},
+        {"definitionId":"material.grain_repeat_m","label":"皮纹重复尺度","value":null,"unit":"m","status":"UNKNOWN","basis":"not_exported","sourceRef":null,"note":"没有到米制材料空间的皮纹重复声明。"},
+        {"definitionId":"material.areal_density_kg_m2","label":"面密度","value":null,"unit":"kg/m2","status":"UNKNOWN","basis":"missing","sourceRef":null,"note":"未声明。"},
+        {"definitionId":"material.linear_density_tex","label":"缝线 Tex","value":null,"unit":"tex","status":"UNKNOWN","basis":"missing","sourceRef":null,"note":"0.32 mm 数字线体不能反推 Tex。"}
+      ],
+      "nativeParameters": [
+        {"name":"pitch","value":3.4,"unit":"mm","semantic":"digital stitch pitch configuration"},
+        {"name":"threadDiameter","value":0.32,"unit":"mm","semantic":"digital visible tube diameter"},
+        {"name":"thicknessScale","value":1,"unit":"1","semantic":"relative scale, not absolute thickness"},
+        {"name":"physicalCalibration","value":false,"unit":"boolean","semantic":"physical calibration state"}
+      ],
+      "checks": [
+        {"code":"LEATHER_STITCH_TRACEABLE","status":"WARNING","message":"节距和数字线体宽度可追溯，但不代表制造认证。"},
+        {"code":"LEATHER_ABSOLUTE_THICKNESS","status":"UNKNOWN","message":"只有相对 thicknessScale，没有绝对厚度。"},
+        {"code":"LEATHER_GRAIN_SCALE","status":"UNKNOWN","message":"皮纹没有米制材料空间声明。"},
+        {"code":"LEATHER_PHYSICAL_CALIBRATION","status":"WARNING","message":"physicalCalibration=false。"}
+      ],
+      "defects": [
+        {"id":"leather-thickness-missing","code":"ABSOLUTE_THICKNESS_NOT_EXPORTED","status":"UNKNOWN","owner":"leather-workshop","expected":"按皮料与产品状态输出绝对厚度和测量条件","observed":"仅 thicknessScale=1","repairAuthorized":false,"verificationRequired":true},
+        {"id":"leather-thread-semantic","code":"THREAD_TEX_DIAMETER_UNBOUND","status":"WARNING","owner":"leather-workshop","expected":"Tex、数字几何直径和实际可见线宽分栏","observed":"只有 0.32 mm 数字几何配置","repairAuthorized":false,"verificationRequired":true}
+      ]
+    },
+    {
+      "id": "fabric-silk-r15",
+      "family": "silk",
+      "name": "丝绸 · RayWave R15",
+      "priority": 4,
+      "mode": "retained-public-browser-evidence",
+      "summary": "光学、几何和物理保留原样；现有厚度与面密度为工程估计，经纬间距和 Denier 尚未声明。",
+      "source": {
+        "owner": "fabric-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=silk"
+      },
+      "measurements": [
+        {"definitionId":"material.thickness_m","label":"厚度估计","value":0.00024,"unit":"m","status":"WARNING","basis":"engineering_estimate","sourceRef":"R03 public browser report","note":"未绑定实物厚度测量方法。"},
+        {"definitionId":"material.areal_density_kg_m2","label":"面密度估计","value":0.08,"unit":"kg/m2","status":"WARNING","basis":"engineering_estimate","sourceRef":"R03 public browser report","note":"工程估计。"},
+        {"definitionId":"physics.stretch_warp_N_m","label":"方向一拉伸参数","value":2300,"unit":"N/m","status":"WARNING","basis":"solver_parameter","sourceRef":"R15 mechanics","note":"只在当前求解器定义内可比较。"},
+        {"definitionId":"physics.stretch_weft_N_m","label":"方向二拉伸参数","value":1700,"unit":"N/m","status":"WARNING","basis":"solver_parameter","sourceRef":"R15 mechanics","note":"未与标准试验方法绑定。"},
+        {"definitionId":"physics.shear_N_m","label":"剪切参数","value":38,"unit":"N/m","status":"WARNING","basis":"solver_parameter","sourceRef":"R15 mechanics","note":"工程参数。"},
+        {"definitionId":"physics.friction","label":"摩擦参数","value":0.2,"unit":"1","status":"WARNING","basis":"solver_parameter","sourceRef":"R15 mechanics","note":"没有指定接触副和实测条件。"},
+        {"definitionId":"material.warp_spacing_m","label":"经纱中心间距","value":null,"unit":"m","status":"UNKNOWN","basis":"missing","sourceRef":null,"note":"当前证据未导出。"},
+        {"definitionId":"material.weft_spacing_m","label":"纬纱中心间距","value":null,"unit":"m","status":"UNKNOWN","basis":"missing","sourceRef":null,"note":"当前证据未导出。"},
+        {"definitionId":"material.linear_density_denier","label":"丝纱 Denier","value":null,"unit":"denier","status":"UNKNOWN","basis":"missing","sourceRef":null,"note":"不能从厚度估计反推。"}
+      ],
+      "nativeParameters": [
+        {"name":"preset","value":"silk-satin","unit":"id","semantic":"native optical/geometry preset"},
+        {"name":"calibrated","value":false,"unit":"boolean","semantic":"physical calibration state"}
+      ],
+      "checks": [
+        {"code":"SILK_NATIVE_PIPELINE_RETAINED","status":"PASS","message":"原光学、几何和物理未修改。"},
+        {"code":"SILK_MECHANICS_ENGINEERING_ONLY","status":"WARNING","message":"厚度、面密度和力学参数为工程估计。"},
+        {"code":"SILK_CONSTRUCTION_DENSITY","status":"UNKNOWN","message":"经纬间距与 Denier 没有导出。"}
+      ],
+      "defects": [
+        {"id":"silk-construction-missing","code":"CONSTRUCTION_DENSITY_NOT_EXPORTED","status":"UNKNOWN","owner":"fabric-workbench","expected":"经纬纱间距、Denier 和材料轴声明","observed":"只有工程厚度/面密度与求解器参数","repairAuthorized":false,"verificationRequired":true}
+      ]
+    },
+    {
+      "id": "fabric-cotton-r03",
+      "family": "cotton",
+      "name": "棉布 · R03 外观入口",
+      "priority": 5,
+      "mode": "appearance-only-retained-evidence",
+      "summary": "现有入口可用于外观比较；scale=5 是原生显示控件，没有到毫米或每米重复数的映射。",
+      "source": {
+        "owner": "fabric-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=cotton"
+      },
+      "measurements": [
+        {"definitionId":"material.texture_scale_native","label":"原生显示尺度","value":5,"unit":"1","status":"NOT_APPLICABLE","basis":"appearance_control","sourceRef":"legacy state.scale","note":"仅为显示控件；没有映射时不属于物理长度。"},
+        {"definitionId":"material.thickness_m","label":"厚度","value":null,"unit":"m","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"},
+        {"definitionId":"material.warp_spacing_m","label":"经纱间距","value":null,"unit":"m","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"},
+        {"definitionId":"material.weft_spacing_m","label":"纬纱间距","value":null,"unit":"m","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"},
+        {"definitionId":"material.areal_density_kg_m2","label":"面密度","value":null,"unit":"kg/m2","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"}
+      ],
+      "nativeParameters": [{"name":"scale","value":5,"unit":"native-control","semantic":"appearance-only display control"}],
+      "checks": [
+        {"code":"COTTON_APPEARANCE_AVAILABLE","status":"PASS","message":"固定网页中的棉布外观入口已通过原 R03 浏览器检查。"},
+        {"code":"COTTON_PHYSICAL_SCALE","status":"UNKNOWN","message":"显示 scale 没有到米制材料空间的映射。"},
+        {"code":"COTTON_PHYSICS","status":"NOT_APPLICABLE","message":"当前入口明确为 appearance-only，不冒充物理试样。"}
+      ],
+      "defects": [{"id":"cotton-scale-unmapped","code":"APPEARANCE_SCALE_UNMAPPED","status":"UNKNOWN","owner":"fabric-workbench","expected":"每米重复数、经纬间距和厚度声明","observed":"只有 scale=5 外观控件","repairAuthorized":false,"verificationRequired":true}]
+    },
+    {
+      "id": "fabric-acrylic-r03",
+      "family": "acrylic",
+      "name": "腈纶 · R03 外观入口",
+      "priority": 6,
+      "mode": "appearance-only-retained-evidence",
+      "summary": "当前为外观入口；没有真实线径、针目密度、厚度或面密度的可追溯声明。",
+      "source": {
+        "owner": "fabric-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=acrylic"
+      },
+      "measurements": [
+        {"definitionId":"material.texture_scale_native","label":"原生显示尺度","value":5,"unit":"1","status":"NOT_APPLICABLE","basis":"appearance_control","sourceRef":"legacy state.scale","note":"不能当毫米或 repeats/m。"},
+        {"definitionId":"material.thickness_m","label":"厚度","value":null,"unit":"m","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"},
+        {"definitionId":"material.yarn_diameter_m","label":"纱线直径","value":null,"unit":"m","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"},
+        {"definitionId":"material.knit_gauge","label":"针目密度 / 标准机号","value":null,"unit":"gauge","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"},
+        {"definitionId":"material.linear_density_tex","label":"Tex","value":null,"unit":"tex","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"}
+      ],
+      "nativeParameters": [{"name":"scale","value":5,"unit":"native-control","semantic":"appearance-only display control"}],
+      "checks": [
+        {"code":"ACRYLIC_APPEARANCE_AVAILABLE","status":"PASS","message":"固定网页中的腈纶外观入口已通过原 R03 浏览器检查。"},
+        {"code":"ACRYLIC_PHYSICAL_SCALE","status":"UNKNOWN","message":"真实线径、针目密度和厚度缺失。"},
+        {"code":"ACRYLIC_PHYSICS","status":"NOT_APPLICABLE","message":"当前入口为 appearance-only。"}
+      ],
+      "defects": [{"id":"acrylic-scale-unmapped","code":"APPEARANCE_SCALE_UNMAPPED","status":"UNKNOWN","owner":"fabric-workbench","expected":"线径、针目密度、厚度与 Tex 分别导出","observed":"只有 scale=5 外观控件","repairAuthorized":false,"verificationRequired":true}]
+    },
+    {
+      "id": "fabric-linen-r03",
+      "family": "linen",
+      "name": "亚麻 · R03 外观入口",
+      "priority": 7,
+      "mode": "appearance-only-retained-evidence",
+      "summary": "当前可观察粗织外观，但显示尺度没有到现实经纬间距、线径或厚度的映射。",
+      "source": {
+        "owner": "fabric-workbench",
+        "repository": "haihao0307/Human-Fabric-Workbench",
+        "evidenceCommit": "7fad8b62fa0358718d74742f689d3c448429aa48",
+        "sourceCommit": "3be635ad51dc81e6ea2dbc773849ca14cba3579f",
+        "path": "fabric-workbench/r03/evidence/public/REPORT.json",
+        "publicURL": "https://haihao0307.github.io/guilin-dem-pipeline/kaopu-fabric-workbench/collection/r03-3be635ad51dc/#material=linen"
+      },
+      "measurements": [
+        {"definitionId":"material.texture_scale_native","label":"原生显示尺度","value":5,"unit":"1","status":"NOT_APPLICABLE","basis":"appearance_control","sourceRef":"legacy state.scale","note":"没有到材料长度的映射。"},
+        {"definitionId":"material.thickness_m","label":"厚度","value":null,"unit":"m","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"},
+        {"definitionId":"material.warp_spacing_m","label":"经纱间距","value":null,"unit":"m","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"},
+        {"definitionId":"material.weft_spacing_m","label":"纬纱间距","value":null,"unit":"m","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"},
+        {"definitionId":"material.yarn_diameter_m","label":"纱线直径","value":null,"unit":"m","status":"UNKNOWN","basis":"appearance_only","sourceRef":null,"note":"未导出。"}
+      ],
+      "nativeParameters": [{"name":"scale","value":5,"unit":"native-control","semantic":"appearance-only display control"}],
+      "checks": [
+        {"code":"LINEN_APPEARANCE_AVAILABLE","status":"PASS","message":"固定网页中的亚麻外观入口已通过原 R03 浏览器检查。"},
+        {"code":"LINEN_PHYSICAL_SCALE","status":"UNKNOWN","message":"经纬间距、线径和厚度缺失。"},
+        {"code":"LINEN_PHYSICS","status":"NOT_APPLICABLE","message":"当前入口为 appearance-only。"}
+      ],
+      "defects": [{"id":"linen-scale-unmapped","code":"APPEARANCE_SCALE_UNMAPPED","status":"UNKNOWN","owner":"fabric-workbench","expected":"经纬间距、线径和厚度分别导出","observed":"只有 scale=5 外观控件","repairAuthorized":false,"verificationRequired":true}]
+    }
+  ],
+  "registeredOnly": [
+    {
+      "id": "garment-s5",
+      "domain": "garment",
+      "status": "registered-only",
+      "message": "成衣宿主安排在材料语义接入之后；当前没有伪造试穿、碰撞或服装尺寸结果。"
+    }
+  ]
+}
+;
+const RF31_NATIVE_B64="PCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9InpoLUNOIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEsdmlld3BvcnQtZml0PWNvdmVyIj4KPG1ldGEgbmFtZT0ia2FvcHUtdmVyc2lvbiIgY29udGVudD0iREVOSU0tUjE3LjItR0FSTUVOVC1TQ0FMRSI+Cjx0aXRsZT5LQU9QVSBEZW5pbSBSMTcgwrcg5oiQ6KGj55yf5a6e5bC65bqmPC90aXRsZT4KPHN0eWxlPgo6cm9vdHtjb2xvci1zY2hlbWU6ZGFyazstLXBhbmVsOiMxMTE4MjE7LS1saW5lOiMyYTM1NDI7LS1tdXRlZDojOTNhMWIyOy0tdGV4dDojZWRmM2Y4Oy0tYWNjZW50OiNkODliNDN9Cip7Ym94LXNpemluZzpib3JkZXItYm94fWh0bWwsYm9keXttYXJnaW46MDttaW4taGVpZ2h0OjEwMCU7YmFja2dyb3VuZDojMDkwZDEyO2NvbG9yOnZhcigtLXRleHQpO2ZvbnQ6MTRweC8xLjQ1IHN5c3RlbS11aSwtYXBwbGUtc3lzdGVtLCJTZWdvZSBVSSIsIk1pY3Jvc29mdCBZYWhlaSIsc2Fucy1zZXJpZn1ib2R5e292ZXJmbG93OmhpZGRlbn0KaGVhZGVye2hlaWdodDo2NnB4O2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47cGFkZGluZzowIDIycHg7Ym9yZGVyLWJvdHRvbToxcHggc29saWQgdmFyKC0tbGluZSk7YmFja2dyb3VuZDojMGQxMzFhfWgxe2ZvbnQtc2l6ZToxN3B4O2xldHRlci1zcGFjaW5nOi4wOGVtO21hcmdpbjowfS5zdWJ7Zm9udC1zaXplOjEycHg7Y29sb3I6dmFyKC0tbXV0ZWQpfQptYWlue2hlaWdodDpjYWxjKDEwMHZoIC0gNjZweCk7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczptaW5tYXgoMCwxZnIpIDMzMHB4fS5zdGFnZXtwb3NpdGlvbjpyZWxhdGl2ZTtvdmVyZmxvdzpoaWRkZW47YmFja2dyb3VuZDpyYWRpYWwtZ3JhZGllbnQoY2lyY2xlIGF0IDUwJSAzOCUsIzUzNjA2YyAwLCMzMTM5NDIgMjglLCMxNzFkMjQgNjIlLCMwYjEwMTYgMTAwJSl9CmNhbnZhc3tkaXNwbGF5OmJsb2NrO3dpZHRoOjEwMCU7aGVpZ2h0OjEwMCU7dG91Y2gtYWN0aW9uOm5vbmU7Y3Vyc29yOmdyYWJ9LnN0YWdlOmFjdGl2ZSBjYW52YXN7Y3Vyc29yOmdyYWJiaW5nfQouaHVke3Bvc2l0aW9uOmFic29sdXRlO2xlZnQ6MThweDtib3R0b206MTdweDtwYWRkaW5nOjEwcHggMTJweDtib3JkZXI6MXB4IHNvbGlkICNmZmZmZmYxYztib3JkZXItcmFkaXVzOjdweDtiYWNrZ3JvdW5kOiMwYTBmMTVjNztiYWNrZHJvcC1maWx0ZXI6Ymx1cig3cHgpO3BvaW50ZXItZXZlbnRzOm5vbmV9Lmh1ZCBie2Rpc3BsYXk6YmxvY2s7Zm9udC1zaXplOjEzcHh9Lmh1ZCBzcGFue2Rpc3BsYXk6YmxvY2s7bWFyZ2luLXRvcDo0cHg7Zm9udC1zaXplOjExcHg7Y29sb3I6I2E5YjVjM30KLnNjYWxlLWNhcmR7cG9zaXRpb246YWJzb2x1dGU7cmlnaHQ6MThweDtib3R0b206MTdweDt3aWR0aDoyMjZweDtwYWRkaW5nOjEwcHggMTJweDtib3JkZXI6MXB4IHNvbGlkICNmZmZmZmYxYztib3JkZXItcmFkaXVzOjdweDtiYWNrZ3JvdW5kOiMwYTBmMTVjNztiYWNrZHJvcC1maWx0ZXI6Ymx1cig3cHgpO3BvaW50ZXItZXZlbnRzOm5vbmU7Zm9udC1zaXplOjExcHg7Y29sb3I6I2I3YzJjZn0uc2NhbGUtY2FyZCBzdHJvbmd7Y29sb3I6I2YwZDNhNn0ucnVsZXJ7aGVpZ2h0OjhweDttYXJnaW46OHB4IDAgNXB4O2JvcmRlci1sZWZ0OjFweCBzb2xpZCAjZDllMWU4O2JvcmRlci1yaWdodDoxcHggc29saWQgI2Q5ZTFlODtib3JkZXItYm90dG9tOjFweCBzb2xpZCAjZDllMWU4fQphc2lkZXtvdmVyZmxvdzphdXRvO3BhZGRpbmc6MTVweCAxNnB4IDI4cHg7Ym9yZGVyLWxlZnQ6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JhY2tncm91bmQ6dmFyKC0tcGFuZWwpfWgye2ZvbnQtc2l6ZToxMXB4O2xldHRlci1zcGFjaW5nOi4xM2VtO2NvbG9yOiM5MWExYjI7bWFyZ2luOjE2cHggMCA4cHh9LnJvd3tkaXNwbGF5OmZsZXg7Z2FwOjdweDttYXJnaW46N3B4IDB9LnJvdz4qe2ZsZXg6MX0KYnV0dG9uLHNlbGVjdHt3aWR0aDoxMDAlO2JvcmRlcjoxcHggc29saWQgIzMzNDI1Mjtib3JkZXItcmFkaXVzOjZweDtiYWNrZ3JvdW5kOiMxYTI0MzA7Y29sb3I6I2U4ZWVmNDtwYWRkaW5nOjlweCA4cHg7Zm9udDppbmhlcml0O2N1cnNvcjpwb2ludGVyfWJ1dHRvbjpob3ZlcixzZWxlY3Q6aG92ZXJ7Ym9yZGVyLWNvbG9yOiM2ZjhkYTh9YnV0dG9uLmFjdGl2ZXtiYWNrZ3JvdW5kOiMzNTRiNWY7Ym9yZGVyLWNvbG9yOiM4Y2IwY2V9LmdvbGQuYWN0aXZle2JhY2tncm91bmQ6IzYxNDcyMztib3JkZXItY29sb3I6I2Q4YTI1NH0KbGFiZWx7ZGlzcGxheTpibG9jazttYXJnaW46MTFweCAwIDA7Y29sb3I6I2I1YzBjYztmb250LXNpemU6MTJweH1vdXRwdXR7ZmxvYXQ6cmlnaHQ7Y29sb3I6I2YwZDNhNjtmb250LXZhcmlhbnQtbnVtZXJpYzp0YWJ1bGFyLW51bXN9aW5wdXRbdHlwZT1yYW5nZV17d2lkdGg6MTAwJTttYXJnaW46N3B4IDAgMDthY2NlbnQtY29sb3I6I2M4OTM0Y30ubm90ZXttYXJnaW4tdG9wOjEycHg7Y29sb3I6Izg3OTVhNTtmb250LXNpemU6MTFweDtsaW5lLWhlaWdodDoxLjY1fS5tZXRyaWNze2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIGF1dG87Z2FwOjVweCAxMHB4O21hcmdpbi10b3A6OXB4O3BhZGRpbmc6MTBweDtib3JkZXI6MXB4IHNvbGlkICMyOTM2NDU7Ym9yZGVyLXJhZGl1czo2cHg7YmFja2dyb3VuZDojMGMxMjE5O2ZvbnQtc2l6ZToxMXB4fS5tZXRyaWNzIHNwYW46bnRoLWNoaWxkKDJuKXtjb2xvcjojZThjNThkO3RleHQtYWxpZ246cmlnaHQ7Zm9udC12YXJpYW50LW51bWVyaWM6dGFidWxhci1udW1zfQpAbWVkaWEobWF4LXdpZHRoOjc2MHB4KXtib2R5e292ZXJmbG93OmF1dG99aGVhZGVye2hlaWdodDo1OHB4O3BhZGRpbmc6MCAxMnB4fWhlYWRlciAuc3Vie2Rpc3BsYXk6bm9uZX1oMXtmb250LXNpemU6MTRweH1tYWlue2hlaWdodDphdXRvO2Rpc3BsYXk6ZmxleDtmbGV4LWRpcmVjdGlvbjpjb2x1bW59LnN0YWdle2hlaWdodDo2MnZoO21pbi1oZWlnaHQ6NDIwcHh9LnNjYWxlLWNhcmR7ZGlzcGxheTpub25lfWFzaWRle2JvcmRlci1sZWZ0OjA7Ym9yZGVyLXRvcDoxcHggc29saWQgdmFyKC0tbGluZSl9Lmh1ZHtsZWZ0OjEwcHg7Ym90dG9tOjEwcHh9LnJvd3tnYXA6NXB4fX0KPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KPGhlYWRlcj48aDE+S0FPUFUgLyBERU5JTSBSMTcuMiDCtyDov57nu63ot53nprvlj6/or7vmgKc8L2gxPjxkaXYgY2xhc3M9InN1YiI+546w5a6e57uP57qs5a+G5bqmIMK3IOW3peS4mumSiOi3nSDCtyDnnJ/lrp7ljZXnurEgKyDmlpznurnogZrlkIggKyDmlrnlkJHmgKfkuK3lsLrluqY8L2Rpdj48L2hlYWRlcj4KPG1haW4+CjxzZWN0aW9uIGNsYXNzPSJzdGFnZSIgaWQ9InN0YWdlIj4KPGNhbnZhcyBpZD0iZ2wiPjwvY2FudmFzPgo8ZGl2IGNsYXNzPSJodWQiPjxiIGlkPSJzdGF0dXMiPuWIneWni+WMliBXZWJHTDLigKY8L2I+PHNwYW4gaWQ9InZpZXdJbmZvIj48L3NwYW4+PC9kaXY+CjxkaXYgY2xhc3M9InNjYWxlLWNhcmQiPjxzdHJvbmc+54mp55CG5bC65bqm5Z+657q/PC9zdHJvbmc+PGRpdiBjbGFzcz0icnVsZXIiPjwvZGl2PjxkaXY+5LiK5pa55qCH5bC65Luj6KGoIDEwIG1t77yb57q555CG5oyJ57Gz5Yi25qih5Z6L5Z2Q5qCH6K6h566X77yM5LiN6ZqP6KOk6KOF5bC65a+45Lu75oSP57yp5pS+44CCPC9kaXY+PC9kaXY+Cjwvc2VjdGlvbj4KPGFzaWRlPgo8aDI+5qOA5p+l6Led56a7PC9oMj4KPGRpdiBjbGFzcz0icm93IiBpZD0idmlld3MiPjxidXR0b24gZGF0YS12aWV3PSJmdWxsIiBjbGFzcz0iYWN0aXZlIj7mlbTmnaHoo6Too4U8L2J1dHRvbj48YnV0dG9uIGRhdGEtdmlldz0ibWlkIj7kuK3ot53nprs8L2J1dHRvbj48L2Rpdj4KPGRpdiBjbGFzcz0icm93Ij48YnV0dG9uIGRhdGEtdmlldz0idGhpZ2giPuWkp+iFv+i/keecizwvYnV0dG9uPjxidXR0b24gZGF0YS12aWV3PSJzZWFtIj7pkojohJrlvq7ot508L2J1dHRvbj48L2Rpdj4KPGgyPueJm+S7lOaVtOeQhjwvaDI+CjxkaXYgY2xhc3M9InJvdyIgaWQ9Indhc2hlcyI+PGJ1dHRvbiBkYXRhLXdhc2g9InJhdyIgY2xhc3M9ImFjdGl2ZSI+5Y6f6Imy56Gs5oy6PC9idXR0b24+PGJ1dHRvbiBkYXRhLXdhc2g9Im9uZSI+5LiA5qyh5rC05rSXPC9idXR0b24+PGJ1dHRvbiBkYXRhLXdhc2g9InZpbnRhZ2UiPuaXp+WMluejqOeZvTwvYnV0dG9uPjwvZGl2Pgo8bGFiZWw+57uE57uH5a6e6ZmF5q+U5L6LIDxvdXRwdXQgaWQ9IndlYXZlU2NhbGVPdXQiPjEwMCU8L291dHB1dD48aW5wdXQgaWQ9IndlYXZlU2NhbGUiIHR5cGU9InJhbmdlIiBtaW49IjAuNDUiIG1heD0iMS41MCIgdmFsdWU9IjEiIHN0ZXA9IjAuMDEiPjwvbGFiZWw+CjxkaXYgY2xhc3M9InJvdyI+PGJ1dHRvbiBpZD0icGh5c2ljYWwiIGNsYXNzPSJhY3RpdmUgZ29sZCI+5oGi5aSN546w5a6e5q+U5L6LPC9idXR0b24+PGJ1dHRvbiBpZD0ic21hbGxDb21wYXJlIj7nvKnlsI/lr7nnhacgNDUlPC9idXR0b24+PC9kaXY+CjxsYWJlbD7pkojot50gPG91dHB1dCBpZD0ic3RpdGNoUGl0Y2hPdXQiPjIuNzMgbW08L291dHB1dD48aW5wdXQgaWQ9InN0aXRjaFBpdGNoIiB0eXBlPSJyYW5nZSIgbWluPSIyLjMiIG1heD0iMy40IiB2YWx1ZT0iMi43MyIgc3RlcD0iMC4wMSI+PC9sYWJlbD4KPGxhYmVsPumdoue6v+ebtOW+hOS7o+eQhiA8b3V0cHV0IGlkPSJ0aHJlYWRXaWR0aE91dCI+MC40NSBtbTwvb3V0cHV0PjxpbnB1dCBpZD0idGhyZWFkV2lkdGgiIHR5cGU9InJhbmdlIiBtaW49IjAuMzAiIG1heD0iMC44NSIgdmFsdWU9IjAuNDUiIHN0ZXA9IjAuMDEiPjwvbGFiZWw+CjxsYWJlbD7kuprlg4/ntKDlj6/or7vmgKflrojmgZIgPG91dHB1dCBpZD0icmVhZGFiaWxpdHlPdXQiPjEuMzA8L291dHB1dD48aW5wdXQgaWQ9InJlYWRhYmlsaXR5IiB0eXBlPSJyYW5nZSIgbWluPSIwLjciIG1heD0iMiIgdmFsdWU9IjEuMyIgc3RlcD0iMC4wMSI+PC9sYWJlbD4KPGgyPuinguWvn+aWueW8jzwvaDI+CjxkaXYgY2xhc3M9InJvdyI+PGJ1dHRvbiBpZD0idHVybnRhYmxlIj7ovazlj7Dop4Llr588L2J1dHRvbj48YnV0dG9uIGlkPSJtb3Rpb24iPui9u+W+ruaIkOiho+i/kOWKqDwvYnV0dG9uPjwvZGl2Pgo8bGFiZWw+5pi+56S65YiG6aG5PHNlbGVjdCBpZD0ibW9kZSI+PG9wdGlvbiB2YWx1ZT0iMCI+5a6M5pW05p2Q6LSoPC9vcHRpb24+PG9wdGlvbiB2YWx1ZT0iMSI+5Y+q55yL57uP57qs57uE57uHPC9vcHRpb24+PG9wdGlvbiB2YWx1ZT0iMiI+5Y+q55yL6ZKI6ISaPC9vcHRpb24+PG9wdGlvbiB2YWx1ZT0iMyI+57uT5p6E54Gw5qihPC9vcHRpb24+PC9zZWxlY3Q+PC9sYWJlbD4KPGxhYmVsPueBr+WFieaWueS9jSA8b3V0cHV0IGlkPSJsaWdodE91dCI+LTI4wrA8L291dHB1dD48aW5wdXQgaWQ9ImxpZ2h0IiB0eXBlPSJyYW5nZSIgbWluPSItMTgwIiBtYXg9IjE4MCIgdmFsdWU9Ii0yOCIgc3RlcD0iMSI+PC9sYWJlbD4KPGRpdiBjbGFzcz0ibWV0cmljcyI+PHNwYW4+57uP57qx5a+G5bqmPC9zcGFuPjxzcGFuPjYwIGVuZHMvaW48L3NwYW4+PHNwYW4+57uP57qx5Lit5b+D6LedPC9zcGFuPjxzcGFuPjAuNDIzIG1tPC9zcGFuPjxzcGFuPue6rOe6seWvhuW6pjwvc3Bhbj48c3Bhbj40MCBwaWNrcy9pbjwvc3Bhbj48c3Bhbj7nuqznurHkuK3lv4Pot508L3NwYW4+PHNwYW4+MC42MzUgbW08L3NwYW4+PHNwYW4+5piO57q/5a+G5bqmPC9zcGFuPjxzcGFuPjExIHN0aXRjaGVzLzMgY208L3NwYW4+PHNwYW4+5qih5Z6L5aSW6ZW/PC9zcGFuPjxzcGFuPue6piAxLjIyIG08L3NwYW4+PC9kaXY+CjxkaXYgY2xhc3M9Im5vdGUiPuaLluWKqOaXi+i9rO+8jOa7mui9rue8qeaUvu+8jFNoaWZ077yL5ouW5Yqo5bmz56e744CC6buY6K6k5LiN5L2/55So5ZCO5pyf5qih57OK44CC6L+R5pmv5Y+q57uY5Yi25YOP57Sg6IO95aSf5YiG6L6o55qE54us56uL57uP57qs57qx77yb5Lit5pmv5L+d55WZM8OXMeaWnOe6ue+8m+aVtOijpOS4juaJi+acuui3neemu+eUqOi/nue7reeahOS4reWwuuW6puaWueWQkeWcuuaJv+aOpeeJm+S7lOi6q+S7ve+8jOS4jeaKiuWNlee6seaUvuWkp+aIkOeyl+aoquadoe+8jOS5n+S4jemAgOWMluS4uuWujOWFqOWFiea7keeahOiTneW4g+OAgjwvZGl2Pgo8L2FzaWRlPgo8L21haW4+CjxzY3JpcHQ+CigoKT0+eyd1c2Ugc3RyaWN0JzsKY29uc3QgVkVSU0lPTj0nREVOSU0tUjE3LjItR0FSTUVOVC1TQ0FMRSc7Y29uc3QgUEk9TWF0aC5QSTsKY29uc3QgY2FudmFzPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdnbCcpLHN0YWdlPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzdGFnZScpOwpjb25zdCBnbD1jYW52YXMuZ2V0Q29udGV4dCgnd2ViZ2wyJyx7YW50aWFsaWFzOnRydWUsYWxwaGE6dHJ1ZSxwcmVzZXJ2ZURyYXdpbmdCdWZmZXI6dHJ1ZSxwb3dlclByZWZlcmVuY2U6J2hpZ2gtcGVyZm9ybWFuY2UnfSk7CmNvbnN0IGVycm9ycz1bXTtpZighZ2wpe2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzdGF0dXMnKS50ZXh0Q29udGVudD0n6ZyA6KaBIFdlYkdMMic7dGhyb3cgRXJyb3IoJ1dlYkdMMiB1bmF2YWlsYWJsZScpO30Kd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ2Vycm9yJyxlPT5lcnJvcnMucHVzaChTdHJpbmcoZS5tZXNzYWdlfHxlLmVycm9yKSkpO3dpbmRvdy5hZGRFdmVudExpc3RlbmVyKCd1bmhhbmRsZWRyZWplY3Rpb24nLGU9PmVycm9ycy5wdXNoKFN0cmluZyhlLnJlYXNvbikpKTsKY29uc3QgVlM9YCN2ZXJzaW9uIDMwMCBlcwpwcmVjaXNpb24gaGlnaHAgZmxvYXQ7CmxheW91dChsb2NhdGlvbj0wKWluIHZlYzMgYVBvc2l0aW9uO2xheW91dChsb2NhdGlvbj0xKWluIHZlYzMgYU5vcm1hbDtsYXlvdXQobG9jYXRpb249MilpbiB2ZWMyIGFNYXRlcmlhbDtsYXlvdXQobG9jYXRpb249MylpbiB2ZWMyIGFQYW5lbFVWO2xheW91dChsb2NhdGlvbj00KWluIGZsb2F0IGFQYW5lbDsKdW5pZm9ybSBtYXQ0IHVNb2RlbCx1Vmlld1Byb2o7dW5pZm9ybSBtYXQzIHVOb3JtYWxNYXRyaXg7dW5pZm9ybSBmbG9hdCB1VGltZSx1TW90aW9uOwpvdXQgdmVjMyB2V29ybGQ7b3V0IHZlYzMgdk5vcm1hbDtvdXQgdmVjMiB2TWF0ZXJpYWw7b3V0IHZlYzIgdlBhbmVsVVY7ZmxhdCBvdXQgZmxvYXQgdlBhbmVsO291dCB2ZWMzIHZXYXJwOwp2b2lkIG1haW4oKXt2ZWMzIHA9YVBvc2l0aW9uO2Zsb2F0IGJhc2U9bW9kKGFQYW5lbCwxMC4wKTtmbG9hdCBsZWc9c3RlcCguNSxiYXNlKTtmbG9hdCBzaWRlPWJhc2U8MS41Py0xLjA6MS4wO2Zsb2F0IGxvd2VyPWxlZypzbW9vdGhzdGVwKC4wNCwuOTUsYVBhbmVsVVYueSk7cC54Kz11TW90aW9uKnNpZGUqLjAxMypzaW4odVRpbWUqMS4yOCkqbG93ZXI7cC56Kz11TW90aW9uKiguMDA2KnNpbigxMC4wKnAueSt1VGltZSoxLjcpKy4wMDQqc2luKDIxLjAqcC55LXVUaW1lKi45KSkqbG93ZXI7dmVjNCB3PXVNb2RlbCp2ZWM0KHAsMS4wKTt2V29ybGQ9dy54eXo7dk5vcm1hbD1ub3JtYWxpemUodU5vcm1hbE1hdHJpeCphTm9ybWFsKTt2V2FycD1ub3JtYWxpemUobWF0Myh1TW9kZWwpKnZlYzMoMC4wLDEuMCwwLjApKTt2TWF0ZXJpYWw9YU1hdGVyaWFsO3ZQYW5lbFVWPWFQYW5lbFVWO3ZQYW5lbD1hUGFuZWw7Z2xfUG9zaXRpb249dVZpZXdQcm9qKnc7fWA7CmNvbnN0IEZTPWAjdmVyc2lvbiAzMDAgZXMKcHJlY2lzaW9uIGhpZ2hwIGZsb2F0OwppbiB2ZWMzIHZXb3JsZDtpbiB2ZWMzIHZOb3JtYWw7aW4gdmVjMiB2TWF0ZXJpYWw7aW4gdmVjMiB2UGFuZWxVVjtmbGF0IGluIGZsb2F0IHZQYW5lbDtpbiB2ZWMzIHZXYXJwO291dCB2ZWM0IG91dENvbG9yOwp1bmlmb3JtIHZlYzMgdUV5ZTt1bmlmb3JtIGZsb2F0IHVXZWF2ZVNjYWxlLHVTdGl0Y2hQaXRjaCx1VGhyZWFkV2lkdGgsdVJlYWRhYmlsaXR5LHVXYXNoLHVMaWdodEFuZ2xlO3VuaWZvcm0gaW50IHVNb2RlOwpjb25zdCBmbG9hdCBQST0zLjE0MTU5MjY1MzU5OwpmbG9hdCBoYXNoMjEodmVjMiBwKXtwPWZyYWN0KHAqdmVjMigxMjMuMzQsNDU2LjIxKSk7cCs9ZG90KHAscCs0NS4zMik7cmV0dXJuIGZyYWN0KHAueCpwLnkpO30KZmxvYXQgdmFsdWVOb2lzZSh2ZWMyIHApe3ZlYzIgaT1mbG9vcihwKSxmPWZyYWN0KHApO2Y9ZipmKigzLjAtMi4wKmYpO2Zsb2F0IGE9aGFzaDIxKGkpLGI9aGFzaDIxKGkrdmVjMigxLDApKSxjPWhhc2gyMShpK3ZlYzIoMCwxKSksZD1oYXNoMjEoaSt2ZWMyKDEpKTtyZXR1cm4gbWl4KG1peChhLGIsZi54KSxtaXgoYyxkLGYueCksZi55KTt9CmZsb2F0IHlhcm5MaW5lKGZsb2F0IHEsZmxvYXQgaGFsZldpZHRoKXtmbG9hdCBkPWFicyhmcmFjdChxKS0uNSksZnc9bWF4KGZ3aWR0aChxKSwxZS01KTtyZXR1cm4gMS4wLXNtb290aHN0ZXAoaGFsZldpZHRoK2Z3Ki4zMCxoYWxmV2lkdGgrZncqLjk1LGQpO30KdmVjMiBzZWFtRmllbGQoKXtmbG9hdCBpZD1tb2QodlBhbmVsLDEwLjApO2Jvb2wgZnJvbnQ9dlBhbmVsPDEwLjA7ZmxvYXQgYmVzdD0xZTQscz0wLjAsZDsKIGlmKGlkPC41KXtkPWFicyh2TWF0ZXJpYWwueS0uNTQ1KTtpZihkPGJlc3Qpe2Jlc3Q9ZDtzPXZNYXRlcmlhbC54O31kPWFicyh2TWF0ZXJpYWwueS0uNTE1KTtpZihkPGJlc3Qpe2Jlc3Q9ZDtzPXZNYXRlcmlhbC54O30KICAgaWYoZnJvbnQpe2Zsb2F0IHlmPWNsYW1wKCh2TWF0ZXJpYWwueS0uMjQ1KS8uMjUsMC4wLDEuMCk7ZmxvYXQgZmx5WD0uMDEyKy4wMzUqeWYqeWY7ZD1hYnModk1hdGVyaWFsLngtZmx5WCk7aWYodk1hdGVyaWFsLnk+LjI0NSYmdk1hdGVyaWFsLnk8LjQ5JiZkPGJlc3Qpe2Jlc3Q9ZDtzPXZNYXRlcmlhbC55O30KICAgICBmb3IoaW50IGs9MDtrPDI7aysrKXtmbG9hdCBzZz1rPT0wPy0xLjA6MS4wO3ZlYzIgcT0odk1hdGVyaWFsLXZlYzIoc2cqLjE0NSwuNDI1KSkvdmVjMiguMTA1LC4xMTUpO2Q9YWJzKGxlbmd0aChxKS0xLjApKi4xMDU7aWYocS55Pi0uNDImJnNnKnEueD4uMDUmJmQ8YmVzdCl7YmVzdD1kO3M9YXRhbihxLnkscS54KSouMTA1O319CiAgIH1lbHNle2ZvcihpbnQgaz0wO2s8MjtrKyspe2Zsb2F0IHNnPWs9PTA/LTEuMDoxLjA7dmVjMiBxPSh2TWF0ZXJpYWwtdmVjMihzZyouMTMsLjM5KSkvdmVjMiguMDg1LC4xMDUpO2Q9YWJzKG1heChhYnMocS54KSxhYnMocS55KSktLjk4KSouMDg1O2lmKGQ8YmVzdCl7YmVzdD1kO3M9KHEueCtxLnkpKi4wODt9fX0KIH1lbHNlIGlmKGlkPDIuNSl7ZmxvYXQgd2lkdGg9bWl4KC4xMzIsLjA5NCx2UGFuZWxVVi55KSoyLjA7ZD1hYnModlBhbmVsVVYueC0uMDc1KSp3aWR0aDtpZihkPGJlc3Qpe2Jlc3Q9ZDtzPXZNYXRlcmlhbC55O31kPWFicyh2UGFuZWxVVi54LS45MjUpKndpZHRoO2lmKGQ8YmVzdCl7YmVzdD1kO3M9dk1hdGVyaWFsLnk7fWlmKHZQYW5lbFVWLnk+LjkxKXtkPWFicyh2UGFuZWxVVi55LS45NjUpKi4xOTtpZihkPGJlc3Qpe2Jlc3Q9ZDtzPXZNYXRlcmlhbC54O319fQogcmV0dXJuIHZlYzIoYmVzdCxzKTsKfQpmbG9hdCBzdGl0Y2hNYXNrKGZsb2F0IGRpc3QsZmxvYXQgcyl7ZmxvYXQgcGl4ZWw9bWF4KGxlbmd0aCh2ZWMyKGZ3aWR0aCh2TWF0ZXJpYWwueCksZndpZHRoKHZNYXRlcmlhbC55KSkpKi43MDcsMWUtNik7ZmxvYXQgZXc9bWF4KHVUaHJlYWRXaWR0aCxwaXhlbCoxLjE1KTtmbG9hdCBjb3ZlcmFnZT1taW4oMS4wLHVUaHJlYWRXaWR0aC9ldyp1UmVhZGFiaWxpdHkpO2Zsb2F0IGxpbmU9MS4wLXNtb290aHN0ZXAoZXcqLjM4LGV3Ki43MixkaXN0KTtmbG9hdCBxPXMvdVN0aXRjaFBpdGNoLGFhPW1heChmd2lkdGgocSksLjAwMykscD1hYnMoZnJhY3QocSktLjUpO2Zsb2F0IGRhc2g9MS4wLXNtb290aHN0ZXAoLjMxNS1hYSwuMzE1K2FhLHApO3JldHVybiBsaW5lKmRhc2gqY292ZXJhZ2U7fQp2b2lkIG1haW4oKXsKIGZsb2F0IHdhcnBQaXRjaD0uMDI1NC82MC4wKnVXZWF2ZVNjYWxlLGZpbGxQaXRjaD0uMDI1NC80MC4wKnVXZWF2ZVNjYWxlOwogdmVjMiBtYXRlcmlhbER4PWRGZHgodk1hdGVyaWFsKSxtYXRlcmlhbER5PWRGZHkodk1hdGVyaWFsKTtmbG9hdCBwaXhlbD1tYXgobGVuZ3RoKG1hdGVyaWFsRHgpLGxlbmd0aChtYXRlcmlhbER5KSk7ZmxvYXQgZm9vdHByaW50PW1heChwaXhlbC93YXJwUGl0Y2gscGl4ZWwvZmlsbFBpdGNoKTsKIGZsb2F0IG5lYXJXPTEuMC1zbW9vdGhzdGVwKC4zMiwuODgsZm9vdHByaW50KTtmbG9hdCBhZ2dyZWdhdGVXPXNtb290aHN0ZXAoLjM4LDEuMzUsZm9vdHByaW50KTsKIGZsb2F0IHd4PXZNYXRlcmlhbC54L3dhcnBQaXRjaCxmeT12TWF0ZXJpYWwueS9maWxsUGl0Y2g7ZmxvYXQgd2FycD15YXJuTGluZSh3eCwuMzApLGZpbGw9eWFybkxpbmUoZnksLjI3KTtmbG9hdCBjZWxsPW1vZChmbG9vcih3eCktZmxvb3IoZnkpKzQwMDAuMCw0LjApO2Zsb2F0IHdhcnBUb3A9MS4wLXN0ZXAoMy4wLGNlbGwpOwogZmxvYXQgcGh5c2ljYWxQaGFzZT0od3gtZnkpLzQuMDtmbG9hdCBwaGFzZUZvb3Q9bGVuZ3RoKHZlYzIoZEZkeChwaHlzaWNhbFBoYXNlKSxkRmR5KHBoeXNpY2FsUGhhc2UpKSk7ZmxvYXQgcGh5c2ljYWxGaWx0ZXI9ZXhwKC01LjIqcGhhc2VGb290KnBoYXNlRm9vdCk7ZmxvYXQgcGh5c2ljYWxUd2lsbD1jb3MoMi4wKlBJKnBoeXNpY2FsUGhhc2UpKnBoeXNpY2FsRmlsdGVyOwogZmxvYXQgc2x1Yj12YWx1ZU5vaXNlKHZlYzIodk1hdGVyaWFsLngqMzQuMCx2TWF0ZXJpYWwueSo5LjApKTtmbG9hdCBsb25nU2x1Yj12YWx1ZU5vaXNlKHZlYzIodk1hdGVyaWFsLngqMTEuMCx2TWF0ZXJpYWwueSo1Mi4wKSk7ZmxvYXQgY290dG9uPXZhbHVlTm9pc2Uodk1hdGVyaWFsKnZlYzIoNzIuMCw0OC4wKSk7CiBmbG9hdCBtZXNvUGhhc2VBPSh2TWF0ZXJpYWwueC0uNjcqdk1hdGVyaWFsLnkpLy4wMDUyKyhzbHViLS41KSouMTI7ZmxvYXQgbWVzb0Zvb3RBPWxlbmd0aCh2ZWMyKGRGZHgobWVzb1BoYXNlQSksZEZkeShtZXNvUGhhc2VBKSkpO2Zsb2F0IG1lc29BPWNvcygyLjAqUEkqbWVzb1BoYXNlQSkqZXhwKC00LjIqbWVzb0Zvb3RBKm1lc29Gb290QSk7CiBmbG9hdCBtZXNvUGhhc2VCPSh2TWF0ZXJpYWwueC0uNjcqdk1hdGVyaWFsLnkpLy4wMTA2Kyhsb25nU2x1Yi0uNSkqLjE4O2Zsb2F0IG1lc29Gb290Qj1sZW5ndGgodmVjMihkRmR4KG1lc29QaGFzZUIpLGRGZHkobWVzb1BoYXNlQikpKTtmbG9hdCBtZXNvQj1jb3MoMi4wKlBJKm1lc29QaGFzZUIpKmV4cCgtNC4wKm1lc29Gb290QiptZXNvRm9vdEIpO2Zsb2F0IGRpcmVjdGlvbmFsPW1lc29BKi42OCttZXNvQiouMzI7CiBmbG9hdCB3ZWFyPTAuMDtmbG9hdCBpZD1tb2QodlBhbmVsLDEwLjApO2lmKGlkPi41KXdlYXIrPSgxLjAtc21vb3Roc3RlcCgwLjAsLjA3NSxhYnModlBhbmVsVVYueS0uNTUpKSkqLjEzO3dlYXIrPXVXYXNoKiguMTArLjE0KnNsdWIrLjEwKmxvbmdTbHViKTtpZih1V2FzaD4xLjUpd2Vhcis9LjE3KnNtb290aHN0ZXAoLjU3LDEuMCx2YWx1ZU5vaXNlKHZNYXRlcmlhbCoxMy4wKSk7CiB2ZWMzIHJhdz12ZWMzKC4wMjIsLjA2MSwuMTM5KSx3YXNoZWQ9dmVjMyguMDY0LC4xMzcsLjI1MiksZmlsbENvbD12ZWMzKC40MiwuNDQsLjQyKSxpbmRpZ289bWl4KHJhdyx3YXNoZWQsY2xhbXAodVdhc2gqLjQ2K3dlYXIsMC4wLC44MCkpO3ZlYzMgY29sPWluZGlnbyooLjkwKy4wOCpzbHViKy4wMjUqKGNvdHRvbi0uNSkpO2Zsb2F0IHdhcnBNYXNrPXdhcnAqKC43MisuMjgqd2FycFRvcCkqbmVhclc7ZmxvYXQgZmlsbE1hc2s9ZmlsbCooMS4wLXdhcnBUb3ApKi43MipuZWFyVztjb2w9bWl4KGNvbCxpbmRpZ28qdmVjMyguODAsLjk3LDEuMTMpLHdhcnBNYXNrKi42OCk7Y29sPW1peChjb2wsZmlsbENvbCxmaWxsTWFzayouMzgpOwogZmxvYXQgdHdpbGxTaWduYWw9cGh5c2ljYWxUd2lsbCooMS4wLW5lYXJXKSouMDQwK2RpcmVjdGlvbmFsKmFnZ3JlZ2F0ZVcqLjA2ODtjb2wqPTEuMCt0d2lsbFNpZ25hbDtjb2w9bWl4KGNvbCxjb2wrdmVjMyguMTMsLjE1LC4xNCkqd2VhcixjbGFtcCh3ZWFyLDAuMCwuNTApKTsKIGZsb2F0IGhlaWdodD1uZWFyVyood2FycCouMDA1OCtmaWxsKi4wMDM1KStwaHlzaWNhbFR3aWxsKigxLjAtbmVhclcpKi4wMDIyK2RpcmVjdGlvbmFsKmFnZ3JlZ2F0ZVcqLjAwMTA1O3ZlYzMgTj1ub3JtYWxpemUodk5vcm1hbCk7dmVjMyBkcGR4PWRGZHgodldvcmxkKSxkcGR5PWRGZHkodldvcmxkKTtmbG9hdCBoeD1kRmR4KGhlaWdodCksaHk9ZEZkeShoZWlnaHQpO3ZlYzMgcjE9Y3Jvc3MoZHBkeSxOKSxyMj1jcm9zcyhOLGRwZHgpO2Zsb2F0IGRldD1kb3QoZHBkeCxyMSk7dmVjMyBncmFkPXNpZ24oZGV0KSooaHgqcjEraHkqcjIpO049bm9ybWFsaXplKGFicyhkZXQpKk4tZ3JhZCouMTQpOwogdmVjMyBWPW5vcm1hbGl6ZSh1RXllLXZXb3JsZCk7ZmxvYXQgYT1yYWRpYW5zKHVMaWdodEFuZ2xlKTt2ZWMzIEw9bm9ybWFsaXplKHZlYzMoc2luKGEpLC42Mixjb3MoYSkpKTt2ZWMzIEwyPW5vcm1hbGl6ZSh2ZWMzKC0uNjUsLjIyLC0uNzIpKTt2ZWMzIEg9bm9ybWFsaXplKEwrVik7ZmxvYXQgbmRsPW1heChkb3QoTixMKSwwLjApLGZpbGxMPW1heChkb3QoTixMMiksMC4wKTtmbG9hdCByb3VnaD1taXgoLjU5LC43NixjbGFtcCh1V2FzaCouMzUsMC4wLDEuMCkpO2Zsb2F0IHNwZWM9cG93KG1heChkb3QoTixIKSwwLjApLG1peCg0OC4wLDIwLjAscm91Z2gpKTt2ZWMzIEI9Y3Jvc3ModldhcnAsVik7Qj1sZW5ndGgoQik+MWUtNT9ub3JtYWxpemUoQik6dmVjMygxLjAsMC4wLDAuMCk7ZmxvYXQgeWFyblNoZWVuPXBvdyhtYXgoYWJzKGRvdChCLG5vcm1hbGl6ZShMK1YpKSksMC4wKSwxOC4wKSooMS4wLXJvdWdoKi41NSk7CiB2ZWMzIGxpdD1jb2wqKC4yNysuOTQqbmRsKy4yMipmaWxsTCkrdmVjMyguMjEsLjI4LC4zNykqc3BlYyouMTQrdmVjMyguMTMsLjE4LC4yNikqeWFyblNoZWVuKi4xNDtmbG9hdCBkaWFnPWNsYW1wKC41Ky41KihwaHlzaWNhbFR3aWxsKigxLjAtbmVhclcpK2RpcmVjdGlvbmFsKmFnZ3JlZ2F0ZVcpLDAuMCwxLjApOwogdmVjMiBzZWFtPXNlYW1GaWVsZCgpO2Zsb2F0IHN0aXRjaD1zdGl0Y2hNYXNrKHNlYW0ueCxzZWFtLnkpO3ZlYzMgdGhyZWFkPXZlYzMoLjcyLC4zNiwuMDc1KTtpZih1TW9kZT09MSlsaXQ9dmVjMyguMTApK3ZlYzMoLjI4LC40NSwuNzApKih3YXJwTWFzayouNTgrZGlhZyouMjcpK3ZlYzMoLjUyKSpmaWxsTWFzayouNDI7ZWxzZSBpZih1TW9kZT09Mil7bGl0PXZlYzMoLjAzNSk7c3RpdGNoPW1pbigxLjAsc3RpdGNoKjEuNyk7fWVsc2UgaWYodU1vZGU9PTMpbGl0PXZlYzMoLjIwKy40OCpuZGwpOwogaWYodU1vZGUhPTEmJnVNb2RlIT0zKWxpdD1taXgobGl0LHRocmVhZCooLjY1KzEuMjUqbmRsKSt2ZWMzKC4zMCkqc3BlYyxzdGl0Y2gpO2lmKHVNb2RlPT0xKXN0aXRjaD0wLjA7b3V0Q29sb3I9dmVjNChwb3cobWF4KGxpdCx2ZWMzKDAuMCkpLHZlYzMoMS4wLzIuMikpLDEuMCk7Cn1gOwpmdW5jdGlvbiBzaGFkZXIodHlwZSxzcmMpe2NvbnN0IHM9Z2wuY3JlYXRlU2hhZGVyKHR5cGUpO2dsLnNoYWRlclNvdXJjZShzLHNyYyk7Z2wuY29tcGlsZVNoYWRlcihzKTtpZighZ2wuZ2V0U2hhZGVyUGFyYW1ldGVyKHMsZ2wuQ09NUElMRV9TVEFUVVMpKXRocm93IEVycm9yKGdsLmdldFNoYWRlckluZm9Mb2cocykpO3JldHVybiBzfQpjb25zdCBwcm9nPWdsLmNyZWF0ZVByb2dyYW0oKTtnbC5hdHRhY2hTaGFkZXIocHJvZyxzaGFkZXIoZ2wuVkVSVEVYX1NIQURFUixWUykpO2dsLmF0dGFjaFNoYWRlcihwcm9nLHNoYWRlcihnbC5GUkFHTUVOVF9TSEFERVIsRlMpKTtnbC5saW5rUHJvZ3JhbShwcm9nKTtpZighZ2wuZ2V0UHJvZ3JhbVBhcmFtZXRlcihwcm9nLGdsLkxJTktfU1RBVFVTKSl0aHJvdyBFcnJvcihnbC5nZXRQcm9ncmFtSW5mb0xvZyhwcm9nKSk7CmNvbnN0IHZlcnRpY2VzPVtdLGluZGljZXM9W107Y29uc3Qgc3RyaWRlPTEyO2Z1bmN0aW9uIHB1c2hWZXJ0ZXgocCxuLG0sdXYscGFuZWwpe3ZlcnRpY2VzLnB1c2goLi4ucCwuLi5uLC4uLm0sLi4udXYscGFuZWwsMCl9CmZ1bmN0aW9uIG5vcm0odil7Y29uc3QgbD1NYXRoLmh5cG90KC4uLnYpfHwxO3JldHVybiB2Lm1hcCh4PT54L2wpfWZ1bmN0aW9uIHN1YihhLGIpe3JldHVybiBhLm1hcCgoeCxpKT0+eC1iW2ldKX1mdW5jdGlvbiBjcm9zcyhhLGIpe3JldHVyblthWzFdKmJbMl0tYVsyXSpiWzFdLGFbMl0qYlswXS1hWzBdKmJbMl0sYVswXSpiWzFdLWFbMV0qYlswXV19CmZ1bmN0aW9uIHBhbmVsKGZuLG51LG52LGJhc2VJZCl7Y29uc3QgbWFwcz1bXTtmb3IoY29uc3QgYmFjayBvZltmYWxzZSx0cnVlXSl7Y29uc3QgbWFwPVtdO2ZvcihsZXQgaj0wO2o8PW52O2orKyl7Y29uc3Qgcm93PVtdO2ZvcihsZXQgaT0wO2k8PW51O2krKyl7Y29uc3QgdT1pL251LHY9ai9udixlPTFlLTQscD1mbih1LHYsYmFjaykscHUxPWZuKE1hdGgubWluKDEsdStlKSx2LGJhY2spLHB1MD1mbihNYXRoLm1heCgwLHUtZSksdixiYWNrKSxwdjE9Zm4odSxNYXRoLm1pbigxLHYrZSksYmFjaykscHYwPWZuKHUsTWF0aC5tYXgoMCx2LWUpLGJhY2spO2xldCBuPW5vcm0oY3Jvc3Moc3ViKHB1MSxwdTApLHN1YihwdjEscHYwKSkpO2lmKCghYmFjayYmblsyXTwwKXx8KGJhY2smJm5bMl0+MCkpbj1uLm1hcCh4PT4teCk7Y29uc3QgaWR4PXZlcnRpY2VzLmxlbmd0aC9zdHJpZGU7cHVzaFZlcnRleChwLG4sW3BbMF0scFsxXV0sW3Usdl0sYmFzZUlkKyhiYWNrPzEwOjApKTtyb3cucHVzaChpZHgpfW1hcC5wdXNoKHJvdyl9bWFwcy5wdXNoKG1hcCk7Zm9yKGxldCBqPTA7ajxudjtqKyspZm9yKGxldCBpPTA7aTxudTtpKyspe2NvbnN0IGE9bWFwW2pdW2ldLGI9bWFwW2pdW2krMV0sYz1tYXBbaisxXVtpXSxkPW1hcFtqKzFdW2krMV07aWYoYmFjaylpbmRpY2VzLnB1c2goYSxjLGIsYixjLGQpO2Vsc2UgaW5kaWNlcy5wdXNoKGEsYixjLGIsZCxjKX19CiBjb25zdCBbZnJvbnQsYmFja109bWFwcztmdW5jdGlvbiBlZGdlKHNlcSl7Zm9yKGxldCBrPTA7azxzZXEubGVuZ3RoLTE7aysrKXtjb25zdCBbajAsaTBdPXNlcVtrXSxbajEsaTFdPXNlcVtrKzFdLGE9ZnJvbnRbajBdW2kwXSxiPWZyb250W2oxXVtpMV0sYz1iYWNrW2owXVtpMF0sZD1iYWNrW2oxXVtpMV07aW5kaWNlcy5wdXNoKGEsYyxiLGIsYyxkKX19ZWRnZShbLi4uQXJyYXkobnUrMSkua2V5cygpXS5tYXAoaT0+WzAsaV0pKTtlZGdlKFsuLi5BcnJheShudSsxKS5rZXlzKCldLm1hcChpPT5bbnYsaV0pKTtlZGdlKFsuLi5BcnJheShudisxKS5rZXlzKCldLm1hcChqPT5baiwwXSkpO2VkZ2UoWy4uLkFycmF5KG52KzEpLmtleXMoKV0ubWFwKGo9PltqLG51XSkpOyB9CmZ1bmN0aW9uIHBlbHZpcyh1LHYsYmFjayl7Y29uc3QgeT0uMjArLjM4KnYsaGFsZj0uMjU1LSguMDMzKnYpKy4wMTIqTWF0aC5zaW4oUEkqdikseD0odSoyLTEpKmhhbGYsYnVsZ2U9LjA1MisuMDQ1KigxLU1hdGgucG93KE1hdGguYWJzKHUqMi0xKSwxLjcpKSsuMDA2Kk1hdGguc2luKFBJKnYpLHo9KGJhY2s/LTE6MSkqYnVsZ2U7cmV0dXJuW3gseSx6XX0KZnVuY3Rpb24gbGVnKHNpZGUpe3JldHVybih1LHYsYmFjayk9Pntjb25zdCB5PS4yNC0uOTAqdix3aWR0aD0uMTMyLSguMDM4KnYpLGNlbnRlcj1zaWRlKiguMTI4LS4wMTIqdikseD1jZW50ZXIrKHUqMi0xKSp3aWR0aDtsZXQgYnVsZ2U9LjAzOCsuMDQwKigxLU1hdGgucG93KE1hdGguYWJzKHUqMi0xKSwxLjcpKTtidWxnZSs9LjAwOSpNYXRoLnNpbihQSSp2KS0uMDA2Kk1hdGguZXhwKC1NYXRoLnBvdygodi0uNTUpLy4xMiwyKSk7Y29uc3Qgej0oYmFjaz8tMToxKSpidWxnZTtyZXR1cm5beCx5LHpdfX0KcGFuZWwocGVsdmlzLDQyLDMwLDApO3BhbmVsKGxlZygtMSksMjgsNTQsMSk7cGFuZWwobGVnKDEpLDI4LDU0LDIpOwpjb25zdCB2YW89Z2wuY3JlYXRlVmVydGV4QXJyYXkoKTtnbC5iaW5kVmVydGV4QXJyYXkodmFvKTtjb25zdCB2Yj1nbC5jcmVhdGVCdWZmZXIoKTtnbC5iaW5kQnVmZmVyKGdsLkFSUkFZX0JVRkZFUix2Yik7Z2wuYnVmZmVyRGF0YShnbC5BUlJBWV9CVUZGRVIsbmV3IEZsb2F0MzJBcnJheSh2ZXJ0aWNlcyksZ2wuU1RBVElDX0RSQVcpO2NvbnN0IGliPWdsLmNyZWF0ZUJ1ZmZlcigpO2dsLmJpbmRCdWZmZXIoZ2wuRUxFTUVOVF9BUlJBWV9CVUZGRVIsaWIpO2dsLmJ1ZmZlckRhdGEoZ2wuRUxFTUVOVF9BUlJBWV9CVUZGRVIsbmV3IFVpbnQzMkFycmF5KGluZGljZXMpLGdsLlNUQVRJQ19EUkFXKTtmb3IobGV0IGk9MDtpPDU7aSsrKXtjb25zdCBzaXplcz1bMywzLDIsMiwxXTtnbC5lbmFibGVWZXJ0ZXhBdHRyaWJBcnJheShpKTtnbC52ZXJ0ZXhBdHRyaWJQb2ludGVyKGksc2l6ZXNbaV0sZ2wuRkxPQVQsZmFsc2Usc3RyaWRlKjQsWzAsMyw2LDgsMTBdW2ldKjQpfWdsLmJpbmRWZXJ0ZXhBcnJheShudWxsKTsKZnVuY3Rpb24gbWF0NCgpe3JldHVybiBuZXcgRmxvYXQzMkFycmF5KDE2KX1mdW5jdGlvbiBpZGVudCgpe2NvbnN0IG09bWF0NCgpO21bMF09bVs1XT1tWzEwXT1tWzE1XT0xO3JldHVybiBtfWZ1bmN0aW9uIG11bChhLGIpe2NvbnN0IG89bWF0NCgpO2ZvcihsZXQgcj0wO3I8NDtyKyspZm9yKGxldCBjPTA7Yzw0O2MrKylvW2MqNCtyXT1hW3JdKmJbYyo0XSthWzQrcl0qYltjKjQrMV0rYVs4K3JdKmJbYyo0KzJdK2FbMTIrcl0qYltjKjQrM107cmV0dXJuIG99CmZ1bmN0aW9uIHBlcnNwZWN0aXZlKGZvdixhc3AsbixmKXtjb25zdCB0PTEvTWF0aC50YW4oZm92LzIpLG09bWF0NCgpO21bMF09dC9hc3A7bVs1XT10O21bMTBdPShmK24pLyhuLWYpO21bMTFdPS0xO21bMTRdPTIqZipuLyhuLWYpO3JldHVybiBtfQpmdW5jdGlvbiBsb29rQXQoZSx0LHUpe2NvbnN0IHo9bm9ybShzdWIoZSx0KSkseD1ub3JtKGNyb3NzKHUseikpLHk9Y3Jvc3Moeix4KSxtPWlkZW50KCk7bVswXT14WzBdO21bNF09eFsxXTttWzhdPXhbMl07bVsxXT15WzBdO21bNV09eVsxXTttWzldPXlbMl07bVsyXT16WzBdO21bNl09elsxXTttWzEwXT16WzJdO21bMTJdPS14WzBdKmVbMF0teFsxXSplWzFdLXhbMl0qZVsyXTttWzEzXT0teVswXSplWzBdLXlbMV0qZVsxXS15WzJdKmVbMl07bVsxNF09LXpbMF0qZVswXS16WzFdKmVbMV0telsyXSplWzJdO3JldHVybiBtfQpmdW5jdGlvbiBtb2RlbCh5YXcscGl0Y2gpe2NvbnN0IGN5PU1hdGguY29zKHlhdyksc3k9TWF0aC5zaW4oeWF3KSxjeD1NYXRoLmNvcyhwaXRjaCksc3g9TWF0aC5zaW4ocGl0Y2gpLHJ5PWlkZW50KCkscng9aWRlbnQoKTtyeVswXT1jeTtyeVsyXT0tc3k7cnlbOF09c3k7cnlbMTBdPWN5O3J4WzVdPWN4O3J4WzZdPXN4O3J4WzldPS1zeDtyeFsxMF09Y3g7cmV0dXJuIG11bChyeSxyeCl9CmNvbnN0IGxvYz1uPT5nbC5nZXRVbmlmb3JtTG9jYXRpb24ocHJvZyxuKTtjb25zdCBVPXttb2RlbDpsb2MoJ3VNb2RlbCcpLHZwOmxvYygndVZpZXdQcm9qJyksbm9ybWFsOmxvYygndU5vcm1hbE1hdHJpeCcpLHRpbWU6bG9jKCd1VGltZScpLG1vdGlvbjpsb2MoJ3VNb3Rpb24nKSxleWU6bG9jKCd1RXllJyksc2NhbGU6bG9jKCd1V2VhdmVTY2FsZScpLHBpdGNoOmxvYygndVN0aXRjaFBpdGNoJyksdGhyZWFkOmxvYygndVRocmVhZFdpZHRoJykscmVhZDpsb2MoJ3VSZWFkYWJpbGl0eScpLHdhc2g6bG9jKCd1V2FzaCcpLGxpZ2h0OmxvYygndUxpZ2h0QW5nbGUnKSxtb2RlOmxvYygndU1vZGUnKX07CmNvbnN0IHZpZXdzPXtmdWxsOntkaXN0YW5jZToyLjQ4LHRhcmdldDpbMCwtLjA0LDBdLHlhdzouMTAscGl0Y2g6LS4wMTV9LG1pZDp7ZGlzdGFuY2U6MS4zOCx0YXJnZXQ6WzAsLjAyLC4wMl0seWF3Oi4xNyxwaXRjaDotLjAxNX0sdGhpZ2g6e2Rpc3RhbmNlOi43Mix0YXJnZXQ6Wy4xMywtLjA4LC4wNTVdLHlhdzouMTUscGl0Y2g6MH0sc2VhbTp7ZGlzdGFuY2U6LjMyLHRhcmdldDpbLjE3LC40MywuMDY1XSx5YXc6LjEwLHBpdGNoOjB9fTsKY29uc3Qgc3RhdGU9e3ZpZXc6J2Z1bGwnLGRpc3RhbmNlOnZpZXdzLmZ1bGwuZGlzdGFuY2UsdGFyZ2V0OlsuLi52aWV3cy5mdWxsLnRhcmdldF0seWF3OnZpZXdzLmZ1bGwueWF3LHBpdGNoOnZpZXdzLmZ1bGwucGl0Y2gsd2VhdmVTY2FsZToxLHN0aXRjaFBpdGNoOi4wMDI3Myx0aHJlYWRXaWR0aDouMDAwNDUscmVhZGFiaWxpdHk6MS4zLHdhc2g6MCxsaWdodDotMjgsbW9kZTowLG1vdGlvbjpmYWxzZSx0dXJudGFibGU6ZmFsc2UsdGltZTowLHJlYWR5OmZhbHNlLGZyYW1lczowfTtsZXQgZGlydHk9dHJ1ZSxsYXN0PXBlcmZvcm1hbmNlLm5vdygpOwpmdW5jdGlvbiByZXNpemUoKXtjb25zdCByPXN0YWdlLmdldEJvdW5kaW5nQ2xpZW50UmVjdCgpLGRwcj1NYXRoLm1pbihkZXZpY2VQaXhlbFJhdGlvfHwxLDEuNixNYXRoLnNxcnQoMTgwMDAwMC9NYXRoLm1heCgxLHIud2lkdGgqci5oZWlnaHQpKSk7Y29uc3Qgdz1NYXRoLm1heCgyLE1hdGgucm91bmQoci53aWR0aCpkcHIpKSxoPU1hdGgubWF4KDIsTWF0aC5yb3VuZChyLmhlaWdodCpkcHIpKTtpZihjYW52YXMud2lkdGghPT13fHxjYW52YXMuaGVpZ2h0IT09aCl7Y2FudmFzLndpZHRoPXc7Y2FudmFzLmhlaWdodD1oO2RpcnR5PXRydWV9fQpmdW5jdGlvbiBzZXRWaWV3KG5hbWUpe2NvbnN0IHY9dmlld3NbbmFtZV07c3RhdGUudmlldz1uYW1lO3N0YXRlLmRpc3RhbmNlPXYuZGlzdGFuY2U7c3RhdGUudGFyZ2V0PVsuLi52LnRhcmdldF07c3RhdGUueWF3PXYueWF3O3N0YXRlLnBpdGNoPXYucGl0Y2g7ZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnW2RhdGEtdmlld10nKS5mb3JFYWNoKGI9PmIuY2xhc3NMaXN0LnRvZ2dsZSgnYWN0aXZlJyxiLmRhdGFzZXQudmlldz09PW5hbWUpKTtkaXJ0eT10cnVlfQpmdW5jdGlvbiByZW5kZXIobm93KXtyZXNpemUoKTtjb25zdCBkdD1NYXRoLm1pbiguMDUsKG5vdy1sYXN0KS8xMDAwKTtsYXN0PW5vdztpZihzdGF0ZS50dXJudGFibGUpc3RhdGUueWF3Kz1kdCouMjQ7aWYoc3RhdGUubW90aW9uKXN0YXRlLnRpbWUrPWR0O2lmKCFkaXJ0eSYmIXN0YXRlLnR1cm50YWJsZSYmIXN0YXRlLm1vdGlvbilyZXR1cm47ZGlydHk9ZmFsc2U7Z2wudmlld3BvcnQoMCwwLGNhbnZhcy53aWR0aCxjYW52YXMuaGVpZ2h0KTtnbC5lbmFibGUoZ2wuREVQVEhfVEVTVCk7Z2wuZGlzYWJsZShnbC5DVUxMX0ZBQ0UpO2dsLmNsZWFyQ29sb3IoMCwwLDAsMCk7Z2wuY2xlYXIoZ2wuQ09MT1JfQlVGRkVSX0JJVHxnbC5ERVBUSF9CVUZGRVJfQklUKTtnbC51c2VQcm9ncmFtKHByb2cpO2dsLmJpbmRWZXJ0ZXhBcnJheSh2YW8pO2NvbnN0IGV5ZT1bc3RhdGUudGFyZ2V0WzBdK01hdGguc2luKHN0YXRlLnlhdykqTWF0aC5jb3Moc3RhdGUucGl0Y2gpKnN0YXRlLmRpc3RhbmNlLHN0YXRlLnRhcmdldFsxXStNYXRoLnNpbihzdGF0ZS5waXRjaCkqc3RhdGUuZGlzdGFuY2Usc3RhdGUudGFyZ2V0WzJdK01hdGguY29zKHN0YXRlLnlhdykqTWF0aC5jb3Moc3RhdGUucGl0Y2gpKnN0YXRlLmRpc3RhbmNlXTtjb25zdCB2cD1tdWwocGVyc3BlY3RpdmUoMzEqUEkvMTgwLGNhbnZhcy53aWR0aC9jYW52YXMuaGVpZ2h0LC4wMywxMCksbG9va0F0KGV5ZSxzdGF0ZS50YXJnZXQsWzAsMSwwXSkpO2NvbnN0IG09bW9kZWwoLjA4LDApO2dsLnVuaWZvcm1NYXRyaXg0ZnYoVS5tb2RlbCxmYWxzZSxtKTtnbC51bmlmb3JtTWF0cml4NGZ2KFUudnAsZmFsc2UsdnApO2dsLnVuaWZvcm1NYXRyaXgzZnYoVS5ub3JtYWwsZmFsc2UsbmV3IEZsb2F0MzJBcnJheShbbVswXSxtWzFdLG1bMl0sbVs0XSxtWzVdLG1bNl0sbVs4XSxtWzldLG1bMTBdXSkpO2dsLnVuaWZvcm0xZihVLnRpbWUsc3RhdGUudGltZSk7Z2wudW5pZm9ybTFmKFUubW90aW9uLHN0YXRlLm1vdGlvbj8xOjApO2dsLnVuaWZvcm0zZnYoVS5leWUsZXllKTtnbC51bmlmb3JtMWYoVS5zY2FsZSxzdGF0ZS53ZWF2ZVNjYWxlKTtnbC51bmlmb3JtMWYoVS5waXRjaCxzdGF0ZS5zdGl0Y2hQaXRjaCk7Z2wudW5pZm9ybTFmKFUudGhyZWFkLHN0YXRlLnRocmVhZFdpZHRoKTtnbC51bmlmb3JtMWYoVS5yZWFkLHN0YXRlLnJlYWRhYmlsaXR5KTtnbC51bmlmb3JtMWYoVS53YXNoLHN0YXRlLndhc2gpO2dsLnVuaWZvcm0xZihVLmxpZ2h0LHN0YXRlLmxpZ2h0KTtnbC51bmlmb3JtMWkoVS5tb2RlLHN0YXRlLm1vZGUpO2dsLmRyYXdFbGVtZW50cyhnbC5UUklBTkdMRVMsaW5kaWNlcy5sZW5ndGgsZ2wuVU5TSUdORURfSU5ULDApO2dsLmJpbmRWZXJ0ZXhBcnJheShudWxsKTtzdGF0ZS5mcmFtZXMrKztzdGF0ZS5yZWFkeT10cnVlO2RvY3VtZW50LmJvZHkuZGF0YXNldC5yZWFkeT0ndHJ1ZSc7ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0YXR1cycpLnRleHRDb250ZW50PSfnnJ/lrp7kuInnu7Too6Too4Ugwrcg5q+r57Gz5bC65bqm5p2Q6LSoJztkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndmlld0luZm8nKS50ZXh0Q29udGVudD1gJHtzdGF0ZS52aWV3fSDCtyAke3N0YXRlLmRpc3RhbmNlLnRvRml4ZWQoMil9IG0gwrcgJHt2ZXJ0aWNlcy5sZW5ndGgvc3RyaWRlfSDpobbngrkgwrcgJHtNYXRoLnJvdW5kKGluZGljZXMubGVuZ3RoLzMpfSDkuInop5LlvaJgO30KZnVuY3Rpb24gbG9vcCh0KXtyZW5kZXIodCk7cmVxdWVzdEFuaW1hdGlvbkZyYW1lKGxvb3ApfXJlcXVlc3RBbmltYXRpb25GcmFtZShsb29wKTtuZXcgUmVzaXplT2JzZXJ2ZXIoKCk9PntkaXJ0eT10cnVlfSkub2JzZXJ2ZShzdGFnZSk7CmZvcihjb25zdCBiIG9mIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJ1tkYXRhLXZpZXddJykpYi5vbmNsaWNrPSgpPT5zZXRWaWV3KGIuZGF0YXNldC52aWV3KTtmb3IoY29uc3QgYiBvZiBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCdbZGF0YS13YXNoXScpKWIub25jbGljaz0oKT0+e3N0YXRlLndhc2g9e3JhdzowLG9uZToxLHZpbnRhZ2U6Mn1bYi5kYXRhc2V0Lndhc2hdO2RvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJ1tkYXRhLXdhc2hdJykuZm9yRWFjaCh4PT54LmNsYXNzTGlzdC50b2dnbGUoJ2FjdGl2ZScseD09PWIpKTtkaXJ0eT10cnVlfTsKZnVuY3Rpb24gYmluZChpZCxrZXksc2NhbGU9MSxmbXQ9dj0+dil7Y29uc3QgZWw9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoaWQpLG91dD1kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCsnT3V0Jyk7ZWwub25pbnB1dD0oKT0+e3N0YXRlW2tleV09K2VsLnZhbHVlKnNjYWxlO291dC50ZXh0Q29udGVudD1mbXQoK2VsLnZhbHVlKTtkaXJ0eT10cnVlfX0KYmluZCgnd2VhdmVTY2FsZScsJ3dlYXZlU2NhbGUnLDEsdj0+TWF0aC5yb3VuZCh2KjEwMCkrJyUnKTtiaW5kKCdzdGl0Y2hQaXRjaCcsJ3N0aXRjaFBpdGNoJywuMDAxLHY9PigrdikudG9GaXhlZCgyKSsnIG1tJyk7YmluZCgndGhyZWFkV2lkdGgnLCd0aHJlYWRXaWR0aCcsLjAwMSx2PT4oK3YpLnRvRml4ZWQoMikrJyBtbScpO2JpbmQoJ3JlYWRhYmlsaXR5JywncmVhZGFiaWxpdHknLDEsdj0+KCt2KS50b0ZpeGVkKDIpKTtiaW5kKCdsaWdodCcsJ2xpZ2h0JywxLHY9Pk1hdGgucm91bmQodikrJ8KwJyk7CmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwaHlzaWNhbCcpLm9uY2xpY2s9KCk9PntzdGF0ZS53ZWF2ZVNjYWxlPTE7ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3dlYXZlU2NhbGUnKS52YWx1ZT0xO2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd3ZWF2ZVNjYWxlT3V0JykudGV4dENvbnRlbnQ9JzEwMCUnO2RpcnR5PXRydWV9O2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzbWFsbENvbXBhcmUnKS5vbmNsaWNrPSgpPT57c3RhdGUud2VhdmVTY2FsZT0uNDU7ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3dlYXZlU2NhbGUnKS52YWx1ZT0uNDU7ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3dlYXZlU2NhbGVPdXQnKS50ZXh0Q29udGVudD0nNDUlJztkaXJ0eT10cnVlfTsKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3R1cm50YWJsZScpLm9uY2xpY2s9ZT0+e3N0YXRlLnR1cm50YWJsZT0hc3RhdGUudHVybnRhYmxlO2UuY3VycmVudFRhcmdldC5jbGFzc0xpc3QudG9nZ2xlKCdhY3RpdmUnLHN0YXRlLnR1cm50YWJsZSk7ZGlydHk9dHJ1ZX07ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21vdGlvbicpLm9uY2xpY2s9ZT0+e3N0YXRlLm1vdGlvbj0hc3RhdGUubW90aW9uO2UuY3VycmVudFRhcmdldC5jbGFzc0xpc3QudG9nZ2xlKCdhY3RpdmUnLHN0YXRlLm1vdGlvbik7ZGlydHk9dHJ1ZX07ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21vZGUnKS5vbmNoYW5nZT1lPT57c3RhdGUubW9kZT0rZS50YXJnZXQudmFsdWU7ZGlydHk9dHJ1ZX07CmxldCBwb2ludGVyPW51bGw7Y2FudmFzLm9ucG9pbnRlcmRvd249ZT0+e3BvaW50ZXI9e3g6ZS5jbGllbnRYLHk6ZS5jbGllbnRZLHNoaWZ0OmUuc2hpZnRLZXl9O2NhbnZhcy5zZXRQb2ludGVyQ2FwdHVyZShlLnBvaW50ZXJJZCl9O2NhbnZhcy5vbnBvaW50ZXJtb3ZlPWU9PntpZighcG9pbnRlcilyZXR1cm47Y29uc3QgZHg9ZS5jbGllbnRYLXBvaW50ZXIueCxkeT1lLmNsaWVudFktcG9pbnRlci55O2lmKHBvaW50ZXIuc2hpZnQpe3N0YXRlLnRhcmdldFswXS09ZHgqc3RhdGUuZGlzdGFuY2UqLjAwMDY1O3N0YXRlLnRhcmdldFsxXSs9ZHkqc3RhdGUuZGlzdGFuY2UqLjAwMDY1fWVsc2V7c3RhdGUueWF3LT1keCouMDA2O3N0YXRlLnBpdGNoPU1hdGgubWF4KC0xLjE1LE1hdGgubWluKDEuMTUsc3RhdGUucGl0Y2grZHkqLjAwNikpfXBvaW50ZXIueD1lLmNsaWVudFg7cG9pbnRlci55PWUuY2xpZW50WTtkaXJ0eT10cnVlfTtjYW52YXMub25wb2ludGVydXA9Y2FudmFzLm9ucG9pbnRlcmNhbmNlbD0oKT0+cG9pbnRlcj1udWxsO2NhbnZhcy5vbndoZWVsPWU9PntlLnByZXZlbnREZWZhdWx0KCk7c3RhdGUuZGlzdGFuY2U9TWF0aC5tYXgoLjE2LE1hdGgubWluKDQsc3RhdGUuZGlzdGFuY2UqTWF0aC5leHAoZS5kZWx0YVkqLjAwMSkpKTtkaXJ0eT10cnVlfTsKLypSRjMxX05BVElWRV9FWFBPUlRfQkVHSU4qLwp3aW5kb3cuX19SRjMxX1NPVVJDRV9fPXsicmVwb3NpdG9yeSI6ICJoYWloYW8wMzA3L0h1bWFub2lkLVJpZy1MYWItTmV4dCIsICJjb21taXQiOiAiMjJjZGIzZjRjM2JmZDEwMWJkODZmMGZmYTI0NmQyNTViNTYxZDkxNSIsICJwYXRoIjogImRlbmltLXdvcmtzaG9wL3IxNy1zY2FsZS9wcmV2aWV3LXYzLmh0bWwiLCAic2hhMjU2IjogIjJhNzdhM2IxOTg1MjUyMmNiNWU1MjI3MWJmNDY2NWQwMjMwYmMyYjcwYjA3MGZmNjBiZTQ2MWUyNzkwZTE5YjQiLCAiYmFzZVBhZ2UiOiB7ImNvbW1pdCI6ICJhNWFmMWUwMTQwYzkzNTcwM2RlYzdjNGQ0ZGE0ZjU1NDk0NDliNjU3IiwgInBhdGgiOiAiZGVuaW0td29ya3Nob3AvcjE3LXNjYWxlL2luZGV4Lmh0bWwiLCAic2hhMjU2IjogIjYwYzQ5YWRlYzg4N2FjODFlYmU0YjlmMWIwODA3ZmJkZGFiNGMwMzVkYzAzMGI2NWFkOWY2ZTIxNzAxZmM4MTcifSwgImFzc2VtYmxlZE9yaWdpbmFsU0hBMjU2IjogIjUzM2RmNDU2NWI5ZDkxM2ZlNmE3NjIzMDJiODg3ZjJiYzAxMTBmM2IyNmIzZDQ4YWE1OGVkNjQ2M2E4MjZiYjYifTsKLyogQWRkaXRpdmUgc2lkZWNhciBpbnNlcnRlZCBpbnNpZGUgdGhlIHZlcmlmaWVkIG9yaWdpbmFsIFIxNy4yIGNsb3N1cmUuCiAqIFJlYWRzIG5hdGl2ZSBzdGF0ZS91bmlmb3JtcyBvbmx5LiBObyBuYXRpdmUgc2V0dGVycywgZHJhdyBjYWxscywgbWF0cml4IHVwZGF0ZXMsCiAqIGdsLmdldEVycm9yLCBidWZmZXIgdHJhbnNmZXIsIG9yIHByb2R1Y3Rpb24gcGVyc2lzdGVuY2UuICovCnsKIGNvbnN0IHNvdXJjZT1PYmplY3QuZnJlZXplKEpTT04ucGFyc2UoSlNPTi5zdHJpbmdpZnkod2luZG93Ll9fUkYzMV9TT1VSQ0VfXykpKTsKIGxldCBzZXF1ZW5jZT0wOwogY29uc3QgY2xvbmU9eD0+SlNPTi5wYXJzZShKU09OLnN0cmluZ2lmeSh4KSk7CiBjb25zdCBmcmVlemU9eD0+e2lmKHgmJnR5cGVvZiB4PT09J29iamVjdCcpe09iamVjdC5mcmVlemUoeCk7Zm9yKGNvbnN0IHYgb2YgT2JqZWN0LnZhbHVlcyh4KSlmcmVlemUodik7fXJldHVybiB4O307CiBmdW5jdGlvbiBoYXNoVGV4dCh0ZXh0KXtsZXQgaD0yMTY2MTM2MjYxO2ZvcihsZXQgaT0wO2k8dGV4dC5sZW5ndGg7aSsrKXtoXj10ZXh0LmNoYXJDb2RlQXQoaSk7aD1NYXRoLmltdWwoaCwxNjc3NzYxOSk7fXJldHVybiAoaD4+PjApLnRvU3RyaW5nKDE2KS5wYWRTdGFydCg4LCcwJyk7fQogZnVuY3Rpb24gaGFzaE51bWJlcnModmFsdWVzKXtjb25zdCBhPW5ldyBGbG9hdDY0QXJyYXkodmFsdWVzKSxiPW5ldyBVaW50OEFycmF5KGEuYnVmZmVyKTtsZXQgaD0yMTY2MTM2MjYxO2ZvcihsZXQgaT0wO2k8Yi5sZW5ndGg7aSsrKXtoXj1iW2ldO2g9TWF0aC5pbXVsKGgsMTY3Nzc2MTkpO31yZXR1cm4gKGg+Pj4wKS50b1N0cmluZygxNikucGFkU3RhcnQoOCwnMCcpO30KIGZ1bmN0aW9uIHVuaWZvcm1WYWx1ZXMoKXtyZXR1cm4ge3dlYXZlU2NhbGU6Z2wuZ2V0VW5pZm9ybShwcm9nLFUuc2NhbGUpLHN0aXRjaFBpdGNoOmdsLmdldFVuaWZvcm0ocHJvZyxVLnBpdGNoKSx0aHJlYWRXaWR0aDpnbC5nZXRVbmlmb3JtKHByb2csVS50aHJlYWQpLHJlYWRhYmlsaXR5OmdsLmdldFVuaWZvcm0ocHJvZyxVLnJlYWQpLHdhc2g6Z2wuZ2V0VW5pZm9ybShwcm9nLFUud2FzaCksbGlnaHQ6Z2wuZ2V0VW5pZm9ybShwcm9nLFUubGlnaHQpfTt9CiBmdW5jdGlvbiBndWFyZCgpe3JldHVybiB7c3RhdGU6aGFzaFRleHQoSlNPTi5zdHJpbmdpZnkoc3RhdGUpKSx2ZXJ0aWNlczpoYXNoTnVtYmVycyh2ZXJ0aWNlcyksaW5kaWNlczpoYXNoTnVtYmVycyhpbmRpY2VzKSx2ZXJ0ZXhTaGFkZXI6aGFzaFRleHQoVlMpLGZyYWdtZW50U2hhZGVyOmhhc2hUZXh0KEZTKSx1bmlmb3Jtczp1bmlmb3JtVmFsdWVzKCl9O30KIGZ1bmN0aW9uIHJlYWQoKXsKICBjb25zdCBzdGFydGVkPXBlcmZvcm1hbmNlLm5vdygpOwogIGlmKCFzdGF0ZS5yZWFkeXx8Z2wuaXNDb250ZXh0TG9zdCgpKXRocm93IEVycm9yKCdOQVRJVkVfTk9UX1JFQURZJyk7CiAgY29uc3QgYmVmb3JlPWd1YXJkKCksYWN0dWFsPWJlZm9yZS51bmlmb3JtczsKICBmb3IoY29uc3QgbmFtZSBvZiBPYmplY3Qua2V5cyhhY3R1YWwpKXsKICAgaWYodHlwZW9mIGFjdHVhbFtuYW1lXSE9PSdudW1iZXInfHwhTnVtYmVyLmlzRmluaXRlKGFjdHVhbFtuYW1lXSkpdGhyb3cgRXJyb3IoJ0lOVkFMSURfTkFUSVZFX1VOSUZPUk06JytuYW1lKTsKICAgY29uc3QgdGFyZ2V0PXN0YXRlW25hbWVdOwogICBpZihNYXRoLmFicyhhY3R1YWxbbmFtZV0tdGFyZ2V0KT4xZS02Kk1hdGgubWF4KDFlLTMsTWF0aC5hYnModGFyZ2V0KSkpdGhyb3cgRXJyb3IoJ05BVElWRV9GUkFNRV9QRU5ESU5HOicrbmFtZSk7CiAgfQogIGlmKGFjdHVhbC53ZWF2ZVNjYWxlPD0wfHxhY3R1YWwuc3RpdGNoUGl0Y2g8PTB8fGFjdHVhbC50aHJlYWRXaWR0aDw9MCl0aHJvdyBFcnJvcignSU5WQUxJRF9OQVRJVkVfTEVOR1RIJyk7CiAgY29uc3QgdmFsdWVzPVsKICAgWydtYXRlcmlhbC53YXJwX3NwYWNpbmdfbScsJ+e7j+e6seS4reW/g+mXtOi3nScsLjAyNTQvNjAqYWN0dWFsLndlYXZlU2NhbGUsJ20nLCdQQVNTJywncnVudGltZV9jb21wdXRlZCcsJ+WunumZhSB1V2VhdmVTY2FsZSDDlyDmupDnnYDoibLlmaggMjUuNC82MCBtbe+8m+S4jeaYr+WunueJqea1i+mHjyddLAogICBbJ21hdGVyaWFsLndlZnRfc3BhY2luZ19tJywn57qs57qx5Lit5b+D6Ze06LedJywuMDI1NC80MCphY3R1YWwud2VhdmVTY2FsZSwnbScsJ1BBU1MnLCdydW50aW1lX2NvbXB1dGVkJywn5a6e6ZmFIHVXZWF2ZVNjYWxlIMOXIOa6kOedgOiJsuWZqCAyNS40LzQwIG1t77yb5LiN5piv5a6e54mp5rWL6YePJ10sCiAgIFsnbWF0ZXJpYWwudHdpbGxfcmVwZWF0X20nLCflm7rlrpogViDml7bnmoQgVSDlkJHlm5vnurHlkajmnJ8nLC4wMjU0LzYwKjQqYWN0dWFsLndlYXZlU2NhbGUsJ20nLCdQQVNTJywncnVudGltZV9jb21wdXRlZCcsJ+adkOaWmeWPguiAg+WdkOagh+S4reeahCBVIOWQkeWRqOacn++8m+S4jeetieS6juS7u+aEj+aWueWQkeeahOS4lueVjOepuumXtOmVv+W6piddLAogICBbJ21hdGVyaWFsLnN0aXRjaF9waXRjaF9tJywn5a6e6ZmF5LiK5Lyg55qE6ZKI6ISa6IqC6LedJyxhY3R1YWwuc3RpdGNoUGl0Y2gsJ20nLCdQQVNTJywncnVudGltZV9jb21wdXRlZCcsJ+ebtOaOpeivu+WPliBnbC5nZXRVbmlmb3JtKHVTdGl0Y2hQaXRjaCnvvIzkuI3mmK/lpI3ov7Dmu5HlnZfmloflrZcnXSwKICAgWydtYXRlcmlhbC52aXNpYmxlX3RocmVhZF93aWR0aF9tJywn5a6e6ZmF5Y+v6KeB57q/5a695Luj55CGJyxhY3R1YWwudGhyZWFkV2lkdGgsJ20nLCdXQVJOSU5HJywncnVudGltZV9jb21wdXRlZCcsJ+ivu+WPliB1VGhyZWFkV2lkdGjvvJvmipfplK/pvb/opobnm5blj6/mlLnlj5jlsY/luZXmlK/mkpHojIPlm7TvvIzkuI3mmK/lrp7niannur/lvoTmiJYgVGV4J10sCiAgIFsnbWF0ZXJpYWwudGhpY2tuZXNzX20nLCfmnZDmlpnniannkIbljprluqYnLG51bGwsJ20nLCdVTktOT1dOJywndW5rbm93bicsJ+acrCBSMTcuMiDlpJbop4Llt6XkvZzlj7DmnKrnu5nlh7rniannkIbljprluqbvvJvkuI3lgJ/nlKggUjE1IOeahOWFtuS7lueJiOacrOWAmemAiSddLAogICBbJ21hdGVyaWFsLnlhcm5fZGlhbWV0ZXJfbScsJ+e6see6v+WHoOS9leebtOW+hCcsbnVsbCwnbScsJ1VOS05PV04nLCd1bmtub3duJywn56iL5bqP5YyW57qx57q/6YGu572p5LiO5Yeg5L2V57q/5b6E5rKh5pyJ562J5Lu36K+B5o2uJ10sCiAgIFsnbWF0ZXJpYWwubGluZWFyX2RlbnNpdHlfdGV4Jywn57qx57q/IC8g57yd57q/IFRleCcsbnVsbCwndGV4JywnVU5LTk9XTicsJ3Vua25vd24nLCfnur/lr4bluqbkuI3og73nlLHmmL7npLrku6PnkIblrr3luqblj43mjqgnXQogIF0ubWFwKChbaWQsbGFiZWwsdmFsdWUsdW5pdCxzdGF0dXMsYmFzaXMsbWV0aG9kXSk9Pih7aWQsbGFiZWwsdmFsdWUsdW5pdCxzdGF0dXMsYmFzaXMsbWV0aG9kfSkpOwogIGNvbnN0IGFmdGVyPWd1YXJkKCksdW5jaGFuZ2VkPUpTT04uc3RyaW5naWZ5KGJlZm9yZSk9PT1KU09OLnN0cmluZ2lmeShhZnRlcik7CiAgaWYoIXVuY2hhbmdlZCl0aHJvdyBFcnJvcignUkVBRF9QUkVTRVJWQVRJT05fRkFJTEVEJyk7CiAgY29uc3QgcmVzdWx0PXtzY2hlbWE6J2thb3B1L3JlYWxpdHktd29ya2JlbmNoLWV4cG9ydEAxJyxleHBvcnRlclZlcnNpb246JzAuMy4xLWEnLG9iamVjdElkOidmYWJyaWMtZGVuaW0tcjE3LTInLGRvbWFpbjonZmFicmljJyxmYW1pbHk6J2RlbmltJyxzb3VyY2U6Y2xvbmUoc291cmNlKSxjYXB0dXJlOntjYXB0dXJlZEF0Om5ldyBEYXRlKCkudG9JU09TdHJpbmcoKSxzZXF1ZW5jZTorK3NlcXVlbmNlLHNvdXJjZU1vZGU6J25hdGl2ZV9jYWxsYmFjaycsbmF0aXZlRnJhbWU6c3RhdGUuZnJhbWVzLHZpZXc6c3RhdGUudmlldyxlbGFwc2VkTXM6cGVyZm9ybWFuY2Uubm93KCktc3RhcnRlZH0sbmF0aXZlQ29udHJvbHM6e3dlYXZlU2NhbGU6c3RhdGUud2VhdmVTY2FsZSxzdGl0Y2hQaXRjaDpzdGF0ZS5zdGl0Y2hQaXRjaCx0aHJlYWRXaWR0aDpzdGF0ZS50aHJlYWRXaWR0aCxyZWFkYWJpbGl0eTpzdGF0ZS5yZWFkYWJpbGl0eSx3YXNoOnN0YXRlLndhc2gsbGlnaHQ6c3RhdGUubGlnaHR9LHNoYWRlcklucHV0czpjbG9uZShhY3R1YWwpLG1lYXN1cmVtZW50czp2YWx1ZXMsbWF0ZXJpYWxTcGFjZTp7dW5pdDonbScsYmFzaXM6J3NvdXJjZV9kZWNsYXJlZCcsY29vcmRpbmF0ZTonYU1hdGVyaWFsPVtnZW5lcmF0ZWQgbG9jYWwgWCwgZ2VuZXJhdGVkIGxvY2FsIFldIGJlZm9yZSBzaGFkZXIgbW90aW9uJyx1TWVhbmluZzonY3Jvc3Mtd2FycC15YXJuIGRpcmVjdGlvbicsdk1lYW5pbmc6J2Nyb3NzLXdlZnQteWFybiBkaXJlY3Rpb24nLGdhcm1lbnRCaW5kaW5nVmVyaWZpZWQ6ZmFsc2UscGh5c2ljYWxDYWxpYnJhdGlvbjpmYWxzZX0sY2FtZXJhOntkaXN0YW5jZTpzdGF0ZS5kaXN0YW5jZSx0YXJnZXQ6Wy4uLnN0YXRlLnRhcmdldF0seWF3OnN0YXRlLnlhdyxwaXRjaDpzdGF0ZS5waXRjaCxmb3ZZRGVnOjMxLGJ1ZmZlclB4OltjYW52YXMud2lkdGgsY2FudmFzLmhlaWdodF19LG1lc2g6e3ZlcnRpY2VzOnZlcnRpY2VzLmxlbmd0aC9zdHJpZGUsdHJpYW5nbGVzOmluZGljZXMubGVuZ3RoLzN9LHByZXNlcnZhdGlvbjp7cGFzc2VkOnRydWUsYmVmb3JlLGFmdGVyLG1ldGhvZDonc2FtZS10YXNrIEZOVi0xYSBkaWFnbm9zdGljIGZpbmdlcnByaW50czsgc291cmNlIHByb3ZlbmFuY2Ugc2VwYXJhdGVseSB1c2VzIFNIQS0yNTYnLGNoZWNrZWQ6WyduYXRpdmUgc3RhdGUnLCdDUFUgZ2VvbWV0cnkgYXJyYXlzJywndmVydGV4L2ZyYWdtZW50IHNoYWRlciB0ZXh0JywnbGlzdGVkIEdQVSB1bmlmb3JtcyddLG5vdENoZWNrZWQ6WydhbGwgZHJpdmVyIHN0YXRlJywnYWxsIGZyYW1lYnVmZmVyIHBpeGVscycsJ3JlYWwtd29ybGQgc2FtcGxlIGRpbWVuc2lvbnMnXX0sY29tcGFyaXNvbjp7bm9taW5hbFN0aXRjaFBpdGNoTTouMDMvMTEsYWN0dWFsU3RpdGNoUGl0Y2hNOmFjdHVhbC5zdGl0Y2hQaXRjaCxpbnRlcnByZXRhdGlvbjon5rqQ5YCZ6YCJMTHpkogvMzBtbeS4jui/kOihjOaXtuS4iuS8oOWAvOWIhuWIq+S/neeVme+8m+acque7meW3peiJuuWFrOW3ru+8jOS4jeiHquWKqOWIpOWItumAoOe8uumZtyd9LGF1dGhvcml0aWVzOntzb3VyY2VXcml0ZUFQSTpmYWxzZSxyZXBhaXJBdXRob3JpemVkOmZhbHNlLHBoeXNpY2FsQ2VydGlmaWNhdGlvbjpmYWxzZSxtYW51ZmFjdHVyaW5nQ2VydGlmaWNhdGlvbjpmYWxzZSxwcm9kdWN0aW9uUmVhZHk6ZmFsc2V9fTsKICByZXR1cm4gZnJlZXplKHJlc3VsdCk7CiB9CiB3aW5kb3cuS0FPUFVfUkVBTElUWT1PYmplY3QuZnJlZXplKHt2ZXJzaW9uOicwLjMuMS1hJyxyZWFkLGV4cG9ydEpTT046KCk9PkpTT04uc3RyaW5naWZ5KHJlYWQoKSxudWxsLDIpLHNvdXJjZX0pOwp9CgovKlJGMzFfTkFUSVZFX0VYUE9SVF9FTkQqLwp3aW5kb3cuREVOSU1fUjE3PXt2ZXJzaW9uOlZFUlNJT04sc3RhdGUsc2V0VmlldyxzZXRQYXJhbTooayx2KT0+e2lmKCEoayBpbiBzdGF0ZSl8fCFOdW1iZXIuaXNGaW5pdGUoK3YpKXRocm93IEVycm9yKCdpbnZhbGlkIHBhcmFtJyk7c3RhdGVba109K3Y7ZGlydHk9dHJ1ZX0sc2V0TW90aW9uOnY9PntzdGF0ZS5tb3Rpb249ISF2O2RpcnR5PXRydWV9LHJlbmRlck5vdzooKT0+e2RpcnR5PXRydWU7cmVuZGVyKHBlcmZvcm1hbmNlLm5vdygpKX0sY2FwdHVyZTooKT0+Y2FudmFzLnRvRGF0YVVSTCgnaW1hZ2UvcG5nJyksYXVkaXQ6KCk9Pih7dmVyc2lvbjpWRVJTSU9OLHJlYWR5OnN0YXRlLnJlYWR5LHBhcmFtZXRlcnM6e3dlYXZlU2NhbGU6c3RhdGUud2VhdmVTY2FsZSx3YXJwUGl0Y2hNTTouMDI1NC82MCoxMDAwKnN0YXRlLndlYXZlU2NhbGUsZmlsbFBpdGNoTU06LjAyNTQvNDAqMTAwMCpzdGF0ZS53ZWF2ZVNjYWxlLHN0aXRjaFBpdGNoTU06c3RhdGUuc3RpdGNoUGl0Y2gqMTAwMCx0aHJlYWRXaWR0aE1NOnN0YXRlLnRocmVhZFdpZHRoKjEwMDAscmVhZGFiaWxpdHk6c3RhdGUucmVhZGFiaWxpdHksd2FzaDpzdGF0ZS53YXNoLG1vZGU6c3RhdGUubW9kZX0sY2FtZXJhOnt2aWV3OnN0YXRlLnZpZXcsZGlzdGFuY2U6c3RhdGUuZGlzdGFuY2UseWF3OnN0YXRlLnlhdyxwaXRjaDpzdGF0ZS5waXRjaCx0YXJnZXQ6Wy4uLnN0YXRlLnRhcmdldF19LG1lc2g6e3ZlcnRpY2VzOnZlcnRpY2VzLmxlbmd0aC9zdHJpZGUsdHJpYW5nbGVzOmluZGljZXMubGVuZ3RoLzN9LGNhbnZhczp7d2lkdGg6Y2FudmFzLndpZHRoLGhlaWdodDpjYW52YXMuaGVpZ2h0fSxmcmFtZXM6c3RhdGUuZnJhbWVzLHJlbmRlcmVyOmdsLmdldFBhcmFtZXRlcihnbC5SRU5ERVJFUiksZXJyb3JzOlsuLi5lcnJvcnNdfSl9Owp9KSgpOwo8L3NjcmlwdD4KPC9ib2R5PjwvaHRtbD4K";
+/* KAOPU Reality Foundation HC S2.1. Pure data contract; no source-workbench write API. */
+(function(root){
+'use strict';
+const VERSION='0.2.0';
+const OBJECT_SCHEMA='kaopu/reality-object@0.2';
+const BUNDLE_SCHEMA='kaopu/reality-foundation-bundle@0.2';
+const DEFECT_SCHEMA='kaopu/reality-defect@0.2';
+const STATUSES=Object.freeze(['PASS','FAIL','WARNING','UNKNOWN','NOT_APPLICABLE']);
+const DOMAINS=Object.freeze(['human','footwear','pattern','garment','fabric']);
+const SOURCE_MODES=Object.freeze(['live_read_only','fixed_snapshot','imported_unverified','registered_only']);
+const BASES=Object.freeze(['source_declared','runtime_computed','physical_measured','artistic','unknown']);
+const SEVERITY=Object.freeze({FAIL:'critical',WARNING:'warning',UNKNOWN:'info'});
+const UNITS=Object.freeze(['m','mm','cm','in','ft','1','m2','mm2','g/m2','tex','denier','px']);
+const clone=value=>value===undefined?undefined:JSON.parse(JSON.stringify(value));
+const finite=value=>typeof value==='number'&&Number.isFinite(value);
+const plain=value=>value&&typeof value==='object'&&!Array.isArray(value);
+function normalizeStatus(value){
+ const key=String(value??'').trim().toUpperCase().replace(/[\s\/-]+/g,'_');
+ const aliases={OK:'PASS',PASSED:'PASS',ERROR:'FAIL',CONFLICT:'FAIL',WARN:'WARNING',UNRESOLVED:'UNKNOWN',NA:'NOT_APPLICABLE',N_A:'NOT_APPLICABLE'};
+ const status=aliases[key]||key;
+ if(!STATUSES.includes(status))throw Error('未知状态：'+String(value));
+ return status;
+}
+function hashId(value){
+ let h=2166136261;for(const c of String(value)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return (h>>>0).toString(16).padStart(8,'0');
+}
+function validateDictionary(dictionary){
+ if(!plain(dictionary)||dictionary.schema!=='kaopu/reality-measurement-dictionary@1')throw Error('测量字典协议不正确');
+ if(!Array.isArray(dictionary.measurements)||!dictionary.measurements.length)throw Error('测量字典为空');
+ const ids=new Set();
+ for(const item of dictionary.measurements){
+  if(!plain(item)||typeof item.id!=='string'||!item.id)throw Error('测量定义缺少ID');
+  if(ids.has(item.id))throw Error('测量定义重复：'+item.id);ids.add(item.id);
+  if(!DOMAINS.includes(item.domain))throw Error('测量定义越界：'+item.id);
+  if(typeof item.quantity!=='string'||!item.quantity)throw Error('测量定义缺少量纲：'+item.id);
+  if(!UNITS.includes(item.unit))throw Error('测量定义使用未知单位：'+item.id+' / '+item.unit);
+  if(typeof item.definition!=='string'||item.definition.length<8)throw Error('测量定义不完整：'+item.id);
+  if(typeof item.owner!=='string'||!item.owner)throw Error('测量定义缺少责任工作台：'+item.id);
+ }
+ return Object.freeze({byId:Object.freeze(Object.fromEntries(dictionary.measurements.map(item=>[item.id,Object.freeze(clone(item))]))),ids:Object.freeze([...ids])});
+}
+function source(value){
+ if(!plain(value))throw Error('对象缺少来源');
+ if(typeof value.repository!=='string'||!/^[\w.-]+\/[\w.-]+$/.test(value.repository))throw Error('来源仓库无效');
+ if(typeof value.commit!=='string'||!/^[0-9a-f]{40}$/.test(value.commit))throw Error('来源必须绑定完整提交');
+ if(typeof value.path!=='string'||!value.path||value.path.startsWith('/')||value.path.split('/').includes('..'))throw Error('来源路径无效');
+ if(value.sha256!=null&&(!/^[0-9a-f]{64}$/.test(value.sha256)))throw Error('来源摘要格式错误');
+ return {repository:value.repository,commit:value.commit,path:value.path,sha256:value.sha256??null};
+}
+function makeMeasurement(dictionary,definitionId,value,options={}){
+ const index=validateDictionary(dictionary),definition=index.byId[definitionId];
+ if(!definition)throw Error('未登记测量：'+definitionId);
+ const status=value===null||value===undefined?'UNKNOWN':normalizeStatus(options.status||'PASS');
+ if(value!==null&&value!==undefined){
+  if(!finite(value))throw Error('测量必须是有限数值：'+definitionId);
+  if(definition.quantity==='count'&&(!Number.isInteger(value)||value<0))throw Error('计数必须为非负整数：'+definitionId);
+ }
+ const unit=options.unit||definition.unit;
+ if(unit!==definition.unit)throw Error('测量单位与字典不一致：'+definitionId+' 应为 '+definition.unit+'，收到 '+unit);
+ const basis=options.basis||'unknown';if(!BASES.includes(basis))throw Error('测量依据无效：'+definitionId);
+ return {id:options.id||definitionId,definitionId,label:definition.label,value:value??null,unit,status,basis,method:options.method||null,context:clone(options.context||{}),sourceRef:options.sourceRef||null,notEquivalentTo:clone(definition.notEquivalentTo||[]),requiredEvidence:clone(definition.requiredEvidence||[]),owner:definition.owner};
+}
+function makeCheck(id,status,message,options={}){
+ if(typeof id!=='string'||!id)throw Error('检查项缺少ID');
+ if(typeof message!=='string'||!message)throw Error('检查项缺少说明：'+id);
+ return {id,status:normalizeStatus(status),message,category:options.category||'contract',owner:options.owner||null,sourceRef:options.sourceRef||null,measurementId:options.measurementId||null,expected:clone(options.expected??null),observed:clone(options.observed??null),detail:clone(options.detail??null)};
+}
+function makeDefect(objectId,check,options={}){
+ const status=normalizeStatus(check.status);
+ if(!['FAIL','WARNING','UNKNOWN'].includes(status))throw Error('PASS或不适用项不能形成缺陷：'+check.id);
+ const code=options.code||check.id;
+ return {schema:DEFECT_SCHEMA,id:options.id||('defect:'+objectId+':'+hashId(code+'|'+check.message)),objectId,code,severity:options.severity||SEVERITY[status],state:'OPEN',owner:options.owner||check.owner||'reality-coordinator',sourceCommit:options.sourceCommit||null,measurementId:check.measurementId||null,message:check.message,expected:clone(check.expected),observed:clone(check.observed),detail:clone(check.detail),repairAuthorized:false,verificationRequired:true,createdBy:'REALITY-HC-S2.1',createdAt:options.createdAt||null};
+}
+function verifyAdapter(adapter){
+ const methods=['identity','source','units','frames','measurements','checks','defects','preservation'];
+ if(!adapter||typeof adapter!=='object')throw Error('适配器不存在');
+ for(const name of methods)if(typeof adapter[name]!=='function')throw Error('适配器缺少方法：'+name);
+ if(typeof adapter.read!=='function')throw Error('适配器缺少只读read方法');
+ if('write' in adapter)throw Error('S2.1适配器禁止暴露write接口');
+ return true;
+}
+function finalizeObject(candidate,dictionary){
+ const index=validateDictionary(dictionary);
+ if(!plain(candidate)||candidate.schema!==OBJECT_SCHEMA)throw Error('对象协议不正确');
+ if(typeof candidate.objectId!=='string'||!/^[a-zA-Z0-9_.:-]{1,160}$/.test(candidate.objectId))throw Error('对象身份无效');
+ if(!DOMAINS.includes(candidate.domain))throw Error('对象领域越界：'+candidate.domain);
+ if(!SOURCE_MODES.includes(candidate.sourceMode))throw Error('来源模式无效：'+candidate.sourceMode);
+ const result=clone(candidate);result.source=source(candidate.source);
+ if(!Array.isArray(result.units))throw Error('单位声明必须为数组');
+ for(const item of result.units){
+  if(!plain(item)||typeof item.quantity!=='string'||!item.quantity)throw Error('单位声明缺少量纲');
+  if(!UNITS.includes(item.unit))throw Error('未知单位声明：'+item.unit);
+  if(!BASES.includes(item.basis||'unknown'))throw Error('单位声明依据无效');
+ }
+ if(!Array.isArray(result.frames))throw Error('坐标框架必须为数组');
+ if(!Array.isArray(result.measurements))throw Error('测量必须为数组');
+ for(const m of result.measurements){
+  const definition=index.byId[m.definitionId];if(!definition)throw Error('对象含未登记测量：'+m.definitionId);
+  if(m.unit!==definition.unit)throw Error('对象测量单位错误：'+m.id);
+  if(!STATUSES.includes(normalizeStatus(m.status)))throw Error('对象测量状态错误：'+m.id);
+  if(m.value!=null&&!finite(m.value))throw Error('对象测量数值无效：'+m.id);
+ }
+ if(!Array.isArray(result.checks))throw Error('检查项必须为数组');
+ const checkIds=new Set();for(const c of result.checks){c.status=normalizeStatus(c.status);if(checkIds.has(c.id))throw Error('检查ID重复：'+c.id);checkIds.add(c.id);}
+ const counts=Object.fromEntries(STATUSES.map(status=>[status,0]));for(const c of result.checks)counts[c.status]++;
+ if(!Array.isArray(result.defects))result.defects=[];
+ const defectIds=new Set();for(const d of result.defects){if(d.schema!==DEFECT_SCHEMA||d.objectId!==result.objectId)throw Error('缺陷协议或对象不匹配');if(defectIds.has(d.id))throw Error('缺陷ID重复：'+d.id);defectIds.add(d.id);d.repairAuthorized=false;d.verificationRequired=true;}
+ result.status=counts.FAIL?'REJECTED':counts.WARNING||counts.UNKNOWN?'PARTIAL':'VALID';
+ result.counts=counts;
+ result.hostModified=false;result.physicalCertification=false;result.manufacturingCertification=false;result.aestheticAcceptance=false;result.productionReady=false;
+ result.contractVersion=VERSION;
+ return result;
+}
+function aggregate(objects,dictionary){
+ if(!Array.isArray(objects)||!objects.length)throw Error('汇总对象为空');
+ const normalized=objects.map(object=>finalizeObject(object,dictionary));
+ const counts=Object.fromEntries(STATUSES.map(status=>[status,0]));const defects=[];
+ for(const object of normalized){for(const status of STATUSES)counts[status]+=object.counts[status];defects.push(...object.defects);}
+ return {schema:BUNDLE_SCHEMA,version:VERSION,objects:normalized,counts,defects,status:counts.FAIL?'REJECTED':counts.WARNING||counts.UNKNOWN?'PARTIAL':'VALID',sourceWriteAPI:false,automaticRepair:false,physicalCertification:false,manufacturingCertification:false,aestheticAcceptance:false,productionReady:false};
+}
+function defectBundle(objects,dictionary){const bundle=aggregate(objects,dictionary);return {schema:'kaopu/reality-defect-bundle@0.2',version:VERSION,generatedAt:null,sourceObjects:bundle.objects.map(o=>({objectId:o.objectId,domain:o.domain,commit:o.source.commit})),defects:bundle.defects.map(d=>({...d,repairAuthorized:false,verificationRequired:true})),automaticRepair:false};}
+const api=Object.freeze({VERSION,OBJECT_SCHEMA,BUNDLE_SCHEMA,DEFECT_SCHEMA,STATUSES,DOMAINS,SOURCE_MODES,BASES,UNITS,clone,normalizeStatus,validateDictionary,source,makeMeasurement,makeCheck,makeDefect,verifyAdapter,finalizeObject,aggregate,defectBundle});
+root.RealityProtocol=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);
+
+/* Uses the existing RealityProtocol 0.2, without changing its source.
+ * A schema bridge is not a physical or visual certification. */
+(function(root){
+'use strict';
+const P=root.RealityProtocol||(typeof require==='function'?require('../hc-s2-1/protocol.js'):null);
+const clone=x=>JSON.parse(JSON.stringify(x)),finite=x=>typeof x==='number'&&Number.isFinite(x);
+const LIVE_IDS=['material.warp_spacing_m','material.weft_spacing_m','material.twill_repeat_m','material.stitch_pitch_m','material.visible_thread_width_m','material.thickness_m','material.yarn_diameter_m','material.linear_density_tex'];
+const LIVE_UNITS=['m','m','m','m','m','m','m','tex'];
+const LIVE_STATUS=['PASS','PASS','PASS','PASS','WARNING','UNKNOWN','UNKNOWN','UNKNOWN'];
+const MAX_BYTES=1048576;
+function parse(text){if(typeof text!=='string'||new TextEncoder().encode(text).length>MAX_BYTES)throw Error('INPUT_TOO_LARGE');return JSON.parse(text);}
+function sameSource(a,b){return !!a&&!!b&&['repository','commit','path','sha256'].every(k=>a[k]===b[k]);}
+function validateExport(x,expectedSource){
+ if(!x||Array.isArray(x)||x.schema!=='kaopu/reality-workbench-export@1'||x.exporterVersion!=='0.3.1-a')throw Error('EXPORT_SCHEMA_UNSUPPORTED');
+ if(x.objectId!=='fabric-denim-r17-2'||x.family!=='denim'||x.domain!=='fabric')throw Error('EXPORT_SCOPE_MISMATCH');
+ P.source(x.source);if(!sameSource(x.source,expectedSource))throw Error('SOURCE_REVISION_MISMATCH');
+ if(!x.capture||!Number.isInteger(x.capture.sequence)||x.capture.sequence<1||!Number.isFinite(Date.parse(x.capture.capturedAt)))throw Error('CAPTURE_ID_INVALID');
+ if(!x.authorities||['sourceWriteAPI','repairAuthorized','physicalCertification','manufacturingCertification','productionReady'].some(k=>x.authorities[k]!==false))throw Error('AUTHORITY_ESCALATION_REJECTED');
+ if(!Array.isArray(x.measurements)||x.measurements.length!==LIVE_IDS.length)throw Error('MEASUREMENT_SET_MISMATCH');
+ for(let i=0;i<LIVE_IDS.length;i++){const m=x.measurements[i];if(m.id!==LIVE_IDS[i]||m.unit!==LIVE_UNITS[i]||m.status!==LIVE_STATUS[i])throw Error('MEASUREMENT_SEMANTICS_MISMATCH:'+LIVE_IDS[i]);if(i<5&&(!finite(m.value)||m.value<=0))throw Error('INVALID_POSITIVE_LENGTH');if(i>=5&&m.value!==null)throw Error('UNKNOWN_MUST_STAY_NULL');if(typeof m.method!=='string'||!m.method||m.basis!==(i<5?'runtime_computed':'unknown'))throw Error('MEASUREMENT_BASIS_MISMATCH');}
+ const u=x.shaderInputs;if(!u||!['weaveScale','stitchPitch','threadWidth','readability','wash','light'].every(k=>finite(u[k])))throw Error('INVALID_SHADER_INPUTS');
+ const expected=[.0254/60*u.weaveScale,.0254/40*u.weaveScale,.0254/60*4*u.weaveScale,u.stitchPitch,u.threadWidth];
+ for(let i=0;i<5;i++)if(Math.abs(x.measurements[i].value-expected[i])>1e-12*Math.max(1,Math.abs(expected[i])))throw Error('MEASUREMENT_FORMULA_MISMATCH');
+ if(!x.preservation||x.preservation.passed!==true||JSON.stringify(x.preservation.before)!==JSON.stringify(x.preservation.after))throw Error('PRESERVATION_CLAIM_INVALID');
+ return true;
+}
+function dictionary(base,history){
+ const d=clone(base),known=new Set(d.measurements.map(m=>m.id));
+ const records=history.objects.flatMap(o=>o.measurements).concat(LIVE_IDS.map((id,i)=>({definitionId:id,label:id,unit:LIVE_UNITS[i]})));
+ for(const m of records){let unit=m.unit;if(unit==='kg/m2')unit='g/m2';if(!P.UNITS.includes(unit))continue;const id='rf01.'+m.definitionId;if(known.has(id))continue;known.add(id);d.measurements.push({id,domain:'fabric',label:m.label,unit,quantity:unit==='m'?'length':unit==='g/m2'?'areal_density':unit==='tex'||unit==='denier'?'linear_density':'native_control',definition:'原始材料参数或观察量的有出处规范表示；具体范围和方法以每条记录为准，不等同实物标定。',owner:'material-workbench',notEquivalentTo:['physical specimen certification'],requiredEvidence:['source revision','basis','method']});}
+ P.validateDictionary(d);return d;
+}
+function mappedMeasurement(m,dict,owner,sourceRef){
+ const original=clone(m),id=m.definitionId||m.id;let value=m.value,unit=m.unit,conversion=null;
+ if(unit==='kg/m2'){if(value!=null&&!finite(value))throw Error('AREAL_DENSITY_INVALID');value=value==null?null:value*1000;unit='g/m2';conversion={factor:1000,from:'kg/m2',to:'g/m2'};}
+ if(!P.UNITS.includes(unit))return {unsupported:true,original};
+ if(value!=null&&!finite(value))return {unsupported:true,original};
+ const basis=['source_declared','runtime_computed','physical_measured','artistic','unknown'].includes(m.basis)?m.basis:m.value==null?'unknown':'source_declared';
+ const mapped=P.makeMeasurement(dict,'rf01.'+id,value,{status:m.status,unit,basis,method:m.method||m.note||'source declaration',sourceRef,context:{originalRecord:original,originalBasis:m.basis,unitConversion:conversion,physicalCalibration:false}});
+ if(m.status==='NOT_APPLICABLE')mapped.status='NOT_APPLICABLE';
+ mapped.owner=owner;return {measurement:mapped,original};
+}
+function finalize(id,name,source,mode,rows,extraChecks,dict,extensions){
+ const measurements=[],checks=[],unsupported=[];
+ for(const row of rows){const q=mappedMeasurement(row,dict,extensions.owner,source.commit);if(q.unsupported){unsupported.push(q.original);checks.push(P.makeCheck('unsupported:'+(row.id||row.definitionId),'WARNING','共同协议当前不能无损表达此单位/值，已保留在扩展中：'+(row.unit||'?'),{owner:extensions.owner,detail:q.original}));}else {measurements.push(q.measurement);checks.push(P.makeCheck('measurement:'+q.measurement.id,q.measurement.status,q.measurement.method||q.measurement.label,{owner:extensions.owner,measurementId:q.measurement.id,observed:q.measurement.value}));}}
+ checks.push(...extraChecks);
+ const defects=checks.filter(c=>['FAIL','WARNING','UNKNOWN'].includes(c.status)).map(c=>P.makeDefect(id,c,{sourceCommit:source.commit}));
+ return P.finalizeObject({schema:P.OBJECT_SCHEMA,objectId:id,domain:'fabric',name,sourceMode:mode,source,units:[{quantity:'length',unit:'m',basis:'source_declared'}],frames:[],measurements,checks,defects,preservation:extensions.preservation||null,extensions:{...extensions,unsupportedOriginalMeasurements:unsupported}},dict);
+}
+function live(x,dict,expectedSource,imported=false){
+ validateExport(x,expectedSource);
+ const extra=[P.makeCheck('source:transport',imported?'UNKNOWN':'PASS',imported?'导入报告只作为外部声明；不冒充本会话实时读取':'本会话从固定原生副本的只读回调读取'),P.makeCheck('source:preservation',imported?'UNKNOWN':'PASS',imported?'导入文件中的保护声明未重新实测':'同步读取前后受检状态/几何/着色器保持一致'),P.makeCheck('material:axis','WARNING','材料参考坐标已声明；未证明匹配裁缝铺材料轴'),P.makeCheck('physical:calibration','UNKNOWN','没有实物材料标定，不把GPU参数当实物真值'),P.makeCheck('source:nominal','WARNING','名义11针/30mm与实际上传节距分别保留；工艺容差未知',{expected:.03/11,observed:x.shaderInputs.stitchPitch})];
+ return finalize(x.objectId,'牛仔 R17.2 · '+(imported?'导入观察':'实时观察'),x.source,imported?'imported_unverified':'live_read_only',x.measurements,extra,dict,{owner:'denim-workshop',exportSchema:x.schema,originalExport:clone(x),preservation:imported?null:x.preservation,capturedAt:x.capture.capturedAt,sourceAuthority:'candidate-native-copy-not-production-installation'});
+}
+function historyObject(o,dict){
+ const s=o.source.visual||o.source;const source={repository:s.repository,commit:s.commit||s.sourceCommit||s.evidenceCommit,path:s.path,sha256:s.sha256||null};P.source(source);
+ const extra=o.checks.map(c=>P.makeCheck('s3:'+c.code,c.status,c.message,{owner:o.source.owner}));
+ extra.push(P.makeCheck('source:history','WARNING','这是S3固定证据，不是本会话重新读取的工作台'));
+ if(o.source.physics)extra.push(P.makeCheck('source:split','WARNING','外观与物理来源分离，未自动合并版本'));
+ return finalize(o.id,o.name,source,'fixed_snapshot',o.measurements,extra,dict,{owner:o.source.owner,originalSchema:'kaopu/reality-material-snapshot-set@1',originalS3Object:clone(o),originalDefects:clone(o.defects),sourceAuthority:'history'});
+}
+function diff(a,b){const old=new Map((a?.measurements||[]).map(x=>[x.id||x.definitionId,x]));return (b?.measurements||[]).map(n=>{const p=old.get(n.id||n.definitionId);return {id:n.id||n.definitionId,before:p?.value??null,after:n.value,unit:n.unit,changed:!p||p.unit!==n.unit||p.value!==n.value};}).filter(x=>x.changed);}
+const api=Object.freeze({MAX_BYTES,LIVE_IDS,LIVE_UNITS,parse,sameSource,validateExport,dictionary,live,historyObject,diff});root.RealityBridge31=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);
+
+(function(){
+'use strict';
+const B=RealityBridge31,P=RealityProtocol,$=id=>document.getElementById(id),D=B.dictionary(RF31_DICTIONARY,RF31_HISTORY);
+const history=RF31_HISTORY.objects.map(o=>B.historyObject(o,D));
+let current=history[0],packet=null,lastLive=null,previous=null,frame=null,ready=false,generation=0,selected='denim-live',pending=false;
+const events=[];function log(type,detail){events.push({type,detail,at:new Date().toISOString()});if(events.length>40)events.shift();}
+const text=(tag,value,cls)=>{const el=document.createElement(tag);if(value!==undefined)el.textContent=value;if(cls)el.className=cls;return el;};
+const fmt=m=>m.value==null?'未确认':m.unit==='m'?(m.value*1000).toFixed(5)+' mm':String(m.value)+' '+m.unit;
+function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
+function render(){
+ $('mode').textContent=current.sourceMode==='live_read_only'?'本会话原生实时读取':current.sourceMode==='imported_unverified'?'导入报告 · 未实时复验':'S3 历史快照 · 非实时';
+ $('object').textContent=current.name;const counts=$('counts');counts.replaceChildren();for(const s of P.STATUSES){const card=text('div',undefined,'count '+s);card.append(text('b',String(current.counts[s])),text('small',({PASS:'已核对',FAIL:'冲突',WARNING:'风险',UNKNOWN:'未确认',NOT_APPLICABLE:'不适用'})[s]));counts.append(card);}
+ const body=$('measurements');body.replaceChildren();for(const m of current.measurements){const tr=document.createElement('tr');tr.append(text('td',m.label),text('td',fmt(m)),text('td',m.status,m.status),text('td',m.method));body.append(tr);}
+ const issues=$('issues');issues.replaceChildren();for(const c of current.checks.filter(c=>!$('missing-only').checked||c.status==='UNKNOWN'||c.status==='FAIL'||c.status==='WARNING')){const row=text('article',undefined,'issue '+c.status);row.append(text('code',c.id),text('b',c.status),text('p',c.message));issues.append(row);}
+ $('source').textContent=JSON.stringify({schema:current.schema,sourceMode:current.sourceMode,source:current.source,capturedAt:current.extensions.capturedAt||null,unsupported:current.extensions.unsupportedOriginalMeasurements,physicalCertification:false,productionReady:false},null,2);
+ $('export-native').disabled=!packet;$('restore-live').disabled=!lastLive;
+ $('changes').replaceChildren();if(previous&&packet){const rows=B.diff(previous,packet);for(const r of rows)$('changes').append(text('p',r.id+'：'+String(r.before)+' → '+String(r.after)+' '+r.unit));if(!rows.length)$('changes').append(text('p','相邻两次读取的量纲数值一致。'));}else $('changes').append(text('p','在原版控件中调整织纹或针脚，再读取；这里比较两次实际清单。'));
+ if(packet?.preservation&&current.sourceMode==='live_read_only')$('preservation').textContent='读取前后受检状态/几何/着色器一致；本次读取 '+packet.capture.elapsedMs.toFixed(2)+' ms（此设备）';else $('preservation').textContent='历史或导入报告不是本次原台不变性证据。';
+ $('caption').textContent=current.sourceMode==='live_read_only'?'画面来自原生 R17.2，规范数据由新只读接口读取。':'下方表格当前不是原台实时读数；原生画面与报告模式分别标明。';
+}
+function closeNative(){generation++;ready=false;frame?.remove();frame=null;$('host').replaceChildren();$('read').disabled=true;$('close').disabled=true;}
+async function loadNative(){
+ closeNative();selected='denim-live';const token=generation;status('载入封装的原版 R17.2；不联网下载模型。');frame=document.createElement('iframe');frame.id='native';frame.title='原生牛仔 R17.2 + 只读规范接口';frame.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(RF31_NATIVE_B64),c=>c.charCodeAt(0)));$('host').replaceChildren(frame);$('close').disabled=false;
+ const start=performance.now();while(token===generation){if(frame.contentWindow.KAOPU_REALITY&&frame.contentWindow.DENIM_R17?.state.ready)break;if(performance.now()-start>45000)throw Error('原生出画超时；未回退为假对象');await new Promise(r=>setTimeout(r,100));}if(token!==generation)return;
+ ready=true;$('read').disabled=false;const doc=frame.contentDocument;
+ const schedule=()=>{if(!$('auto').checked||pending)return;pending=true;const g=generation;frame.contentWindow.requestAnimationFrame(()=>frame?.contentWindow.requestAnimationFrame(()=>{pending=false;if(g===generation&&selected==='denim-live')safe(read)();}));};
+ doc.addEventListener('input',schedule);doc.addEventListener('change',schedule);
+ await new Promise(r=>frame.contentWindow.requestAnimationFrame(()=>frame.contentWindow.requestAnimationFrame(r)));
+ read();status('原生已出画；可操作原有织纹/针脚控件，规范清单按实际上传值更新。');log('native-loaded',RF31_BUILD.native.source);
+}
+function read(){
+ if(!ready||!frame)throw Error('原生工作台尚未就绪');
+ const next=frame.contentWindow.KAOPU_REALITY.read();
+ const candidate=B.live(next,D,RF31_BUILD.native.source,false);
+ previous=lastLive;packet=next;lastLive=next;current=candidate;selected='denim-live';render();log('capture',{sequence:next.capture.sequence,shaderInputs:next.shaderInputs});return next;
+}
+function importPacket(input){
+ const x=input?.schema==='kaopu/reality-review-bundle@1'?input.native:input;
+ const candidate=B.live(x,D,RF31_BUILD.native.source,true);
+ // Commit only after validation, preserving current valid report on any failure.
+ previous=null;packet=JSON.parse(JSON.stringify(x));current=candidate;selected='imported';render();status('导入成功，但未重新实测；本地文件不会被标记为当前实时观察。');log('imported',{capturedAt:x.capture.capturedAt});
+}
+function selectHistory(id){const h=history.find(o=>o.objectId===id);if(!h)throw Error('未登记对象');current=h;packet=null;selected=id;previous=null;render();status('显示S3固定证据。针织/皮革尚未安装本轮实时接口。');}
+function safe(fn){return async()=>{try{return await fn();}catch(e){status(e.message||String(e),true);log('handled-error',e.message||String(e));}};}
+function download(name,value){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+for(const o of history){const b=text('button',o.name);b.dataset.history=o.objectId;b.onclick=safe(()=>selectHistory(o.objectId));$('history-nav').append(b);}
+$('load').onclick=safe(loadNative);$('read').onclick=safe(read);$('close').onclick=()=>{closeNative();pending=false;status('原生副本已关闭；清单是保留的观察结果，不是持续监控。');if(current.sourceMode==='live_read_only'){current=JSON.parse(JSON.stringify(current));current.sourceMode='imported_unverified';current.extensions.viewingNote='native instance closed; retained local observation';render();}};
+$('restore-live').onclick=safe(()=>{if(!ready)throw Error('原生副本已关闭；请重新加载后读取');read();});
+$('missing-only').onchange=render;
+$('export-native').onclick=()=>download('RF01-S3.1-native-export.json',packet);
+$('export-common').onclick=()=>download('RF01-S3.1-common-object.json',P.aggregate([current],D));
+$('export-review').onclick=()=>download('RF01-S3.1-review.json',{schema:'kaopu/reality-review-bundle@1',native:packet,common:P.aggregate([current],D),build:RF31_BUILD.sourceCommit});
+$('export-defects').onclick=()=>download('RF01-S3.1-defects.json',P.defectBundle([current],D));
+$('file').onchange=safe(async()=>{const f=$('file').files[0];if(!f)return;if(f.size>B.MAX_BYTES)throw Error('文件超过1 MiB');importPacket(B.parse(await f.text()));});
+$('bad-unit').onclick=()=>{if(!lastLive){status('请先读取原生清单',true);return;}const bad=JSON.parse(JSON.stringify(lastLive));bad.measurements[0].unit='tex';try{importPacket(bad);status('错误：反例未被拒绝',true);}catch(e){status('错误单位已原子拒绝；当前有效清单未变：'+e.message);log('negative-unit-rejected',true);}};
+$('build').textContent='S3.1-A · '+RF31_BUILD.sourceCommit.slice(0,12)+' · 原S2.1协议 '+P.VERSION;
+render();status('规范页面已就绪。只有点击“加载原生牛仔”才启动原三维工作台；核心与该原生副本均自包含。');
+window.__REALITY_S31__={version:'REALITY-HC-S3.1-A',loadNative,read,importPacket,selectHistory,report:()=>({sourceCommit:RF31_BUILD.sourceCommit,selected,nativeReady:ready,iframeCount:document.querySelectorAll('#host iframe').length,common:JSON.parse(JSON.stringify(current)),native:packet?JSON.parse(JSON.stringify(packet)):null,historicalCount:history.length,history:JSON.parse(JSON.stringify(history)),events:JSON.parse(JSON.stringify(events)),productionSourceChanged:false,productionExporterInstalled:false,privateKeyIncluded:false,physicalCertification:false})};
+})();
+
+</script></body></html>
