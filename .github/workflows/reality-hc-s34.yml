@@ -1,0 +1,172 @@
+name: Reality HC S3.4 first-fault diagnosis
+on:
+  push:
+    branches: [feature/reality-hc-s34-first-fault-20261020]
+    paths: [.github/workflows/reality-hc-s34.yml, reality-lab/hc-s3-4/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            reality-lab/hc-s3-4
+            reality-lab/hc-s3-3
+            reality-lab/hc-s2-1
+      - name: Enforce final bounded diff and fresh viewer evidence
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 079594b6d212a917f9e8ee6915168979b7db9ced
+          python - <<'PY'
+          from pathlib import Path
+          import json,subprocess,shutil
+          r=Path('reality-lab/hc-s3-4');changed=subprocess.check_output(['git','diff','--name-only','079594b6d212a917f9e8ee6915168979b7db9ced','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s3-4/') or p=='.github/workflows/reality-hc-s34.yml' for p in changed),changed
+          for q in ['qa/source','qa/file','qa/public']:shutil.rmtree(r/q,ignore_errors=True)
+          q=r/'qa/source';q.mkdir(parents=True);(q/'SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'oldProductionFilesChanged':False},indent=2))
+          PY
+      - name: Retrieve exact successful native baseline and trace
+        uses: actions/download-artifact@v4
+        with:
+          name: reality-s34-native-diagnosis
+          run-id: 39392843557
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-4
+      - name: Bind native evidence and run independent report checks
+        env:
+          DIAGNOSTIC_RUN_ID: '39392843557'
+        run: |
+          python reality-lab/hc-s3-4/build.py
+          node reality-lab/hc-s3-4/tests/protocol.cjs
+      - name: Install fixed browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Standalone diagnostic interactions and terminal/transient distinction
+        env:
+          RF34_QA: ${{ github.workspace }}/reality-lab/hc-s3-4/qa/file
+        run: |
+          python reality-lab/hc-s3-4/tests/browser.py
+          python reality-lab/hc-s3-4/tests/terminal_browser.py
+      - name: Freeze passing diagnostic viewer, not a repaired garment
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-4')
+          for n in ['qa/source/SCOPE.json','qa/source/PROTOCOL.json','qa/file/BROWSER.json','qa/file/TERMINAL.json','diagnosis.json']:assert json.loads((r/n).read_text())['passed'],n
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s34-first-fault-20261020
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-4/preview.html reality-lab/hc-s3-4/BUILD_MANIFEST.json reality-lab/hc-s3-4/diagnosis.json reality-lab/hc-s3-4/qa/diagnostic reality-lab/hc-s3-4/qa/source reality-lab/hc-s3-4/qa/file
+          git commit -m 'build(reality): freeze D03 first-fault timeline and original numerical evidence'
+          git push origin HEAD:refs/heads/feature/reality-hc-s34-first-fault-20261020
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-4/preview.html" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s34-viewer-evidence
+          path: |
+            reality-lab/hc-s3-4/qa/source/
+            reality-lab/hc-s3-4/qa/file/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s34-viewer-source
+          path: |
+            reality-lab/hc-s3-4/*.js
+            reality-lab/hc-s3-4/*.py
+            reality-lab/hc-s3-4/*.mjs
+            reality-lab/hc-s3-4/tests/
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: reality-s34-standalone
+          path: |
+            reality-lab/hc-s3-4/preview.html
+            reality-lab/hc-s3-4/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-4
+      - name: Verify fixed public HTML bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF34_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,urllib.request,hashlib,time
+          r=Path('reality-lab/hc-s3-4');m=json.loads((r/'BUILD_MANIFEST.json').read_text());u='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-4/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(u,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'url':os.environ['RF34_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install independent fixed browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify exact public diagnostic controls and report exports
+        env:
+          RF34_URL: ${{ needs.build.outputs.url }}
+          RF34_QA: ${{ github.workspace }}/reality-lab/hc-s3-4/qa/public
+        run: |
+          python reality-lab/hc-s3-4/tests/browser.py
+          python reality-lab/hc-s3-4/tests/terminal_browser.py
+      - name: Persist actual delivery, still-unrepaired source outcome and next bounded task
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF34_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,datetime
+          r=Path('reality-lab/hc-s3-4');m=json.loads((r/'BUILD_MANIFEST.json').read_text());d=json.loads((r/'diagnosis.json').read_text());p=json.loads((r/'qa/source/PROTOCOL.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());b=json.loads((r/'qa/public/BROWSER.json').read_text());tf=json.loads((r/'qa/file/TERMINAL.json').read_text());tb=json.loads((r/'qa/public/TERMINAL.json').read_text());s=json.loads((r/'qa/public/summary.json').read_text())
+          assert all(x['passed'] for x in [d,p,f,b,tf,tb]) and f['fileVerified'] and b['publicVerified']
+          out={'version':'REALITY-HC-S3.4','status':'FIRST_FAULT_LOCALIZED_PUBLIC_VIEWER_VERIFIED_SOURCE_NOT_REPAIRED','fixedURL':os.environ['RF34_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'diagnosticRun':m['diagnosticRun'],'html':m['html'],'nativeDiagnosticChecks':len(d['checks']),'protocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'terminalBrowserChecksPerEnvironment':tb['count'],'firstObserved':s['firstObserved'],'terminal':s['terminal'],'rollback':s['rollback'],'numericalBoundaryParity':True,'checkpointCount':len(d['trace']['events']),'sourceFitAccepted':False,'repairApplied':False,'productionSourceChanged':False,'rootCauseProven':False,'physicalDeviceTested':False,'userVisualAcceptance':False,'next':'Focus one controlled diagnostic on T03 right_btorso edge 3289: prediction, adjacent bending/strain/contact interactions and sourceRest versus targetRest semantics. Keep the original 1.45 gate, actual body and pattern. Do not mistake the recovered P02 transient for the terminal failure.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(out,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.4-D03-FIRST-FAULT-20261020','frameworkId':'RF01','status':out['status'],'fixedURL':out['fixedURL'],'sourceCommit':out['sourceCommit'],'publicCommit':out['publicCommit'],'lastActuallyCompletedStep':'Actual terminal guard localized to T03 right_btorso edge 3289 at fitting step11, with exact baseline/traced numerical parity and fixed public viewer','sourceFitAccepted':False,'nextAction':out['next'],'userAccepted':False},ensure_ascii=False,indent=2));print(json.dumps({k:v for k,v in out.items() if k not in ['firstObserved','terminal']},ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s34-first-fault-20261020
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3-4/DELIVERY.json reality-lab/hc-s3-4/TASK_STATE.json reality-lab/hc-s3-4/qa/public
+          git commit -m 'docs(reality): persist D03 terminal fault and immutable public diagnostic handoff'
+          git push origin HEAD:refs/heads/feature/reality-hc-s34-first-fault-20261020
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s34-public-evidence
+          path: reality-lab/hc-s3-4/qa/public/
+          retention-days: 30

@@ -1,0 +1,53 @@
+{
+  "schema": "kaopu/reality-defect-bundle@0.2",
+  "version": "0.2.0",
+  "generatedAt": null,
+  "sourceObjects": [
+    {
+      "objectId": "garment-r10-d03-init-fault",
+      "domain": "garment",
+      "commit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49"
+    }
+  ],
+  "defects": [
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-init-fault:3ea3c6a4",
+      "objectId": "garment-r10-d03-init-fault",
+      "code": "fit:original_guard",
+      "severity": "critical",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "原生工程保护门触发；仍未完成D03试穿",
+      "expected": 1.45,
+      "observed": 1.5204542157336371,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-init-fault:b909e474",
+      "objectId": "garment-r10-d03-init-fault",
+      "code": "cause:mechanism",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "reality-coordinator",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "只定位观测边界与具体边，尚未证明充分根因，未实施修复",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    }
+  ],
+  "automaticRepair": false
+}

@@ -1,0 +1,2282 @@
+{
+  "schema": "kaopu/reality-foundation-bundle@0.2",
+  "version": "0.2.0",
+  "objects": [
+    {
+      "schema": "kaopu/reality-object@0.2",
+      "objectId": "garment-r10-d03-init-fault",
+      "domain": "garment",
+      "name": "D03 初始化原门禁超限定位",
+      "sourceMode": "fixed_snapshot",
+      "source": {
+        "repository": "haihao0307/guilin-dem-pipeline",
+        "commit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+        "path": "kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef/wasm-cloth.mjs",
+        "sha256": "33df85592209c3ddd60224a75fe3129666028ab185f0da5eb1a9fd9e35b62de5"
+      },
+      "units": [],
+      "frames": [],
+      "measurements": [
+        {
+          "id": "rf01.failure.max_edge_ratio",
+          "definitionId": "rf01.failure.max_edge_ratio",
+          "label": "原保护门首先拒绝的最大边长比",
+          "value": 1.5204542157336371,
+          "unit": "1",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "原保护门实际执行的audit最大值，与独立逐边扫描核对",
+          "context": {},
+          "sourceRef": null,
+          "notEquivalentTo": [
+            "material certification"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "actual original guard",
+            "unchanged arithmetic"
+          ],
+          "owner": "tailor-workbench"
+        }
+      ],
+      "checks": [
+        {
+          "id": "fit:original_guard",
+          "status": "FAIL",
+          "message": "原生工程保护门触发；仍未完成D03试穿",
+          "category": "contract",
+          "owner": "tailor-workbench",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": 1.45,
+          "observed": 1.5204542157336371,
+          "detail": null
+        },
+        {
+          "id": "diagnostic:parity",
+          "status": "PASS",
+          "message": "最小观察与逐阶段观察的四组数值边界状态逐字节一致",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "diagnostic:rollback",
+          "status": "PASS",
+          "message": "受检数值状态精确回到本步入口",
+          "category": "contract",
+          "owner": "tailor-workbench",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": [],
+          "detail": null
+        },
+        {
+          "id": "cause:mechanism",
+          "status": "UNKNOWN",
+          "message": "只定位观测边界与具体边，尚未证明充分根因，未实施修复",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        }
+      ],
+      "defects": [
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:garment-r10-d03-init-fault:3ea3c6a4",
+          "objectId": "garment-r10-d03-init-fault",
+          "code": "fit:original_guard",
+          "severity": "critical",
+          "state": "OPEN",
+          "owner": "tailor-workbench",
+          "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+          "measurementId": null,
+          "message": "原生工程保护门触发；仍未完成D03试穿",
+          "expected": 1.45,
+          "observed": 1.5204542157336371,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:garment-r10-d03-init-fault:b909e474",
+          "objectId": "garment-r10-d03-init-fault",
+          "code": "cause:mechanism",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "reality-coordinator",
+          "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+          "measurementId": null,
+          "message": "只定位观测边界与具体边，尚未证明充分根因，未实施修复",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        }
+      ],
+      "extensions": {
+        "summary": {
+          "schema": "kaopu/first-fault-summary@1",
+          "source": {
+            "repository": "haihao0307/guilin-dem-pipeline",
+            "commit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+            "directory": "kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef",
+            "sourcePR": 283,
+            "branchHeadAtRead": "bd430222b3c62819bdf38d2c84d4bf3eec8ac5be",
+            "files": {
+              "app.mjs": "958ce88eaec470c472204dd4b348d67d94230820b084f668f21799fcbb30f63b",
+              "wasm-cloth.mjs": "33df85592209c3ddd60224a75fe3129666028ab185f0da5eb1a9fd9e35b62de5",
+              "live-cloth-worker.mjs": "7cd945c060e4206bdef1b2b1eba302d8bd4a0cd9c44d0858b6031db3cf21d3c7",
+              "live-cloth-controller.mjs": "8fa9f8f444b3d6b560e811ffc9b87049b6a9b54e273daadc6be4b1468b55fbe6",
+              "cloth-kernel.wasm": "772ffe81b9c49b17e81c99dc0f5323ff2006cf3d46e5532de8bf2ebe631d9416",
+              "material-physics.mjs": "5b040b89a14808f904ce4488e2e9d74835e8afaa0ba53836db4a64bf67cbd099",
+              "coupled-cloth.mjs": "1f0e93ba23658fd0b3d16abd27325b4c3d29cba267b94078f05fafc7105cdd68"
+            }
+          },
+          "firstObserved": {
+            "event": {
+              "sequence": 12,
+              "fitStep": 0,
+              "stepCall": 1,
+              "stage": "after-bend-or-skip",
+              "substep": 0,
+              "iteration": 0,
+              "phase": "elastic",
+              "operationSolver": 1,
+              "states": [
+                {
+                  "role": "top",
+                  "solver": 0,
+                  "edgeCount": 6550,
+                  "maxRatio": 1.2059790690617804,
+                  "minRatio": 0.8899784687511896,
+                  "maxEdgeIndex": 5038,
+                  "overLimitCount": 0,
+                  "firstOverIndex": -1,
+                  "invalidCount": 0
+                },
+                {
+                  "role": "bottom",
+                  "solver": 1,
+                  "edgeCount": 9035,
+                  "maxRatio": 1.967292201323522,
+                  "minRatio": 0.6312215497612909,
+                  "maxEdgeIndex": 2797,
+                  "overLimitCount": 5,
+                  "firstOverIndex": 648,
+                  "invalidCount": 0
+                }
+              ]
+            },
+            "previous": {
+              "sequence": 11,
+              "fitStep": 0,
+              "stepCall": 1,
+              "stage": "after-distance",
+              "substep": 0,
+              "iteration": 0,
+              "phase": "elastic",
+              "operationSolver": 1,
+              "states": [
+                {
+                  "role": "top",
+                  "solver": 0,
+                  "edgeCount": 6550,
+                  "maxRatio": 1.2059790690617804,
+                  "minRatio": 0.8899784687511896,
+                  "maxEdgeIndex": 5038,
+                  "overLimitCount": 0,
+                  "firstOverIndex": -1,
+                  "invalidCount": 0
+                },
+                {
+                  "role": "bottom",
+                  "solver": 1,
+                  "edgeCount": 9035,
+                  "maxRatio": 1.327857361956532,
+                  "minRatio": 0.9054529403466486,
+                  "maxEdgeIndex": 67,
+                  "overLimitCount": 0,
+                  "firstOverIndex": -1,
+                  "invalidCount": 0
+                }
+              ]
+            },
+            "worstEdge": {
+              "solver": 1,
+              "role": "bottom",
+              "presetId": "P02",
+              "edgeIndex": 2797,
+              "panelId": "pant_b_r",
+              "localVertices": [
+                160,
+                814
+              ],
+              "globalVertices": [
+                954,
+                1608
+              ],
+              "particles": [
+                48,
+                1525
+              ],
+              "uvMm": [
+                [
+                  389.1585138460797,
+                  199.31713026988672
+                ],
+                [
+                  390.27028463505786,
+                  193.29247767849657
+                ]
+              ],
+              "endpointsM": [
+                [
+                  -0.0005531807362843322,
+                  -0.14799497389003372,
+                  0.007231718663851382
+                ],
+                [
+                  -0.00871119241870819,
+                  -0.14545746803193338,
+                  0.015974206552767725
+                ]
+              ],
+              "lengthM": 0.012223877661294987,
+              "restM": 0.006213554678390537,
+              "sourceRestM": 0.006213554678390537,
+              "targetRestM": 0.006126375203508938,
+              "packedRestM": 0.006213554678390537,
+              "ratio": 1.967292201323522,
+              "engineeringStrain": 0.9672922013235219,
+              "inverseMass": [
+                15385.314911032314,
+                97785.37328729425
+              ],
+              "endpointMembers": [
+                [
+                  {
+                    "panelId": "pant_b_l",
+                    "localVertex": 50,
+                    "globalVertex": 50,
+                    "uvMm": [
+                      -389.15851384608,
+                      199.31713026988666
+                    ]
+                  },
+                  {
+                    "panelId": "pant_b_r",
+                    "localVertex": 160,
+                    "globalVertex": 954,
+                    "uvMm": [
+                      389.1585138460797,
+                      199.31713026988672
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "panelId": "pant_b_r",
+                    "localVertex": 814,
+                    "globalVertex": 1608,
+                    "uvMm": [
+                      390.27028463505786,
+                      193.29247767849657
+                    ]
+                  }
+                ]
+              ]
+            },
+            "firstEnumeratedOverLimit": {
+              "solver": 1,
+              "role": "bottom",
+              "presetId": "P02",
+              "edgeIndex": 648,
+              "panelId": "pant_b_l",
+              "localVertices": [
+                173,
+                174
+              ],
+              "globalVertices": [
+                173,
+                174
+              ],
+              "particles": [
+                152,
+                153
+              ],
+              "uvMm": [
+                [
+                  -0.5957022484467658,
+                  315.46751613930064
+                ],
+                [
+                  -0.45604051266029144,
+                  311.21557565095
+                ]
+              ],
+              "endpointsM": [
+                [
+                  0.19233933156821464,
+                  -0.02252272908659077,
+                  -0.0014666695635930653
+                ],
+                [
+                  0.19594760494053592,
+                  -0.027462192730440208,
+                  -0.0013394675136934409
+                ]
+              ],
+              "lengthM": 0.00611834276416513,
+              "restM": 0.003943289550970049,
+              "sourceRestM": 0.003943289550970049,
+              "targetRestM": 0.004254233575735895,
+              "packedRestM": 0.003943289550970049,
+              "ratio": 1.5515834394306698,
+              "engineeringStrain": 0.5515834394306698,
+              "inverseMass": [
+                63435.69502759465,
+                28020.707383119006
+              ],
+              "endpointMembers": [
+                [
+                  {
+                    "panelId": "pant_b_l",
+                    "localVertex": 173,
+                    "globalVertex": 173,
+                    "uvMm": [
+                      -0.5957022484467658,
+                      315.46751613930064
+                    ]
+                  },
+                  {
+                    "panelId": "pant_f_l",
+                    "localVertex": 720,
+                    "globalVertex": 2330,
+                    "uvMm": [
+                      -0.5584844451749009,
+                      312.3739316060577
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "panelId": "pant_b_l",
+                    "localVertex": 174,
+                    "globalVertex": 174,
+                    "uvMm": [
+                      -0.45604051266029144,
+                      311.21557565095
+                    ]
+                  },
+                  {
+                    "panelId": "pant_f_l",
+                    "localVertex": 721,
+                    "globalVertex": 2331,
+                    "uvMm": [
+                      -0.4315189495319138,
+                      308.5085559457594
+                    ]
+                  }
+                ]
+              ]
+            },
+            "initialCondition": false
+          },
+          "terminal": {
+            "role": "top",
+            "edge": {
+              "solver": 0,
+              "role": "top",
+              "presetId": "T03",
+              "edgeIndex": 3289,
+              "panelId": "right_btorso",
+              "localVertices": [
+                2,
+                38
+              ],
+              "globalVertices": [
+                1170,
+                1206
+              ],
+              "particles": [
+                1142,
+                1177
+              ],
+              "uvMm": [
+                [
+                  -256.91238438223604,
+                  312.14208620485783
+                ],
+                [
+                  -248.59573943238365,
+                  314.5727214288561
+                ]
+              ],
+              "endpointsM": [
+                [
+                  -0.1932158850422447,
+                  0.3896723575341926,
+                  -0.022005320364454583
+                ],
+                [
+                  -0.1918290593365318,
+                  0.3910507390555841,
+                  -0.033247913569671904
+                ]
+              ],
+              "lengthM": 0.011411359390297821,
+              "restM": 0.007505230524019235,
+              "sourceRestM": 0.007505230524019235,
+              "targetRestM": 0.00866455831615474,
+              "packedRestM": 0.007505230524019235,
+              "ratio": 1.5204542157336371,
+              "engineeringStrain": 0.5204542157336371,
+              "inverseMass": [
+                34677.57786688155,
+                101727.65813831618
+              ],
+              "endpointMembers": [
+                [
+                  {
+                    "panelId": "right_btorso",
+                    "localVertex": 2,
+                    "globalVertex": 1170,
+                    "uvMm": [
+                      -256.91238438223604,
+                      312.14208620485783
+                    ]
+                  },
+                  {
+                    "panelId": "right_ftorso",
+                    "localVertex": 4,
+                    "globalVertex": 1717,
+                    "uvMm": [
+                      -335.1225373356963,
+                      313.39048586656463
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "panelId": "right_btorso",
+                    "localVertex": 38,
+                    "globalVertex": 1206,
+                    "uvMm": [
+                      -248.59573943238365,
+                      314.5727214288561
+                    ]
+                  }
+                ]
+              ]
+            },
+            "originalAudit": {
+              "role": "top",
+              "maxEdgeStretch": 1.5204542157336371,
+              "minEdgeStretch": 0.5161125014174405
+            },
+            "fittingStepOneBased": 11,
+            "substepOneBased": 4,
+            "persistentRoleCrossing": {
+              "before": {
+                "sequence": 10259,
+                "fitStep": 10,
+                "stepCall": 11,
+                "stage": "after-body-interpolation-and-waist",
+                "substep": 3,
+                "iteration": null,
+                "phase": "prediction",
+                "operationSolver": null,
+                "states": [
+                  {
+                    "role": "top",
+                    "solver": 0,
+                    "edgeCount": 6550,
+                    "maxRatio": 1.3861648652351741,
+                    "minRatio": 0.6372043125531974,
+                    "maxEdgeIndex": 3289,
+                    "overLimitCount": 0,
+                    "firstOverIndex": -1,
+                    "invalidCount": 0
+                  },
+                  {
+                    "role": "bottom",
+                    "solver": 1,
+                    "edgeCount": 9035,
+                    "maxRatio": 1.1669674367357128,
+                    "minRatio": 0.8962538958958246,
+                    "maxEdgeIndex": 2170,
+                    "overLimitCount": 0,
+                    "firstOverIndex": -1,
+                    "invalidCount": 0
+                  }
+                ]
+              },
+              "after": {
+                "sequence": 10260,
+                "fitStep": 10,
+                "stepCall": 11,
+                "stage": "iteration-entry",
+                "substep": 3,
+                "iteration": 0,
+                "phase": "elastic",
+                "operationSolver": null,
+                "states": [
+                  {
+                    "role": "top",
+                    "solver": 0,
+                    "edgeCount": 6550,
+                    "maxRatio": 1.4848977511394317,
+                    "minRatio": 0.5378677332791829,
+                    "maxEdgeIndex": 3289,
+                    "overLimitCount": 1,
+                    "firstOverIndex": 3289,
+                    "invalidCount": 0
+                  },
+                  {
+                    "role": "bottom",
+                    "solver": 1,
+                    "edgeCount": 9035,
+                    "maxRatio": 1.2129262706157198,
+                    "minRatio": 0.8198434131575345,
+                    "maxEdgeIndex": 548,
+                    "overLimitCount": 0,
+                    "firstOverIndex": -1,
+                    "invalidCount": 0
+                  }
+                ]
+              }
+            },
+            "lastIncreaseBeforeGate": {
+              "before": {
+                "sequence": 10480,
+                "fitStep": 10,
+                "stepCall": 11,
+                "stage": "after-strain-projection",
+                "substep": 3,
+                "iteration": 11,
+                "phase": "polish",
+                "operationSolver": 0,
+                "states": [
+                  {
+                    "role": "top",
+                    "solver": 0,
+                    "edgeCount": 6550,
+                    "maxRatio": 1.4595569017653751,
+                    "minRatio": 0.8825378881190656,
+                    "maxEdgeIndex": 3289,
+                    "overLimitCount": 1,
+                    "firstOverIndex": 3289,
+                    "invalidCount": 0
+                  },
+                  {
+                    "role": "bottom",
+                    "solver": 1,
+                    "edgeCount": 9035,
+                    "maxRatio": 1.1599977022960115,
+                    "minRatio": 0.896346835605619,
+                    "maxEdgeIndex": 2170,
+                    "overLimitCount": 0,
+                    "firstOverIndex": -1,
+                    "invalidCount": 0
+                  }
+                ]
+              },
+              "after": {
+                "sequence": 10481,
+                "fitStep": 10,
+                "stepCall": 11,
+                "stage": "after-project",
+                "substep": 3,
+                "iteration": 11,
+                "phase": "polish",
+                "operationSolver": 0,
+                "states": [
+                  {
+                    "role": "top",
+                    "solver": 0,
+                    "edgeCount": 6550,
+                    "maxRatio": 1.5204542157336371,
+                    "minRatio": 0.5161125014174405,
+                    "maxEdgeIndex": 3289,
+                    "overLimitCount": 1,
+                    "firstOverIndex": 3289,
+                    "invalidCount": 0
+                  },
+                  {
+                    "role": "bottom",
+                    "solver": 1,
+                    "edgeCount": 9035,
+                    "maxRatio": 1.1599977022960115,
+                    "minRatio": 0.896346835605619,
+                    "maxEdgeIndex": 2170,
+                    "overLimitCount": 0,
+                    "firstOverIndex": -1,
+                    "invalidCount": 0
+                  }
+                ]
+              }
+            },
+            "firstTransientRecoveredAt": {
+              "sequence": 13,
+              "fitStep": 0,
+              "stepCall": 1,
+              "stage": "after-strain-projection",
+              "substep": 0,
+              "iteration": 0,
+              "phase": "elastic",
+              "operationSolver": 1,
+              "states": [
+                {
+                  "role": "top",
+                  "solver": 0,
+                  "edgeCount": 6550,
+                  "maxRatio": 1.2059790690617804,
+                  "minRatio": 0.8899784687511896,
+                  "maxEdgeIndex": 5038,
+                  "overLimitCount": 0,
+                  "firstOverIndex": -1,
+                  "invalidCount": 0
+                },
+                {
+                  "role": "bottom",
+                  "solver": 1,
+                  "edgeCount": 9035,
+                  "maxRatio": 1.2489744279488764,
+                  "minRatio": 0.837629534299316,
+                  "maxEdgeIndex": 2431,
+                  "overLimitCount": 0,
+                  "firstOverIndex": -1,
+                  "invalidCount": 0
+                }
+              ]
+            },
+            "firstTransientIsTerminalCauseProven": false,
+            "ratioAgainstGradedReference": 1.3170157062734258,
+            "excessAboveOriginalLimitM": 0.0005287751304699304
+          },
+          "guard": {
+            "limit": 1.45,
+            "quantity": "edge_length/rest_length",
+            "edgeMaxima": [
+              {
+                "role": "top",
+                "top": [
+                  {
+                    "solver": 0,
+                    "role": "top",
+                    "presetId": "T03",
+                    "edgeIndex": 3289,
+                    "panelId": "right_btorso",
+                    "localVertices": [
+                      2,
+                      38
+                    ],
+                    "globalVertices": [
+                      1170,
+                      1206
+                    ],
+                    "particles": [
+                      1142,
+                      1177
+                    ],
+                    "uvMm": [
+                      [
+                        -256.91238438223604,
+                        312.14208620485783
+                      ],
+                      [
+                        -248.59573943238365,
+                        314.5727214288561
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        -0.1932158850422447,
+                        0.3896723575341926,
+                        -0.022005320364454583
+                      ],
+                      [
+                        -0.1918290593365318,
+                        0.3910507390555841,
+                        -0.033247913569671904
+                      ]
+                    ],
+                    "lengthM": 0.011411359390297821,
+                    "restM": 0.007505230524019235,
+                    "sourceRestM": 0.007505230524019235,
+                    "targetRestM": 0.00866455831615474,
+                    "packedRestM": 0.007505230524019235,
+                    "ratio": 1.5204542157336371,
+                    "engineeringStrain": 0.5204542157336371,
+                    "inverseMass": [
+                      34677.57786688155,
+                      101727.65813831618
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "right_btorso",
+                          "localVertex": 2,
+                          "globalVertex": 1170,
+                          "uvMm": [
+                            -256.91238438223604,
+                            312.14208620485783
+                          ]
+                        },
+                        {
+                          "panelId": "right_ftorso",
+                          "localVertex": 4,
+                          "globalVertex": 1717,
+                          "uvMm": [
+                            -335.1225373356963,
+                            313.39048586656463
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "right_btorso",
+                          "localVertex": 38,
+                          "globalVertex": 1206,
+                          "uvMm": [
+                            -248.59573943238365,
+                            314.5727214288561
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 0,
+                    "role": "top",
+                    "presetId": "T03",
+                    "edgeIndex": 22,
+                    "panelId": "left_btorso",
+                    "localVertices": [
+                      76,
+                      4
+                    ],
+                    "globalVertices": [
+                      76,
+                      4
+                    ],
+                    "particles": [
+                      76,
+                      4
+                    ],
+                    "uvMm": [
+                      [
+                        248.59573943238365,
+                        314.5727214288561
+                      ],
+                      [
+                        256.91238438223604,
+                        312.14208620485783
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        0.19231358372784957,
+                        0.39172586605400667,
+                        -0.030561982511389377
+                      ],
+                      [
+                        0.19389162489865372,
+                        0.388999975254423,
+                        -0.020392846635985014
+                      ]
+                    ],
+                    "lengthM": 0.010645751220108612,
+                    "restM": 0.007505230524019235,
+                    "sourceRestM": 0.007505230524019235,
+                    "targetRestM": 0.00866455831615474,
+                    "packedRestM": 0.007505230524019235,
+                    "ratio": 1.4184442684390128,
+                    "engineeringStrain": 0.41844426843901283,
+                    "inverseMass": [
+                      27300.79573328217,
+                      56098.50204900042
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "left_btorso",
+                          "localVertex": 76,
+                          "globalVertex": 76,
+                          "uvMm": [
+                            248.59573943238365,
+                            314.5727214288561
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "left_btorso",
+                          "localVertex": 4,
+                          "globalVertex": 4,
+                          "uvMm": [
+                            256.91238438223604,
+                            312.14208620485783
+                          ]
+                        },
+                        {
+                          "panelId": "left_ftorso",
+                          "localVertex": 2,
+                          "globalVertex": 550,
+                          "uvMm": [
+                            335.1225373356963,
+                            313.39048586656463
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 0,
+                    "role": "top",
+                    "presetId": "T03",
+                    "edgeIndex": 4825,
+                    "panelId": "right_ftorso",
+                    "localVertices": [
+                      74,
+                      4
+                    ],
+                    "globalVertices": [
+                      1787,
+                      1717
+                    ],
+                    "particles": [
+                      1698,
+                      1142
+                    ],
+                    "uvMm": [
+                      [
+                        -325.9043796503177,
+                        313.7039527066872
+                      ],
+                      [
+                        -335.1225373356963,
+                        313.39048586656463
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        -0.1939888174129671,
+                        0.3892393955423482,
+                        -0.011698381122502493
+                      ],
+                      [
+                        -0.1932158850422447,
+                        0.3896723575341926,
+                        -0.022005320364454583
+                      ]
+                    ],
+                    "lengthM": 0.010344944517656164,
+                    "restM": 0.00785850262360895,
+                    "sourceRestM": 0.00785850262360895,
+                    "targetRestM": 0.009223485923031509,
+                    "packedRestM": 0.00785850262360895,
+                    "ratio": 1.316401484244251,
+                    "engineeringStrain": 0.3164014842442511,
+                    "inverseMass": [
+                      104586.01740083522,
+                      34677.57786688155
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "right_ftorso",
+                          "localVertex": 74,
+                          "globalVertex": 1787,
+                          "uvMm": [
+                            -325.9043796503177,
+                            313.7039527066872
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "right_btorso",
+                          "localVertex": 2,
+                          "globalVertex": 1170,
+                          "uvMm": [
+                            -256.91238438223604,
+                            312.14208620485783
+                          ]
+                        },
+                        {
+                          "panelId": "right_ftorso",
+                          "localVertex": 4,
+                          "globalVertex": 1717,
+                          "uvMm": [
+                            -335.1225373356963,
+                            313.39048586656463
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 0,
+                    "role": "top",
+                    "presetId": "T03",
+                    "edgeIndex": 277,
+                    "panelId": "left_btorso",
+                    "localVertices": [
+                      74,
+                      75
+                    ],
+                    "globalVertices": [
+                      74,
+                      75
+                    ],
+                    "particles": [
+                      74,
+                      75
+                    ],
+                    "uvMm": [
+                      [
+                        232.61166520897433,
+                        320.74416164059437
+                      ],
+                      [
+                        240.47116516754872,
+                        317.4195682909492
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        0.18950746645745947,
+                        0.3978237405183099,
+                        -0.04758263920998935
+                      ],
+                      [
+                        0.1907183852179196,
+                        0.39372220158371163,
+                        -0.03874982300311301
+                      ]
+                    ],
+                    "lengthM": 0.009813642953608863,
+                    "restM": 0.007504243177025441,
+                    "sourceRestM": 0.007504243177025441,
+                    "targetRestM": 0.008533736610614115,
+                    "packedRestM": 0.007504243177025441,
+                    "ratio": 1.3077458608555954,
+                    "engineeringStrain": 0.3077458608555954,
+                    "inverseMass": [
+                      26999.62819675673,
+                      69291.09433340833
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "left_btorso",
+                          "localVertex": 74,
+                          "globalVertex": 74,
+                          "uvMm": [
+                            232.61166520897433,
+                            320.74416164059437
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "left_btorso",
+                          "localVertex": 75,
+                          "globalVertex": 75,
+                          "uvMm": [
+                            240.47116516754872,
+                            317.4195682909492
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 0,
+                    "role": "top",
+                    "presetId": "T03",
+                    "edgeIndex": 1704,
+                    "panelId": "left_ftorso",
+                    "localVertices": [
+                      43,
+                      44
+                    ],
+                    "globalVertices": [
+                      591,
+                      592
+                    ],
+                    "particles": [
+                      568,
+                      569
+                    ],
+                    "uvMm": [
+                      [
+                        316.72239374504653,
+                        314.44958459146744
+                      ],
+                      [
+                        307.61938334131804,
+                        315.6971453251104
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        0.19436178555222502,
+                        0.3904280595055512,
+                        -0.0006624498183674235
+                      ],
+                      [
+                        0.1953767074877365,
+                        0.3920575893718192,
+                        0.009418863606934159
+                      ]
+                    ],
+                    "lengthM": 0.010262471169236372,
+                    "restM": 0.007857596883482308,
+                    "sourceRestM": 0.007857596883482308,
+                    "targetRestM": 0.009188101337845424,
+                    "packedRestM": 0.007857596883482308,
+                    "ratio": 1.306057223527135,
+                    "engineeringStrain": 0.30605722352713505,
+                    "inverseMass": [
+                      88844.66595134759,
+                      88859.31826581463
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "left_ftorso",
+                          "localVertex": 43,
+                          "globalVertex": 591,
+                          "uvMm": [
+                            316.72239374504653,
+                            314.44958459146744
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "left_ftorso",
+                          "localVertex": 44,
+                          "globalVertex": 592,
+                          "uvMm": [
+                            307.61938334131804,
+                            315.6971453251104
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 0,
+                    "role": "top",
+                    "presetId": "T03",
+                    "edgeIndex": 3442,
+                    "panelId": "right_btorso",
+                    "localVertices": [
+                      40,
+                      41
+                    ],
+                    "globalVertices": [
+                      1208,
+                      1209
+                    ],
+                    "particles": [
+                      1179,
+                      1180
+                    ],
+                    "uvMm": [
+                      [
+                        -232.61166520897433,
+                        320.7441616405944
+                      ],
+                      [
+                        -225.11463494977463,
+                        324.6077723872895
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        -0.1880627284458825,
+                        0.39775286395436377,
+                        -0.049604068949214424
+                      ],
+                      [
+                        -0.18499462593699934,
+                        0.402067554557901,
+                        -0.05774504250695031
+                      ]
+                    ],
+                    "lengthM": 0.009711089458810614,
+                    "restM": 0.007503628219451088,
+                    "sourceRestM": 0.007503628219451088,
+                    "targetRestM": 0.008434035256585887,
+                    "packedRestM": 0.007503628219451088,
+                    "ratio": 1.2941858491385927,
+                    "engineeringStrain": 0.2941858491385927,
+                    "inverseMass": [
+                      39777.67414819993,
+                      123182.9863637828
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "right_btorso",
+                          "localVertex": 40,
+                          "globalVertex": 1208,
+                          "uvMm": [
+                            -232.61166520897433,
+                            320.7441616405944
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "right_btorso",
+                          "localVertex": 41,
+                          "globalVertex": 1209,
+                          "uvMm": [
+                            -225.11463494977463,
+                            324.6077723872895
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 0,
+                    "role": "top",
+                    "presetId": "T03",
+                    "edgeIndex": 1700,
+                    "panelId": "left_ftorso",
+                    "localVertices": [
+                      42,
+                      43
+                    ],
+                    "globalVertices": [
+                      590,
+                      591
+                    ],
+                    "particles": [
+                      567,
+                      568
+                    ],
+                    "uvMm": [
+                      [
+                        325.9043796503178,
+                        313.7039527066873
+                      ],
+                      [
+                        316.72239374504653,
+                        314.44958459146744
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        0.19389299299841586,
+                        0.39004339853601877,
+                        -0.010806776545949833
+                      ],
+                      [
+                        0.19436178555222502,
+                        0.3904280595055512,
+                        -0.0006624498183674235
+                      ]
+                    ],
+                    "lengthM": 0.010162435499226127,
+                    "restM": 0.007858063121111975,
+                    "sourceRestM": 0.007858063121111975,
+                    "targetRestM": 0.009212211030594199,
+                    "packedRestM": 0.007858063121111975,
+                    "ratio": 1.2932494105224324,
+                    "engineeringStrain": 0.29324941052243236,
+                    "inverseMass": [
+                      18632.640819640023,
+                      88844.66595134759
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "left_ftorso",
+                          "localVertex": 42,
+                          "globalVertex": 590,
+                          "uvMm": [
+                            325.9043796503178,
+                            313.7039527066873
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "left_ftorso",
+                          "localVertex": 43,
+                          "globalVertex": 591,
+                          "uvMm": [
+                            316.72239374504653,
+                            314.44958459146744
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 0,
+                    "role": "top",
+                    "presetId": "T03",
+                    "edgeIndex": 5060,
+                    "panelId": "right_ftorso",
+                    "localVertices": [
+                      71,
+                      72
+                    ],
+                    "globalVertices": [
+                      1784,
+                      1785
+                    ],
+                    "particles": [
+                      1695,
+                      1696
+                    ],
+                    "uvMm": [
+                      [
+                        -298.65780164701107,
+                        317.52202962095174
+                      ],
+                      [
+                        -307.61938334131804,
+                        315.6971453251104
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        -0.19509355163456488,
+                        0.39427238735853465,
+                        0.01627078853246486
+                      ],
+                      [
+                        -0.1948725454014683,
+                        0.39176120879662685,
+                        0.006581884969792991
+                      ]
+                    ],
+                    "lengthM": 0.010011479100093477,
+                    "restM": 0.007857024008348298,
+                    "sourceRestM": 0.007857024008348298,
+                    "targetRestM": 0.009145498846806892,
+                    "packedRestM": 0.007857024008348298,
+                    "ratio": 1.2742075230336591,
+                    "engineeringStrain": 0.27420752303365914,
+                    "inverseMass": [
+                      34853.432059413964,
+                      84387.3263977486
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "right_ftorso",
+                          "localVertex": 71,
+                          "globalVertex": 1784,
+                          "uvMm": [
+                            -298.65780164701107,
+                            317.52202962095174
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "right_ftorso",
+                          "localVertex": 72,
+                          "globalVertex": 1785,
+                          "uvMm": [
+                            -307.61938334131804,
+                            315.6971453251104
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              },
+              {
+                "role": "bottom",
+                "top": [
+                  {
+                    "solver": 1,
+                    "role": "bottom",
+                    "presetId": "P02",
+                    "edgeIndex": 2170,
+                    "panelId": "pant_b_r",
+                    "localVertices": [
+                      2,
+                      80
+                    ],
+                    "globalVertices": [
+                      796,
+                      874
+                    ],
+                    "particles": [
+                      775,
+                      848
+                    ],
+                    "uvMm": [
+                      [
+                        24.11521783511905,
+                        497.17140760116405
+                      ],
+                      [
+                        40.300521990954216,
+                        497.17140760116405
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        -0.1514537091752445,
+                        0.13473088476048206,
+                        -0.004661493147135246
+                      ],
+                      [
+                        -0.1427963802944223,
+                        0.13393169720907175,
+                        -0.01797419152627888
+                      ]
+                    ],
+                    "lengthM": 0.015900188119236235,
+                    "restM": 0.013509384150350192,
+                    "sourceRestM": 0.013509384150350192,
+                    "targetRestM": 0.016185304155835165,
+                    "packedRestM": 0.013509384150350192,
+                    "ratio": 1.1769735720206067,
+                    "engineeringStrain": 0.1769735720206067,
+                    "inverseMass": [
+                      20958.191331665,
+                      12961.289183732302
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 2,
+                          "globalVertex": 796,
+                          "uvMm": [
+                            24.11521783511905,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "pant_f_r",
+                          "localVertex": 8,
+                          "globalVertex": 2365,
+                          "uvMm": [
+                            21.92292530465371,
+                            477.5598561557267
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 0,
+                          "globalVertex": 3111,
+                          "uvMm": [
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "panelId": "wb_front",
+                          "localVertex": 0,
+                          "globalVertex": 3198,
+                          "uvMm": [
+                            0,
+                            0
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 80,
+                          "globalVertex": 874,
+                          "uvMm": [
+                            40.300521990954216,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 49,
+                          "globalVertex": 3160,
+                          "uvMm": [
+                            16.185304155835173,
+                            0
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 1,
+                    "role": "bottom",
+                    "presetId": "P02",
+                    "edgeIndex": 8525,
+                    "panelId": "wb_back",
+                    "localVertices": [
+                      49,
+                      0
+                    ],
+                    "globalVertices": [
+                      3160,
+                      3111
+                    ],
+                    "particles": [
+                      848,
+                      775
+                    ],
+                    "uvMm": [
+                      [
+                        16.185304155835173,
+                        0
+                      ],
+                      [
+                        0,
+                        0
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        -0.1427963802944223,
+                        0.13393169720907175,
+                        -0.01797419152627888
+                      ],
+                      [
+                        -0.1514537091752445,
+                        0.13473088476048206,
+                        -0.004661493147135246
+                      ]
+                    ],
+                    "lengthM": 0.015900188119236235,
+                    "restM": 0.013509384150350192,
+                    "sourceRestM": 0.013509384150350192,
+                    "targetRestM": 0.016185304155835172,
+                    "packedRestM": 0.013509384150350192,
+                    "ratio": 1.1769735720206067,
+                    "engineeringStrain": 0.1769735720206067,
+                    "inverseMass": [
+                      12961.289183732302,
+                      20958.191331665
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 80,
+                          "globalVertex": 874,
+                          "uvMm": [
+                            40.300521990954216,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 49,
+                          "globalVertex": 3160,
+                          "uvMm": [
+                            16.185304155835173,
+                            0
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 2,
+                          "globalVertex": 796,
+                          "uvMm": [
+                            24.11521783511905,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "pant_f_r",
+                          "localVertex": 8,
+                          "globalVertex": 2365,
+                          "uvMm": [
+                            21.92292530465371,
+                            477.5598561557267
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 0,
+                          "globalVertex": 3111,
+                          "uvMm": [
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "panelId": "wb_front",
+                          "localVertex": 0,
+                          "globalVertex": 3198,
+                          "uvMm": [
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 1,
+                    "role": "bottom",
+                    "presetId": "P02",
+                    "edgeIndex": 2192,
+                    "panelId": "pant_b_r",
+                    "localVertices": [
+                      5,
+                      102
+                    ],
+                    "globalVertices": [
+                      799,
+                      896
+                    ],
+                    "particles": [
+                      776,
+                      861
+                    ],
+                    "uvMm": [
+                      [
+                        146.38330351526156,
+                        497.17140760116405
+                      ],
+                      [
+                        160.16087263848658,
+                        497.17140760116405
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        -0.0940610874665667,
+                        0.1262489340245457,
+                        -0.0530367378154813
+                      ],
+                      [
+                        -0.0815857548753867,
+                        0.12445490524273543,
+                        -0.05720636851412178
+                      ]
+                    ],
+                    "lengthM": 0.013275476740726362,
+                    "restM": 0.011499720496543603,
+                    "sourceRestM": 0.011499720496543603,
+                    "targetRestM": 0.013777569123225022,
+                    "packedRestM": 0.011499720496543603,
+                    "ratio": 1.1544173395098156,
+                    "engineeringStrain": 0.15441733950981562,
+                    "inverseMass": [
+                      14133.609535821639,
+                      15238.136200046254
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 3,
+                          "globalVertex": 797,
+                          "uvMm": [
+                            105.04173861429489,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 5,
+                          "globalVertex": 799,
+                          "uvMm": [
+                            146.38330351526156,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 8,
+                          "globalVertex": 3119,
+                          "uvMm": [
+                            80.92652077917589,
+                            0
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 102,
+                          "globalVertex": 896,
+                          "uvMm": [
+                            160.16087263848658,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 45,
+                          "globalVertex": 3156,
+                          "uvMm": [
+                            94.7040899024009,
+                            0
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 1,
+                    "role": "bottom",
+                    "presetId": "P02",
+                    "edgeIndex": 8567,
+                    "panelId": "wb_back",
+                    "localVertices": [
+                      45,
+                      8
+                    ],
+                    "globalVertices": [
+                      3156,
+                      3119
+                    ],
+                    "particles": [
+                      861,
+                      776
+                    ],
+                    "uvMm": [
+                      [
+                        94.7040899024009,
+                        0
+                      ],
+                      [
+                        80.92652077917589,
+                        0
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        -0.0815857548753867,
+                        0.12445490524273543,
+                        -0.05720636851412178
+                      ],
+                      [
+                        -0.0940610874665667,
+                        0.1262489340245457,
+                        -0.0530367378154813
+                      ]
+                    ],
+                    "lengthM": 0.013275476740726362,
+                    "restM": 0.011499720496543603,
+                    "sourceRestM": 0.011499720496543603,
+                    "targetRestM": 0.013777569123225007,
+                    "packedRestM": 0.011499720496543603,
+                    "ratio": 1.1544173395098156,
+                    "engineeringStrain": 0.15441733950981562,
+                    "inverseMass": [
+                      15238.136200046254,
+                      14133.609535821639
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 102,
+                          "globalVertex": 896,
+                          "uvMm": [
+                            160.16087263848658,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 45,
+                          "globalVertex": 3156,
+                          "uvMm": [
+                            94.7040899024009,
+                            0
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 3,
+                          "globalVertex": 797,
+                          "uvMm": [
+                            105.04173861429489,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 5,
+                          "globalVertex": 799,
+                          "uvMm": [
+                            146.38330351526156,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 8,
+                          "globalVertex": 3119,
+                          "uvMm": [
+                            80.92652077917589,
+                            0
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 1,
+                    "role": "bottom",
+                    "presetId": "P02",
+                    "edgeIndex": 8523,
+                    "panelId": "wb_back",
+                    "localVertices": [
+                      0,
+                      50
+                    ],
+                    "globalVertices": [
+                      3111,
+                      3161
+                    ],
+                    "particles": [
+                      775,
+                      2832
+                    ],
+                    "uvMm": [
+                      [
+                        0,
+                        0
+                      ],
+                      [
+                        9.584628862843088,
+                        6.79376543538561
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        -0.1514537091752445,
+                        0.13473088476048206,
+                        -0.004661493147135246
+                      ],
+                      [
+                        -0.14511424921244637,
+                        0.14089996494958865,
+                        -0.013078095347592132
+                      ]
+                    ],
+                    "lengthM": 0.012210057149755017,
+                    "restM": 0.010583005244258363,
+                    "sourceRestM": 0.010583005244258363,
+                    "targetRestM": 0.011748206638865569,
+                    "packedRestM": 0.010583005244258363,
+                    "ratio": 1.1537419540049254,
+                    "engineeringStrain": 0.1537419540049254,
+                    "inverseMass": [
+                      20958.191331665,
+                      18844.570381559293
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "pant_b_r",
+                          "localVertex": 2,
+                          "globalVertex": 796,
+                          "uvMm": [
+                            24.11521783511905,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "pant_f_r",
+                          "localVertex": 8,
+                          "globalVertex": 2365,
+                          "uvMm": [
+                            21.92292530465371,
+                            477.5598561557267
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 0,
+                          "globalVertex": 3111,
+                          "uvMm": [
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "panelId": "wb_front",
+                          "localVertex": 0,
+                          "globalVertex": 3198,
+                          "uvMm": [
+                            0,
+                            0
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 50,
+                          "globalVertex": 3161,
+                          "uvMm": [
+                            9.584628862843088,
+                            6.79376543538561
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 1,
+                    "role": "bottom",
+                    "presetId": "P02",
+                    "edgeIndex": 542,
+                    "panelId": "pant_b_l",
+                    "localVertices": [
+                      132,
+                      133
+                    ],
+                    "globalVertices": [
+                      132,
+                      133
+                    ],
+                    "particles": [
+                      111,
+                      112
+                    ],
+                    "uvMm": [
+                      [
+                        -22.272622407214676,
+                        488.7992115068913
+                      ],
+                      [
+                        -21.378170463872422,
+                        484.6092094897897
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        0.1547411697226948,
+                        0.1265081465827843,
+                        -0.005229539087167725
+                      ],
+                      [
+                        0.15507927654030465,
+                        0.12198616759906532,
+                        -0.00501721540570639
+                      ]
+                    ],
+                    "lengthM": 0.004539569527501456,
+                    "restM": 0.003942145513884239,
+                    "sourceRestM": 0.003942145513884239,
+                    "targetRestM": 0.004284409082039713,
+                    "packedRestM": 0.003942145513884239,
+                    "ratio": 1.151547935385208,
+                    "engineeringStrain": 0.15154793538520805,
+                    "inverseMass": [
+                      64796.19981098128,
+                      18437.94482973674
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "pant_b_l",
+                          "localVertex": 132,
+                          "globalVertex": 132,
+                          "uvMm": [
+                            -22.272622407214676,
+                            488.7992115068913
+                          ]
+                        },
+                        {
+                          "panelId": "pant_f_l",
+                          "localVertex": 693,
+                          "globalVertex": 2303,
+                          "uvMm": [
+                            -20.263865898553156,
+                            469.9452882899583
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "pant_b_l",
+                          "localVertex": 133,
+                          "globalVertex": 133,
+                          "uvMm": [
+                            -21.378170463872422,
+                            484.6092094897897
+                          ]
+                        },
+                        {
+                          "panelId": "pant_f_l",
+                          "localVertex": 42,
+                          "globalVertex": 1652,
+                          "uvMm": [
+                            -19.434700336979592,
+                            466.1396756534586
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 1,
+                    "role": "bottom",
+                    "presetId": "P02",
+                    "edgeIndex": 4402,
+                    "panelId": "pant_f_l",
+                    "localVertices": [
+                      42,
+                      693
+                    ],
+                    "globalVertices": [
+                      1652,
+                      2303
+                    ],
+                    "particles": [
+                      112,
+                      111
+                    ],
+                    "uvMm": [
+                      [
+                        -19.434700336979592,
+                        466.1396756534586
+                      ],
+                      [
+                        -20.263865898553156,
+                        469.9452882899583
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        0.15507927654030465,
+                        0.12198616759906532,
+                        -0.00501721540570639
+                      ],
+                      [
+                        0.1547411697226948,
+                        0.1265081465827843,
+                        -0.005229539087167725
+                      ]
+                    ],
+                    "lengthM": 0.004539569527501456,
+                    "restM": 0.003942145513884239,
+                    "sourceRestM": 0.003942145513884239,
+                    "targetRestM": 0.0038948944873495243,
+                    "packedRestM": 0.003942145513884239,
+                    "ratio": 1.151547935385208,
+                    "engineeringStrain": 0.15154793538520805,
+                    "inverseMass": [
+                      18437.94482973674,
+                      64796.19981098128
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "pant_b_l",
+                          "localVertex": 133,
+                          "globalVertex": 133,
+                          "uvMm": [
+                            -21.378170463872422,
+                            484.6092094897897
+                          ]
+                        },
+                        {
+                          "panelId": "pant_f_l",
+                          "localVertex": 42,
+                          "globalVertex": 1652,
+                          "uvMm": [
+                            -19.434700336979592,
+                            466.1396756534586
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "pant_b_l",
+                          "localVertex": 132,
+                          "globalVertex": 132,
+                          "uvMm": [
+                            -22.272622407214676,
+                            488.7992115068913
+                          ]
+                        },
+                        {
+                          "panelId": "pant_f_l",
+                          "localVertex": 693,
+                          "globalVertex": 2303,
+                          "uvMm": [
+                            -20.263865898553156,
+                            469.9452882899583
+                          ]
+                        }
+                      ]
+                    ]
+                  },
+                  {
+                    "solver": 1,
+                    "role": "bottom",
+                    "presetId": "P02",
+                    "edgeIndex": 65,
+                    "panelId": "pant_b_l",
+                    "localVertices": [
+                      10,
+                      127
+                    ],
+                    "globalVertices": [
+                      10,
+                      127
+                    ],
+                    "particles": [
+                      7,
+                      106
+                    ],
+                    "uvMm": [
+                      [
+                        -105.04173861429489,
+                        497.17140760116405
+                      ],
+                      [
+                        -88.85643445845972,
+                        497.17140760116405
+                      ]
+                    ],
+                    "endpointsM": [
+                      [
+                        0.0953660855595043,
+                        0.12731681395914626,
+                        -0.053092352804598335
+                      ],
+                      [
+                        0.1092693129847282,
+                        0.12996606117833515,
+                        -0.046837533722452425
+                      ]
+                    ],
+                    "lengthM": 0.01547388139466807,
+                    "restM": 0.013509384150350173,
+                    "sourceRestM": 0.013509384150350173,
+                    "targetRestM": 0.01618530415583517,
+                    "packedRestM": 0.013509384150350173,
+                    "ratio": 1.1454172316409388,
+                    "engineeringStrain": 0.14541723164093878,
+                    "inverseMass": [
+                      14848.964443098545,
+                      13814.407456399793
+                    ],
+                    "endpointMembers": [
+                      [
+                        {
+                          "panelId": "pant_b_l",
+                          "localVertex": 8,
+                          "globalVertex": 8,
+                          "uvMm": [
+                            -146.38330351526156,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "pant_b_l",
+                          "localVertex": 10,
+                          "globalVertex": 10,
+                          "uvMm": [
+                            -105.04173861429489,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 4,
+                          "globalVertex": 3115,
+                          "uvMm": [
+                            287.59005436492237,
+                            0
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "panelId": "pant_b_l",
+                          "localVertex": 127,
+                          "globalVertex": 127,
+                          "uvMm": [
+                            -88.85643445845972,
+                            497.17140760116405
+                          ]
+                        },
+                        {
+                          "panelId": "wb_back",
+                          "localVertex": 35,
+                          "globalVertex": 3146,
+                          "uvMm": [
+                            303.7753585207575,
+                            0
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              }
+            ],
+            "event": {
+              "sequence": 10496,
+              "fitStep": 10,
+              "stepCall": 11,
+              "stage": "original-safety-gate",
+              "substep": 3,
+              "iteration": null,
+              "phase": "finish",
+              "operationSolver": null,
+              "states": [
+                {
+                  "role": "top",
+                  "solver": 0,
+                  "edgeCount": 6550,
+                  "maxRatio": 1.5204542157336371,
+                  "minRatio": 0.5161125014174405,
+                  "maxEdgeIndex": 3289,
+                  "overLimitCount": 1,
+                  "firstOverIndex": 3289,
+                  "invalidCount": 0
+                },
+                {
+                  "role": "bottom",
+                  "solver": 1,
+                  "edgeCount": 9035,
+                  "maxRatio": 1.1769735720206067,
+                  "minRatio": 0.8934030341150934,
+                  "maxEdgeIndex": 2170,
+                  "overLimitCount": 0,
+                  "firstOverIndex": -1,
+                  "invalidCount": 0
+                }
+              ]
+            },
+            "nativeAudits": [
+              {
+                "role": "top",
+                "maxEdgeStretch": 1.5204542157336371,
+                "minEdgeStretch": 0.5161125014174405
+              }
+            ]
+          },
+          "failure": {
+            "message": "物理应变超出工程安全范围",
+            "fitStep": 10,
+            "stepCall": 11,
+            "elapsedAfterRollback": 0.16666666666666677,
+            "safetyTrips": 1,
+            "rollbackCount": 1
+          },
+          "rollback": {
+            "checkedBuffersExactlyRestored": true,
+            "differences": []
+          },
+          "observerParity": true,
+          "sourceFitAccepted": false,
+          "repairApplied": false,
+          "physicalCertification": false,
+          "localizationResolution": "after individual native batch operations; not inside a WASM kernel",
+          "rootCauseProven": false,
+          "interpretation": "最早瞬时跨线与最终触发原门禁分开核对；操作边界定位不单独证明充分根因。"
+        },
+        "live": false,
+        "rootCauseProven": false
+      },
+      "status": "REJECTED",
+      "counts": {
+        "PASS": 2,
+        "FAIL": 1,
+        "WARNING": 0,
+        "UNKNOWN": 1,
+        "NOT_APPLICABLE": 0
+      },
+      "hostModified": false,
+      "physicalCertification": false,
+      "manufacturingCertification": false,
+      "aestheticAcceptance": false,
+      "productionReady": false,
+      "contractVersion": "0.2.0"
+    }
+  ],
+  "counts": {
+    "PASS": 2,
+    "FAIL": 1,
+    "WARNING": 0,
+    "UNKNOWN": 1,
+    "NOT_APPLICABLE": 0
+  },
+  "defects": [
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-init-fault:3ea3c6a4",
+      "objectId": "garment-r10-d03-init-fault",
+      "code": "fit:original_guard",
+      "severity": "critical",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "原生工程保护门触发；仍未完成D03试穿",
+      "expected": 1.45,
+      "observed": 1.5204542157336371,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-init-fault:b909e474",
+      "objectId": "garment-r10-d03-init-fault",
+      "code": "cause:mechanism",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "reality-coordinator",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "只定位观测边界与具体边，尚未证明充分根因，未实施修复",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    }
+  ],
+  "status": "REJECTED",
+  "sourceWriteAPI": false,
+  "automaticRepair": false,
+  "physicalCertification": false,
+  "manufacturingCertification": false,
+  "aestheticAcceptance": false,
+  "productionReady": false
+}

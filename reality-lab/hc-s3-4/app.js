@@ -1,0 +1,36 @@
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),D=RF34_DATA,T=D.trace,S=FirstFault34.summarize(D),COMMON=FirstFault34.buildCommon(D,RealityProtocol,RF34_DICTIONARY),ns='http://www.w3.org/2000/svg';
+const text=(tag,value,cls)=>{const n=document.createElement(tag);n.textContent=value;if(cls)n.className=cls;return n;};
+const svg=(tag,attrs)=>{const n=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
+const zh={ 'coupled-construction':'初始接缝焊接／约束构造后','wasm-attached':'原WASM初始化后','step-entry':'原求解步入口','substep-entry':'子步入口','after-body-interpolation-and-waist':'人体插值／腰部锚定之后','iteration-entry':'约束迭代入口','after-distance':'距离约束之后','after-bend-or-skip':'弯曲约束／跳过分支之后','after-strain-projection':'原伸缩限制投影之后','after-project':'人体接触投影之后','after-pair':'衣物间点接触之后','after-pairDense':'衣物间密集接触之后','substep-finished':'子步结束','original-safety-gate':'原生保护门之前'};
+const role=r=>r==='top'?'上衣':'下装',mm=x=>x==null?'未提供':(x*1000).toFixed(6)+' mm';
+const trigger=T.gate.originalAudits.find(a=>a.maxEdgeStretch>1.45),first=T.firstCrossing,allEdges=[{label:'首次观测跨线 · '+role(first.worstEdge.role),edge:first.worstEdge}];
+for(const g of T.gate.edges)g.top.forEach((edge,i)=>allEdges.push({label:'原门禁前 · '+role(g.role)+' 第'+(i+1)+'高边 '+edge.edgeIndex,edge}));
+$('outcome').textContent=D.runs.traced.status+' 本轮只定位，不宣布修复。';
+$('headline').textContent=first.initialCondition?'初始构造状态已经超过原门限':'首次跨线出现在：'+(zh[first.event.stage]||first.event.stage);
+$('interpretation').textContent=S.interpretation;
+for(const [label,value,cls]of [['首次观测最大边长比',first.worstEdge.ratio.toFixed(6),'red'],['原门禁首先拒绝',trigger?role(trigger.role)+' '+trigger.maxEdgeStretch.toFixed(6):'查看原读数','red'],['跨线对应裁片',first.worstEdge.panelId,'amber'],['受检状态回滚',D.rollbackExact?'精确恢复':'存在差异',D.rollbackExact?'green':'red']]){const n=text('div','','metric');n.append(text('b',value,cls),text('span',label));$('metrics').append(n);}
+$('status').textContent='源提交 '+D.source.commit.slice(0,12)+' ｜ 记录 '+T.events.length+' 个检查点 ｜ 非实时诊断 ｜ 生产源未改';
+let current=0;
+const vals=T.events.flatMap(e=>e.states.map(s=>s.maxRatio)),lo=0,hi=Math.max(1.6,...vals)*1.08,X=i=>50+(i/Math.max(1,T.events.length-1))*920,Y=v=>210-(v-lo)/(hi-lo)*190;
+const graph=$('timeline');for(const v of [0,1,1.45,hi]){graph.append(svg('line',{x1:50,y1:Y(v),x2:970,y2:Y(v),stroke:v===1.45?'#edc882':'#354952','stroke-dasharray':v===1.45?'6 4':'0'}));const label=svg('text',{x:4,y:Y(v)+4,fill:'#acbec4','font-size':11});label.textContent=v.toFixed(2);graph.append(label);}
+for(let si=0;si<2;si++)graph.append(svg('path',{d:T.events.map((e,i)=>(i?'L':'M')+X(i)+','+Y(e.states[si].maxRatio)).join(' '),fill:'none',stroke:si?'#abc4eb':'#9bdfc6','stroke-width':1.5}));
+const marker=svg('line',{x1:50,x2:50,y1:10,y2:220,stroke:'#f2a19b','stroke-width':2});graph.append(marker);
+function selectEvent(i){current=Math.max(0,Math.min(T.events.length-1,i));const e=T.events[current];marker.setAttribute('x1',X(current));marker.setAttribute('x2',X(current));$('cursor').value=current;$('selected-event').textContent='#'+e.sequence+' '+(zh[e.stage]||e.stage)+' ｜ 适配步 '+(e.fitStep==null?'未开始':e.fitStep+1)+' / 子步 '+(e.substep==null?'—':e.substep+1)+' / 迭代 '+(e.iteration==null?'—':e.iteration+1)+' ｜ '+e.states.map(s=>role(s.role)+' 最大 '+s.maxRatio.toFixed(6)+'（边 '+s.maxEdgeIndex+'，超限 '+s.overLimitCount+' 条）').join('；');}
+$('cursor').max=T.events.length-1;$('cursor').oninput=()=>selectEvent(Number($('cursor').value));$('jump-initial').onclick=()=>selectEvent(0);$('jump-first').onclick=()=>selectEvent(first.event.sequence-1);$('jump-gate').onclick=()=>selectEvent(T.gate.event.sequence-1);
+function renderEdge(index){const e=allEdges[index].edge,piece=RF34_PATTERNS.pieces.find(p=>p.role===e.role),panel=piece?.panels.find(p=>p.id===e.panelId),boundary=panel?.boundaryMm||[],pts=[...boundary.flat(),...e.uvMm],xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys),scale=Math.min(370/Math.max(1,maxx-minx),260/Math.max(1,maxy-miny)),at=([x,y])=>[30+(x-minx)*scale,290-(y-miny)*scale],box=$('panel');box.replaceChildren();
+ if(boundary.length)box.append(svg('path',{d:boundary.map(seg=>'M'+at(seg[0]).join(',')+'L'+at(seg[1]).join(',')).join(' '),class:'boundary'}));box.append(svg('path',{d:'M'+at(e.uvMm[0]).join(',')+'L'+at(e.uvMm[1]).join(','),class:'edge'}));for(const p of e.uvMm){const q=at(p);box.append(svg('circle',{cx:q[0],cy:q[1],r:4,fill:'#f2a19b'}));}
+ const label=svg('text',{x:20,y:318,fill:'#acbec4','font-size':12});label.textContent=e.panelId+' · 材料坐标 mm';box.append(label);
+ $('edge-values').replaceChildren();for(const[k,v]of [['所属',role(e.role)+' / '+e.presetId+' / '+e.panelId],['约束边ID',e.edgeIndex],['裁片局部顶点',e.localVertices.join(' → ')],['焊接后粒子',e.particles.join(' → ')],['当前边长',mm(e.lengthM)],['原audit参考长度',mm(e.restM)],['原模板参考长度',mm(e.sourceRestM)],['分级后候选参考长度',mm(e.targetRestM)],['WASM实际参考长度',mm(e.packedRestM)],['当前／参考',e.ratio.toFixed(9)],['工程伸长率',(e.engineeringStrain*100).toFixed(3)+'%'],['逆质量',e.inverseMass.join(' / ')]]){const tr=document.createElement('tr');tr.append(text('th',k),text('td',String(v)));$('edge-values').append(tr);}
+ $('members').textContent=JSON.stringify({edge:e.edgeIndex,originalPanel:e.panelId,endpointMembers:e.endpointMembers,worldEndpointsM:e.endpointsM},null,2);
+}
+allEdges.forEach((row,i)=>{const o=text('option',row.label);o.value=i;$('edge-select').append(o);});$('edge-select').onchange=()=>renderEdge(Number($('edge-select').value));renderEdge(0);selectEvent(first.event.sequence-1);
+for(const [k,label]of [['initialState','原WASM初始状态'],['entryState','失败步入口'],['gateState','原保护门前'],['rollbackState','原回滚之后']])$('verification').append(text('p',label+'：基线／详细观察数值字节一致','green'));
+$('verification').append(text('p',D.rollbackExact?'受检数组与本步入口精确一致。':'受检字段仍存在回滚差异：'+D.rollbackDifferences.join('，'),D.rollbackExact?'green':'red'));
+$('provenance').textContent=JSON.stringify({source:D.source,captureCode:D.captureCode,build:RF34_BUILD,originalGate:T.gate.originalAudits,failure:T.failure,firstObservedAtStage:first.event.stage,observationalResolution:S.localizationResolution,rootCauseProven:false,hardware:'Actions software Chromium; no consumer GPU/device certification',sourceFitAccepted:false},null,2);
+function download(name,value){const u=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+$('export').onclick=()=>download('RF01-S34-first-fault.json',S);$('export-common').onclick=()=>download('RF01-S34-common.json',COMMON.bundle);$('export-defects').onclick=()=>download('RF01-S34-defects.json',COMMON.defects);
+$('build').textContent='REALITY-HC-S3.4 · '+RF34_BUILD.sourceCommit+' ｜ 来源与诊断证据已固定；此前页面保留；没有合并生产或授予试穿/制造认证。';
+window.__REALITY_S34__=Object.freeze({selectEvent,renderEdge,report:()=>({version:'REALITY-HC-S3.4',sourceCommit:RF34_BUILD.sourceCommit,selectedEvent:current,summary:JSON.parse(JSON.stringify(S)),common:JSON.parse(JSON.stringify(COMMON.bundle)),eventCount:T.events.length,edgeCount:allEdges.length,live:false,sourceFitAccepted:false,repairApplied:false})});
+})();
