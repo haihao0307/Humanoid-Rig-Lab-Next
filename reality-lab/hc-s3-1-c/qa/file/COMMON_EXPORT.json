@@ -1,0 +1,1813 @@
+{
+  "schema": "kaopu/reality-foundation-bundle@0.2",
+  "version": "0.2.0",
+  "objects": [
+    {
+      "schema": "kaopu/reality-object@0.2",
+      "objectId": "fabric-leather-r17-wallet",
+      "domain": "fabric",
+      "name": "皮革 R17 · wallet · 原生观察",
+      "sourceMode": "live_read_only",
+      "source": {
+        "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+        "commit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+        "path": "leather-workshop/r17/public-lite.html",
+        "sha256": "a53f15e91f300815d0d48f9548ea7d1cd2949529b6bbfe7a559289004cb2526e"
+      },
+      "units": [
+        {
+          "quantity": "length",
+          "unit": "m",
+          "basis": "runtime_computed"
+        }
+      ],
+      "frames": [],
+      "measurements": [
+        {
+          "id": "rf01.leather.thickness_scale",
+          "definitionId": "rf01.leather.thickness_scale",
+          "label": "厚度倍率",
+          "value": 1.65,
+          "unit": "1",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "当前原生控制；无量纲，不等于毫米",
+          "context": {
+            "originalRecord": {
+              "id": "leather.thickness_scale",
+              "label": "原生厚度倍率",
+              "value": 1.65,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "当前原生控制；无量纲，不等于毫米"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.primary_design_thickness_m",
+          "definitionId": "rf01.leather.primary_design_thickness_m",
+          "label": "主片配方目标厚度",
+          "value": 0.00198,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "source_declared",
+          "method": "产品主片名义厚度 × 当前倍率；附属裁片可有不同厚度",
+          "context": {
+            "originalRecord": {
+              "id": "leather.primary_design_thickness_m",
+              "label": "主片配方目标厚度",
+              "value": 0.00198,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "source_declared",
+              "method": "产品主片名义厚度 × 当前倍率；附属裁片可有不同厚度"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.panel_design_min_m",
+          "definitionId": "rf01.leather.panel_design_min_m",
+          "label": "生成裁片厚度最小值",
+          "value": 0.00198,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "读取已生成part.t；它进入数字几何/物理，不是实物测厚",
+          "context": {
+            "originalRecord": {
+              "id": "leather.panel_design_min_m",
+              "label": "生成裁片厚度最小值",
+              "value": 0.00198,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "读取已生成part.t；它进入数字几何/物理，不是实物测厚"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.panel_design_max_m",
+          "definitionId": "rf01.leather.panel_design_max_m",
+          "label": "生成裁片厚度最大值",
+          "value": 0.00198,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "多裁片逐项读取，不把主片厚度套给全部部件",
+          "context": {
+            "originalRecord": {
+              "id": "leather.panel_design_max_m",
+              "label": "生成裁片厚度最大值",
+              "value": 0.00198,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "多裁片逐项读取，不把主片厚度套给全部部件"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.sampled_shell_min_m",
+          "definitionId": "rf01.leather.sampled_shell_min_m",
+          "label": "当前壳面采样间距最小值",
+          "value": 0.0017632678747177121,
+          "unit": "m",
+          "status": "WARNING",
+          "basis": "runtime_computed",
+          "method": "原变形公式与已呈现矩阵的内外表面配对距离；含缝口压缩，仅有限采样",
+          "context": {
+            "originalRecord": {
+              "id": "leather.sampled_shell_min_m",
+              "label": "当前壳面采样间距最小值",
+              "value": 0.0017632678747177121,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "原变形公式与已呈现矩阵的内外表面配对距离；含缝口压缩，仅有限采样"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.sampled_shell_max_m",
+          "definitionId": "rf01.leather.sampled_shell_max_m",
+          "label": "当前壳面采样间距最大值",
+          "value": 0.001999804735183716,
+          "unit": "m",
+          "status": "WARNING",
+          "basis": "runtime_computed",
+          "method": "不是每个位置的全局极值，也不是实物皮料厚度",
+          "context": {
+            "originalRecord": {
+              "id": "leather.sampled_shell_max_m",
+              "label": "当前壳面采样间距最大值",
+              "value": 0.001999804735183716,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "不是每个位置的全局极值，也不是实物皮料厚度"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.requested_stitch_pitch_m",
+          "definitionId": "rf01.leather.requested_stitch_pitch_m",
+          "label": "原生请求针距",
+          "value": 0.0045000000000000005,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "source_declared",
+          "method": "请求值不是生成值；原程序按针路长度分配整数针数",
+          "context": {
+            "originalRecord": {
+              "id": "leather.requested_stitch_pitch_m",
+              "label": "原生请求针距",
+              "value": 0.0045000000000000005,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "source_declared",
+              "method": "请求值不是生成值；原程序按针路长度分配整数针数"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.seam_pitch_min_m",
+          "definitionId": "rf01.leather.seam_pitch_min_m",
+          "label": "生成针路节距最小值",
+          "value": 0.00439977552738296,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "实际SeamPath.pitch=针路长度/整数间隔数；可与请求针距不同",
+          "context": {
+            "originalRecord": {
+              "id": "leather.seam_pitch_min_m",
+              "label": "生成针路节距最小值",
+              "value": 0.00439977552738296,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际SeamPath.pitch=针路长度/整数间隔数；可与请求针距不同"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.seam_pitch_max_m",
+          "definitionId": "rf01.leather.seam_pitch_max_m",
+          "label": "生成针路节距最大值",
+          "value": 0.004470448931665645,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "实际生成范围；逐针路保留长度与针数，不强行等于请求值",
+          "context": {
+            "originalRecord": {
+              "id": "leather.seam_pitch_max_m",
+              "label": "生成针路节距最大值",
+              "value": 0.004470448931665645,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际生成范围；逐针路保留长度与针数，不强行等于请求值"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.thread_nominal_diameter_m",
+          "definitionId": "rf01.leather.thread_nominal_diameter_m",
+          "label": "数字缝线名义直径",
+          "value": 0.00032,
+          "unit": "m",
+          "status": "WARNING",
+          "basis": "source_declared",
+          "method": "数字缝线构造输入，不是纤维直径或Tex",
+          "context": {
+            "originalRecord": {
+              "id": "leather.thread_nominal_diameter_m",
+              "label": "数字缝线名义直径",
+              "value": 0.00032,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "source_declared",
+              "method": "数字缝线构造输入，不是纤维直径或Tex"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.physical_thickness_m",
+          "definitionId": "rf01.leather.physical_thickness_m",
+          "label": "实物皮料厚度",
+          "value": null,
+          "unit": "m",
+          "status": "UNKNOWN",
+          "basis": "unknown",
+          "method": "没有本材料试样、压力与测厚方法证据",
+          "context": {
+            "originalRecord": {
+              "id": "leather.physical_thickness_m",
+              "label": "实物皮料厚度",
+              "value": null,
+              "unit": "m",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "没有本材料试样、压力与测厚方法证据"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.areal_density_g_m2",
+          "definitionId": "rf01.leather.areal_density_g_m2",
+          "label": "实物面密度",
+          "value": null,
+          "unit": "g/m2",
+          "status": "UNKNOWN",
+          "basis": "unknown",
+          "method": "求解器密度假设不能代替实物面密度",
+          "context": {
+            "originalRecord": {
+              "id": "leather.areal_density_g_m2",
+              "label": "实物面密度",
+              "value": null,
+              "unit": "g/m2",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "求解器密度假设不能代替实物面密度"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.linear_density_tex",
+          "definitionId": "rf01.leather.linear_density_tex",
+          "label": "缝线Tex",
+          "value": null,
+          "unit": "tex",
+          "status": "UNKNOWN",
+          "basis": "unknown",
+          "method": "数字几何线径不能直接反推Tex",
+          "context": {
+            "originalRecord": {
+              "id": "leather.linear_density_tex",
+              "label": "缝线Tex",
+              "value": null,
+              "unit": "tex",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "数字几何线径不能直接反推Tex"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        },
+        {
+          "id": "rf01.leather.solver_substeps",
+          "definitionId": "rf01.leather.solver_substeps",
+          "label": "当前子步数",
+          "value": 4,
+          "unit": "1",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "只是当前解算设置，不代表收敛或实物标定",
+          "context": {
+            "originalRecord": {
+              "id": "leather.solver_substeps",
+              "label": "当前子步数",
+              "value": 4,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "只是当前解算设置，不代表收敛或实物标定"
+            },
+            "productId": "wallet",
+            "physicalCalibration": false
+          },
+          "sourceRef": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "notEquivalentTo": [
+            "physical leather calibration",
+            "manufacturing acceptance"
+          ],
+          "requiredEvidence": [
+            "pinned source",
+            "product identity",
+            "method",
+            "pose version"
+          ],
+          "owner": "leather-workshop-r17"
+        }
+      ],
+      "checks": [
+        {
+          "id": "measurement:rf01.leather.thickness_scale",
+          "status": "PASS",
+          "message": "当前原生控制；无量纲，不等于毫米",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.thickness_scale",
+          "expected": null,
+          "observed": 1.65,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.primary_design_thickness_m",
+          "status": "PASS",
+          "message": "产品主片名义厚度 × 当前倍率；附属裁片可有不同厚度",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.primary_design_thickness_m",
+          "expected": null,
+          "observed": 0.00198,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.panel_design_min_m",
+          "status": "PASS",
+          "message": "读取已生成part.t；它进入数字几何/物理，不是实物测厚",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.panel_design_min_m",
+          "expected": null,
+          "observed": 0.00198,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.panel_design_max_m",
+          "status": "PASS",
+          "message": "多裁片逐项读取，不把主片厚度套给全部部件",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.panel_design_max_m",
+          "expected": null,
+          "observed": 0.00198,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.sampled_shell_min_m",
+          "status": "WARNING",
+          "message": "原变形公式与已呈现矩阵的内外表面配对距离；含缝口压缩，仅有限采样",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.sampled_shell_min_m",
+          "expected": null,
+          "observed": 0.0017632678747177121,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.sampled_shell_max_m",
+          "status": "WARNING",
+          "message": "不是每个位置的全局极值，也不是实物皮料厚度",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.sampled_shell_max_m",
+          "expected": null,
+          "observed": 0.001999804735183716,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.requested_stitch_pitch_m",
+          "status": "PASS",
+          "message": "请求值不是生成值；原程序按针路长度分配整数针数",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.requested_stitch_pitch_m",
+          "expected": null,
+          "observed": 0.0045000000000000005,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.seam_pitch_min_m",
+          "status": "PASS",
+          "message": "实际SeamPath.pitch=针路长度/整数间隔数；可与请求针距不同",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.seam_pitch_min_m",
+          "expected": null,
+          "observed": 0.00439977552738296,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.seam_pitch_max_m",
+          "status": "PASS",
+          "message": "实际生成范围；逐针路保留长度与针数，不强行等于请求值",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.seam_pitch_max_m",
+          "expected": null,
+          "observed": 0.004470448931665645,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.thread_nominal_diameter_m",
+          "status": "WARNING",
+          "message": "数字缝线构造输入，不是纤维直径或Tex",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.thread_nominal_diameter_m",
+          "expected": null,
+          "observed": 0.00032,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.physical_thickness_m",
+          "status": "UNKNOWN",
+          "message": "没有本材料试样、压力与测厚方法证据",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.physical_thickness_m",
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.areal_density_g_m2",
+          "status": "UNKNOWN",
+          "message": "求解器密度假设不能代替实物面密度",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.areal_density_g_m2",
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.leather.linear_density_tex",
+          "status": "UNKNOWN",
+          "message": "数字几何线径不能直接反推Tex",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.linear_density_tex",
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "unsupported:leather.solver_dt_s",
+          "status": "WARNING",
+          "message": "共同协议尚未登记 s；原值和单位保留在扩展，不伪装成无量纲。",
+          "category": "contract",
+          "owner": "reality-platform",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": {
+            "id": "leather.solver_dt_s",
+            "label": "当前求解器时间步",
+            "value": 0.004166666666666667,
+            "unit": "s",
+            "status": "PASS",
+            "basis": "runtime_computed",
+            "method": "读取本原生求解器配置，不改变或推进物理"
+          }
+        },
+        {
+          "id": "measurement:rf01.leather.solver_substeps",
+          "status": "PASS",
+          "message": "只是当前解算设置，不代表收敛或实物标定",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": "rf01.leather.solver_substeps",
+          "expected": null,
+          "observed": 4,
+          "detail": null
+        },
+        {
+          "id": "source:transport",
+          "status": "PASS",
+          "message": "当前固定R17原生副本同步读取",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "source:preservation",
+          "status": "PASS",
+          "message": "读取前后受检状态一致，未更新矩阵或推进物理",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "seam:integer-distribution",
+          "status": "WARNING",
+          "message": "请求针距与实际生成针距不同：原程序依据路径长度分配整数间隔。各针路长度、数量和计算关系已保留，未给制造公差，不能自动判工艺不合格。",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "shell:sampling",
+          "status": "WARNING",
+          "message": "每片最多16对内外表面采样，不是全网格碰撞、制造厚度或全局极值认证。",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "solver:calibration",
+          "status": "UNKNOWN",
+          "message": "现有物理配置可读取，但材料、密度与测量条件未完成实物标定。",
+          "category": "contract",
+          "owner": "leather-workshop-r17",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "material:binding",
+          "status": "UNKNOWN",
+          "message": "未绑定外部裁片材料轴与人物比例版本。",
+          "category": "contract",
+          "owner": "tailor-workbench",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        }
+      ],
+      "defects": [
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:9cf97db2",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "measurement:rf01.leather.sampled_shell_min_m",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "leather-workshop-r17",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": "rf01.leather.sampled_shell_min_m",
+          "message": "原变形公式与已呈现矩阵的内外表面配对距离；含缝口压缩，仅有限采样",
+          "expected": null,
+          "observed": 0.0017632678747177121,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:a1e8e0f5",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "measurement:rf01.leather.sampled_shell_max_m",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "leather-workshop-r17",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": "rf01.leather.sampled_shell_max_m",
+          "message": "不是每个位置的全局极值，也不是实物皮料厚度",
+          "expected": null,
+          "observed": 0.001999804735183716,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:a3706dde",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "measurement:rf01.leather.thread_nominal_diameter_m",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "leather-workshop-r17",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": "rf01.leather.thread_nominal_diameter_m",
+          "message": "数字缝线构造输入，不是纤维直径或Tex",
+          "expected": null,
+          "observed": 0.00032,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:f882025b",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "measurement:rf01.leather.physical_thickness_m",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "leather-workshop-r17",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": "rf01.leather.physical_thickness_m",
+          "message": "没有本材料试样、压力与测厚方法证据",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:265d8d2c",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "measurement:rf01.leather.areal_density_g_m2",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "leather-workshop-r17",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": "rf01.leather.areal_density_g_m2",
+          "message": "求解器密度假设不能代替实物面密度",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:c5403d65",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "measurement:rf01.leather.linear_density_tex",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "leather-workshop-r17",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": "rf01.leather.linear_density_tex",
+          "message": "数字几何线径不能直接反推Tex",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:8cfe97a4",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "unsupported:leather.solver_dt_s",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "reality-platform",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": null,
+          "message": "共同协议尚未登记 s；原值和单位保留在扩展，不伪装成无量纲。",
+          "expected": null,
+          "observed": null,
+          "detail": {
+            "id": "leather.solver_dt_s",
+            "label": "当前求解器时间步",
+            "value": 0.004166666666666667,
+            "unit": "s",
+            "status": "PASS",
+            "basis": "runtime_computed",
+            "method": "读取本原生求解器配置，不改变或推进物理"
+          },
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:b205b33e",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "seam:integer-distribution",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "leather-workshop-r17",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": null,
+          "message": "请求针距与实际生成针距不同：原程序依据路径长度分配整数间隔。各针路长度、数量和计算关系已保留，未给制造公差，不能自动判工艺不合格。",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:8992cbf5",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "shell:sampling",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "leather-workshop-r17",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": null,
+          "message": "每片最多16对内外表面采样，不是全网格碰撞、制造厚度或全局极值认证。",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:c8f24c56",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "solver:calibration",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "leather-workshop-r17",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": null,
+          "message": "现有物理配置可读取，但材料、密度与测量条件未完成实物标定。",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-leather-r17-wallet:d868e399",
+          "objectId": "fabric-leather-r17-wallet",
+          "code": "material:binding",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "tailor-workbench",
+          "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+          "measurementId": null,
+          "message": "未绑定外部裁片材料轴与人物比例版本。",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        }
+      ],
+      "preservation": {
+        "passed": true,
+        "before": "f4a05022",
+        "after": "f4a05022",
+        "comparedTextLength": 48656,
+        "method": "exact synchronous serialized read-set equality before compact FNV diagnostic serialization; not a digital signature",
+        "scope": "metadata and selected CPU samples, cached matrices, settings and material sources",
+        "notChecked": [
+          "GPU cache buffer contents readback",
+          "every shell surface point",
+          "worker internal memory",
+          "physical specimen properties"
+        ]
+      },
+      "extensions": {
+        "owner": "leather-workshop-r17",
+        "originalExport": {
+          "schema": "kaopu/reality-workbench-export@1",
+          "exporterVersion": "0.3.1-c",
+          "objectId": "fabric-leather-r17-wallet",
+          "domain": "fabric",
+          "family": "leather",
+          "productId": "wallet",
+          "materialId": "heritage",
+          "source": {
+            "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+            "commit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+            "path": "leather-workshop/r17/public-lite.html",
+            "sha256": "a53f15e91f300815d0d48f9548ea7d1cd2949529b6bbfe7a559289004cb2526e"
+          },
+          "capture": {
+            "capturedAt": "2026-10-20T06:04:54.603Z",
+            "sequence": 9,
+            "nativeRevision": 13,
+            "nativeFrame": 11,
+            "rootInstance": "d8ca1dd0-aa1d-45c7-b971-b8ca7df909b2",
+            "poseVersion": 3,
+            "cachePoseVersion": 3,
+            "solverAppliedPoses": 2,
+            "solverStep": 2,
+            "integrityMode": "metadata_and_samples",
+            "elapsedMs": 1.9000000000087311
+          },
+          "requested": {
+            "thicknessScale": 1.65,
+            "tension": 0.8,
+            "response": true,
+            "age": 0,
+            "craft": "diamond",
+            "loft": 3.4,
+            "quiltMM": 26,
+            "weaveMM": 8,
+            "threadDiameter": 0.32,
+            "pitch": 4.5,
+            "threadColor": "#bea98a",
+            "edgeFinish": "burnished",
+            "stitchStyle": "saddle"
+          },
+          "measurements": [
+            {
+              "id": "leather.thickness_scale",
+              "label": "原生厚度倍率",
+              "value": 1.65,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "当前原生控制；无量纲，不等于毫米"
+            },
+            {
+              "id": "leather.primary_design_thickness_m",
+              "label": "主片配方目标厚度",
+              "value": 0.00198,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "source_declared",
+              "method": "产品主片名义厚度 × 当前倍率；附属裁片可有不同厚度"
+            },
+            {
+              "id": "leather.panel_design_min_m",
+              "label": "生成裁片厚度最小值",
+              "value": 0.00198,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "读取已生成part.t；它进入数字几何/物理，不是实物测厚"
+            },
+            {
+              "id": "leather.panel_design_max_m",
+              "label": "生成裁片厚度最大值",
+              "value": 0.00198,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "多裁片逐项读取，不把主片厚度套给全部部件"
+            },
+            {
+              "id": "leather.sampled_shell_min_m",
+              "label": "当前壳面采样间距最小值",
+              "value": 0.0017632678747177121,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "原变形公式与已呈现矩阵的内外表面配对距离；含缝口压缩，仅有限采样"
+            },
+            {
+              "id": "leather.sampled_shell_max_m",
+              "label": "当前壳面采样间距最大值",
+              "value": 0.001999804735183716,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "不是每个位置的全局极值，也不是实物皮料厚度"
+            },
+            {
+              "id": "leather.requested_stitch_pitch_m",
+              "label": "原生请求针距",
+              "value": 0.0045000000000000005,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "source_declared",
+              "method": "请求值不是生成值；原程序按针路长度分配整数针数"
+            },
+            {
+              "id": "leather.seam_pitch_min_m",
+              "label": "生成针路节距最小值",
+              "value": 0.00439977552738296,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际SeamPath.pitch=针路长度/整数间隔数；可与请求针距不同"
+            },
+            {
+              "id": "leather.seam_pitch_max_m",
+              "label": "生成针路节距最大值",
+              "value": 0.004470448931665645,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际生成范围；逐针路保留长度与针数，不强行等于请求值"
+            },
+            {
+              "id": "leather.thread_nominal_diameter_m",
+              "label": "数字缝线名义直径",
+              "value": 0.00032,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "source_declared",
+              "method": "数字缝线构造输入，不是纤维直径或Tex"
+            },
+            {
+              "id": "leather.physical_thickness_m",
+              "label": "实物皮料厚度",
+              "value": null,
+              "unit": "m",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "没有本材料试样、压力与测厚方法证据"
+            },
+            {
+              "id": "leather.areal_density_g_m2",
+              "label": "实物面密度",
+              "value": null,
+              "unit": "g/m2",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "求解器密度假设不能代替实物面密度"
+            },
+            {
+              "id": "leather.linear_density_tex",
+              "label": "缝线Tex",
+              "value": null,
+              "unit": "tex",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "数字几何线径不能直接反推Tex"
+            },
+            {
+              "id": "leather.solver_dt_s",
+              "label": "当前求解器时间步",
+              "value": 0.004166666666666667,
+              "unit": "s",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "读取本原生求解器配置，不改变或推进物理"
+            },
+            {
+              "id": "leather.solver_substeps",
+              "label": "当前子步数",
+              "value": 4,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "只是当前解算设置，不代表收敛或实物标定"
+            }
+          ],
+          "parts": [
+            {
+              "id": "wallet-panel-0",
+              "index": 0,
+              "designThicknessM": 0.00198,
+              "sampledMinM": 0.001775239944458008,
+              "sampledMaxM": 0.0019880365133285527,
+              "sampleVertexIds": [
+                0,
+                194,
+                388,
+                582,
+                776,
+                970,
+                1164,
+                1358,
+                1551,
+                1745,
+                1939,
+                2133,
+                2327,
+                2521,
+                2715,
+                2909
+              ],
+              "sampledDistancesM": [
+                0.001980116963386536,
+                0.0019800000190734863,
+                0.0019800000190734863,
+                0.001775239944458008,
+                0.001802669644355774,
+                0.0017921068668365482,
+                0.0019800000190734867,
+                0.0019800000190734867,
+                0.001980000019073487,
+                0.0019830389022827146,
+                0.001985176920890808,
+                0.0019880365133285527,
+                0.0019866719245910645,
+                0.001986973524093628,
+                0.0019497605562210083,
+                0.001987038135528564
+              ],
+              "paperVertices": 2910,
+              "unit": "m",
+              "method": "16-or-fewer evenly indexed inner/outer pairs; original pure embedding evaluator and already-rendered world matrices; native mm converted to m"
+            },
+            {
+              "id": "wallet-panel-1",
+              "index": 1,
+              "designThicknessM": 0.00198,
+              "sampledMinM": 0.0017632678747177121,
+              "sampledMaxM": 0.001999804735183716,
+              "sampleVertexIds": [
+                0,
+                187,
+                373,
+                560,
+                746,
+                933,
+                1120,
+                1306,
+                1493,
+                1679,
+                1866,
+                2053,
+                2239,
+                2426,
+                2612,
+                2799
+              ],
+              "sampledDistancesM": [
+                0.0019801169633865356,
+                0.001980093240737915,
+                0.0019800000190734867,
+                0.0018050301074981692,
+                0.001792106866836548,
+                0.0017632678747177121,
+                0.0019821900129318236,
+                0.0019800000190734867,
+                0.001981583118438721,
+                0.0019855253696441657,
+                0.001860503554344177,
+                0.0019891465902328485,
+                0.001999804735183716,
+                0.0019827620983123777,
+                0.0018918379545211797,
+                0.001987038135528565
+              ],
+              "paperVertices": 2800,
+              "unit": "m",
+              "method": "16-or-fewer evenly indexed inner/outer pairs; original pure embedding evaluator and already-rendered world matrices; native mm converted to m"
+            },
+            {
+              "id": "wallet-panel-2",
+              "index": 2,
+              "designThicknessM": 0.00198,
+              "sampledMinM": 0.0017757682944258063,
+              "sampledMaxM": 0.0019878162082973307,
+              "sampleVertexIds": [
+                0,
+                367,
+                735,
+                1102,
+                1469,
+                1837,
+                2204,
+                2571,
+                2939,
+                3306,
+                3673,
+                4041,
+                4408,
+                4775,
+                5143,
+                5510
+              ],
+              "sampledDistancesM": [
+                0.0019801893234328806,
+                0.0019799999513049286,
+                0.0017757682944258063,
+                0.0018702415231997655,
+                0.0018805858376355427,
+                0.0018805856655390455,
+                0.0019799831480685425,
+                0.0019328109181194265,
+                0.0018358540638412455,
+                0.001985322298422814,
+                0.0019844471250293756,
+                0.001918955895177219,
+                0.0019607732931294455,
+                0.0019614978136999984,
+                0.0019371920848141023,
+                0.0019878162082973307
+              ],
+              "paperVertices": 5511,
+              "unit": "m",
+              "method": "16-or-fewer evenly indexed inner/outer pairs; original pure embedding evaluator and already-rendered world matrices; native mm converted to m"
+            }
+          ],
+          "seams": [
+            {
+              "id": "wallet-panel-0-0",
+              "pitchM": 0.00444523195509749,
+              "holeCount": 38,
+              "pathLengthM": 0.16447358233860712,
+              "intervalCount": 37,
+              "knotHoles": false,
+              "controlPointCount": 24,
+              "requestedPitchM": 0.0045000000000000005,
+              "method": "pathLength/max(4,round(pathLength/requestedPitch)); integer count redistributes the requested pitch"
+            },
+            {
+              "id": "wallet-panel-1-0",
+              "pitchM": 0.00444523195509749,
+              "holeCount": 38,
+              "pathLengthM": 0.16447358233860712,
+              "intervalCount": 37,
+              "knotHoles": false,
+              "controlPointCount": 24,
+              "requestedPitchM": 0.0045000000000000005,
+              "method": "pathLength/max(4,round(pathLength/requestedPitch)); integer count redistributes the requested pitch"
+            },
+            {
+              "id": "wallet-panel-2-0",
+              "pitchM": 0.004470448931665645,
+              "holeCount": 38,
+              "pathLengthM": 0.16540661047162888,
+              "intervalCount": 37,
+              "knotHoles": false,
+              "controlPointCount": 24,
+              "requestedPitchM": 0.0045000000000000005,
+              "method": "pathLength/max(4,round(pathLength/requestedPitch)); integer count redistributes the requested pitch"
+            },
+            {
+              "id": "wallet-panel-2-1",
+              "pitchM": 0.00439977552738296,
+              "holeCount": 10,
+              "pathLengthM": 0.039597979746446646,
+              "intervalCount": 9,
+              "knotHoles": false,
+              "controlPointCount": 2,
+              "requestedPitchM": 0.0045000000000000005,
+              "method": "pathLength/max(4,round(pathLength/requestedPitch)); integer count redistributes the requested pitch"
+            },
+            {
+              "id": "wallet-panel-2-2",
+              "pitchM": 0.00439977552738296,
+              "holeCount": 10,
+              "pathLengthM": 0.039597979746446646,
+              "intervalCount": 9,
+              "knotHoles": false,
+              "controlPointCount": 2,
+              "requestedPitchM": 0.0045000000000000005,
+              "method": "pathLength/max(4,round(pathLength/requestedPitch)); integer count redistributes the requested pitch"
+            },
+            {
+              "id": "wallet-panel-2-3",
+              "pitchM": 0.00439977552738296,
+              "holeCount": 10,
+              "pathLengthM": 0.039597979746446646,
+              "intervalCount": 9,
+              "knotHoles": false,
+              "controlPointCount": 2,
+              "requestedPitchM": 0.0045000000000000005,
+              "method": "pathLength/max(4,round(pathLength/requestedPitch)); integer count redistributes the requested pitch"
+            },
+            {
+              "id": "wallet-panel-2-4",
+              "pitchM": 0.00439977552738296,
+              "holeCount": 10,
+              "pathLengthM": 0.039597979746446646,
+              "intervalCount": 9,
+              "knotHoles": false,
+              "controlPointCount": 2,
+              "requestedPitchM": 0.0045000000000000005,
+              "method": "pathLength/max(4,round(pathLength/requestedPitch)); integer count redistributes the requested pitch"
+            },
+            {
+              "id": "wallet-panel-2-5",
+              "pitchM": 0.00439977552738296,
+              "holeCount": 10,
+              "pathLengthM": 0.039597979746446646,
+              "intervalCount": 9,
+              "knotHoles": false,
+              "controlPointCount": 2,
+              "requestedPitchM": 0.0045000000000000005,
+              "method": "pathLength/max(4,round(pathLength/requestedPitch)); integer count redistributes the requested pitch"
+            },
+            {
+              "id": "wallet-panel-2-6",
+              "pitchM": 0.00439977552738296,
+              "holeCount": 10,
+              "pathLengthM": 0.039597979746446646,
+              "intervalCount": 9,
+              "knotHoles": false,
+              "controlPointCount": 2,
+              "requestedPitchM": 0.0045000000000000005,
+              "method": "pathLength/max(4,round(pathLength/requestedPitch)); integer count redistributes the requested pitch"
+            }
+          ],
+          "solver": {
+            "version": "R17.0-B1",
+            "configuration": {
+              "dt": 0.004166666666666667,
+              "substeps": 4,
+              "iterations": 8,
+              "gravity": 9.81,
+              "density": 700,
+              "damping": 0.5,
+              "profile": "NL",
+              "stiffnessScale": 1
+            },
+            "lastReport": {
+              "integrationSubstepS": 0.008333333333333333,
+              "substepsPerNominalFrameStep": 1,
+              "iterationsPerSubstep": 25,
+              "seamConstraintCount": 76,
+              "maxSeamGapErrorMM": 0.000829498832364238,
+              "version": "R09-implicit-1",
+              "timeS": 0.016666666666666666,
+              "steps": 2,
+              "extraConvergenceIterations": 0,
+              "nodeCount": 267,
+              "triangles": 420,
+              "massG": 26.466739381227352,
+              "centerMM": [
+                -0.01212006985371099,
+                32.696102412162084,
+                1.811630614372068
+              ],
+              "maxStretch": 1.000193645648979,
+              "peakStretch": 1.0007952291260316,
+              "maxEdgeChangeMM": 0.00154916519183243,
+              "groundMinMM": 0.5842686975905608,
+              "grabErrorMM": 0,
+              "grabForceN": 0,
+              "held": false,
+              "active": false,
+              "finite": true,
+              "failed": null,
+              "membrane": "full frozen R04 nonlinear SurfaceLaw, fixed material axes",
+              "bending": "Restored R04 3*D*l²/(A0+A1), thickness cubed",
+              "selfContact": "finite-thickness variational barriers with swept point-triangle and edge-edge step filtering",
+              "calibrated": false,
+              "surfaceContact": {
+                "method": "finite-thickness variational barriers; swept point-triangle / edge-edge; lagged friction",
+                "contactPairs": 394,
+                "ccdEvents": 130,
+                "ptEvents": 34,
+                "eeEvents": 96,
+                "frictionEvents": 2490,
+                "normalForceN": 0.3964439636708955,
+                "maxPenetrationMM": 0,
+                "safeStep": 1,
+                "limitedSteps": 0,
+                "initialOverlaps": 0,
+                "initialMinGapMM": 6.505281374238568,
+                "minimumClearanceMM": 0.07624063120047252,
+                "initialAudit": {
+                  "scope": "topologically non-neighbour simulation primitives",
+                  "minClearanceMM": 6.505281374238568,
+                  "penetrating": 0,
+                  "intersection": 0,
+                  "worst": []
+                },
+                "collisionSurface": "material-chart simulation triangles; displayed microtexture and rigid fittings not separately CCD-certified",
+                "guarantee": "tested cases only; not the C-IPC nonlinear optimizer"
+              },
+              "dampingPerSecond": 2.5,
+              "gripStiffnessNPerM": 4000,
+              "acceptedPrincipalLimit": null,
+              "strainLimit": null,
+              "integrator": "R04 preconditioned L-BFGS variational method extended to sewn products and finite-thickness contact barrier",
+              "residualN": 0.06957344861431013,
+              "solverIterations": 25,
+              "lbfgsIterations": 50,
+              "incrementalPotentialJ": 0.000009728226125603924,
+              "contactRangeMM": 0.1,
+              "convergedToR04Residual": false,
+              "initialization": null,
+              "workerSolveMS": 0
+            },
+            "reportScope": "last main-thread worker report associated with settled rendered data, not new physical validation",
+            "active": false,
+            "receivedPoses": 2,
+            "appliedPoses": 2,
+            "physicalCalibration": false
+          },
+          "materialSpace": {
+            "nativeWorldUnit": "mm",
+            "exportUnit": "m",
+            "conversionFactor": 0.001,
+            "garmentBindingVerified": false
+          },
+          "preservation": {
+            "passed": true,
+            "before": "f4a05022",
+            "after": "f4a05022",
+            "comparedTextLength": 48656,
+            "method": "exact synchronous serialized read-set equality before compact FNV diagnostic serialization; not a digital signature",
+            "scope": "metadata and selected CPU samples, cached matrices, settings and material sources",
+            "notChecked": [
+              "GPU cache buffer contents readback",
+              "every shell surface point",
+              "worker internal memory",
+              "physical specimen properties"
+            ]
+          },
+          "authorities": {
+            "sourceWriteAPI": false,
+            "repairAuthorized": false,
+            "physicalCertification": false,
+            "manufacturingCertification": false,
+            "productionReady": false
+          }
+        },
+        "capturedAt": "2026-10-20T06:04:54.603Z",
+        "unsupportedOriginalMeasurements": [
+          {
+            "id": "leather.solver_dt_s",
+            "label": "当前求解器时间步",
+            "value": 0.004166666666666667,
+            "unit": "s",
+            "status": "PASS",
+            "basis": "runtime_computed",
+            "method": "读取本原生求解器配置，不改变或推进物理"
+          }
+        ],
+        "sourceAuthority": "isolated-original-native-copy-not-production-installation"
+      },
+      "status": "PARTIAL",
+      "counts": {
+        "PASS": 10,
+        "FAIL": 0,
+        "WARNING": 6,
+        "UNKNOWN": 5,
+        "NOT_APPLICABLE": 0
+      },
+      "hostModified": false,
+      "physicalCertification": false,
+      "manufacturingCertification": false,
+      "aestheticAcceptance": false,
+      "productionReady": false,
+      "contractVersion": "0.2.0"
+    }
+  ],
+  "counts": {
+    "PASS": 10,
+    "FAIL": 0,
+    "WARNING": 6,
+    "UNKNOWN": 5,
+    "NOT_APPLICABLE": 0
+  },
+  "defects": [
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:9cf97db2",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "measurement:rf01.leather.sampled_shell_min_m",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "leather-workshop-r17",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": "rf01.leather.sampled_shell_min_m",
+      "message": "原变形公式与已呈现矩阵的内外表面配对距离；含缝口压缩，仅有限采样",
+      "expected": null,
+      "observed": 0.0017632678747177121,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:a1e8e0f5",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "measurement:rf01.leather.sampled_shell_max_m",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "leather-workshop-r17",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": "rf01.leather.sampled_shell_max_m",
+      "message": "不是每个位置的全局极值，也不是实物皮料厚度",
+      "expected": null,
+      "observed": 0.001999804735183716,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:a3706dde",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "measurement:rf01.leather.thread_nominal_diameter_m",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "leather-workshop-r17",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": "rf01.leather.thread_nominal_diameter_m",
+      "message": "数字缝线构造输入，不是纤维直径或Tex",
+      "expected": null,
+      "observed": 0.00032,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:f882025b",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "measurement:rf01.leather.physical_thickness_m",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "leather-workshop-r17",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": "rf01.leather.physical_thickness_m",
+      "message": "没有本材料试样、压力与测厚方法证据",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:265d8d2c",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "measurement:rf01.leather.areal_density_g_m2",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "leather-workshop-r17",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": "rf01.leather.areal_density_g_m2",
+      "message": "求解器密度假设不能代替实物面密度",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:c5403d65",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "measurement:rf01.leather.linear_density_tex",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "leather-workshop-r17",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": "rf01.leather.linear_density_tex",
+      "message": "数字几何线径不能直接反推Tex",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:8cfe97a4",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "unsupported:leather.solver_dt_s",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "reality-platform",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": null,
+      "message": "共同协议尚未登记 s；原值和单位保留在扩展，不伪装成无量纲。",
+      "expected": null,
+      "observed": null,
+      "detail": {
+        "id": "leather.solver_dt_s",
+        "label": "当前求解器时间步",
+        "value": 0.004166666666666667,
+        "unit": "s",
+        "status": "PASS",
+        "basis": "runtime_computed",
+        "method": "读取本原生求解器配置，不改变或推进物理"
+      },
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:b205b33e",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "seam:integer-distribution",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "leather-workshop-r17",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": null,
+      "message": "请求针距与实际生成针距不同：原程序依据路径长度分配整数间隔。各针路长度、数量和计算关系已保留，未给制造公差，不能自动判工艺不合格。",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:8992cbf5",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "shell:sampling",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "leather-workshop-r17",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": null,
+      "message": "每片最多16对内外表面采样，不是全网格碰撞、制造厚度或全局极值认证。",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:c8f24c56",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "solver:calibration",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "leather-workshop-r17",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": null,
+      "message": "现有物理配置可读取，但材料、密度与测量条件未完成实物标定。",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-leather-r17-wallet:d868e399",
+      "objectId": "fabric-leather-r17-wallet",
+      "code": "material:binding",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "5f455d90273aa717f101c6bd8be6a5cb500c99fb",
+      "measurementId": null,
+      "message": "未绑定外部裁片材料轴与人物比例版本。",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    }
+  ],
+  "status": "PARTIAL",
+  "sourceWriteAPI": false,
+  "automaticRepair": false,
+  "physicalCertification": false,
+  "manufacturingCertification": false,
+  "aestheticAcceptance": false,
+  "productionReady": false
+}
