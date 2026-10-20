@@ -6,9 +6,7 @@ sha=lambda b:hashlib.sha256(b).hexdigest()
 a=json.loads((R/'TASK_ANCHOR.json').read_text());source={k:a['source'][k] for k in ['repository','commit']};source.update(path=a['source']['directory']+'/index.html',sha256=sha((H/'index.html').read_bytes()))
 files={p.relative_to(H).as_posix():sha(p.read_bytes()) for p in H.rglob('*') if p.is_file()};(Q/'SOURCE_FILES.json').write_text(json.dumps(files,indent=2))
 reader=(R/'capture.js').read_text();original=(H/'app.mjs').read_text()
-assert sha((H/'app.mjs').read_bytes())=='f88cf22fa756be9b3d4c1f04720be6e6e95fec0b36ba281c41f0a8320c1a05c73' if False else True
-# Exact whole-file input is retained in the inventory; the unique reviewed insertion point
-# is after native packets/materials/UV are built and before the unchanged physics init.
+assert sha((H/'app.mjs').read_bytes())=='958ce88eaec470c472204dd4b348d67d94230820b084f668f21799fcbb30f63b','AUDITED_APP_DIGEST_MISMATCH'
 point='  newPhysics=new ClothController('
 assert original.count(point)==1
 prefix="import * as __RF33_GRAIN from './panel-grain.mjs';\nconst __RF33_READER="+reader+';\n'
@@ -17,7 +15,6 @@ augmented=prefix+original.replace(point,hook+point)
 assert augmented[len(prefix):].replace(hook,'')==original
 contextline='const __RF33_CONTEXT='+json.dumps({'source':source})+';\n'
 augmented=contextline+augmented
-# No renderer/solver replacements; only the observer and one call are added in the test response.
 assert augmented[len(contextline)+len(prefix):].replace(hook,'')==original
 report={'source':source,'passed':False,'checks':[],'pageErrors':[],'consoleErrors':[],'failedRequests':[],'userVisualAccepted':False,'physicalDeviceTested':False,'observerHookAddedInMemory':True,'originalFilesChanged':False,'renderingPhysicsCodeChanged':False,'captureCode':{'commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'readerSHA256':sha((R/'capture.js').read_bytes()),'runnerSHA256':sha((R/'capture.py').read_bytes())},'hook':{'originalAppSHA256':sha((H/'app.mjs').read_bytes()),'observedAppSHA256':sha(augmented.encode()),'removalRestoresOriginal':True},'setup':'Observer sees original prepared packets before unchanged physics init. Native failure or success is recorded separately; no success stamp or source physics change is introduced.'}
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -39,7 +36,6 @@ with sync_playwright() as pw:
   page.wait_for_function('!!window.__RF33_PREPARED__ || !!window.__RF33_OBSERVER_ERROR__ || document.getElementById("status").classList.contains("error")',timeout=240000)
   reason=page.evaluate('window.__RF33_OBSERVER_ERROR__||null');check('observer completed on actual native prepared rows',page.evaluate('!!window.__RF33_PREPARED__'),reason or page.locator('#status').inner_text())
   report['preparedSeconds']=time.monotonic()-start
-  # Wait for the original app's own terminal outcome, including failure; do not turn failure into success.
   page.wait_for_function('document.getElementById("status").classList.contains("error") || !!document.getElementById("provenance").textContent',timeout=240000)
   outcome=page.evaluate('''()=>({statusText:document.getElementById('status').textContent,error:document.getElementById('status').classList.contains('error'),nativeProvenancePresent:!!document.getElementById('provenance').textContent,committedGarmentCount:__MP05__.debug().items.length,physicsLastError:__MP05__.debug().physics?.lastError||null,observedAt:new Date().toISOString()})''')
   report['sourceOutcome']=outcome;check('original terminal outcome is explicitly retained',bool(outcome['statusText']) and (outcome['error'] or outcome['nativeProvenancePresent']),outcome)
