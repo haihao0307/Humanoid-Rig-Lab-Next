@@ -30,9 +30,15 @@ function validate(x,source){
   if(!Array.isArray(p.sampleVertexIds)||!Array.isArray(p.sampledDistancesM)||p.sampleVertexIds.length<1||p.sampleVertexIds.length>16||p.sampleVertexIds.length!==p.sampledDistancesM.length||!p.sampleVertexIds.every(i=>Number.isInteger(i)&&i>=0&&i<p.paperVertices)||!p.sampledDistancesM.every(v=>finite(v)&&v>=0))throw Error('SHELL_SAMPLE_INVALID');
   if(p.sampledMinM!==Math.min(...p.sampledDistancesM)||p.sampledMaxM!==Math.max(...p.sampledDistancesM))throw Error('SHELL_RANGE_INVALID');
  }
- for(const s of x.seams)if(!s||typeof s.id!=='string'||!finite(s.pitchM)||s.pitchM<=0||!Number.isInteger(s.holeCount)||s.holeCount<0)throw Error('SEAM_INVALID');
+ for(const s of x.seams){
+  if(!s||typeof s.id!=='string'||!finite(s.pitchM)||s.pitchM<=0||!Number.isInteger(s.holeCount)||s.holeCount<2||!finite(s.pathLengthM)||s.pathLengthM<=0||!Number.isInteger(s.intervalCount)||s.intervalCount<1||typeof s.knotHoles!=='boolean'||!Number.isInteger(s.controlPointCount)||s.controlPointCount<2||!finite(s.requestedPitchM)||s.requestedPitchM<=0)throw Error('SEAM_INVALID');
+  if(s.intervalCount!==s.holeCount-1||Math.abs(s.pitchM-s.pathLengthM/s.intervalCount)>1e-12)throw Error('SEAM_INTERVAL_RELATION_MISMATCH');
+  const intervals=s.knotHoles?s.controlPointCount-1:Math.max(4,Math.round(s.pathLengthM/s.requestedPitchM));
+  if(s.intervalCount!==intervals)throw Error('SEAM_COUNT_RELATION_MISMATCH');
+ }
  const r=x.requested,v=x.measurements.map(m=>m.value),close=(a,b)=>finite(a)&&finite(b)&&Math.abs(a-b)<=1e-12;
  if(!r||!finite(r.thicknessScale)||r.thicknessScale<=0||!finite(r.pitch)||r.pitch<=0||!finite(r.threadDiameter)||r.threadDiameter<=0)throw Error('REQUEST_INVALID');
+ if(x.seams.some(s=>!close(s.requestedPitchM,r.pitch*.001)))throw Error('SEAM_REQUEST_MISMATCH');
  const expected=[r.thicknessScale,PRODUCTS[x.productId]*r.thicknessScale*.001,Math.min(...x.parts.map(p=>p.designThicknessM)),Math.max(...x.parts.map(p=>p.designThicknessM)),Math.min(...x.parts.map(p=>p.sampledMinM)),Math.max(...x.parts.map(p=>p.sampledMaxM)),r.pitch*.001,Math.min(...x.seams.map(s=>s.pitchM)),Math.max(...x.seams.map(s=>s.pitchM)),r.threadDiameter*.001];
  for(let i=0;i<expected.length;i++)if(!close(v[i],expected[i]))throw Error('OBSERVATION_RELATION_MISMATCH:'+SPECS[i][0]);
  const s=x.solver;if(!s||s.version!=='R17.0-B1'||s.physicalCalibration!==false||!s.configuration||!finite(s.configuration.dt)||s.configuration.dt<=0||!Number.isInteger(s.configuration.substeps)||s.configuration.substeps<1||v[13]!==s.configuration.dt||v[14]!==s.configuration.substeps)throw Error('SOLVER_SEMANTICS_INVALID');
@@ -46,6 +52,8 @@ function leather(x,d,source,imported=false){
  }
  checks.push(P.makeCheck('source:transport',imported?'UNKNOWN':'PASS',imported?'导入记录未经本次原生实例复验':'当前固定R17原生副本同步读取'));
  checks.push(P.makeCheck('source:preservation',imported?'UNKNOWN':'PASS',imported?'文件中的保护声明不等于新实测':'读取前后受检状态一致，未更新矩阵或推进物理'));
+ const pitchDifference=x.seams.some(s=>Math.abs(s.pitchM-s.requestedPitchM)>1e-12);
+ checks.push(P.makeCheck('seam:integer-distribution',pitchDifference?'WARNING':'PASS',pitchDifference?'请求针距与实际生成针距不同：原程序依据路径长度分配整数间隔。各针路长度、数量和计算关系已保留，未给制造公差，不能自动判工艺不合格。':'生成针距与请求值在本次数字计算中一致；不是实物工艺认证。',{owner:'leather-workshop-r17'}));
  checks.push(P.makeCheck('shell:sampling','WARNING','每片最多16对内外表面采样，不是全网格碰撞、制造厚度或全局极值认证。',{owner:'leather-workshop-r17'}));
  checks.push(P.makeCheck('solver:calibration','UNKNOWN','现有物理配置可读取，但材料、密度与测量条件未完成实物标定。',{owner:'leather-workshop-r17'}));
  checks.push(P.makeCheck('material:binding','UNKNOWN','未绑定外部裁片材料轴与人物比例版本。',{owner:'tailor-workbench'}));
