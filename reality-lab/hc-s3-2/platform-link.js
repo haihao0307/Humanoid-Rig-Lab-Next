@@ -4,6 +4,9 @@ const C=RealityConnectionContract,R=RF32_REGISTRY,$=id=>document.getElementById(
 const entry=R.entries.find(x=>x.family==='denim'),install=entry.installation;
 let generation=0,abort=null,session={state:'DISCONNECTED',transport:null,observedCore:null,checkedAt:null,error:null},display={mode:null,family:null},sourceCheck={state:'NOT_CHECKED',checkedAt:null};
 const copy=C.copy;
+// The inherited S3.1 sidebar described only injected copies; the new source trial is different.
+const launch=$('load'),legacy=$('load-leather');launch.classList.add('primary');legacy.classList.remove('primary');launch.style.marginTop='0';legacy.style.marginTop='8px';launch.parentNode.insertBefore(launch,legacy);
+const note=document.querySelector('.layout>aside .side-note');if(note)note.textContent='原画面、几何、着色器、灯光不改。牛仔接口已试装到独立源分支；毛衣、皮革仍用已验证副本。原工作分支均未合并。';
 function paint(){
  const table=$('rf32-connections');table.replaceChildren();
  for(const e of R.entries){const row=document.createElement('tr');const cells=[({denim:'牛仔 R17.2',knit:'毛衣 P02 C2',leather:'皮革 R17'})[e.family],'已登记','已验证',e.installation?'源端试装已复验':'尚未试装','未安装／未合并'];for(const value of cells){const td=document.createElement('td');td.textContent=value;row.append(td);}table.append(row);}
