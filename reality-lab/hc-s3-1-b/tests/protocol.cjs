@@ -14,7 +14,9 @@ test('generated grid never becomes physical measured',()=>{const o=K.knit(fixtur
 test('physics explicitly absent and not certified',()=>{const o=K.knit(fixture(),D,M.sources.knit);assert(o.checks.some(c=>c.id==='physical:solver'&&c.status==='NOT_APPLICABLE'));assert.equal(o.productionReady,false);assert.equal(o.physicalCertification,false);});
 test('unknown physical measures remain null',()=>{const o=K.knit(fixture(),D,M.sources.knit);assert.equal(o.measurements.filter(m=>m.status==='UNKNOWN'&&m.value===null).length,3);});
 test('defects remain read only',()=>{const o=K.knit(fixture(),D,M.sources.knit);assert(o.defects.length>0);assert(o.defects.every(d=>!d.repairAuthorized&&d.verificationRequired));});
-rejected('rejected P03 commit not accepted',x=>x.source.commit='a51a5e4f429b91eb4d9d2d2bfc361863a81f6d9',/SOURCE_REVISION/);
+// Full rejected source verified from guilin-dem-pipeline PR291, not reconstructed.
+rejected('rejected P03 commit not accepted',x=>x.source.commit='a51a5e4f429b91eb4d9d2d2bfc361863a81f6d9d',/SOURCE_REVISION/);
+rejected('truncated commit independently rejected',x=>x.source.commit='a51a5e4f429b91eb4d9d2d2bfc361863a81f6d9',/完整提交/);
 rejected('old R15 identity not relabelled current P02',x=>x.objectId='fabric-knit-r15',/IDENTITY/);
 rejected('changed source digest rejected',x=>x.source.sha256='0'.repeat(64),/SOURCE_REVISION/);
 rejected('other domain not accepted',x=>x.domain='architecture',/IDENTITY/);
