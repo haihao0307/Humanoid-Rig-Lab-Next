@@ -6,16 +6,24 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
-  capture:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 14
+    permissions:
+      contents: write
+      actions: read
     defaults:
       run:
         working-directory: platform
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.sha }}
           path: platform
           sparse-checkout: |
             reality-lab/hc-s3-3
@@ -27,19 +35,148 @@ jobs:
           ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
           path: host
           sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-      - name: Install fixed browser
+      - name: Scope and clean current-build evidence
+        run: |
+          git fetch --filter=blob:none --depth=1 origin e23ee111a26aa5e33298597c1b8c5e501fb9b359
+          python - <<'PY'
+          from pathlib import Path
+          import json,subprocess,shutil,ast
+          r=Path('reality-lab/hc-s3-3');changed=subprocess.check_output(['git','diff','--name-only','e23ee111a26aa5e33298597c1b8c5e501fb9b359','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s3-3/') or p=='.github/workflows/reality-hc-s33.yml' for p in changed)
+          for f in r.rglob('*.py'):ast.parse(f.read_text(),filename=str(f))
+          for name in ['qa/native','qa/source','qa/file','qa/public']:shutil.rmtree(r/name,ignore_errors=True)
+          q=r/'qa/source';q.mkdir(parents=True);(q/'SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'originalProductionSourceChanged':False,'excludedDomainsTouched':[]},indent=2))
+          PY
+      - name: Retrieve independently captured original prepared bindings
+        uses: actions/download-artifact@v4
+        with:
+          name: reality-s33-native-observation
+          run-id: 39388054526
+          github-token: ${{ github.token }}
+          path: platform/reality-lab/hc-s3-3
+      - name: Verify pinned capture and assemble relationship inspector
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+          CAPTURE_RUN_ID: '39388054526'
+        run: |
+          python reality-lab/hc-s3-3/build.py
+          node reality-lab/hc-s3-3/tests/protocol.cjs
+      - name: Install pinned independent browser
         run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
-      - name: Read actual prepared D03 and retain original outcome
+      - name: Standalone inspector interactions and preserved material entry
         env:
-          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-        run: python reality-lab/hc-s3-3/capture.py
+          RF33_QA: ${{ github.workspace }}/platform/reality-lab/hc-s3-3/qa/file
+        run: python reality-lab/hc-s3-3/tests/browser.py
+      - name: Freeze passing inspector only, not source garment acceptance
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-3')
+          for n in ['qa/native/CAPTURE_REPORT.json','qa/source/SCOPE.json','qa/source/ASSEMBLY.json','qa/source/PROTOCOL.json','qa/file/BROWSER.json']:assert json.loads((r/n).read_text())['passed'],n
+          x=json.loads((r/'runtime-observation.json').read_text());assert x['capture']['mode']=='native_prephysics_binding_capture' and x['authority']['fitCertified'] is False
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s33-garment-relations-20261020
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-3/preview.html reality-lab/hc-s3-3/BUILD_MANIFEST.json reality-lab/hc-s3-3/runtime-observation.json reality-lab/hc-s3-3/source-facts.json reality-lab/hc-s3-3/qa/native reality-lab/hc-s3-3/qa/source reality-lab/hc-s3-3/qa/file
+          git commit -m 'build(reality): freeze S3.3 relationship inspector and explicit original fit failure'
+          git push origin HEAD:refs/heads/feature/reality-hc-s33-garment-relations-20261020
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-3/preview.html" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: reality-s33-native-observation
+          name: reality-s33-build-evidence
+          path: platform/reality-lab/hc-s3-3/qa/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s33-reviewed-code
           path: |
-            platform/reality-lab/hc-s3-3/qa/native/
-            platform/reality-lab/hc-s3-3/runtime-observation.json
+            platform/reality-lab/hc-s3-3/*.js
+            platform/reality-lab/hc-s3-3/*.py
+            platform/reality-lab/hc-s3-3/*.json
+            platform/reality-lab/hc-s3-3/*.md
+            platform/reality-lab/hc-s3-3/panel.html
+            platform/reality-lab/hc-s3-3/tests/
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: reality-s33-standalone
+          path: |
+            platform/reality-lab/hc-s3-3/preview.html
+            platform/reality-lab/hc-s3-3/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-3
+      - name: Verify exact public bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF33_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,json,hashlib,os,time
+          r=Path('reality-lab/hc-s3-3');m=json.loads((r/'BUILD_MANIFEST.json').read_text());url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-3/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(url,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'url':os.environ['RF33_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install fixed public browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify fixed HTTPS inspector and old native denim entry
+        env:
+          RF33_URL: ${{ needs.build.outputs.url }}
+          RF33_QA: ${{ github.workspace }}/reality-lab/hc-s3-3/qa/public
+        run: python reality-lab/hc-s3-3/tests/browser.py
+      - name: Persist exact checker delivery, source failure and next action
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF33_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-3');m=json.loads((r/'BUILD_MANIFEST.json').read_text());n=json.loads((r/'qa/native/CAPTURE_REPORT.json').read_text());p=json.loads((r/'qa/source/PROTOCOL.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());b=json.loads((r/'qa/public/BROWSER.json').read_text());x=json.loads((r/'runtime-observation.json').read_text())
+          assert n['passed'] and p['passed'] and f['passed'] and f['fileVerified'] and b['passed'] and b['publicVerified']
+          assert b['sourceOutcome']==x['sourceOutcome']==n['sourceOutcome']
+          d={'version':'REALITY-HC-S3.3-A','status':'RELATIONSHIP_INSPECTOR_VERIFIED_SOURCE_FIT_NOT_ACCEPTED','fixedURL':os.environ['RF33_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'html':m['html'],'nativeSource':m['nativeSource'],'captureEvidence':m['captureEvidence'],'captureChecks':len(n['checks']),'protocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'sourceOutcome':x['sourceOutcome'],'countsByObject':b['countsByObject'],'case':'D03 T03 top and P02 bottom; prepared bindings before physical initialization','captureIsLive':False,'capturedGarmentDisplayed':x['sourceOutcome']['committedGarmentCount']==2,'originalProductionSourceModified':False,'diagnosticObserverAdded':True,'originalRenderingPhysicsFunctionsChanged':False,'priorS32BytesPreserved':True,'productionInstalled':False,'physicalCertification':False,'manufacturingCertification':False,'fitCertified':False,'physicalDeviceTested':False,'userVisualAcceptance':False,'productionReady':False,'next':'Hand off original D03 physics-initialization failure with these precise prepared bindings; identify the failing constraint/panel in a separately scoped source diagnostic without disabling the guard. Explicit proportion revision and physical/manufacturing axis mapping remain source-workbench duties.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.3-GARMENT-RELATIONS-20261020','frameworkId':'RF01','status':d['status'],'fixedURL':d['fixedURL'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'lastActuallyCompletedStep':'Prepared D03 native bindings captured, original fit outcome retained, relationship checker and fixed public entry verified','sourceFitAccepted':False,'nextAction':d['next'],'userAccepted':False},ensure_ascii=False,indent=2));print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s33-garment-relations-20261020
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3-3/DELIVERY.json reality-lab/hc-s3-3/TASK_STATE.json reality-lab/hc-s3-3/qa/public
+          git commit -m 'docs(reality): record S3.3 public relationship checks without certifying source try-on'
+          git push origin HEAD:refs/heads/feature/reality-hc-s33-garment-relations-20261020
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s33-public-evidence
+          path: reality-lab/hc-s3-3/qa/public/
           retention-days: 30
