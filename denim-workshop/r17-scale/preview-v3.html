@@ -1,7 +1,82 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DENIM R17.2 正在装载</title><style>html,body{margin:0;height:100%;background:#0a0f15;color:#dce5ee;font:14px system-ui}.boot{height:100%;display:grid;place-items:center}.boot div{padding:18px 22px;border:1px solid #344352;border-radius:8px;background:#111821}</style></head><body><div class="boot"><div>正在装载 R17.2 连续距离牛仔材质…</div></div><script>
-(async()=>{
-const SOURCE='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/a5af1e0140c935703dec7c4d4da4f5549449b657/denim-workshop/r17-scale/index.html';
-const replacement=String.raw`void main(){
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="kaopu-version" content="DENIM-R17.2-GARMENT-SCALE">
+<title>KAOPU Denim R17 · 成衣真实尺度</title>
+<style>
+:root{color-scheme:dark;--panel:#111821;--line:#2a3542;--muted:#93a1b2;--text:#edf3f8;--accent:#d89b43}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#090d12;color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI","Microsoft Yahei",sans-serif}body{overflow:hidden}
+header{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line);background:#0d131a}h1{font-size:17px;letter-spacing:.08em;margin:0}.sub{font-size:12px;color:var(--muted)}
+main{height:calc(100vh - 66px);display:grid;grid-template-columns:minmax(0,1fr) 330px}.stage{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 38%,#53606c 0,#313942 28%,#171d24 62%,#0b1016 100%)}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.stage:active canvas{cursor:grabbing}
+.hud{position:absolute;left:18px;bottom:17px;padding:10px 12px;border:1px solid #ffffff1c;border-radius:7px;background:#0a0f15c7;backdrop-filter:blur(7px);pointer-events:none}.hud b{display:block;font-size:13px}.hud span{display:block;margin-top:4px;font-size:11px;color:#a9b5c3}
+.scale-card{position:absolute;right:18px;bottom:17px;width:226px;padding:10px 12px;border:1px solid #ffffff1c;border-radius:7px;background:#0a0f15c7;backdrop-filter:blur(7px);pointer-events:none;font-size:11px;color:#b7c2cf}.scale-card strong{color:#f0d3a6}.ruler{height:8px;margin:8px 0 5px;border-left:1px solid #d9e1e8;border-right:1px solid #d9e1e8;border-bottom:1px solid #d9e1e8}
+aside{overflow:auto;padding:15px 16px 28px;border-left:1px solid var(--line);background:var(--panel)}h2{font-size:11px;letter-spacing:.13em;color:#91a1b2;margin:16px 0 8px}.row{display:flex;gap:7px;margin:7px 0}.row>*{flex:1}
+button,select{width:100%;border:1px solid #334252;border-radius:6px;background:#1a2430;color:#e8eef4;padding:9px 8px;font:inherit;cursor:pointer}button:hover,select:hover{border-color:#6f8da8}button.active{background:#354b5f;border-color:#8cb0ce}.gold.active{background:#614723;border-color:#d8a254}
+label{display:block;margin:11px 0 0;color:#b5c0cc;font-size:12px}output{float:right;color:#f0d3a6;font-variant-numeric:tabular-nums}input[type=range]{width:100%;margin:7px 0 0;accent-color:#c8934c}.note{margin-top:12px;color:#8795a5;font-size:11px;line-height:1.65}.metrics{display:grid;grid-template-columns:1fr auto;gap:5px 10px;margin-top:9px;padding:10px;border:1px solid #293645;border-radius:6px;background:#0c1219;font-size:11px}.metrics span:nth-child(2n){color:#e8c58d;text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:760px){body{overflow:auto}header{height:58px;padding:0 12px}header .sub{display:none}h1{font-size:14px}main{height:auto;display:flex;flex-direction:column}.stage{height:62vh;min-height:420px}.scale-card{display:none}aside{border-left:0;border-top:1px solid var(--line)}.hud{left:10px;bottom:10px}.row{gap:5px}}
+</style>
+</head>
+<body>
+<header><h1>KAOPU / DENIM R17.2 · 连续距离可读性</h1><div class="sub">现实经纬密度 · 工业针距 · 真实单纱 + 斜纹聚合 + 方向性中尺度</div></header>
+<main>
+<section class="stage" id="stage">
+<canvas id="gl"></canvas>
+<div class="hud"><b id="status">初始化 WebGL2…</b><span id="viewInfo"></span></div>
+<div class="scale-card"><strong>物理尺度基线</strong><div class="ruler"></div><div>上方标尺代表 10 mm；纹理按米制模型坐标计算，不随裤装尺寸任意缩放。</div></div>
+</section>
+<aside>
+<h2>检查距离</h2>
+<div class="row" id="views"><button data-view="full" class="active">整条裤装</button><button data-view="mid">中距离</button></div>
+<div class="row"><button data-view="thigh">大腿近看</button><button data-view="seam">针脚微距</button></div>
+<h2>牛仔整理</h2>
+<div class="row" id="washes"><button data-wash="raw" class="active">原色硬挺</button><button data-wash="one">一次水洗</button><button data-wash="vintage">旧化磨白</button></div>
+<label>组织实际比例 <output id="weaveScaleOut">100%</output><input id="weaveScale" type="range" min="0.45" max="1.50" value="1" step="0.01"></label>
+<div class="row"><button id="physical" class="active gold">恢复现实比例</button><button id="smallCompare">缩小对照 45%</button></div>
+<label>针距 <output id="stitchPitchOut">2.73 mm</output><input id="stitchPitch" type="range" min="2.3" max="3.4" value="2.73" step="0.01"></label>
+<label>面线直径代理 <output id="threadWidthOut">0.45 mm</output><input id="threadWidth" type="range" min="0.30" max="0.85" value="0.45" step="0.01"></label>
+<label>亚像素可读性守恒 <output id="readabilityOut">1.30</output><input id="readability" type="range" min="0.7" max="2" value="1.3" step="0.01"></label>
+<h2>观察方式</h2>
+<div class="row"><button id="turntable">转台观察</button><button id="motion">轻微成衣运动</button></div>
+<label>显示分项<select id="mode"><option value="0">完整材质</option><option value="1">只看经纬组织</option><option value="2">只看针脚</option><option value="3">结构灰模</option></select></label>
+<label>灯光方位 <output id="lightOut">-28°</output><input id="light" type="range" min="-180" max="180" value="-28" step="1"></label>
+<div class="metrics"><span>经纱密度</span><span>60 ends/in</span><span>经纱中心距</span><span>0.423 mm</span><span>纬纱密度</span><span>40 picks/in</span><span>纬纱中心距</span><span>0.635 mm</span><span>明线密度</span><span>11 stitches/3 cm</span><span>模型外长</span><span>约 1.22 m</span></div>
+<div class="note">拖动旋转，滚轮缩放，Shift＋拖动平移。默认不使用后期模糊。近景只绘制像素能够分辨的独立经纬纱；中景保留3×1斜纹；整裤与手机距离用连续的中尺度方向场承接牛仔身份，不把单纱放大成粗横条，也不退化为完全光滑的蓝布。</div>
+</aside>
+</main>
+<script>
+(()=>{'use strict';
+const VERSION='DENIM-R17.2-GARMENT-SCALE';const PI=Math.PI;
+const canvas=document.getElementById('gl'),stage=document.getElementById('stage');
+const gl=canvas.getContext('webgl2',{antialias:true,alpha:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});
+const errors=[];if(!gl){document.getElementById('status').textContent='需要 WebGL2';throw Error('WebGL2 unavailable');}
+window.addEventListener('error',e=>errors.push(String(e.message||e.error)));window.addEventListener('unhandledrejection',e=>errors.push(String(e.reason)));
+const VS=`#version 300 es
+precision highp float;
+layout(location=0)in vec3 aPosition;layout(location=1)in vec3 aNormal;layout(location=2)in vec2 aMaterial;layout(location=3)in vec2 aPanelUV;layout(location=4)in float aPanel;
+uniform mat4 uModel,uViewProj;uniform mat3 uNormalMatrix;uniform float uTime,uMotion;
+out vec3 vWorld;out vec3 vNormal;out vec2 vMaterial;out vec2 vPanelUV;flat out float vPanel;out vec3 vWarp;
+void main(){vec3 p=aPosition;float base=mod(aPanel,10.0);float leg=step(.5,base);float side=base<1.5?-1.0:1.0;float lower=leg*smoothstep(.04,.95,aPanelUV.y);p.x+=uMotion*side*.013*sin(uTime*1.28)*lower;p.z+=uMotion*(.006*sin(10.0*p.y+uTime*1.7)+.004*sin(21.0*p.y-uTime*.9))*lower;vec4 w=uModel*vec4(p,1.0);vWorld=w.xyz;vNormal=normalize(uNormalMatrix*aNormal);vWarp=normalize(mat3(uModel)*vec3(0.0,1.0,0.0));vMaterial=aMaterial;vPanelUV=aPanelUV;vPanel=aPanel;gl_Position=uViewProj*w;}`;
+const FS=`#version 300 es
+precision highp float;
+in vec3 vWorld;in vec3 vNormal;in vec2 vMaterial;in vec2 vPanelUV;flat in float vPanel;in vec3 vWarp;out vec4 outColor;
+uniform vec3 uEye;uniform float uWeaveScale,uStitchPitch,uThreadWidth,uReadability,uWash,uLightAngle;uniform int uMode;
+const float PI=3.14159265359;
+float hash21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float valueNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1));return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}
+float yarnLine(float q,float halfWidth){float d=abs(fract(q)-.5),fw=max(fwidth(q),1e-5);return 1.0-smoothstep(halfWidth+fw*.30,halfWidth+fw*.95,d);}
+vec2 seamField(){float id=mod(vPanel,10.0);bool front=vPanel<10.0;float best=1e4,s=0.0,d;
+ if(id<.5){d=abs(vMaterial.y-.545);if(d<best){best=d;s=vMaterial.x;}d=abs(vMaterial.y-.515);if(d<best){best=d;s=vMaterial.x;}
+   if(front){float yf=clamp((vMaterial.y-.245)/.25,0.0,1.0);float flyX=.012+.035*yf*yf;d=abs(vMaterial.x-flyX);if(vMaterial.y>.245&&vMaterial.y<.49&&d<best){best=d;s=vMaterial.y;}
+     for(int k=0;k<2;k++){float sg=k==0?-1.0:1.0;vec2 q=(vMaterial-vec2(sg*.145,.425))/vec2(.105,.115);d=abs(length(q)-1.0)*.105;if(q.y>-.42&&sg*q.x>.05&&d<best){best=d;s=atan(q.y,q.x)*.105;}}
+   }else{for(int k=0;k<2;k++){float sg=k==0?-1.0:1.0;vec2 q=(vMaterial-vec2(sg*.13,.39))/vec2(.085,.105);d=abs(max(abs(q.x),abs(q.y))-.98)*.085;if(d<best){best=d;s=(q.x+q.y)*.08;}}}
+ }else if(id<2.5){float width=mix(.132,.094,vPanelUV.y)*2.0;d=abs(vPanelUV.x-.075)*width;if(d<best){best=d;s=vMaterial.y;}d=abs(vPanelUV.x-.925)*width;if(d<best){best=d;s=vMaterial.y;}if(vPanelUV.y>.91){d=abs(vPanelUV.y-.965)*.19;if(d<best){best=d;s=vMaterial.x;}}}
+ return vec2(best,s);
+}
+float stitchMask(float dist,float s){float pixel=max(length(vec2(fwidth(vMaterial.x),fwidth(vMaterial.y)))*.707,1e-6);float ew=max(uThreadWidth,pixel*1.15);float coverage=min(1.0,uThreadWidth/ew*uReadability);float line=1.0-smoothstep(ew*.38,ew*.72,dist);float q=s/uStitchPitch,aa=max(fwidth(q),.003),p=abs(fract(q)-.5);float dash=1.0-smoothstep(.315-aa,.315+aa,p);return line*dash*coverage;}
+void main(){
  float warpPitch=.0254/60.0*uWeaveScale,fillPitch=.0254/40.0*uWeaveScale;
  vec2 materialDx=dFdx(vMaterial),materialDy=dFdy(vMaterial);float pixel=max(length(materialDx),length(materialDy));float footprint=max(pixel/warpPitch,pixel/fillPitch);
  float nearW=1.0-smoothstep(.32,.88,footprint);float aggregateW=smoothstep(.38,1.35,footprint);
@@ -15,16 +90,100 @@ const replacement=String.raw`void main(){
  float twillSignal=physicalTwill*(1.0-nearW)*.040+directional*aggregateW*.068;col*=1.0+twillSignal;col=mix(col,col+vec3(.13,.15,.14)*wear,clamp(wear,0.0,.50));
  float height=nearW*(warp*.0058+fill*.0035)+physicalTwill*(1.0-nearW)*.0022+directional*aggregateW*.00105;vec3 N=normalize(vNormal);vec3 dpdx=dFdx(vWorld),dpdy=dFdy(vWorld);float hx=dFdx(height),hy=dFdy(height);vec3 r1=cross(dpdy,N),r2=cross(N,dpdx);float det=dot(dpdx,r1);vec3 grad=sign(det)*(hx*r1+hy*r2);N=normalize(abs(det)*N-grad*.14);
  vec3 V=normalize(uEye-vWorld);float a=radians(uLightAngle);vec3 L=normalize(vec3(sin(a),.62,cos(a)));vec3 L2=normalize(vec3(-.65,.22,-.72));vec3 H=normalize(L+V);float ndl=max(dot(N,L),0.0),fillL=max(dot(N,L2),0.0);float rough=mix(.59,.76,clamp(uWash*.35,0.0,1.0));float spec=pow(max(dot(N,H),0.0),mix(48.0,20.0,rough));vec3 B=cross(vWarp,V);B=length(B)>1e-5?normalize(B):vec3(1.0,0.0,0.0);float yarnSheen=pow(max(abs(dot(B,normalize(L+V))),0.0),18.0)*(1.0-rough*.55);
- vec3 lit=col*(.27+.94*ndl+.22*fillL)+vec3(.21,.28,.37)*spec*.14+vec3(.13,.18,.26)*yarnSheen*.14;float diag=clamp(.5+.5*(physicalTwill*(1.0-nearW)+directional*aggregateW),0.0,1.0);`;
-let html=await fetch(SOURCE,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('源页面读取失败 '+r.status);return r.text()});
-const rx=/void main\(\)\{\n float warpPitch=[\s\S]*? vec2 seam=seamField\(\);/;
-if(!rx.test(html))throw Error('固定着色器锚点不匹配');
-html=html.replace(rx,replacement+'\n vec2 seam=seamField();');
-html=html.replace('warpMask*.65+diag*.20','warpMask*.58+diag*.27');
-html=html.replaceAll('DENIM-R17-GARMENT-SCALE','DENIM-R17.2-GARMENT-SCALE');
-html=html.replaceAll('DENIM R17 · 成衣真实尺度','DENIM R17.2 · 连续距离可读性');
-html=html.replace('连续像素足迹重建','真实单纱 + 斜纹聚合 + 方向性中尺度');
-html=html.replace('近景显示独立经纬纱；中景连续保留四纱循环形成的斜纹脊；更远处只保留宏观靛蓝、竹节和磨白，不让高频纹理变成灰糊或闪烁。','近景只绘制像素能够分辨的独立经纬纱；中景保留3×1斜纹；整裤与手机距离用连续的中尺度方向场承接牛仔身份，不把单纱放大成粗横条，也不退化为完全光滑的蓝布。');
-document.open();document.write(html);document.close();
-})().catch(e=>{document.body.innerHTML='<div class="boot"><div>R17.2 装载失败：'+String(e)+'</div></div>';console.error(e)});
-</script></body></html>
+ vec3 lit=col*(.27+.94*ndl+.22*fillL)+vec3(.21,.28,.37)*spec*.14+vec3(.13,.18,.26)*yarnSheen*.14;float diag=clamp(.5+.5*(physicalTwill*(1.0-nearW)+directional*aggregateW),0.0,1.0);
+ vec2 seam=seamField();float stitch=stitchMask(seam.x,seam.y);vec3 thread=vec3(.72,.36,.075);if(uMode==1)lit=vec3(.10)+vec3(.28,.45,.70)*(warpMask*.58+diag*.27)+vec3(.52)*fillMask*.42;else if(uMode==2){lit=vec3(.035);stitch=min(1.0,stitch*1.7);}else if(uMode==3)lit=vec3(.20+.48*ndl);
+ if(uMode!=1&&uMode!=3)lit=mix(lit,thread*(.65+1.25*ndl)+vec3(.30)*spec,stitch);if(uMode==1)stitch=0.0;outColor=vec4(pow(max(lit,vec3(0.0)),vec3(1.0/2.2)),1.0);
+}`;
+function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s}
+const prog=gl.createProgram();gl.attachShader(prog,shader(gl.VERTEX_SHADER,VS));gl.attachShader(prog,shader(gl.FRAGMENT_SHADER,FS));gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(prog));
+const vertices=[],indices=[];const stride=12;function pushVertex(p,n,m,uv,panel){vertices.push(...p,...n,...m,...uv,panel,0)}
+function norm(v){const l=Math.hypot(...v)||1;return v.map(x=>x/l)}function sub(a,b){return a.map((x,i)=>x-b[i])}function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}
+function panel(fn,nu,nv,baseId){const maps=[];for(const back of[false,true]){const map=[];for(let j=0;j<=nv;j++){const row=[];for(let i=0;i<=nu;i++){const u=i/nu,v=j/nv,e=1e-4,p=fn(u,v,back),pu1=fn(Math.min(1,u+e),v,back),pu0=fn(Math.max(0,u-e),v,back),pv1=fn(u,Math.min(1,v+e),back),pv0=fn(u,Math.max(0,v-e),back);let n=norm(cross(sub(pu1,pu0),sub(pv1,pv0)));if((!back&&n[2]<0)||(back&&n[2]>0))n=n.map(x=>-x);const idx=vertices.length/stride;pushVertex(p,n,[p[0],p[1]],[u,v],baseId+(back?10:0));row.push(idx)}map.push(row)}maps.push(map);for(let j=0;j<nv;j++)for(let i=0;i<nu;i++){const a=map[j][i],b=map[j][i+1],c=map[j+1][i],d=map[j+1][i+1];if(back)indices.push(a,c,b,b,c,d);else indices.push(a,b,c,b,d,c)}}
+ const [front,back]=maps;function edge(seq){for(let k=0;k<seq.length-1;k++){const [j0,i0]=seq[k],[j1,i1]=seq[k+1],a=front[j0][i0],b=front[j1][i1],c=back[j0][i0],d=back[j1][i1];indices.push(a,c,b,b,c,d)}}edge([...Array(nu+1).keys()].map(i=>[0,i]));edge([...Array(nu+1).keys()].map(i=>[nv,i]));edge([...Array(nv+1).keys()].map(j=>[j,0]));edge([...Array(nv+1).keys()].map(j=>[j,nu])); }
+function pelvis(u,v,back){const y=.20+.38*v,half=.255-(.033*v)+.012*Math.sin(PI*v),x=(u*2-1)*half,bulge=.052+.045*(1-Math.pow(Math.abs(u*2-1),1.7))+.006*Math.sin(PI*v),z=(back?-1:1)*bulge;return[x,y,z]}
+function leg(side){return(u,v,back)=>{const y=.24-.90*v,width=.132-(.038*v),center=side*(.128-.012*v),x=center+(u*2-1)*width;let bulge=.038+.040*(1-Math.pow(Math.abs(u*2-1),1.7));bulge+=.009*Math.sin(PI*v)-.006*Math.exp(-Math.pow((v-.55)/.12,2));const z=(back?-1:1)*bulge;return[x,y,z]}}
+panel(pelvis,42,30,0);panel(leg(-1),28,54,1);panel(leg(1),28,54,2);
+const vao=gl.createVertexArray();gl.bindVertexArray(vao);const vb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(vertices),gl.STATIC_DRAW);const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(indices),gl.STATIC_DRAW);for(let i=0;i<5;i++){const sizes=[3,3,2,2,1];gl.enableVertexAttribArray(i);gl.vertexAttribPointer(i,sizes[i],gl.FLOAT,false,stride*4,[0,3,6,8,10][i]*4)}gl.bindVertexArray(null);
+function mat4(){return new Float32Array(16)}function ident(){const m=mat4();m[0]=m[5]=m[10]=m[15]=1;return m}function mul(a,b){const o=mat4();for(let r=0;r<4;r++)for(let c=0;c<4;c++)o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3];return o}
+function perspective(fov,asp,n,f){const t=1/Math.tan(fov/2),m=mat4();m[0]=t/asp;m[5]=t;m[10]=(f+n)/(n-f);m[11]=-1;m[14]=2*f*n/(n-f);return m}
+function lookAt(e,t,u){const z=norm(sub(e,t)),x=norm(cross(u,z)),y=cross(z,x),m=ident();m[0]=x[0];m[4]=x[1];m[8]=x[2];m[1]=y[0];m[5]=y[1];m[9]=y[2];m[2]=z[0];m[6]=z[1];m[10]=z[2];m[12]=-x[0]*e[0]-x[1]*e[1]-x[2]*e[2];m[13]=-y[0]*e[0]-y[1]*e[1]-y[2]*e[2];m[14]=-z[0]*e[0]-z[1]*e[1]-z[2]*e[2];return m}
+function model(yaw,pitch){const cy=Math.cos(yaw),sy=Math.sin(yaw),cx=Math.cos(pitch),sx=Math.sin(pitch),ry=ident(),rx=ident();ry[0]=cy;ry[2]=-sy;ry[8]=sy;ry[10]=cy;rx[5]=cx;rx[6]=sx;rx[9]=-sx;rx[10]=cx;return mul(ry,rx)}
+const loc=n=>gl.getUniformLocation(prog,n);const U={model:loc('uModel'),vp:loc('uViewProj'),normal:loc('uNormalMatrix'),time:loc('uTime'),motion:loc('uMotion'),eye:loc('uEye'),scale:loc('uWeaveScale'),pitch:loc('uStitchPitch'),thread:loc('uThreadWidth'),read:loc('uReadability'),wash:loc('uWash'),light:loc('uLightAngle'),mode:loc('uMode')};
+const views={full:{distance:2.48,target:[0,-.04,0],yaw:.10,pitch:-.015},mid:{distance:1.38,target:[0,.02,.02],yaw:.17,pitch:-.015},thigh:{distance:.72,target:[.13,-.08,.055],yaw:.15,pitch:0},seam:{distance:.32,target:[.17,.43,.065],yaw:.10,pitch:0}};
+const state={view:'full',distance:views.full.distance,target:[...views.full.target],yaw:views.full.yaw,pitch:views.full.pitch,weaveScale:1,stitchPitch:.00273,threadWidth:.00045,readability:1.3,wash:0,light:-28,mode:0,motion:false,turntable:false,time:0,ready:false,frames:0};let dirty=true,last=performance.now();
+function resize(){const r=stage.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,1.6,Math.sqrt(1800000/Math.max(1,r.width*r.height)));const w=Math.max(2,Math.round(r.width*dpr)),h=Math.max(2,Math.round(r.height*dpr));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;dirty=true}}
+function setView(name){const v=views[name];state.view=name;state.distance=v.distance;state.target=[...v.target];state.yaw=v.yaw;state.pitch=v.pitch;document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));dirty=true}
+function render(now){resize();const dt=Math.min(.05,(now-last)/1000);last=now;if(state.turntable)state.yaw+=dt*.24;if(state.motion)state.time+=dt;if(!dirty&&!state.turntable&&!state.motion)return;dirty=false;gl.viewport(0,0,canvas.width,canvas.height);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(prog);gl.bindVertexArray(vao);const eye=[state.target[0]+Math.sin(state.yaw)*Math.cos(state.pitch)*state.distance,state.target[1]+Math.sin(state.pitch)*state.distance,state.target[2]+Math.cos(state.yaw)*Math.cos(state.pitch)*state.distance];const vp=mul(perspective(31*PI/180,canvas.width/canvas.height,.03,10),lookAt(eye,state.target,[0,1,0]));const m=model(.08,0);gl.uniformMatrix4fv(U.model,false,m);gl.uniformMatrix4fv(U.vp,false,vp);gl.uniformMatrix3fv(U.normal,false,new Float32Array([m[0],m[1],m[2],m[4],m[5],m[6],m[8],m[9],m[10]]));gl.uniform1f(U.time,state.time);gl.uniform1f(U.motion,state.motion?1:0);gl.uniform3fv(U.eye,eye);gl.uniform1f(U.scale,state.weaveScale);gl.uniform1f(U.pitch,state.stitchPitch);gl.uniform1f(U.thread,state.threadWidth);gl.uniform1f(U.read,state.readability);gl.uniform1f(U.wash,state.wash);gl.uniform1f(U.light,state.light);gl.uniform1i(U.mode,state.mode);gl.drawElements(gl.TRIANGLES,indices.length,gl.UNSIGNED_INT,0);gl.bindVertexArray(null);state.frames++;state.ready=true;document.body.dataset.ready='true';document.getElementById('status').textContent='真实三维裤装 · 毫米尺度材质';document.getElementById('viewInfo').textContent=`${state.view} · ${state.distance.toFixed(2)} m · ${vertices.length/stride} 顶点 · ${Math.round(indices.length/3)} 三角形`;}
+function loop(t){render(t);requestAnimationFrame(loop)}requestAnimationFrame(loop);new ResizeObserver(()=>{dirty=true}).observe(stage);
+for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>setView(b.dataset.view);for(const b of document.querySelectorAll('[data-wash]'))b.onclick=()=>{state.wash={raw:0,one:1,vintage:2}[b.dataset.wash];document.querySelectorAll('[data-wash]').forEach(x=>x.classList.toggle('active',x===b));dirty=true};
+function bind(id,key,scale=1,fmt=v=>v){const el=document.getElementById(id),out=document.getElementById(id+'Out');el.oninput=()=>{state[key]=+el.value*scale;out.textContent=fmt(+el.value);dirty=true}}
+bind('weaveScale','weaveScale',1,v=>Math.round(v*100)+'%');bind('stitchPitch','stitchPitch',.001,v=>(+v).toFixed(2)+' mm');bind('threadWidth','threadWidth',.001,v=>(+v).toFixed(2)+' mm');bind('readability','readability',1,v=>(+v).toFixed(2));bind('light','light',1,v=>Math.round(v)+'°');
+document.getElementById('physical').onclick=()=>{state.weaveScale=1;document.getElementById('weaveScale').value=1;document.getElementById('weaveScaleOut').textContent='100%';dirty=true};document.getElementById('smallCompare').onclick=()=>{state.weaveScale=.45;document.getElementById('weaveScale').value=.45;document.getElementById('weaveScaleOut').textContent='45%';dirty=true};
+document.getElementById('turntable').onclick=e=>{state.turntable=!state.turntable;e.currentTarget.classList.toggle('active',state.turntable);dirty=true};document.getElementById('motion').onclick=e=>{state.motion=!state.motion;e.currentTarget.classList.toggle('active',state.motion);dirty=true};document.getElementById('mode').onchange=e=>{state.mode=+e.target.value;dirty=true};
+let pointer=null;canvas.onpointerdown=e=>{pointer={x:e.clientX,y:e.clientY,shift:e.shiftKey};canvas.setPointerCapture(e.pointerId)};canvas.onpointermove=e=>{if(!pointer)return;const dx=e.clientX-pointer.x,dy=e.clientY-pointer.y;if(pointer.shift){state.target[0]-=dx*state.distance*.00065;state.target[1]+=dy*state.distance*.00065}else{state.yaw-=dx*.006;state.pitch=Math.max(-1.15,Math.min(1.15,state.pitch+dy*.006))}pointer.x=e.clientX;pointer.y=e.clientY;dirty=true};canvas.onpointerup=canvas.onpointercancel=()=>pointer=null;canvas.onwheel=e=>{e.preventDefault();state.distance=Math.max(.16,Math.min(4,state.distance*Math.exp(e.deltaY*.001)));dirty=true};
+/*RF31_NATIVE_EXPORT_BEGIN*/
+window.__RF31_SOURCE__={"repository": "haihao0307/Humanoid-Rig-Lab-Next", "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915", "path": "denim-workshop/r17-scale/preview-v3.html", "sha256": "2a77a3b19852522cb5e52271bf4665d0230bc2b70b070ff60be461e2790e19b4", "basePage": {"commit": "a5af1e0140c935703dec7c4d4da4f5549449b657", "path": "denim-workshop/r17-scale/index.html", "sha256": "60c49adec887ac81ebe4b9f1b0807fbddab4c035dc030b65ad9f6e21701fc817"}, "assembledOriginalSHA256": "533df4565b9d913fe6a762302b887f2bc0110f3b26b3d48aa58ed6463a826bb6"};
+/* Additive sidecar inserted inside the verified original R17.2 closure.
+ * Reads native state/uniforms only. No native setters, draw calls, matrix updates,
+ * gl.getError, buffer transfer, or production persistence. */
+{
+ const source=Object.freeze(JSON.parse(JSON.stringify(window.__RF31_SOURCE__)));
+ let sequence=0;
+ const clone=x=>JSON.parse(JSON.stringify(x));
+ const freeze=x=>{if(x&&typeof x==='object'){Object.freeze(x);for(const v of Object.values(x))freeze(v);}return x;};
+ function hashText(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(16).padStart(8,'0');}
+ function hashNumbers(values){const a=new Float64Array(values),b=new Uint8Array(a.buffer);let h=2166136261;for(let i=0;i<b.length;i++){h^=b[i];h=Math.imul(h,16777619);}return (h>>>0).toString(16).padStart(8,'0');}
+ function uniformValues(){return {weaveScale:gl.getUniform(prog,U.scale),stitchPitch:gl.getUniform(prog,U.pitch),threadWidth:gl.getUniform(prog,U.thread),readability:gl.getUniform(prog,U.read),wash:gl.getUniform(prog,U.wash),light:gl.getUniform(prog,U.light)};}
+ function guard(){return {state:hashText(JSON.stringify(state)),vertices:hashNumbers(vertices),indices:hashNumbers(indices),vertexShader:hashText(VS),fragmentShader:hashText(FS),uniforms:uniformValues()};}
+ function read(){
+  const started=performance.now();
+  if(!state.ready||gl.isContextLost())throw Error('NATIVE_NOT_READY');
+  const before=guard(),actual=before.uniforms;
+  for(const name of Object.keys(actual)){
+   if(typeof actual[name]!=='number'||!Number.isFinite(actual[name]))throw Error('INVALID_NATIVE_UNIFORM:'+name);
+   const target=state[name];
+   if(Math.abs(actual[name]-target)>1e-6*Math.max(1e-3,Math.abs(target)))throw Error('NATIVE_FRAME_PENDING:'+name);
+  }
+  if(actual.weaveScale<=0||actual.stitchPitch<=0||actual.threadWidth<=0)throw Error('INVALID_NATIVE_LENGTH');
+  const values=[
+   ['material.warp_spacing_m','经纱中心间距',.0254/60*actual.weaveScale,'m','PASS','runtime_computed','实际 uWeaveScale × 源着色器 25.4/60 mm；不是实物测量'],
+   ['material.weft_spacing_m','纬纱中心间距',.0254/40*actual.weaveScale,'m','PASS','runtime_computed','实际 uWeaveScale × 源着色器 25.4/40 mm；不是实物测量'],
+   ['material.twill_repeat_m','固定 V 时的 U 向四纱周期',.0254/60*4*actual.weaveScale,'m','PASS','runtime_computed','材料参考坐标中的 U 向周期；不等于任意方向的世界空间长度'],
+   ['material.stitch_pitch_m','实际上传的针脚节距',actual.stitchPitch,'m','PASS','runtime_computed','直接读取 gl.getUniform(uStitchPitch)，不是复述滑块文字'],
+   ['material.visible_thread_width_m','实际可见线宽代理',actual.threadWidth,'m','WARNING','runtime_computed','读取 uThreadWidth；抗锯齿覆盖可改变屏幕支撑范围，不是实物线径或 Tex'],
+   ['material.thickness_m','材料物理厚度',null,'m','UNKNOWN','unknown','本 R17.2 外观工作台未给出物理厚度；不借用 R15 的其他版本候选'],
+   ['material.yarn_diameter_m','纱线几何直径',null,'m','UNKNOWN','unknown','程序化纱线遮罩与几何线径没有等价证据'],
+   ['material.linear_density_tex','纱线 / 缝线 Tex',null,'tex','UNKNOWN','unknown','线密度不能由显示代理宽度反推']
+  ].map(([id,label,value,unit,status,basis,method])=>({id,label,value,unit,status,basis,method}));
+  const after=guard(),unchanged=JSON.stringify(before)===JSON.stringify(after);
+  if(!unchanged)throw Error('READ_PRESERVATION_FAILED');
+  const result={schema:'kaopu/reality-workbench-export@1',exporterVersion:'0.3.1-a',objectId:'fabric-denim-r17-2',domain:'fabric',family:'denim',source:clone(source),capture:{capturedAt:new Date().toISOString(),sequence:++sequence,sourceMode:'native_callback',nativeFrame:state.frames,view:state.view,elapsedMs:performance.now()-started},nativeControls:{weaveScale:state.weaveScale,stitchPitch:state.stitchPitch,threadWidth:state.threadWidth,readability:state.readability,wash:state.wash,light:state.light},shaderInputs:clone(actual),measurements:values,materialSpace:{unit:'m',basis:'source_declared',coordinate:'aMaterial=[generated local X, generated local Y] before shader motion',uMeaning:'cross-warp-yarn direction',vMeaning:'cross-weft-yarn direction',garmentBindingVerified:false,physicalCalibration:false},camera:{distance:state.distance,target:[...state.target],yaw:state.yaw,pitch:state.pitch,fovYDeg:31,bufferPx:[canvas.width,canvas.height]},mesh:{vertices:vertices.length/stride,triangles:indices.length/3},preservation:{passed:true,before,after,method:'same-task FNV-1a diagnostic fingerprints; source provenance separately uses SHA-256',checked:['native state','CPU geometry arrays','vertex/fragment shader text','listed GPU uniforms'],notChecked:['all driver state','all framebuffer pixels','real-world sample dimensions']},comparison:{nominalStitchPitchM:.03/11,actualStitchPitchM:actual.stitchPitch,interpretation:'源候选11针/30mm与运行时上传值分别保留；未给工艺公差，不自动判制造缺陷'},authorities:{sourceWriteAPI:false,repairAuthorized:false,physicalCertification:false,manufacturingCertification:false,productionReady:false}};
+  return freeze(result);
+ }
+ window.KAOPU_REALITY=Object.freeze({version:'0.3.1-a',read,exportJSON:()=>JSON.stringify(read(),null,2),source});
+}
+
+/*RF31_NATIVE_EXPORT_END*/
+window.DENIM_R17={version:VERSION,state,setView,setParam:(k,v)=>{if(!(k in state)||!Number.isFinite(+v))throw Error('invalid param');state[k]=+v;dirty=true},setMotion:v=>{state.motion=!!v;dirty=true},renderNow:()=>{dirty=true;render(performance.now())},capture:()=>canvas.toDataURL('image/png'),audit:()=>({version:VERSION,ready:state.ready,parameters:{weaveScale:state.weaveScale,warpPitchMM:.0254/60*1000*state.weaveScale,fillPitchMM:.0254/40*1000*state.weaveScale,stitchPitchMM:state.stitchPitch*1000,threadWidthMM:state.threadWidth*1000,readability:state.readability,wash:state.wash,mode:state.mode},camera:{view:state.view,distance:state.distance,yaw:state.yaw,pitch:state.pitch,target:[...state.target]},mesh:{vertices:vertices.length/stride,triangles:indices.length/3},canvas:{width:canvas.width,height:canvas.height},frames:state.frames,renderer:gl.getParameter(gl.RENDERER),errors:[...errors]})};
+})();
+</script>
+<!--RF32_SOURCE_MOUNT_BEGIN--><script>
+const RF32_CORE={"schema": "kaopu/reality-source-installation@1", "installationId": "RF01-S32-DENIM-R17", "scope": "trial_branch", "repository": "haihao0307/Humanoid-Rig-Lab-Next", "sourceBranch": "feature/denim-r17-reality-s32-trial-20261020", "sourceBaseCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915", "entryPath": "denim-workshop/r17-scale/preview-v3.html", "adapterVersion": "0.3.1-a", "adapterSHA256": "2488cb2ba9eb4bdaf664dc091b45c0508d3f3c9cf73f6816a732098d4173f9af", "rendererSHA256": "533df4565b9d913fe6a762302b887f2bc0110f3b26b3d48aa58ed6463a826bb6", "implementationCommit": "65152640b3c9ce923877a6b6c4437b22631184d5", "productionBranch": "feature/denim-r17-garment-scale-20261015", "authorities": {"sourceWriteAPI": false, "mergeAuthorized": false, "productionInstalled": false, "physicalCertification": false}};
+/* Runs in the installed native page, not in the standards platform. No message listener or write command. */
+(function(){
+'use strict';
+const freeze=x=>{if(x&&typeof x==='object'){Object.freeze(x);Object.values(x).forEach(freeze);}return x;};
+const copy=x=>JSON.parse(JSON.stringify(x)),core=freeze(copy(RF32_CORE));
+if(!window.KAOPU_REALITY||window.KAOPU_REALITY.version!==core.adapterVersion)throw Error('SOURCE_ADAPTER_MISSING');
+window.KAOPU_SOURCE_INSTALLATION=Object.freeze({info:()=>freeze(copy(core)),read:()=>window.KAOPU_REALITY.read(),version:'1'});
+const details=document.createElement('details');details.id='reality-source-installation';details.style.cssText='margin-top:16px;border-top:1px solid #334252;padding-top:8px';
+const summary=document.createElement('summary');summary.textContent='世界规范接口 · 源端试装（未合并）';details.append(summary);
+const note=document.createElement('p');note.className='note';note.textContent='这份固定源入口已安装只读接口。原工作分支未被覆盖；无物性认证，无参数写回。';details.append(note);
+const button=document.createElement('button');button.id='reality-source-export';button.textContent='导出当前原生规范清单';details.append(button);
+const result=document.createElement('p');result.id='reality-source-result';result.className='note';details.append(result);
+button.onclick=async()=>{button.disabled=true;try{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));const native=window.KAOPU_REALITY.read();const blob=new Blob([JSON.stringify({schema:'kaopu/reality-review-bundle@1',installation:core,native,sourceReceipt:true},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='DENIM-R17-source-reality.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);result.textContent='已读取当前源实例；生产安装状态仍为未合并。';}catch(e){result.textContent='未导出：'+e.message;}finally{button.disabled=false;}};
+document.querySelector('aside').append(details);
+})();
+
+</script><!--RF32_SOURCE_MOUNT_END-->
+</body></html>
