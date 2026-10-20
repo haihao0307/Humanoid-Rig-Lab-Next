@@ -1,5 +1,5 @@
 from pathlib import Path
-import os,json,hashlib,time,traceback
+import os,json,hashlib,time,traceback,base64
 from playwright.sync_api import sync_playwright
 R=Path(__file__).resolve().parents[1];Q=Path(os.environ.get('RF31B_QA',str(R/'qa/file')));Q.mkdir(parents=True,exist_ok=True)
 URL=os.environ.get('RF31B_URL',(R/'preview.html').as_uri());M=json.loads((R/'BUILD_MANIFEST.json').read_text())
@@ -10,6 +10,12 @@ def check(name,value=True,detail=None):
  report['checks'].append({'name':name,'passed':True,'detail':detail});print('PASS',name,flush=True);save()
 def shot(page,name):
  p=Q/(name+'.png');page.screenshot(path=str(p),timeout=90000);report.setdefault('screenshots',[]).append({'name':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+def pixels(locator):
+ # A DOM screenshot can round a fractional iframe offset into an extra border row.
+ # Read the existing preserved canvas buffer, without requesting any new rendering.
+ v=locator.evaluate('(c)=>({width:c.width,height:c.height,png:c.toDataURL("image/png")})')
+ assert v['png'].startswith('data:image/png;base64,')
+ return base64.b64decode(v['png'].split(',',1)[1]),[v['width'],v['height']]
 with sync_playwright() as pw:
  browser=pw.chromium.launch(headless=True,args=['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage'])
  context=browser.new_context(viewport={'width':1440,'height':1060},device_scale_factor=1,accept_downloads=True)
@@ -40,17 +46,17 @@ with sync_playwright() as pw:
   check('returned snapshot is deeply frozen',proof['frozen'])
   check('metadata and sampled geometry unchanged',proof['protected'])
   canvas=page.frame_locator('#native').locator('#stage canvas');page.wait_for_timeout(150)
-  image=canvas.screenshot(timeout=90000);(Q/'knit-native.png').write_bytes(image)
-  page.evaluate('__REALITY_S31B__.capture(false)');image2=canvas.screenshot(timeout=90000)
-  check('light read leaves actual pixels unchanged',hashlib.sha256(image).hexdigest()==hashlib.sha256(image2).hexdigest())
+  image,dimensions_buffer=pixels(canvas);(Q/'knit-native.png').write_bytes(image)
+  page.evaluate('__REALITY_S31B__.capture(false)');image2,dimensions_after=pixels(canvas)
+  check('light read leaves actual pixels unchanged',dimensions_buffer==dimensions_after and hashlib.sha256(image).hexdigest()==hashlib.sha256(image2).hexdigest())
   page.locator('#read-deep').click();page.wait_for_function('__REALITY_S31B__.report().native.capture.integrityMode==="full_cpu_arrays"');deep=state()['native'];report['deepKnit']=deep
   check('manual full arrays integrity check passes',deep['preservation']['before']==deep['preservation']['after'])
-  image3=canvas.screenshot(timeout=90000);check('deep read leaves actual pixels unchanged',hashlib.sha256(image2).hexdigest()==hashlib.sha256(image3).hexdigest())
+  image3,dimensions_deep=pixels(canvas);check('deep read leaves actual pixels unchanged',dimensions_buffer==dimensions_deep and hashlib.sha256(image2).hexdigest()==hashlib.sha256(image3).hexdigest())
   if URL.startswith('file:'):
    dimensions=page.locator('#native').evaluate('(x)=>({width:x.clientWidth,height:x.clientHeight})');baseline=context.new_page();baseline.set_viewport_size(dimensions)
    baseline.goto((R/'_generated/knit-before.html').as_uri(),wait_until='load',timeout=120000);baseline.wait_for_function('document.getElementById("loading").hidden');baseline.wait_for_timeout(150)
-   original=baseline.locator('#stage canvas').screenshot(timeout=90000);(Q/'knit-original.png').write_bytes(original)
-   check('candidate matches exact retained baseline pixels',hashlib.sha256(image).hexdigest()==hashlib.sha256(original).hexdigest(),{'candidate':hashlib.sha256(image).hexdigest(),'baseline':hashlib.sha256(original).hexdigest()});baseline.close();page.bring_to_front()
+   original,original_dimensions=pixels(baseline.locator('#stage canvas'));(Q/'knit-original.png').write_bytes(original)
+   check('candidate matches exact retained baseline pixels',dimensions_buffer==original_dimensions and hashlib.sha256(image).hexdigest()==hashlib.sha256(original).hexdigest(),{'candidate':hashlib.sha256(image).hexdigest(),'baseline':hashlib.sha256(original).hexdigest(),'candidateBuffer':dimensions_buffer,'baselineBuffer':original_dimensions,'comparison':'complete original canvas PNG bytes, not viewport clipping'});baseline.close();page.bring_to_front()
   shot(page,'01-knit-live')
   before=state()['native'];control=page.frame_locator('#native').locator('[data-param="length"]');max_length=float(control.get_attribute('max'));control.focus();control.press('End')
   page.wait_for_function('(v)=>{const n=__REALITY_S31B__.report().native;return n?.family==="knit"&&Math.abs(n.shaderInputs.length-v)<2e-6;}',arg=max_length)
