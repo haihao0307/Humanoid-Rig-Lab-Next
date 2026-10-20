@@ -1,14 +1,15 @@
 {
   "task":"RF01-S3.1-C-LEATHER-20261020",
-  "attempt":2,
-  "previousRun":39376548875,
-  "previousEvidenceArtifact":12243354266,
-  "previousEvidenceSHA256":"3dc859d74400687081f8c541bae8c7ea4e5aca9690168ecb083868764ee20419",
-  "previousPassed":{"protocol":51,"fileBrowserBeforeFailure":28},
-  "rootCause":"The browser test selected details.craftParameters > summary, but the unchanged source contains three such panels. Playwright correctly rejected this ambiguous locator before operating the pitch slider.",
-  "correction":"Locate details.craftParameters:has(#pitchMM) > summary, tying the action to the actual unique pitch control instead of choosing an arbitrary first panel.",
-  "verifiedBeforeCorrection":["exact original/candidate canvas buffer equality","ordinary and full read pixel preservation","unchanged physics step during reads","real thicknessScale 1 to 1.65 updates generated thickness 1.40 to 2.31 mm"],
-  "runtimeOrSourceRendererChanged":false,
-  "acceptanceThresholdsChanged":false,
-  "next":"Rerun all source, protocol, file and fixed public gates; do not publish until the complete suite passes."
+  "attempt":3,
+  "previousRun":39377083376,
+  "previousEvidenceArtifact":12244090981,
+  "previousEvidenceSHA256":"ca29ef9abb48eda333605005bd9416bccdea82d068b3e6ddb9c25db5c6abd352",
+  "rootCauseReview":"ROOT_CAUSE_REVIEW.md",
+  "rootCause":"The browser assertion incorrectly equated requested pitch with generated pitch. Original SeamPath distributes path length over an integer interval count; actual generated 4.31529–4.55978mm can accompany a 4.5mm request.",
+  "correction":"Export native path length, integer intervals, knot mode and requested pitch. Validate actual length/count/pitch relations and retain the deviation with explanation, rather than alter native geometry to satisfy a false premise.",
+  "newNegativeCases":["inconsistent path length and pitch","wrong hole/interval count","fabricated integer distribution","rounded deviation retained","knot-anchored count rule"],
+  "sourceRendererChanged":false,
+  "sourcePhysicsChanged":false,
+  "pixelEqualityGateUnchanged":true,
+  "next":"Rerun every source/protocol/file/HTTPS gate. Preserve old fixed releases and do not merge."
 }
