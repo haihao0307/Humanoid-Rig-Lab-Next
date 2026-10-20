@@ -15,7 +15,7 @@ function paint(){
 }
 async function bytesHash(bytes){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),x=>x.toString(16).padStart(2,'0')).join('');}
 async function load(){
- const ticket=++generation;abort?.abort();abort=new AbortController();const signal=abort.signal;
+ const ticket=++generation;abort?.abort();const controller=new AbortController();abort=controller;const signal=controller.signal,deadline=setTimeout(()=>controller.abort(),20000);
  session={state:'CHECKING',transport:location.protocol==='file:'?'embedded_installed_bytes':'pinned_https',observedCore:null,checkedAt:null,error:null};paint();
  try{
   let b;if(location.protocol==='file:'){
@@ -27,14 +27,15 @@ async function load(){
   if(ticket!==generation)throw Error('SOURCE_CONNECTION_CANCELLED');
   if(b.length!==install.bytes||await bytesHash(b)!==install.htmlSHA256)throw Error('SOURCE_HASH_MISMATCH');
   if(ticket!==generation)throw Error('SOURCE_CONNECTION_CANCELLED');session.state='BYTES_VERIFIED';session.checkedAt=new Date().toISOString();paint();return new TextDecoder('utf-8',{fatal:true}).decode(b);
- }catch(e){if(ticket===generation){session.state='FAILED';session.error=e.message;paint();}throw e;}
+ }catch(e){if(ticket===generation){session.state='FAILED';session.error=e.name==='AbortError'?'SOURCE_CHECK_TIMEOUT_OR_CANCELLED':e.message;paint();}throw e;}finally{clearTimeout(deadline);}
 }
-function verify(kind,frame,packet){if(kind!=='denim')return;if(!['BYTES_VERIFIED','CONNECTED'].includes(session.state))throw Error('SOURCE_NOT_BYTE_VERIFIED');const provider=frame.contentWindow.KAOPU_SOURCE_INSTALLATION;if(!provider||typeof provider.info!=='function')throw Error('SOURCE_PROVIDER_MISSING');const core=provider.info();C.inspectProvider(core,install.core,packet);session.state='CONNECTED';session.observedCore=copy(core);paint();}
+function verify(kind,frame,packet){if(kind!=='denim')return;try{if(!['BYTES_VERIFIED','CONNECTED'].includes(session.state))throw Error('SOURCE_NOT_BYTE_VERIFIED');const provider=frame.contentWindow.KAOPU_SOURCE_INSTALLATION;if(!provider||typeof provider.info!=='function')throw Error('SOURCE_PROVIDER_MISSING');const core=provider.info();C.inspectProvider(core,install.core,packet);session.state='CONNECTED';session.observedCore=copy(core);paint();}catch(e){session.state='FAILED';session.error=e.message;paint();throw e;}}
 function close(){generation++;abort?.abort();abort=null;session={...session,state:'CLOSED',observedCore:null,error:null};paint();}
 function reportMode(mode,family){display={mode,family};paint();}
 async function checkOriginal(){
- sourceCheck={state:'CHECKING',checkedAt:null};paint();
- try{const u='https://raw.githubusercontent.com/'+install.core.repository+'/refs/heads/'+install.core.productionBranch+'/'+install.core.entryPath;const r=await fetch(u,{cache:'no-store',credentials:'omit',referrerPolicy:'no-referrer'});if(!r.ok)throw Error('HTTP_'+r.status);const bytes=new Uint8Array(await r.arrayBuffer());if(bytes.length>1048576)throw Error('SOURCE_TOO_LARGE');const h=await bytesHash(bytes);sourceCheck={state:h===R.originalEntrySHA256?'MATCH':'CHANGED',checkedAt:new Date().toISOString(),sha256:h};}catch(e){sourceCheck={state:'ERROR',checkedAt:new Date().toISOString(),error:e.message};}paint();return copy(sourceCheck);
+ if(sourceCheck.state==='CHECKING')return copy(sourceCheck);
+ sourceCheck={state:'CHECKING',checkedAt:null};paint();const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),20000);
+ try{const u='https://raw.githubusercontent.com/'+install.core.repository+'/refs/heads/'+install.core.productionBranch+'/'+install.core.entryPath;const r=await fetch(u,{signal:controller.signal,cache:'no-store',credentials:'omit',referrerPolicy:'no-referrer'});if(!r.ok)throw Error('HTTP_'+r.status);const bytes=new Uint8Array(await r.arrayBuffer());if(bytes.length>1048576)throw Error('SOURCE_TOO_LARGE');const h=await bytesHash(bytes);sourceCheck={state:h===R.originalEntrySHA256?'MATCH':'CHANGED',checkedAt:new Date().toISOString(),sha256:h};}catch(e){sourceCheck={state:'ERROR',checkedAt:new Date().toISOString(),error:e.message};}finally{clearTimeout(deadline);}paint();return copy(sourceCheck);
 }
 $('rf32-source-link').href=C.publicURL(install);
 $('rf32-old-link').href='https://htmlpreview.github.io/?https://raw.githubusercontent.com/'+install.core.repository+'/'+install.core.sourceBaseCommit+'/'+install.core.entryPath;
