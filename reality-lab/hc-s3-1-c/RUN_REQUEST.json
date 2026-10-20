@@ -1,0 +1,15 @@
+{
+  "task":"RF01-S3.1-C-LEATHER-20261020",
+  "attempt":3,
+  "previousRun":39377083376,
+  "previousEvidenceArtifact":12244090981,
+  "previousEvidenceSHA256":"ca29ef9abb48eda333605005bd9416bccdea82d068b3e6ddb9c25db5c6abd352",
+  "rootCauseReview":"ROOT_CAUSE_REVIEW.md",
+  "rootCause":"The browser assertion incorrectly equated requested pitch with generated pitch. Original SeamPath distributes path length over an integer interval count; actual generated 4.31529–4.55978mm can accompany a 4.5mm request.",
+  "correction":"Export native path length, integer intervals, knot mode and requested pitch. Validate actual length/count/pitch relations and retain the deviation with explanation, rather than alter native geometry to satisfy a false premise.",
+  "newNegativeCases":["inconsistent path length and pitch","wrong hole/interval count","fabricated integer distribution","rounded deviation retained","knot-anchored count rule"],
+  "sourceRendererChanged":false,
+  "sourcePhysicsChanged":false,
+  "pixelEqualityGateUnchanged":true,
+  "next":"Rerun every source/protocol/file/HTTPS gate. Preserve old fixed releases and do not merge."
+}
