@@ -1,0 +1,37 @@
+{
+  "schema": "kaopu/reality-evidence-index@1",
+  "version": "REALITY-HC-S3.2",
+  "workflowRun": 39381757672,
+  "implementationCommit": "65152640b3c9ce923877a6b6c4437b22631184d5",
+  "portalCommit": "a9e31af5527d90c0a15e72780d47f7d6cce1f58f",
+  "nativeSourceTrialCommit": "c208300628479aaeb8abea73b8eaaf7b51314c54",
+  "finalReceiptCommit": "bcb764463781cffec4336637ae6ac11f73dc32a7",
+  "portalHTML": {"bytes": 3413942, "sha256": "fefe6a5d1ad4b572e1f39a6721c7186a4a03a6a8cdde1433211676f726df5101"},
+  "nativeHTML": {"bytes": 32826, "sha256": "5c24ba3616765572c0d57bf8a72414247baf13ee449b89f1b32eeeca00a1a80d"},
+  "acceptedArtifacts": [
+    {"id": 12245875811, "name": "reality-s32-standalone", "zipSHA256": "d2e556452d0ede266fba2c2b652ac161426cbc0bad9e80f29200203fa7187872", "scope": "Exact final standalone portal and manifest"},
+    {"id": 12244968946, "name": "reality-s32-build-evidence", "zipSHA256": "cabc62be5c131bceddc3158abcc007892bba9085402105550ce8bf9309b02b59", "acceptedDirectories": ["source", "source-file", "source-public", "portal-file"], "excludedDirectories": ["portal-public"]},
+    {"id": 12245374820, "name": "reality-s32-public-evidence", "zipSHA256": "c0ca6c58ed4da8a911fa31e58999947c61715072d45cce147e7a0587bd69ae33", "scope": "Authoritative final fixed HTTPS portal browser and byte evidence"}
+  ],
+  "checks": {"protocol": 34, "sourceFile": 20, "sourcePublic": 19, "portalFile": 24, "portalPublic": 28, "overlappingSuitesMustNotBeSummedAsIndependentFeatures": true},
+  "excludedInheritedEvidence": {
+    "artifactId": 12244968946,
+    "directory": "portal-public",
+    "reason": "The intermediate build artifact contains the prior run's committed portal-public directory. It is not evidence of the final public execution.",
+    "oldPortalCommit": "552b97c1819c61b58181c5ea8082ffc0c49bbf19",
+    "useInstead": "Artifact 12245374820, or qa/portal-public at finalReceiptCommit bcb764463781cffec4336637ae6ac11f73dc32a7"
+  },
+  "sourceCanvasEquality": {"dimensions": [1110, 934], "originalAndInstalledPNG_SHA256": "003adce05858231d693862e343f15d13e3b5d624629accdad3e25859d90f0725", "sameTestEnvironmentOnly": true},
+  "finalPublicScreenshots": [
+    {"file": "02-portal-source-connected.png", "sha256": "cb13878bc5d303836455c217d4cda63a477c3cf634973443cd92b680043b239e"},
+    {"file": "03-mobile-registry.png", "sha256": "ecb64733963077d29b014feae9fb8b36bf90ead5d24e213ce8cb305330a9be8e"}
+  ],
+  "producerArtifactInspectionCompleted": true,
+  "newBrowserExecutionByArtifactInspection": false,
+  "productionInstalled": false,
+  "productionBranchUnchangedAtFinalWorkflow": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+  "userVisualAccepted": false,
+  "physicalDeviceTested": false,
+  "physicalCertification": false,
+  "manufacturingCertification": false
+}
