@@ -3,7 +3,7 @@
 const K=RealityKnitBridge,P=RealityProtocol,$=id=>document.getElementById(id),D=K.dictionary(RF31_DICTIONARY,RF31_HISTORY);
 const histories=RF31_HISTORY.objects.map(o=>K.historyObject(o,D));
 const names={knit:'毛衣 P02 C2',denim:'牛仔 R17.2'},events=[],last={};
-let current=null,packet=null,previous=null,frame=null,family=null,generation=0,ready=false,following=false,timer=null,busy=false;
+let current=null,packet=null,previous=null,frame=null,family=null,generation=0,selectionEpoch=0,ready=false,following=false,timer=null,busy=false;
 const copy=x=>JSON.parse(JSON.stringify(x));
 const node=(tag,value,cls)=>{const n=document.createElement(tag);if(value!==undefined)n.textContent=value;if(cls)n.className=cls;return n;};
 function log(type,detail){events.push({type,detail,at:new Date().toISOString()});if(events.length>40)events.shift();}
@@ -15,7 +15,7 @@ function render(){
  $('counts').replaceChildren();for(const s of P.STATUSES){const n=node('div',undefined,'count '+s);n.append(node('b',current?String(current.counts[s]):'—'),node('small',({PASS:'已核对',FAIL:'冲突',WARNING:'风险',UNKNOWN:'未确认',NOT_APPLICABLE:'不适用'})[s]));$('counts').append(n);}
  $('measurements').replaceChildren();for(const m of current?.measurements||[]){const tr=document.createElement('tr');tr.append(node('td',m.label),node('td',fmt(m)),node('td',m.status,m.status),node('td',m.method));$('measurements').append(tr);}
  $('issues').replaceChildren();for(const c of current?.checks||[]){if($('missing-only').checked&&!['WARNING','UNKNOWN','FAIL'].includes(c.status))continue;const r=node('article',undefined,'issue '+c.status);r.append(node('code',c.id),node('b',c.status),node('p',c.message));$('issues').append(r);}
- $('source').textContent=current?JSON.stringify({schema:current.schema,sourceMode:mode,source:current.source,capturedAt:current.extensions.capturedAt||null,retainedCapture:!!current.extensions.retainedCapture,unsupported:current.extensions.unsupportedOriginalMeasurements,physicalCertification:false,productionReady:false},null,2):'尚未读取；不会从旧R15猜测P02当前数值。';
+ $('source').textContent=current?JSON.stringify({schema:current.schema,sourceMode:mode,source:current.source,capturedAt:current.extensions.capturedAt||null,requestedControls:packet?.requested||packet?.nativeControls||null,shaderInputs:packet?.shaderInputs||null,retainedCapture:!!current.extensions.retainedCapture,unsupported:current.extensions.unsupportedOriginalMeasurements,physicalCertification:false,productionReady:false},null,2):'尚未读取；不会从旧R15猜测P02当前数值。';
  for(const id of ['export-native','export-review'])$(id).disabled=!packet;for(const id of ['export-common','export-defects'])$(id).disabled=!current;
  $('read').disabled=!ready;$('read-deep').disabled=!ready||family!=='knit';$('restore-live').disabled=!ready;$('close').disabled=!frame;
  $('caption').textContent=frame?'当前画面：'+names[family]+'保留的原生程序。表格是否跟随，以模式标签和捕获时间为准。':'没有活动三维引擎；选择一个原生工作台才启动。';
@@ -23,27 +23,28 @@ function render(){
  $('changes').replaceChildren();if(previous&&packet&&previous.objectId===packet.objectId){const ds=K.diff(previous,packet);for(const r of ds)$('changes').append(node('p',r.id+'：'+r.before+' → '+r.after+' '+r.unit));const a=previous.requested||previous.nativeControls,b=packet.requested||packet.nativeControls;for(const k of Object.keys(b||{}))if(a?.[k]!==b[k])$('changes').append(node('p','原生控制 '+k+'：'+a?.[k]+' → '+b[k]));if(!$('changes').children.length)$('changes').append(node('p','当前观测量与上次一致。'));}else $('changes').append(node('p','操作原生控制后，可比较同一对象的两次实际读数。不同对象不会混算差异。'));
 }
 function retain(){if(current?.sourceMode==='live_read_only'){current=copy(current);current.sourceMode='fixed_snapshot';current.extensions.retainedCapture=true;current.extensions.viewingNote='native instance is no longer followed';}}
-function stop(){generation++;clearTimeout(timer);timer=null;ready=false;following=false;busy=false;frame?.remove();frame=null;family=null;retain();$('host').replaceChildren();render();}
+function stop(){generation++;selectionEpoch++;clearTimeout(timer);timer=null;ready=false;following=false;busy=false;frame?.remove();frame=null;family=null;retain();$('host').replaceChildren();render();}
 async function capture(full=false){
- if(!ready||!frame)throw Error('NATIVE_NOT_READY');const f=frame,g=generation,kind=family;
+ if(!ready||!frame)throw Error('NATIVE_NOT_READY');const f=frame,g=generation,kind=family,ticket=++selectionEpoch;
  for(let i=0;i<100;i++){
-  if(g!==generation||f!==frame)return null;
-  try{const result=kind==='knit'?f.contentWindow.KAOPU_REALITY.read({fullIntegrity:full}):f.contentWindow.KAOPU_REALITY.read();const candidate=K.normalize(result,D,RF31B_BUILD.sources,false);previous=last[kind]||null;last[kind]=result;packet=result;current=candidate;following=true;render();log('capture',{family:kind,sequence:result.capture.sequence,elapsedMs:result.capture.elapsedMs});return result;}
+  if(g!==generation||f!==frame||ticket!==selectionEpoch)return null;
+  try{const result=kind==='knit'?f.contentWindow.KAOPU_REALITY.read({fullIntegrity:full}):f.contentWindow.KAOPU_REALITY.read();const candidate=K.normalize(result,D,RF31B_BUILD.sources,false);if(ticket!==selectionEpoch||g!==generation)return null;previous=last[kind]||null;last[kind]=result;packet=result;current=candidate;following=true;render();log('capture',{family:kind,sequence:result.capture.sequence,elapsedMs:result.capture.elapsedMs});return result;}
   catch(e){if(!['NATIVE_FRAME_PENDING','NATIVE_NOT_READY','NATIVE_PROGRAM_NOT_READY'].some(t=>String(e.message).includes(t)))throw e;await new Promise(r=>setTimeout(r,40));}
  }
  throw Error('NATIVE_SETTLE_TIMEOUT');
 }
 function handle(fn){return async()=>{try{return await fn();}catch(e){message(e.message||String(e),true);log('handled-error',String(e.message||e));}};}
 async function loadNative(kind){
- if(!['knit','denim'].includes(kind))throw Error('UNSUPPORTED_NATIVE');stop();family=kind;const g=generation;
+ if(!['knit','denim'].includes(kind))throw Error('UNSUPPORTED_NATIVE');stop();family=kind;const g=generation,loadEpoch=selectionEpoch;
  const f=document.createElement('iframe');frame=f;f.id='native';f.title=names[kind]+'原生只读规范副本';f.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(RF31B_NATIVES[kind]),c=>c.charCodeAt(0)));$('host').replaceChildren(f);render();message('正在启动'+names[kind]+'原生副本；不重新生成替身。');
  for(let i=0;i<1200;i++){if(g!==generation||frame!==f)return;if(f.contentWindow.KAOPU_REALITY){ready=true;break;}await new Promise(r=>setTimeout(r,50));}
  if(!ready)throw Error('NATIVE_LOAD_TIMEOUT');
- const schedule=()=>{if(!$('auto').checked||!following||g!==generation)return;clearTimeout(timer);timer=setTimeout(()=>{if(g!==generation||busy)return;busy=true;handle(()=>capture(false))().finally(()=>{if(g===generation)busy=false;});},100);};
+ const schedule=()=>{if(!$('auto').checked||!following||g!==generation)return;clearTimeout(timer);timer=setTimeout(()=>{if(g!==generation||busy||!following)return;busy=true;handle(()=>capture(false))().finally(()=>{if(g===generation)busy=false;});},100);};
  for(const type of ['input','change','click','pointerup','wheel'])f.contentDocument.addEventListener(type,schedule,{passive:true});
- await capture(false);if(g===generation){message(names[kind]+'已读取。原生控件、按钮和拖动结束后可自动更新；深度校验另行手动触发。');log('native-loaded',kind);}
+ if(loadEpoch!==selectionEpoch){render();return;}
+ const got=await capture(false);if(g===generation&&got){message(names[kind]+'已读取。原生控件、按钮和拖动结束后可自动更新；深度校验另行手动触发。');log('native-loaded',kind);}
 }
-function importPacket(value){const x=value?.schema==='kaopu/reality-review-bundle@1'?value.native:value;const candidate=K.normalize(x,D,RF31B_BUILD.sources,true);clearTimeout(timer);following=false;previous=null;packet=copy(x);current=candidate;render();message('导入成功，仅为未复验文件；不会写回源工作台或自动成为实时证据。');log('imported',{family:x.family,capturedAt:x.capture.capturedAt});}
+function importPacket(value){const x=value?.schema==='kaopu/reality-review-bundle@1'?value.native:value;const candidate=K.normalize(x,D,RF31B_BUILD.sources,true);selectionEpoch++;clearTimeout(timer);following=false;previous=null;packet=copy(x);current=candidate;render();message('导入成功，仅为未复验文件；不会写回源工作台或自动成为实时证据。');log('imported',{family:x.family,capturedAt:x.capture.capturedAt});}
 function selectHistory(id){const o=histories.find(x=>x.objectId===id);if(!o)throw Error('HISTORY_NOT_FOUND');stop();current=o;packet=null;previous=null;render();message('历史对象，不是P02当前读数。已关闭原生引擎，避免后台重复计算。');}
 function download(name,data){const u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
 for(const o of histories){const b=node('button',o.name+(o.objectId.includes('knit')?'（独立旧源）':''));b.dataset.history=o.objectId;b.onclick=handle(()=>selectHistory(o.objectId));$('history-nav').append(b);}
