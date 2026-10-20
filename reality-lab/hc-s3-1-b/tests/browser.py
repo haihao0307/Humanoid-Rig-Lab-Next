@@ -23,6 +23,7 @@ with sync_playwright() as pw:
   check('no automatic native engine startup',state()['iframeCount']==0)
   check('no fictional default measurements',state()['common'] is None)
   check('seven old histories remain distinct',len(state()['history'])==7 and all(o['sourceMode']=='fixed_snapshot' for o in state()['history']))
+  race=page.evaluate('async()=>{const p=__REALITY_S31B__.loadNative("knit");__REALITY_S31B__.close();await p;return __REALITY_S31B__.report().iframeCount;}');check('cancelled load cannot recreate a closed engine',race==0)
   count=len(requests);start=time.monotonic();page.locator('#load-knit').click();page.wait_for_function('__REALITY_S31B__.report().native?.objectId==="fabric-knit-public-p02-c2"',timeout=120000)
   report['knitStartupMs']=(time.monotonic()-start)*1000;s=state();n=s['native'];report['initialKnit']=n
   check('retained P02 C2 not old R15',n['source']==M['sources']['knit'] and s['knitBaseline']=='P02-C2')
@@ -78,11 +79,14 @@ with sync_playwright() as pw:
   before=state()['common'];bad=json.loads(json.dumps(raw));bad['measurements'][2]['unit']='tex'
   page.locator('#file').set_input_files({'name':'bad.json','mimeType':'application/json','buffer':json.dumps(bad).encode()});page.wait_for_function('document.getElementById("status").textContent.includes("SEMANTICS")')
   check('invalid import atomic',state()['common']==before)
-  bad=json.loads(json.dumps(raw));bad['source']['commit']='a51a5e4f429b91eb4d9d2d2bfc361863a81f6d9'
+  bad=json.loads(json.dumps(raw));bad['source']['commit']='a51a5e4f429b91eb4d9d2d2bfc361863a81f6d9d'
   err=page.evaluate('(x)=>{try{__REALITY_S31B__.importPacket(x);return null;}catch(e){return e.message}}',bad);check('rejected P03 source refused',err=='SOURCE_REVISION_MISMATCH')
   page.locator('#file').set_input_files(str(exported));page.wait_for_function('__REALITY_S31B__.report().common.sourceMode==="imported_unverified"')
   check('import stays unverified',not state()['following'])
   page.locator('#restore-live').click();page.wait_for_function('__REALITY_S31B__.report().common.sourceMode==="live_read_only"');check('explicit refresh restores current read',state()['native']['family']=='knit')
+  race=page.evaluate('''async raw=>{const f=document.getElementById('native').contentWindow,e=f.document.querySelector('[data-param="fuzz"]');e.value='0.25';e.dispatchEvent(new f.Event('input',{bubbles:true}));const pending=__REALITY_S31B__.capture(false);__REALITY_S31B__.importPacket(raw);await pending;return __REALITY_S31B__.report().common.sourceMode;}''',raw)
+  check('queued live read cannot overwrite imported selection',race=='imported_unverified')
+  page.locator('#restore-live').click();page.wait_for_function('__REALITY_S31B__.report().common.sourceMode==="live_read_only"')
   page.locator('#load').click();page.wait_for_function('__REALITY_S31B__.report().native?.family==="denim" && __REALITY_S31B__.report().common.sourceMode==="live_read_only"',timeout=120000)
   check('previous denim still runs and reads',state()['native']['source']==M['sources']['denim'])
   check('knit disposed before denim starts',state()['iframeCount']==1 and state()['family']=='denim')
