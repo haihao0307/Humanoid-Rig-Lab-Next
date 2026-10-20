@@ -1,0 +1,377 @@
+{
+  "schema": "kaopu/reality-defect-bundle@0.2",
+  "version": "0.2.0",
+  "generatedAt": null,
+  "sourceObjects": [
+    {
+      "objectId": "garment-r10-d03-top",
+      "domain": "garment",
+      "commit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49"
+    },
+    {
+      "objectId": "garment-r10-d03-bottom",
+      "domain": "garment",
+      "commit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49"
+    }
+  ],
+  "defects": [
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-top:e9ed11b2",
+      "objectId": "garment-r10-d03-top",
+      "code": "person:proportion_revision",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "只核对明确的proportion_revision/proportionRevision；不从源码提交或人体哈希推断",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-top:d46fec49",
+      "objectId": "garment-r10-d03-top",
+      "code": "material:independent_workbench",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "独立材料工作台通过不等于这件衣服已采用同版本；不同源只报告边界，不自动换材质",
+      "expected": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "observed": "086414b317f313bf9465ea957753ae7e84453f6f",
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-top:ea7391ef",
+      "objectId": "garment-r10-d03-top",
+      "code": "axis:physics",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "显示方向不证明物理各向异性已绑定；原字段若存在仍缺少与显示轴的映射证据",
+      "expected": null,
+      "observed": [
+        {
+          "id": "left_btorso",
+          "field": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "left_ftorso",
+          "field": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "right_btorso",
+          "field": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "right_ftorso",
+          "field": [
+            0,
+            1
+          ]
+        }
+      ],
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-top:c75bdf57",
+      "objectId": "garment-r10-d03-top",
+      "code": "axis:manufacturing",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "显示方向不是制造丝缕认证；不根据纸样形状推断经纬或裁剪要求",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-top:f3ea482c",
+      "objectId": "garment-r10-d03-top",
+      "code": "fit:target_static",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "旧模板静态通过不等于分级后的当前人物通过：New-person size grade requires new live fit and visual acceptance",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-top:b0d78d61",
+      "objectId": "garment-r10-d03-top",
+      "code": "fit:captured_runtime",
+      "severity": "critical",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "本次原程序报告失败，不能把已准备的裁片当作试穿成功：载入 D03 失败：物理应变超出工程安全范围，已完整回滚本步状态。保留此前搭配。",
+      "expected": null,
+      "observed": {
+        "statusText": "载入 D03 失败：物理应变超出工程安全范围，已完整回滚本步状态。保留此前搭配。",
+        "error": true,
+        "nativeProvenancePresent": false,
+        "committedGarmentCount": 0,
+        "physicsLastError": null,
+        "observedAt": "2026-10-20T07:45:12.669Z"
+      },
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-top:0e06e936",
+      "objectId": "garment-r10-d03-top",
+      "code": "fit:upstream_gate",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "原R10发布仍未获整衣验收；保留已知动态布料失败边界",
+      "expected": true,
+      "observed": false,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-bottom:e9ed11b2",
+      "objectId": "garment-r10-d03-bottom",
+      "code": "person:proportion_revision",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "只核对明确的proportion_revision/proportionRevision；不从源码提交或人体哈希推断",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-bottom:d46fec49",
+      "objectId": "garment-r10-d03-bottom",
+      "code": "material:independent_workbench",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "独立材料工作台通过不等于这件衣服已采用同版本；不同源只报告边界，不自动换材质",
+      "expected": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "observed": "086414b317f313bf9465ea957753ae7e84453f6f",
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-bottom:ea7391ef",
+      "objectId": "garment-r10-d03-bottom",
+      "code": "axis:physics",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "显示方向不证明物理各向异性已绑定；原字段若存在仍缺少与显示轴的映射证据",
+      "expected": null,
+      "observed": [
+        {
+          "id": "pant_b_l",
+          "field": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "pant_b_r",
+          "field": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "pant_f_l",
+          "field": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "pant_f_r",
+          "field": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "wb_back",
+          "field": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "wb_front",
+          "field": [
+            0,
+            1
+          ]
+        }
+      ],
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-bottom:c75bdf57",
+      "objectId": "garment-r10-d03-bottom",
+      "code": "axis:manufacturing",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "显示方向不是制造丝缕认证；不根据纸样形状推断经纬或裁剪要求",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-bottom:58231929",
+      "objectId": "garment-r10-d03-bottom",
+      "code": "fit:target_static",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "旧模板静态通过不等于分级后的当前人物通过：Common seam refinement requires the current live fitting and continuous-edge audit; original static acceptance is retained only in the source packet",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-bottom:b0d78d61",
+      "objectId": "garment-r10-d03-bottom",
+      "code": "fit:captured_runtime",
+      "severity": "critical",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "本次原程序报告失败，不能把已准备的裁片当作试穿成功：载入 D03 失败：物理应变超出工程安全范围，已完整回滚本步状态。保留此前搭配。",
+      "expected": null,
+      "observed": {
+        "statusText": "载入 D03 失败：物理应变超出工程安全范围，已完整回滚本步状态。保留此前搭配。",
+        "error": true,
+        "nativeProvenancePresent": false,
+        "committedGarmentCount": 0,
+        "physicsLastError": null,
+        "observedAt": "2026-10-20T07:45:12.669Z"
+      },
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:garment-r10-d03-bottom:0e06e936",
+      "objectId": "garment-r10-d03-bottom",
+      "code": "fit:upstream_gate",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "tailor-workbench",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "原R10发布仍未获整衣验收；保留已知动态布料失败边界",
+      "expected": true,
+      "observed": false,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    }
+  ],
+  "automaticRepair": false,
+  "reviewContext": {
+    "mode": "captured",
+    "live": false,
+    "scenario": false
+  }
+}

@@ -1,0 +1,12 @@
+{
+ "task":"RF01-S3.3-GARMENT-RELATIONS-20261020",
+ "request":5,
+ "previousRun":39388933043,
+ "cause":"Browser test used HTMLElement.innerText on an SVGElement. Fifteen preceding checks passed and the actual rendered page was preserved; this was a test-reader API error, not the upstream physical-strain failure.",
+ "correction":"Read SVG labels with textContent while keeping exact panel identity and unit-display assertions. No render, physics, observation, shared protocol or original production source change.",
+ "verifiedCaptureRun":39388054526,
+ "nativeTryOnAccepted":false,
+ "mustRetain":"Original D03 physical-strain rollback stays visible and FAIL; successful inspector tests must not promote it to successful try-on. Frozen pre-physics observation is not a live garment session.",
+ "sourceSolverChanged":false,
+ "manufacturingOrFitCertified":false
+}
