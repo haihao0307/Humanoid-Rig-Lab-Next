@@ -6,20 +6,19 @@ R=Path(__file__).resolve().parent;H=Path(os.environ['GARMENT_HOST']).resolve();Q
 sha=lambda b:hashlib.sha256(b).hexdigest()
 a=json.loads((R/'TASK_ANCHOR.json').read_text());source={k:a['source'][k] for k in ['repository','commit']};source.update(path=a['source']['directory']+'/index.html',sha256=sha((H/'index.html').read_bytes()))
 files={p.relative_to(H).as_posix():sha(p.read_bytes()) for p in H.rglob('*') if p.is_file()};(Q/'SOURCE_FILES.json').write_text(json.dumps(files,indent=2))
-reader=(R/'capture.js').read_text();original=(H/'app.mjs').read_text();assert sha(original.encode())=='958ce88eaec470c472204dd4b348d67d94230820b084f668f21799fcbb30f63b'
+reader=(R/'capture.js').read_text();original=(H/'app.mjs').read_bytes().decode('utf-8');assert sha(original.encode())=='958ce88eaec470c472204dd4b348d67d94230820b084f668f21799fcbb30f63b'
 prefix="import * as __RF33_GRAIN from './panel-grain.mjs';\nconst __RF33_CONTEXT="+json.dumps({'source':source})+";\nconst __RF33_READER="+reader+';\n'
 patches=[(" try{const templates=", "window.__RF33_PHASE__='loading-original-templates';"),("const sourceProof=", "window.__RF33_PHASE__='grading-original-templates';"),("  for(let i=0;i<2;i++){const mesh=", "window.__RF33_PHASE__='constructing-original-carriers';"),("  newPhysics=new ClothController(", "window.__RF33_PHASE__='observing-prepared-bindings';try{const __n={items:next,model,viewer,actor,look:id,request};window.__RF33_PREPARED__=__RF33_READER(__n,__RF33_GRAIN,__RF33_CONTEXT);window.__RF33_REPEAT__=__RF33_READER(__n,__RF33_GRAIN,__RF33_CONTEXT);}catch(__e){window.__RF33_OBSERVER_ERROR__=String(__e.stack||__e);}window.__RF33_PHASE__='original-physics-init';")]
 modified=original
 for needle,addition in patches:
  assert modified.count(needle)==1,needle
- # Insert the first phase inside try, never between 'try' and its block.
  if needle.startswith(' try{'):modified=modified.replace(needle,' try{'+addition+'const templates=')
  else:modified=modified.replace(needle,addition+needle)
 restored=modified
 for needle,addition in reversed(patches):
  if needle.startswith(' try{'):restored=restored.replace(' try{'+addition+'const templates=',needle)
  else:restored=restored.replace(addition+needle,needle)
-assert restored==original
+assert restored.encode()==(H/'app.mjs').read_bytes()
 augmented=(prefix+modified).encode()
 report={'source':source,'passed':False,'checks':[],'pageErrors':[],'consoleErrors':[],'failedRequests':[],'phaseLog':[],'physicalDeviceTested':False,'userVisualAccepted':False,'observerHookAddedInMemory':True,'originalFilesChanged':False,'renderingPhysicsCodeChanged':False,'captureCode':{'commit':subprocess.check_output(['git','-C',str(R),'rev-parse','HEAD'],text=True).strip(),'readerSHA256':sha((R/'capture.js').read_bytes()),'runnerSHA256':sha((R/'capture.py').read_bytes())},'hook':{'originalAppSHA256':sha(original.encode()),'observedAppSHA256':sha(augmented),'removalRestoresOriginal':True,'servedDiagnosticResponseOnly':True},'setup':'Read original prepared carriers before original physics. Cache policy and all original functions unchanged. Native terminal failure is separate from observation success.'}
 class Quiet(http.server.SimpleHTTPRequestHandler):
