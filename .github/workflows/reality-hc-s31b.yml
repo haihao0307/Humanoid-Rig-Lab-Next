@@ -1,0 +1,42 @@
+name: Reality HC S3.1-B knit acceptance
+on:
+  push:
+    branches: [feature/reality-hc-s31b-knit-export-20261020]
+    paths: [.github/workflows/reality-hc-s31b.yml, reality-lab/hc-s3-1-b/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            reality-lab/hc-s3-1-b
+            reality-lab/hc-s3-1
+            reality-lab/hc-s2-1
+            reality-lab/hc-s3
+      - name: Verify pinned public original and gather exact adapter source
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,hashlib,json,shutil
+          r=Path('reality-lab/hc-s3-1-b');d=r/'_source_audit';d.mkdir(exist_ok=True)
+          a=json.loads((r/'TASK_ANCHOR.json').read_text());s=a['nativeSource'];base='https://raw.githubusercontent.com/'+s['repository']+'/'+s['commit']+'/kaopu-fabric-workbench/knit-public-p02/'
+          for name in ['index.html','main.mjs','jacket-refined.mjs','BUILD_MANIFEST.json','THIRD_PARTY_NOTICES.txt']:
+            b=urllib.request.urlopen(base+name,timeout=90).read();(d/name).write_bytes(b)
+            if name=='index.html':assert hashlib.sha256(b).hexdigest()==s['sha256']
+          for folder in ['hc-s3-1','hc-s2-1','hc-s3']:
+            dest=d/'previous'/folder;dest.mkdir(parents=True,exist_ok=True)
+            for p in (r.parent/folder).iterdir():
+              if p.is_file() and p.suffix in ['.js','.json','.py','.html','.md']:shutil.copy2(p,dest/p.name)
+          text=(d/'index.html').read_text();pos=text.index('window.KnitPublic=');print(text[pos-300:pos+1800]);print('source_bytes',len(text.encode()),'source_sha256',hashlib.sha256(text.encode()).hexdigest())
+          (d/'AUDIT.json').write_text(json.dumps({'passed':True,'source':s,'sourceMutation':False,'purpose':'source inspection only; no implementation or browser certification yet'},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reality-s31b-source-audit
+          path: reality-lab/hc-s3-1-b/_source_audit/
+          retention-days: 7
