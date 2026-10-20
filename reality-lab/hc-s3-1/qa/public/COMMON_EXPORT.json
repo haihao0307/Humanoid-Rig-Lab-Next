@@ -1,0 +1,1056 @@
+{
+  "schema": "kaopu/reality-foundation-bundle@0.2",
+  "version": "0.2.0",
+  "objects": [
+    {
+      "schema": "kaopu/reality-object@0.2",
+      "objectId": "fabric-denim-r17-2",
+      "domain": "fabric",
+      "name": "牛仔 R17.2 · 实时观察",
+      "sourceMode": "live_read_only",
+      "source": {
+        "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+        "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+        "path": "denim-workshop/r17-scale/preview-v3.html",
+        "sha256": "2a77a3b19852522cb5e52271bf4665d0230bc2b70b070ff60be461e2790e19b4"
+      },
+      "units": [
+        {
+          "quantity": "length",
+          "unit": "m",
+          "basis": "source_declared"
+        }
+      ],
+      "frames": [],
+      "measurements": [
+        {
+          "id": "rf01.material.warp_spacing_m",
+          "definitionId": "rf01.material.warp_spacing_m",
+          "label": "经纱中心间距",
+          "value": 0.000635,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "实际 uWeaveScale × 源着色器 25.4/60 mm；不是实物测量",
+          "context": {
+            "originalRecord": {
+              "id": "material.warp_spacing_m",
+              "label": "经纱中心间距",
+              "value": 0.000635,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际 uWeaveScale × 源着色器 25.4/60 mm；不是实物测量"
+            },
+            "originalBasis": "runtime_computed",
+            "unitConversion": null,
+            "physicalCalibration": false
+          },
+          "sourceRef": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "notEquivalentTo": [
+            "physical specimen certification"
+          ],
+          "requiredEvidence": [
+            "source revision",
+            "basis",
+            "method"
+          ],
+          "owner": "denim-workshop"
+        },
+        {
+          "id": "rf01.material.weft_spacing_m",
+          "definitionId": "rf01.material.weft_spacing_m",
+          "label": "纬纱中心间距",
+          "value": 0.0009524999999999999,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "实际 uWeaveScale × 源着色器 25.4/40 mm；不是实物测量",
+          "context": {
+            "originalRecord": {
+              "id": "material.weft_spacing_m",
+              "label": "纬纱中心间距",
+              "value": 0.0009524999999999999,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际 uWeaveScale × 源着色器 25.4/40 mm；不是实物测量"
+            },
+            "originalBasis": "runtime_computed",
+            "unitConversion": null,
+            "physicalCalibration": false
+          },
+          "sourceRef": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "notEquivalentTo": [
+            "physical specimen certification"
+          ],
+          "requiredEvidence": [
+            "source revision",
+            "basis",
+            "method"
+          ],
+          "owner": "denim-workshop"
+        },
+        {
+          "id": "rf01.material.twill_repeat_m",
+          "definitionId": "rf01.material.twill_repeat_m",
+          "label": "3×1 斜纹重复尺度",
+          "value": 0.00254,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "材料参考坐标中的 U 向周期；不等于任意方向的世界空间长度",
+          "context": {
+            "originalRecord": {
+              "id": "material.twill_repeat_m",
+              "label": "固定 V 时的 U 向四纱周期",
+              "value": 0.00254,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "材料参考坐标中的 U 向周期；不等于任意方向的世界空间长度"
+            },
+            "originalBasis": "runtime_computed",
+            "unitConversion": null,
+            "physicalCalibration": false
+          },
+          "sourceRef": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "notEquivalentTo": [
+            "physical specimen certification"
+          ],
+          "requiredEvidence": [
+            "source revision",
+            "basis",
+            "method"
+          ],
+          "owner": "denim-workshop"
+        },
+        {
+          "id": "rf01.material.stitch_pitch_m",
+          "definitionId": "rf01.material.stitch_pitch_m",
+          "label": "可见针脚节距",
+          "value": 0.0034000000450760126,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "直接读取 gl.getUniform(uStitchPitch)，不是复述滑块文字",
+          "context": {
+            "originalRecord": {
+              "id": "material.stitch_pitch_m",
+              "label": "实际上传的针脚节距",
+              "value": 0.0034000000450760126,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "直接读取 gl.getUniform(uStitchPitch)，不是复述滑块文字"
+            },
+            "originalBasis": "runtime_computed",
+            "unitConversion": null,
+            "physicalCalibration": false
+          },
+          "sourceRef": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "notEquivalentTo": [
+            "physical specimen certification"
+          ],
+          "requiredEvidence": [
+            "source revision",
+            "basis",
+            "method"
+          ],
+          "owner": "denim-workshop"
+        },
+        {
+          "id": "rf01.material.visible_thread_width_m",
+          "definitionId": "rf01.material.visible_thread_width_m",
+          "label": "可见缝线宽度代理",
+          "value": 0.00044999999227002263,
+          "unit": "m",
+          "status": "WARNING",
+          "basis": "runtime_computed",
+          "method": "读取 uThreadWidth；抗锯齿覆盖可改变屏幕支撑范围，不是实物线径或 Tex",
+          "context": {
+            "originalRecord": {
+              "id": "material.visible_thread_width_m",
+              "label": "实际可见线宽代理",
+              "value": 0.00044999999227002263,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "读取 uThreadWidth；抗锯齿覆盖可改变屏幕支撑范围，不是实物线径或 Tex"
+            },
+            "originalBasis": "runtime_computed",
+            "unitConversion": null,
+            "physicalCalibration": false
+          },
+          "sourceRef": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "notEquivalentTo": [
+            "physical specimen certification"
+          ],
+          "requiredEvidence": [
+            "source revision",
+            "basis",
+            "method"
+          ],
+          "owner": "denim-workshop"
+        },
+        {
+          "id": "rf01.material.thickness_m",
+          "definitionId": "rf01.material.thickness_m",
+          "label": "布料厚度候选",
+          "value": null,
+          "unit": "m",
+          "status": "UNKNOWN",
+          "basis": "unknown",
+          "method": "本 R17.2 外观工作台未给出物理厚度；不借用 R15 的其他版本候选",
+          "context": {
+            "originalRecord": {
+              "id": "material.thickness_m",
+              "label": "材料物理厚度",
+              "value": null,
+              "unit": "m",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "本 R17.2 外观工作台未给出物理厚度；不借用 R15 的其他版本候选"
+            },
+            "originalBasis": "unknown",
+            "unitConversion": null,
+            "physicalCalibration": false
+          },
+          "sourceRef": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "notEquivalentTo": [
+            "physical specimen certification"
+          ],
+          "requiredEvidence": [
+            "source revision",
+            "basis",
+            "method"
+          ],
+          "owner": "denim-workshop"
+        },
+        {
+          "id": "rf01.material.yarn_diameter_m",
+          "definitionId": "rf01.material.yarn_diameter_m",
+          "label": "纱线几何直径",
+          "value": null,
+          "unit": "m",
+          "status": "UNKNOWN",
+          "basis": "unknown",
+          "method": "程序化纱线遮罩与几何线径没有等价证据",
+          "context": {
+            "originalRecord": {
+              "id": "material.yarn_diameter_m",
+              "label": "纱线几何直径",
+              "value": null,
+              "unit": "m",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "程序化纱线遮罩与几何线径没有等价证据"
+            },
+            "originalBasis": "unknown",
+            "unitConversion": null,
+            "physicalCalibration": false
+          },
+          "sourceRef": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "notEquivalentTo": [
+            "physical specimen certification"
+          ],
+          "requiredEvidence": [
+            "source revision",
+            "basis",
+            "method"
+          ],
+          "owner": "denim-workshop"
+        },
+        {
+          "id": "rf01.material.linear_density_tex",
+          "definitionId": "rf01.material.linear_density_tex",
+          "label": "缝线或纱线 Tex",
+          "value": null,
+          "unit": "tex",
+          "status": "UNKNOWN",
+          "basis": "unknown",
+          "method": "线密度不能由显示代理宽度反推",
+          "context": {
+            "originalRecord": {
+              "id": "material.linear_density_tex",
+              "label": "纱线 / 缝线 Tex",
+              "value": null,
+              "unit": "tex",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "线密度不能由显示代理宽度反推"
+            },
+            "originalBasis": "unknown",
+            "unitConversion": null,
+            "physicalCalibration": false
+          },
+          "sourceRef": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "notEquivalentTo": [
+            "physical specimen certification"
+          ],
+          "requiredEvidence": [
+            "source revision",
+            "basis",
+            "method"
+          ],
+          "owner": "denim-workshop"
+        }
+      ],
+      "checks": [
+        {
+          "id": "measurement:rf01.material.warp_spacing_m",
+          "status": "PASS",
+          "message": "实际 uWeaveScale × 源着色器 25.4/60 mm；不是实物测量",
+          "category": "contract",
+          "owner": "denim-workshop",
+          "sourceRef": null,
+          "measurementId": "rf01.material.warp_spacing_m",
+          "expected": null,
+          "observed": 0.000635,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.material.weft_spacing_m",
+          "status": "PASS",
+          "message": "实际 uWeaveScale × 源着色器 25.4/40 mm；不是实物测量",
+          "category": "contract",
+          "owner": "denim-workshop",
+          "sourceRef": null,
+          "measurementId": "rf01.material.weft_spacing_m",
+          "expected": null,
+          "observed": 0.0009524999999999999,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.material.twill_repeat_m",
+          "status": "PASS",
+          "message": "材料参考坐标中的 U 向周期；不等于任意方向的世界空间长度",
+          "category": "contract",
+          "owner": "denim-workshop",
+          "sourceRef": null,
+          "measurementId": "rf01.material.twill_repeat_m",
+          "expected": null,
+          "observed": 0.00254,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.material.stitch_pitch_m",
+          "status": "PASS",
+          "message": "直接读取 gl.getUniform(uStitchPitch)，不是复述滑块文字",
+          "category": "contract",
+          "owner": "denim-workshop",
+          "sourceRef": null,
+          "measurementId": "rf01.material.stitch_pitch_m",
+          "expected": null,
+          "observed": 0.0034000000450760126,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.material.visible_thread_width_m",
+          "status": "WARNING",
+          "message": "读取 uThreadWidth；抗锯齿覆盖可改变屏幕支撑范围，不是实物线径或 Tex",
+          "category": "contract",
+          "owner": "denim-workshop",
+          "sourceRef": null,
+          "measurementId": "rf01.material.visible_thread_width_m",
+          "expected": null,
+          "observed": 0.00044999999227002263,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.material.thickness_m",
+          "status": "UNKNOWN",
+          "message": "本 R17.2 外观工作台未给出物理厚度；不借用 R15 的其他版本候选",
+          "category": "contract",
+          "owner": "denim-workshop",
+          "sourceRef": null,
+          "measurementId": "rf01.material.thickness_m",
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.material.yarn_diameter_m",
+          "status": "UNKNOWN",
+          "message": "程序化纱线遮罩与几何线径没有等价证据",
+          "category": "contract",
+          "owner": "denim-workshop",
+          "sourceRef": null,
+          "measurementId": "rf01.material.yarn_diameter_m",
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.material.linear_density_tex",
+          "status": "UNKNOWN",
+          "message": "线密度不能由显示代理宽度反推",
+          "category": "contract",
+          "owner": "denim-workshop",
+          "sourceRef": null,
+          "measurementId": "rf01.material.linear_density_tex",
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "source:transport",
+          "status": "PASS",
+          "message": "本会话从固定原生副本的只读回调读取",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "source:preservation",
+          "status": "PASS",
+          "message": "同步读取前后受检状态/几何/着色器保持一致",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "material:axis",
+          "status": "WARNING",
+          "message": "材料参考坐标已声明；未证明匹配裁缝铺材料轴",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "physical:calibration",
+          "status": "UNKNOWN",
+          "message": "没有实物材料标定，不把GPU参数当实物真值",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "source:nominal",
+          "status": "WARNING",
+          "message": "名义11针/30mm与实际上传节距分别保留；工艺容差未知",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": 0.002727272727272727,
+          "observed": 0.0034000000450760126,
+          "detail": null
+        }
+      ],
+      "defects": [
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-denim-r17-2:6f1cc85d",
+          "objectId": "fabric-denim-r17-2",
+          "code": "measurement:rf01.material.visible_thread_width_m",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "denim-workshop",
+          "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "measurementId": "rf01.material.visible_thread_width_m",
+          "message": "读取 uThreadWidth；抗锯齿覆盖可改变屏幕支撑范围，不是实物线径或 Tex",
+          "expected": null,
+          "observed": 0.00044999999227002263,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-denim-r17-2:6e1cdddd",
+          "objectId": "fabric-denim-r17-2",
+          "code": "measurement:rf01.material.thickness_m",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "denim-workshop",
+          "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "measurementId": "rf01.material.thickness_m",
+          "message": "本 R17.2 外观工作台未给出物理厚度；不借用 R15 的其他版本候选",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-denim-r17-2:b9fd36a7",
+          "objectId": "fabric-denim-r17-2",
+          "code": "measurement:rf01.material.yarn_diameter_m",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "denim-workshop",
+          "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "measurementId": "rf01.material.yarn_diameter_m",
+          "message": "程序化纱线遮罩与几何线径没有等价证据",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-denim-r17-2:35dade9c",
+          "objectId": "fabric-denim-r17-2",
+          "code": "measurement:rf01.material.linear_density_tex",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "denim-workshop",
+          "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "measurementId": "rf01.material.linear_density_tex",
+          "message": "线密度不能由显示代理宽度反推",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-denim-r17-2:6a6aafe9",
+          "objectId": "fabric-denim-r17-2",
+          "code": "material:axis",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "reality-coordinator",
+          "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "measurementId": null,
+          "message": "材料参考坐标已声明；未证明匹配裁缝铺材料轴",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-denim-r17-2:5b0b1c55",
+          "objectId": "fabric-denim-r17-2",
+          "code": "physical:calibration",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "reality-coordinator",
+          "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "measurementId": null,
+          "message": "没有实物材料标定，不把GPU参数当实物真值",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-denim-r17-2:182e40c1",
+          "objectId": "fabric-denim-r17-2",
+          "code": "source:nominal",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "reality-coordinator",
+          "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+          "measurementId": null,
+          "message": "名义11针/30mm与实际上传节距分别保留；工艺容差未知",
+          "expected": 0.002727272727272727,
+          "observed": 0.0034000000450760126,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        }
+      ],
+      "preservation": {
+        "passed": true,
+        "before": {
+          "state": "6c39701e",
+          "vertices": "e7ce8ad2",
+          "indices": "594b1e73",
+          "vertexShader": "8404a857",
+          "fragmentShader": "4460cd90",
+          "uniforms": {
+            "weaveScale": 1.5,
+            "stitchPitch": 0.0034000000450760126,
+            "threadWidth": 0.00044999999227002263,
+            "readability": 1.2999999523162842,
+            "wash": 0,
+            "light": -28
+          }
+        },
+        "after": {
+          "state": "6c39701e",
+          "vertices": "e7ce8ad2",
+          "indices": "594b1e73",
+          "vertexShader": "8404a857",
+          "fragmentShader": "4460cd90",
+          "uniforms": {
+            "weaveScale": 1.5,
+            "stitchPitch": 0.0034000000450760126,
+            "threadWidth": 0.00044999999227002263,
+            "readability": 1.2999999523162842,
+            "wash": 0,
+            "light": -28
+          }
+        },
+        "method": "same-task FNV-1a diagnostic fingerprints; source provenance separately uses SHA-256",
+        "checked": [
+          "native state",
+          "CPU geometry arrays",
+          "vertex/fragment shader text",
+          "listed GPU uniforms"
+        ],
+        "notChecked": [
+          "all driver state",
+          "all framebuffer pixels",
+          "real-world sample dimensions"
+        ]
+      },
+      "extensions": {
+        "owner": "denim-workshop",
+        "exportSchema": "kaopu/reality-workbench-export@1",
+        "originalExport": {
+          "schema": "kaopu/reality-workbench-export@1",
+          "exporterVersion": "0.3.1-a",
+          "objectId": "fabric-denim-r17-2",
+          "domain": "fabric",
+          "family": "denim",
+          "source": {
+            "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+            "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+            "path": "denim-workshop/r17-scale/preview-v3.html",
+            "sha256": "2a77a3b19852522cb5e52271bf4665d0230bc2b70b070ff60be461e2790e19b4",
+            "basePage": {
+              "commit": "a5af1e0140c935703dec7c4d4da4f5549449b657",
+              "path": "denim-workshop/r17-scale/index.html",
+              "sha256": "60c49adec887ac81ebe4b9f1b0807fbddab4c035dc030b65ad9f6e21701fc817"
+            },
+            "assembledOriginalSHA256": "533df4565b9d913fe6a762302b887f2bc0110f3b26b3d48aa58ed6463a826bb6"
+          },
+          "capture": {
+            "capturedAt": "2026-10-20T03:00:23.840Z",
+            "sequence": 5,
+            "sourceMode": "native_callback",
+            "nativeFrame": 4,
+            "view": "full",
+            "elapsedMs": 9.5
+          },
+          "nativeControls": {
+            "weaveScale": 1.5,
+            "stitchPitch": 0.0034,
+            "threadWidth": 0.00045,
+            "readability": 1.3,
+            "wash": 0,
+            "light": -28
+          },
+          "shaderInputs": {
+            "weaveScale": 1.5,
+            "stitchPitch": 0.0034000000450760126,
+            "threadWidth": 0.00044999999227002263,
+            "readability": 1.2999999523162842,
+            "wash": 0,
+            "light": -28
+          },
+          "measurements": [
+            {
+              "id": "material.warp_spacing_m",
+              "label": "经纱中心间距",
+              "value": 0.000635,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际 uWeaveScale × 源着色器 25.4/60 mm；不是实物测量"
+            },
+            {
+              "id": "material.weft_spacing_m",
+              "label": "纬纱中心间距",
+              "value": 0.0009524999999999999,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际 uWeaveScale × 源着色器 25.4/40 mm；不是实物测量"
+            },
+            {
+              "id": "material.twill_repeat_m",
+              "label": "固定 V 时的 U 向四纱周期",
+              "value": 0.00254,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "材料参考坐标中的 U 向周期；不等于任意方向的世界空间长度"
+            },
+            {
+              "id": "material.stitch_pitch_m",
+              "label": "实际上传的针脚节距",
+              "value": 0.0034000000450760126,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "直接读取 gl.getUniform(uStitchPitch)，不是复述滑块文字"
+            },
+            {
+              "id": "material.visible_thread_width_m",
+              "label": "实际可见线宽代理",
+              "value": 0.00044999999227002263,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "读取 uThreadWidth；抗锯齿覆盖可改变屏幕支撑范围，不是实物线径或 Tex"
+            },
+            {
+              "id": "material.thickness_m",
+              "label": "材料物理厚度",
+              "value": null,
+              "unit": "m",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "本 R17.2 外观工作台未给出物理厚度；不借用 R15 的其他版本候选"
+            },
+            {
+              "id": "material.yarn_diameter_m",
+              "label": "纱线几何直径",
+              "value": null,
+              "unit": "m",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "程序化纱线遮罩与几何线径没有等价证据"
+            },
+            {
+              "id": "material.linear_density_tex",
+              "label": "纱线 / 缝线 Tex",
+              "value": null,
+              "unit": "tex",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "线密度不能由显示代理宽度反推"
+            }
+          ],
+          "materialSpace": {
+            "unit": "m",
+            "basis": "source_declared",
+            "coordinate": "aMaterial=[generated local X, generated local Y] before shader motion",
+            "uMeaning": "cross-warp-yarn direction",
+            "vMeaning": "cross-weft-yarn direction",
+            "garmentBindingVerified": false,
+            "physicalCalibration": false
+          },
+          "camera": {
+            "distance": 2.48,
+            "target": [
+              0,
+              -0.04,
+              0
+            ],
+            "yaw": 0.1,
+            "pitch": -0.015,
+            "fovYDeg": 31,
+            "bufferPx": [
+              800,
+              694
+            ]
+          },
+          "mesh": {
+            "vertices": 9046,
+            "triangles": 18080
+          },
+          "preservation": {
+            "passed": true,
+            "before": {
+              "state": "6c39701e",
+              "vertices": "e7ce8ad2",
+              "indices": "594b1e73",
+              "vertexShader": "8404a857",
+              "fragmentShader": "4460cd90",
+              "uniforms": {
+                "weaveScale": 1.5,
+                "stitchPitch": 0.0034000000450760126,
+                "threadWidth": 0.00044999999227002263,
+                "readability": 1.2999999523162842,
+                "wash": 0,
+                "light": -28
+              }
+            },
+            "after": {
+              "state": "6c39701e",
+              "vertices": "e7ce8ad2",
+              "indices": "594b1e73",
+              "vertexShader": "8404a857",
+              "fragmentShader": "4460cd90",
+              "uniforms": {
+                "weaveScale": 1.5,
+                "stitchPitch": 0.0034000000450760126,
+                "threadWidth": 0.00044999999227002263,
+                "readability": 1.2999999523162842,
+                "wash": 0,
+                "light": -28
+              }
+            },
+            "method": "same-task FNV-1a diagnostic fingerprints; source provenance separately uses SHA-256",
+            "checked": [
+              "native state",
+              "CPU geometry arrays",
+              "vertex/fragment shader text",
+              "listed GPU uniforms"
+            ],
+            "notChecked": [
+              "all driver state",
+              "all framebuffer pixels",
+              "real-world sample dimensions"
+            ]
+          },
+          "comparison": {
+            "nominalStitchPitchM": 0.002727272727272727,
+            "actualStitchPitchM": 0.0034000000450760126,
+            "interpretation": "源候选11针/30mm与运行时上传值分别保留；未给工艺公差，不自动判制造缺陷"
+          },
+          "authorities": {
+            "sourceWriteAPI": false,
+            "repairAuthorized": false,
+            "physicalCertification": false,
+            "manufacturingCertification": false,
+            "productionReady": false
+          }
+        },
+        "preservation": {
+          "passed": true,
+          "before": {
+            "state": "6c39701e",
+            "vertices": "e7ce8ad2",
+            "indices": "594b1e73",
+            "vertexShader": "8404a857",
+            "fragmentShader": "4460cd90",
+            "uniforms": {
+              "weaveScale": 1.5,
+              "stitchPitch": 0.0034000000450760126,
+              "threadWidth": 0.00044999999227002263,
+              "readability": 1.2999999523162842,
+              "wash": 0,
+              "light": -28
+            }
+          },
+          "after": {
+            "state": "6c39701e",
+            "vertices": "e7ce8ad2",
+            "indices": "594b1e73",
+            "vertexShader": "8404a857",
+            "fragmentShader": "4460cd90",
+            "uniforms": {
+              "weaveScale": 1.5,
+              "stitchPitch": 0.0034000000450760126,
+              "threadWidth": 0.00044999999227002263,
+              "readability": 1.2999999523162842,
+              "wash": 0,
+              "light": -28
+            }
+          },
+          "method": "same-task FNV-1a diagnostic fingerprints; source provenance separately uses SHA-256",
+          "checked": [
+            "native state",
+            "CPU geometry arrays",
+            "vertex/fragment shader text",
+            "listed GPU uniforms"
+          ],
+          "notChecked": [
+            "all driver state",
+            "all framebuffer pixels",
+            "real-world sample dimensions"
+          ]
+        },
+        "capturedAt": "2026-10-20T03:00:23.840Z",
+        "sourceAuthority": "candidate-native-copy-not-production-installation",
+        "unsupportedOriginalMeasurements": []
+      },
+      "status": "PARTIAL",
+      "counts": {
+        "PASS": 6,
+        "FAIL": 0,
+        "WARNING": 3,
+        "UNKNOWN": 4,
+        "NOT_APPLICABLE": 0
+      },
+      "hostModified": false,
+      "physicalCertification": false,
+      "manufacturingCertification": false,
+      "aestheticAcceptance": false,
+      "productionReady": false,
+      "contractVersion": "0.2.0"
+    }
+  ],
+  "counts": {
+    "PASS": 6,
+    "FAIL": 0,
+    "WARNING": 3,
+    "UNKNOWN": 4,
+    "NOT_APPLICABLE": 0
+  },
+  "defects": [
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-denim-r17-2:6f1cc85d",
+      "objectId": "fabric-denim-r17-2",
+      "code": "measurement:rf01.material.visible_thread_width_m",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "denim-workshop",
+      "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "measurementId": "rf01.material.visible_thread_width_m",
+      "message": "读取 uThreadWidth；抗锯齿覆盖可改变屏幕支撑范围，不是实物线径或 Tex",
+      "expected": null,
+      "observed": 0.00044999999227002263,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-denim-r17-2:6e1cdddd",
+      "objectId": "fabric-denim-r17-2",
+      "code": "measurement:rf01.material.thickness_m",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "denim-workshop",
+      "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "measurementId": "rf01.material.thickness_m",
+      "message": "本 R17.2 外观工作台未给出物理厚度；不借用 R15 的其他版本候选",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-denim-r17-2:b9fd36a7",
+      "objectId": "fabric-denim-r17-2",
+      "code": "measurement:rf01.material.yarn_diameter_m",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "denim-workshop",
+      "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "measurementId": "rf01.material.yarn_diameter_m",
+      "message": "程序化纱线遮罩与几何线径没有等价证据",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-denim-r17-2:35dade9c",
+      "objectId": "fabric-denim-r17-2",
+      "code": "measurement:rf01.material.linear_density_tex",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "denim-workshop",
+      "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "measurementId": "rf01.material.linear_density_tex",
+      "message": "线密度不能由显示代理宽度反推",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-denim-r17-2:6a6aafe9",
+      "objectId": "fabric-denim-r17-2",
+      "code": "material:axis",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "reality-coordinator",
+      "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "measurementId": null,
+      "message": "材料参考坐标已声明；未证明匹配裁缝铺材料轴",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-denim-r17-2:5b0b1c55",
+      "objectId": "fabric-denim-r17-2",
+      "code": "physical:calibration",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "reality-coordinator",
+      "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "measurementId": null,
+      "message": "没有实物材料标定，不把GPU参数当实物真值",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-denim-r17-2:182e40c1",
+      "objectId": "fabric-denim-r17-2",
+      "code": "source:nominal",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "reality-coordinator",
+      "sourceCommit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+      "measurementId": null,
+      "message": "名义11针/30mm与实际上传节距分别保留；工艺容差未知",
+      "expected": 0.002727272727272727,
+      "observed": 0.0034000000450760126,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    }
+  ],
+  "status": "PARTIAL",
+  "sourceWriteAPI": false,
+  "automaticRepair": false,
+  "physicalCertification": false,
+  "manufacturingCertification": false,
+  "aestheticAcceptance": false,
+  "productionReady": false
+}
