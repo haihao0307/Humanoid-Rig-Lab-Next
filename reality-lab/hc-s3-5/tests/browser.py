@@ -38,7 +38,7 @@ with sync_playwright() as pw:
   page.locator('#denominator').select_option('activeRatio');shot(page,'01-combined-outcomes')
   page.locator('[data-case="baseline"]').click();page.locator('#last-step').click();check('original focused contact details available','11.411359' in page.locator('#contacts').inner_text())
   check('prediction increments visible','预测方程最大残差' in page.locator('#prediction').inner_text());shot(page,'02-original-edge')
-  slider=page.locator('#step-slider');slider.fill('1');slider.dispatch_event('input');check('stage slider selects original step',state()['step']==0)
+  slider=page.locator('#step-slider');slider.focus();slider.press('Home');page.wait_for_function('__REALITY_S35__.report().step===0');check('stage slider selects original step',state()['step']==0)
   with page.expect_download() as ev:page.locator('#export-review').click()
   p=Q/'REVIEW.json';ev.value.save_as(p);actual=json.loads(p.read_text());check('full review export preserves all cases',actual==original)
   with page.expect_download() as ev:page.locator('#export-common').click()
