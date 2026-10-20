@@ -1,0 +1,32 @@
+{
+  "taskId": "REALITY-HC-S3.1-A-20261020",
+  "frameworkId": "RF01",
+  "primaryDefect": "S3 material records are static and are not tied to the native workbench's current shader inputs or the S2.1 common object protocol.",
+  "baseCommit": "e7df669b97a13ca79ff9b780ea21d20da7acd1d0",
+  "branch": "feature/reality-hc-s31-denim-export-20261020",
+  "allowedPaths": ["reality-lab/hc-s3-1/", ".github/workflows/reality-hc-s31.yml"],
+  "allowedDomains": ["human", "garment", "pattern", "fabric", "footwear"],
+  "activeScope": "One complete denim live-export vertical slice; loss-aware bridge of existing S3 material snapshots. Knit and leather live exporters remain next steps.",
+  "excludedDomains": ["architecture", "aircraft", "terrain", "animals", "vegetation", "world"],
+  "protected": ["S1/S2/S2.1/S3 frozen pages", "native shaders", "native geometry", "lighting", "physics", "pattern warnings", "production branches", "private credentials"],
+  "source": {
+    "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+    "commit": "22cdb3f4c3bfd101bd86f0ffa246d255b561d915",
+    "path": "denim-workshop/r17-scale/preview-v3.html",
+    "basePageCommit": "a5af1e0140c935703dec7c4d4da4f5549449b657",
+    "basePagePath": "denim-workshop/r17-scale/index.html"
+  },
+  "implementation": "Replay the exact published R17.2 assembly at build time, append a read-only export sidecar in an isolated native copy, and use the unchanged S2.1 protocol for common objects. No native setters, render calls, or matrix updates in exporter.",
+  "acceptance": [
+    "Removing the single sidecar insertion reproduces exact R17.2 HTML bytes",
+    "Same-frame protected state, geometry arrays, and shader source fingerprints unchanged by capture",
+    "Native input changes appear in GPU uniform readback after the native renderer settles",
+    "Old imported reports are never labelled as current live captures",
+    "Engineering estimates and unsupported units remain explicitly labelled through the common-protocol bridge",
+    "All invalid imports are rejected atomically; no silent repair or source write",
+    "Exact-source public HTTPS and self-contained file browser validation",
+    "No key or private runtime source included"
+  ],
+  "approval": {"implementationRequested": true, "mergeAuthorized": false, "sourceRepairAuthorized": false, "userVisualAccepted": false},
+  "next": "Reuse tested read-only export contract for knit and leather; inspect getter side effects before integrating, then garment binding."
+}
