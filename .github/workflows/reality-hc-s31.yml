@@ -74,6 +74,14 @@ jobs:
           name: reality-s31-file-evidence
           path: reality-lab/hc-s3-1/qa/
           retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: reality-s31-standalone
+          path: |
+            reality-lab/hc-s3-1/preview.html
+            reality-lab/hc-s3-1/BUILD_MANIFEST.json
+          retention-days: 30
   public:
     needs: build
     runs-on: ubuntu-latest
