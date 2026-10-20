@@ -1,0 +1,10 @@
+{
+  "task":"RF01-S3.1-B-KNIT-20261020",
+  "request":2,
+  "previousRun":39365710701,
+  "previousFailure":"The rejected P03 reference copied into the negative fixture had only 39 hexadecimal characters, so the existing format gate rejected it before the expected pin-mismatch gate.",
+  "correction":"Read closed guilin-dem-pipeline PR291. Verified full P03 commit a51a5e4f429b91eb4d9d2d2bfc361863a81f6d9d. Test full mismatching pin and truncated-reference rejection separately; no product validation threshold changed.",
+  "additionalRegression":["cancelled load cannot recreate native engine","queued live read cannot overwrite imported selection"],
+  "sourceRendererChanged":false,
+  "nativeBaseline":"KNIT-P02 C2 retained"
+}
