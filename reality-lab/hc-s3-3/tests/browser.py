@@ -41,7 +41,7 @@ with sync_playwright() as pw:
    panels=next(p for p in O['pieces'] if p['role']==role)['panels']
    check(role+' has original panel list',page.locator('#rf33-panel option').count()==len(panels))
    for p in panels:
-    page.locator('#rf33-panel').select_option(p['id']);check(role+':'+p['id']+' boundary and axis facts render',state()['panelId']==p['id'] and p['id'] in page.locator('#rf33-outline').inner_text() and '× 0.001' in page.locator('#rf33-axis-facts').inner_text())
+    page.locator('#rf33-panel').select_option(p['id']);check(role+':'+p['id']+' boundary and axis facts render',state()['panelId']==p['id'] and p['id'] in page.locator('#rf33-outline').text_content() and '× 0.001' in page.locator('#rf33-axis-facts').inner_text())
   page.locator('#rf33-missing').uncheck();check('all-check filter includes valid identities',page.locator('[data-check="person:identity"]').count()==1);page.locator('#rf33-missing').check()
   original=state()['observation'];page.locator('#rf33-bad-person').click()
   check('synthetic person mismatch is detected',status_of('person:identity')=='FAIL' and state()['mode']=='scenario')
