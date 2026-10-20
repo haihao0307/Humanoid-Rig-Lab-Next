@@ -7,9 +7,9 @@ on:
 permissions:
   contents: read
 jobs:
-  audit:
+  capture:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,29 +24,19 @@ jobs:
           ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
           path: host
           sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-      - name: Read source identity and collect bounded review files
+      - name: Install fixed browser
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          import json,hashlib,subprocess,shutil
-          h=Path('host');d=h/'kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef';out=Path('audit');out.mkdir()
-          records=[]
-          for p in sorted(d.rglob('*')):
-            if not p.is_file():continue
-            rel=p.relative_to(d).as_posix();b=p.read_bytes()
-            records.append({'path':rel,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest(),'gitBlob':hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()})
-            if p.suffix.lower() in ['.js','.mjs','.json','.md','.html','.txt','.py'] and len(b)<2100000 and not any(t in rel for t in ['node_modules/','vendor/','thumbnails/','textures/']):
-              q=out/'host'/rel;q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(b)
-          for folder in ['hc-s3-2','hc-s2-1']:
-            for p in (Path('platform/reality-lab')/folder).glob('*'):
-              if p.is_file() and p.suffix in ['.json','.js','.py','.md']:
-                q=out/'previous'/folder/p.name;q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes(p.read_bytes())
-          (out/'SOURCE_INVENTORY.json').write_text(json.dumps({'sourceCommit':subprocess.check_output(['git','-C',str(h),'rev-parse','HEAD'],text=True).strip(),'files':records},indent=2))
-          print('files',len(records),'bytes',sum(x['bytes'] for x in records))
-          print('\n'.join(x['path'] for x in records if '/' not in x['path']))
-          PY
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Read actual D03 without changing original runtime
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+        run: python platform/reality-lab/hc-s3-3/capture.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: reality-s33-source-audit
-          path: audit/
-          retention-days: 7
+          name: reality-s33-native-observation
+          path: |
+            platform/reality-lab/hc-s3-3/qa/native/
+            platform/reality-lab/hc-s3-3/runtime-observation.json
+          retention-days: 30
