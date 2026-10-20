@@ -1,10 +1,12 @@
 {
   "task":"RF01-S3.1-B-KNIT-20261020",
-  "request":2,
-  "previousRun":39365710701,
-  "previousFailure":"The rejected P03 reference copied into the negative fixture had only 39 hexadecimal characters, so the existing format gate rejected it before the expected pin-mismatch gate.",
-  "correction":"Read closed guilin-dem-pipeline PR291. Verified full P03 commit a51a5e4f429b91eb4d9d2d2bfc361863a81f6d9d. Test full mismatching pin and truncated-reference rejection separately; no product validation threshold changed.",
-  "additionalRegression":["cancelled load cannot recreate native engine","queued live read cannot overwrite imported selection"],
+  "request":3,
+  "previousRun":39366277320,
+  "rootCauseReview":"ROOT_CAUSE_REVIEW.md",
+  "previousFailure":"Candidate DOM screenshot had 695 rows while baseline had 694 because the embedded canvas element had a fractional viewport offset. Their common full 840x694 area is byte-identical RGB (MAE0, changed pixels0).",
+  "correction":"Compare complete preserved native canvas PNG bytes and exact drawing-buffer dimensions, not viewport element clipping. Preserve zero-difference requirement and original shaders, geometry, lighting and P02 source pin.",
+  "requiredGates":["46 protocol checks","real retained P02 controls and unchanged canvas","full canvas original-vs-candidate equality","read lifecycle and invalid-import cases","old denim live regression","file and fixed public HTTPS verification"],
   "sourceRendererChanged":false,
-  "nativeBaseline":"KNIT-P02 C2 retained"
+  "nativeBaseline":"KNIT-P02 C2 retained",
+  "thresholdsRelaxed":false
 }
