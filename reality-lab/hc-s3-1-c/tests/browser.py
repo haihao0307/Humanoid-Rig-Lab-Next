@@ -63,7 +63,7 @@ with sync_playwright() as pw:
   check('sampled actual shell range changes independently',thick['parts'][0]['sampledMaxM']!=n['parts'][0]['sampledMaxM'])
   check('full array scan is not triggered by ordinary native input',thick['capture']['integrityMode']=='metadata_and_samples')
   check('per-panel table shows generated values','2.31000' in page.locator('#part-rows').inner_text())
-  page.frame_locator('#native').locator('details.craftParameters > summary').click();pitch=page.frame_locator('#native').locator('#pitchMM');maximum=float(pitch.get_attribute('max'));pitch.focus();pitch.press('End');page.wait_for_function('(v)=>__REALITY_S31C__.report().native?.requested.pitch===v',arg=maximum,timeout=180000)
+  page.frame_locator('#native').locator('details.craftParameters:has(#pitchMM) > summary').click();pitch=page.frame_locator('#native').locator('#pitchMM');maximum=float(pitch.get_attribute('max'));pitch.focus();pitch.press('End');page.wait_for_function('(v)=>__REALITY_S31C__.report().native?.requested.pitch===v',arg=maximum,timeout=180000)
   check('original requested stitch pitch is read',abs(state()['native']['measurements'][6]['value']-maximum*.001)<1e-12)
   check('actual generated seam data follows current build',all(abs(s['pitchM']-maximum*.001)<1e-12 for s in state()['native']['seams']))
   page.frame_locator('#native').locator('[data-product="wallet"]').click();page.wait_for_function('__REALITY_S31C__.report().native?.productId==="wallet"',timeout=180000);wallet=state()['native'];report['walletLeather']=wallet
