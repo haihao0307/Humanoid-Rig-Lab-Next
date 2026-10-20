@@ -1,0 +1,191 @@
+name: Reality HC S3.5 metric-contact experiment
+on:
+  push:
+    branches: [feature/reality-hc-s35-metric-contact-20261020]
+    paths: [.github/workflows/reality-hc-s35.yml, reality-lab/hc-s3-5/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            reality-lab/hc-s3-5
+            reality-lab/hc-s3-4
+            reality-lab/hc-s2-1
+      - name: Limit changes and clear viewer evidence from previous runs
+        run: |
+          git fetch --filter=blob:none --depth=1 origin bbb0a2e379d0c7b26faf71cb2ea8f9b1069c5caf
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json,shutil,ast
+          r=Path('reality-lab/hc-s3-5');paths=subprocess.check_output(['git','diff','--name-only','bbb0a2e379d0c7b26faf71cb2ea8f9b1069c5caf','HEAD'],text=True).splitlines()
+          assert paths and all(p.startswith('reality-lab/hc-s3-5/') or p=='.github/workflows/reality-hc-s35.yml' for p in paths),paths
+          for p in r.rglob('*.py'):ast.parse(p.read_text(),filename=str(p))
+          shutil.rmtree(r/'qa',ignore_errors=True);q=r/'qa/source';q.mkdir(parents=True)
+          (q/'SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':paths,'productionSourceChanged':False,'otherDomainsTouched':[]},indent=2))
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: reality-s35-baseline
+          run-id: 39397533314
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-5/qa/baseline
+      - uses: actions/download-artifact@v4
+        with:
+          name: reality-s35-previous-only
+          run-id: 39397533314
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-5/qa/previous-only
+      - uses: actions/download-artifact@v4
+        with:
+          name: reality-s35-metric-only
+          run-id: 39397533314
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-5/qa/metric-only
+      - uses: actions/download-artifact@v4
+        with:
+          name: reality-s35-combined
+          run-id: 39397533314
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-5/qa/combined
+      - name: Verify immutable native evidence and build comparison
+        env:
+          EXPERIMENT_RUN: '39397533314'
+        run: |
+          python reality-lab/hc-s3-5/build.py
+          node reality-lab/hc-s3-5/tests/protocol.cjs
+      - name: Install independent browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Standalone evidence and interactions
+        env:
+          RF35_QA: ${{ github.workspace }}/reality-lab/hc-s3-5/qa/file
+        run: python reality-lab/hc-s3-5/tests/browser.py
+      - name: Freeze only verified comparison page
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-5')
+          for n in ['qa/source/SCOPE.json','qa/source/ASSEMBLY.json','qa/source/PROTOCOL.json','qa/file/BROWSER.json']:assert json.loads((r/n).read_text())['passed'],n
+          d=json.loads((r/'review-data.json').read_text());assert d['fitCertified'] is False and d['productionChanged'] is False
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s35-metric-contact-20261020
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-5/preview.html reality-lab/hc-s3-5/BUILD_MANIFEST.json reality-lab/hc-s3-5/review-data.json reality-lab/hc-s3-5/ANALYSIS_SUMMARY.json reality-lab/hc-s3-5/qa/source reality-lab/hc-s3-5/qa/file reality-lab/hc-s3-5/qa/baseline reality-lab/hc-s3-5/qa/previous-only reality-lab/hc-s3-5/qa/metric-only reality-lab/hc-s3-5/qa/combined
+          git commit -m 'build(reality): freeze S3.5 native comparison without promoting dynamic fit'
+          git push origin HEAD:refs/heads/feature/reality-hc-s35-metric-contact-20261020
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-5/preview.html" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s35-viewer-evidence
+          path: |
+            reality-lab/hc-s3-5/qa/source/
+            reality-lab/hc-s3-5/qa/file/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s35-viewer-code
+          path: |
+            reality-lab/hc-s3-5/*.js
+            reality-lab/hc-s3-5/*.py
+            reality-lab/hc-s3-5/*.json
+            reality-lab/hc-s3-5/*.md
+            reality-lab/hc-s3-5/index.template.html
+            reality-lab/hc-s3-5/tests/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: reality-s35-standalone
+          path: |
+            reality-lab/hc-s3-5/preview.html
+            reality-lab/hc-s3-5/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-5
+      - name: Verify immutable public bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF35_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,json,os,hashlib,time
+          r=Path('reality-lab/hc-s3-5');m=json.loads((r/'BUILD_MANIFEST.json').read_text());url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-5/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(url,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'url':os.environ['RF35_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install fixed public browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify fixed HTTPS comparison and reports
+        env:
+          RF35_URL: ${{ needs.build.outputs.url }}
+          RF35_QA: ${{ github.workspace }}/reality-lab/hc-s3-5/qa/public
+        run: python reality-lab/hc-s3-5/tests/browser.py
+      - name: Persist truthful delivery and next transaction work
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF35_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-5');m=json.loads((r/'BUILD_MANIFEST.json').read_text());p=json.loads((r/'qa/source/PROTOCOL.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());b=json.loads((r/'qa/public/BROWSER.json').read_text());a=json.loads((r/'ANALYSIS_SUMMARY.json').read_text())
+          assert p['passed'] and f['passed'] and f['fileVerified'] and b['passed'] and b['publicVerified']
+          assert [x['id'] for x in a['rows'] if x['initializationAccepted']]==['combined']
+          c=next(x for x in a['rows'] if x['id']=='combined');assert c['bodyMinimumSampleMM']<0 and c['pairMinimumSampleMM']<0
+          d={'version':'REALITY-HC-S3.5','status':'INIT_CANDIDATE_VERIFIED_DYNAMIC_CONTACT_FAILED_NO_PRODUCTION_PROMOTION','fixedURL':os.environ['RF35_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'experimentRun':m['experimentRun'],'experimentCode':m['experimentCode'],'html':m['html'],'source':m['source'],'caseEvidence':m['caseEvidence'],'protocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'results':a['rows'],'baselineMatchesS34':True,'candidateInitializationAccepted':True,'sourceFitAccepted':False,'productionChanged':False,'productionInstalled':False,'dynamicFitCertified':False,'physicalCertification':False,'manufacturingCertification':False,'physicalDeviceTested':False,'userVisualAcceptance':False,'candidateMetricSchedule':'immediate full graded metric; not yet original GPU gradual scheduling','walkSamplingScope':'four extra requested walk steps after original automatic playback, not a four-frame-from-rest benchmark','next':'Create a versioned and rollback-safe WASM fitting transaction matching the existing GPU intent: advance body previous/target and progressively update rest metrics. Reverify 48 steps plus failure/cancellation. Independently retain and diagnose original ReducedCloth contact failures; do not merge current immediate-target candidate.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.5-METRIC-CONTACT-20261020','frameworkId':'RF01','status':d['status'],'fixedURL':d['fixedURL'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'lastActuallyCompletedStep':'Four native conditions compared, combined initialization reaches all 48 steps, sampled dynamic penetrations remain explicit failures, fixed public review verified','nextAction':d['next'],'sourceFitAccepted':False,'productionChanged':False,'userAccepted':False},ensure_ascii=False,indent=2));print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s35-metric-contact-20261020
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3-5/DELIVERY.json reality-lab/hc-s3-5/TASK_STATE.json reality-lab/hc-s3-5/qa/public
+          git commit -m 'docs(reality): preserve verified initialization candidate and remaining contact failures'
+          git push origin HEAD:refs/heads/feature/reality-hc-s35-metric-contact-20261020
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s35-public-evidence
+          path: reality-lab/hc-s3-5/qa/public/
+          retention-days: 30
