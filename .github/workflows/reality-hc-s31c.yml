@@ -1,0 +1,158 @@
+name: Reality HC S3.1-C leather acceptance
+on:
+  push:
+    branches: [feature/reality-hc-s31c-leather-export-20261020]
+    paths: [.github/workflows/reality-hc-s31c.yml, reality-lab/hc-s3-1-c/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            reality-lab/hc-s3-1-c
+            reality-lab/hc-s3-1-b
+            reality-lab/hc-s3-1
+            reality-lab/hc-s2-1
+            reality-lab/hc-s3
+      - name: Enforce source scope and syntax
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 543e99f60192673ef39e32f8555051757972177b
+          python - <<'PY'
+          from pathlib import Path
+          import ast,json,subprocess
+          r=Path('reality-lab/hc-s3-1-c');changed=subprocess.check_output(['git','diff','--name-only','543e99f60192673ef39e32f8555051757972177b','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s3-1-c/') or p=='.github/workflows/reality-hc-s31c.yml' for p in changed),changed
+          for p in r.rglob('*.py'):ast.parse(p.read_text(),filename=str(p))
+          q=r/'qa/source';q.mkdir(parents=True,exist_ok=True);(q/'SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'sourceWorkbenchesChanged':False,'excludedDomainsTouched':[]},indent=2))
+          PY
+      - name: Assemble original native sources and validate protocol
+        run: |
+          python reality-lab/hc-s3-1-c/build.py
+          node reality-lab/hc-s3-1-c/tests/protocol.cjs
+      - name: Install pinned test browser
+        run: |
+          python -m pip install playwright==1.56.0 pillow==11.3.0
+          python -m playwright install --with-deps chromium
+      - name: Real native standalone and original-pixel verification
+        env:
+          RF31C_QA: ${{ github.workspace }}/reality-lab/hc-s3-1-c/qa/file
+        run: python reality-lab/hc-s3-1-c/tests/browser.py
+      - name: Freeze only the verified current source
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-1-c')
+          for f in ['qa/source/SCOPE.json','qa/source/ASSEMBLY.json','qa/source/PROTOCOL.json','qa/file/BROWSER.json']:assert json.loads((r/f).read_text())['passed'],f
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s31c-leather-export-20261020
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-1-c/preview.html reality-lab/hc-s3-1-c/BUILD_MANIFEST.json reality-lab/hc-s3-1-c/qa/source reality-lab/hc-s3-1-c/qa/file
+          git commit -m 'build(reality): freeze verified leather knit and denim standards workbench'
+          git push origin HEAD:refs/heads/feature/reality-hc-s31c-leather-export-20261020
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-1-c/preview.html" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s31c-build-evidence
+          path: reality-lab/hc-s3-1-c/qa/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s31c-reviewed-source
+          path: |
+            reality-lab/hc-s3-1-c/*.js
+            reality-lab/hc-s3-1-c/*.py
+            reality-lab/hc-s3-1-c/*.json
+            reality-lab/hc-s3-1-c/tests/
+            reality-lab/hc-s3-1-c/_generated/controller.js
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: reality-s31c-standalone
+          path: |
+            reality-lab/hc-s3-1-c/preview.html
+            reality-lab/hc-s3-1-c/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-1-c
+      - name: Verify immutable public HTML bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF31C_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,hashlib,json,os,time
+          r=Path('reality-lab/hc-s3-1-c');m=json.loads((r/'BUILD_MANIFEST.json').read_text());u='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-1-c/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(u,timeout=120).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'fixedURL':os.environ['RF31C_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install independent pinned browser
+        run: |
+          python -m pip install playwright==1.56.0 pillow==11.3.0
+          python -m playwright install --with-deps chromium
+      - name: Real fixed HTTPS native interactions
+        env:
+          RF31C_URL: ${{ needs.build.outputs.url }}
+          RF31C_QA: ${{ github.workspace }}/reality-lab/hc-s3-1-c/qa/public
+        run: python reality-lab/hc-s3-1-c/tests/browser.py
+      - name: Persist delivery with actual evidence and limits
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF31C_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-1-c');m=json.loads((r/'BUILD_MANIFEST.json').read_text());p=json.loads((r/'qa/source/PROTOCOL.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());b=json.loads((r/'qa/public/BROWSER.json').read_text())
+          assert p['passed'] and f['passed'] and f['fileVerified'] and b['passed'] and b['publicVerified']
+          d={'version':'REALITY-HC-S3.1-C','status':'PUBLIC_AND_STANDALONE_VERIFIED_AWAITING_USER','sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'fixedURL':os.environ['RF31C_URL'],'workflowRun':os.environ['GITHUB_RUN_ID'],'html':m['html'],'sources':m['sources'],'protocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'liveFamilies':['leather','knit','denim'],'leatherRuntimeModes':['products'],'browserTestedLeatherProducts':['swatch','wallet'],'sourceRendererChanged':False,'sourceSolverChanged':False,'productionExporterInstalled':False,'oldCommonProtocolChanged':False,'retainedNativeSourcesPreserved':True,'leatherOriginalPixelsMatched':True,'readDidNotAdvancePhysics':True,'compressionIsLossless':True,'physicalCertification':False,'manufacturingCertification':False,'physicalDeviceTested':False,'userVisualAccepted':False,'productionReady':False,'next':'S3.2: consolidate version-pinned adapters and controlled source-installation contract; test garment/material-axis/person-version relationships only after source integration is explicitly scoped.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.1-C-LEATHER-20261020','frameworkId':'RF01','status':d['status'],'fixedURL':d['fixedURL'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'lastActuallyCompletedStep':'Native leather per-panel read, exact source/pixels preservation, three material entry, import safety and fixed public validation','nextAction':d['next'],'productionExporterInstalled':False,'userAccepted':False},ensure_ascii=False,indent=2));print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s31c-leather-export-20261020
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3-1-c/DELIVERY.json reality-lab/hc-s3-1-c/TASK_STATE.json reality-lab/hc-s3-1-c/qa/public
+          git commit -m 'docs(reality): persist native leather public evidence and next integration boundary'
+          git push origin HEAD:refs/heads/feature/reality-hc-s31c-leather-export-20261020
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s31c-public-evidence
+          path: reality-lab/hc-s3-1-c/qa/public/
+          retention-days: 30
