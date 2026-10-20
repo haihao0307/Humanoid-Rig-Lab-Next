@@ -1,0 +1,38 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const C=require('../connection-contract.js'),R=path.resolve(__dirname,'..'),prep=JSON.parse(fs.readFileSync(R+'/SOURCE_PREPARED.json','utf8')),checks=[];
+const clone=x=>JSON.parse(JSON.stringify(x));function test(name,f){f();checks.push({name,passed:true});console.log('PASS',name);}
+const core=prep.core,commit='1'.repeat(40),hash=prep.lock.installedHTMLSHA256;
+function registry(){return {schema:'kaopu/reality-connection-registry@1',version:'REALITY-HC-S3.2',syntheticFixture:true,entries:['denim','knit','leather'].map(f=>({family:f,lineage:{commit:f==='denim'?core.sourceBaseCommit:commit,sha256:'2'.repeat(64)},copyVerified:true,productionInstalled:false,productionVerified:false,productionHeadAtCheck:f==='denim'?core.sourceBaseCommit:null,installation:f==='denim'?{core:clone(core),commit,htmlSHA256:hash,bytes:prep.lock.installedBytes,sourcePublicVerification:{passed:true,commit,htmlSHA256:hash}}:null}))};}
+const bad=(name,fn,pattern)=>test(name,()=>{const r=registry();fn(r);assert.throws(()=>C.validateRegistry(r),pattern);});
+test('exact source installation core valid',()=>assert(C.validateCore(core)));
+test('synthetic bounded registry valid',()=>assert(C.validateRegistry(registry())));
+test('unchanged core identity accepted',()=>assert(C.sameCore(clone(core),core)));
+test('source trial not production',()=>assert.equal(C.stage(registry().entries[0]),'SOURCE_TRIAL_VERIFIED'));
+test('knit and leather remain copy verified',()=>{for(const e of registry().entries.slice(1))assert.equal(C.stage(e),'COPY_VERIFIED');});
+test('missing verification cannot label a trial verified',()=>{const e=registry().entries[0];e.installation.sourcePublicVerification=null;assert.equal(C.stage(e),'SOURCE_TRIAL_UNVERIFIED');});
+test('raw endpoint must contain immutable source commit',()=>assert(C.rawURL(registry().entries[0].installation).includes('/'+commit+'/denim-workshop/r17-scale/preview-v3.html')));
+test('public link derives from the same pin',()=>assert(C.publicURL(registry().entries[0].installation).endsWith(C.rawURL(registry().entries[0].installation))));
+bad('no production promotion by imported flag',r=>r.entries[0].productionInstalled=true,/PRODUCTION/);
+bad('no production verification by a claimed green check',r=>r.entries[0].productionVerified=true,/PRODUCTION/);
+bad('no production scope in trial core',r=>r.entries[0].installation.core.scope='production',/PRODUCTION/);
+bad('source branch cannot secretly target production',r=>r.entries[0].installation.core.sourceBranch=core.productionBranch,/BRANCH/);
+bad('only one selected material source may be installed',r=>r.entries[1].installation=clone(r.entries[0].installation),/UNSCOPED/);
+bad('missing material rejected',r=>r.entries.pop(),/ENTRIES/);
+bad('duplicate material rejected',r=>r.entries[1].family='denim',/FAMILIES/);
+bad('missing copy evidence rejected',r=>r.entries[1].copyVerified=false,/COPY/);
+bad('changing renderer digest format rejected',r=>r.entries[0].installation.core.rendererSHA256='bad',/IDENTITY/);
+bad('moving source refs not accepted',r=>r.entries[0].installation.commit='main',/ARTIFACT/);
+bad('missing source public test rejected',r=>r.entries[0].installation.sourcePublicVerification.passed=false,/VERIFICATION/);
+bad('source test must refer to same commit',r=>r.entries[0].installation.sourcePublicVerification.commit='3'.repeat(40),/VERIFICATION/);
+bad('source test must refer to exact installed HTML',r=>r.entries[0].installation.sourcePublicVerification.htmlSHA256='0'.repeat(64),/VERIFICATION/);
+bad('different original lineage not relabelled compatible',r=>r.entries[0].lineage.commit='3'.repeat(40),/SOURCE_BASE/);
+bad('drifted production head cannot use old review snapshot',r=>r.entries[0].productionHeadAtCheck='3'.repeat(40),/SOURCE_BASE/);
+bad('cannot change output repository',r=>r.entries[0].installation.core.repository='someone/other',/SCOPE/);
+bad('cannot change native source path',r=>r.entries[0].installation.core.entryPath='aircraft/main.html',/SCOPE/);
+bad('repair permission cannot be introduced',r=>r.entries[0].installation.core.authorities.sourceWriteAPI=true,/AUTHORITY/);
+bad('new unverified adapter version rejected',r=>r.entries[0].installation.core.adapterVersion='next',/ADAPTER/);
+for(const field of ['adapterSHA256','rendererSHA256','sourceBaseCommit','implementationCommit'])test('provider mismatch rejected: '+field,()=>{const x=clone(core);x[field]='0'.repeat(field.includes('SHA256')?64:40);assert.throws(()=>C.sameCore(x,core),/PROVIDER_MISMATCH/);});
+test('validation cannot mutate input',()=>{const r=registry(),before=JSON.stringify(r);C.validateRegistry(r);assert.equal(JSON.stringify(r),before);});
+test('valid runtime envelope preserves original material lineage',()=>assert(C.inspectProvider(core,core,{source:{commit:core.sourceBaseCommit},family:'denim',exporterVersion:'0.3.1-a',authorities:{sourceWriteAPI:false,repairAuthorized:false}})));
+test('wrong runtime source rejected',()=>assert.throws(()=>C.inspectProvider(core,core,{source:{commit},family:'denim',exporterVersion:'0.3.1-a',authorities:{sourceWriteAPI:false,repairAuthorized:false}}),/OBSERVATION_SOURCE/));
+const q=R+'/qa/source';fs.mkdirSync(q,{recursive:true});fs.writeFileSync(q+'/PROTOCOL.json',JSON.stringify({passed:true,count:checks.length,checks,syntheticRegistryFixture:true},null,2));
