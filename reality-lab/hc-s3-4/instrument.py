@@ -27,7 +27,7 @@ def make_responses(host:Path,root:Path,verbose:bool):
    prepend_before('world.actor.evaluate({});',"try{globalThis.__RF34=createObserver(world,"+str(verbose).lower()+");}catch(e){self.postMessage({__RF34_DIAG__:{key:'observerError',data:String(e.stack||e)}});}")
    prepend_before('const fittingSteps=origin?48:8;',"globalThis.__RF34?.attach(world.acceleration);")
    append_after('for(let i=0;i<fittingSteps;i++){',"globalThis.__RF34?.fit(i,fittingSteps,!!origin);")
-   prepend_before('world.initial=world.solvers.map(s=>s.p.slice());',"globalThis.__RF34?.finish();")
+   prepend_before('world.initial=world.solvers.map(s=>s.p.slice());world.initialTime=',"globalThis.__RF34?.finish();")
   elif name=='live-cloth-controller.mjs':
    prepend_before('  this.worker.onmessage=',"  this.worker.addEventListener('message',({data})=>{if(data.__RF34_DIAG__){window.__RF34_CAPTURE__??={};window.__RF34_CAPTURE__[data.__RF34_DIAG__.key]=data.__RF34_DIAG__.data;}});\n")
   else:
