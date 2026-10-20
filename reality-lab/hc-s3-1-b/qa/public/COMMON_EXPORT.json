@@ -1,0 +1,1297 @@
+{
+  "schema": "kaopu/reality-foundation-bundle@0.2",
+  "version": "0.2.0",
+  "objects": [
+    {
+      "schema": "kaopu/reality-object@0.2",
+      "objectId": "fabric-knit-public-p02-c2",
+      "domain": "fabric",
+      "name": "毛衣 KNIT-P02 C2 · 原生观察",
+      "sourceMode": "live_read_only",
+      "source": {
+        "repository": "haihao0307/guilin-dem-pipeline",
+        "commit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+        "path": "kaopu-fabric-workbench/knit-public-p02/index.html",
+        "sha256": "aff46d61deae59656fd4605356bd04b62789db8c64c3cf88ffd729d16f201ee1"
+      },
+      "units": [
+        {
+          "quantity": "length",
+          "unit": "m",
+          "basis": "source_declared"
+        }
+      ],
+      "frames": [],
+      "measurements": [
+        {
+          "id": "rf01.knit.grid_columns",
+          "definitionId": "rf01.knit.grid_columns",
+          "label": "生成针目列数",
+          "value": 16,
+          "unit": "1",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "源拓扑列数；与实际载纱顶点布局核对",
+          "context": {
+            "originalRecord": {
+              "id": "knit.grid_columns",
+              "label": "生成针目列数",
+              "value": 16,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "源拓扑列数；与实际载纱顶点布局核对"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.grid_rows",
+          "definitionId": "rf01.knit.grid_rows",
+          "label": "生成针目行数",
+          "value": 20,
+          "unit": "1",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "源拓扑行数；与实际载纱顶点布局核对",
+          "context": {
+            "originalRecord": {
+              "id": "knit.grid_rows",
+              "label": "生成针目行数",
+              "value": 20,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "源拓扑行数；与实际载纱顶点布局核对"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.column_pitch_m",
+          "definitionId": "rf01.knit.column_pitch_m",
+          "label": "生成列间距（局部X）",
+          "value": 0.005799999150137104,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "实际载纱网格相邻针目同一截面中心差；不是标准机号",
+          "context": {
+            "originalRecord": {
+              "id": "knit.column_pitch_m",
+              "label": "生成列间距（局部 X 投影）",
+              "value": 0.005799999150137104,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际载纱网格相邻针目同一截面中心差；不是标准机号"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.row_pitch_m",
+          "definitionId": "rf01.knit.row_pitch_m",
+          "label": "生成行间距（局部Y）",
+          "value": 0.0029000003511706965,
+          "unit": "m",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "实际载纱网格相邻针目截面中心差；不是成衣拉伸后的密度",
+          "context": {
+            "originalRecord": {
+              "id": "knit.row_pitch_m",
+              "label": "生成行间距（局部 Y 投影）",
+              "value": 0.0029000003511706965,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际载纱网格相邻针目截面中心差；不是成衣拉伸后的密度"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.carrier_nominal_diameter_m",
+          "definitionId": "rf01.knit.carrier_nominal_diameter_m",
+          "label": "载纱名义直径",
+          "value": 0.00172,
+          "unit": "m",
+          "status": "WARNING",
+          "basis": "source_declared",
+          "method": "自有数字几何配方；截面存在起伏，非实物纱径",
+          "context": {
+            "originalRecord": {
+              "id": "knit.carrier_nominal_diameter_m",
+              "label": "载纱名义直径",
+              "value": 0.00172,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "source_declared",
+              "method": "自有数字几何配方；截面存在起伏，非实物纱径"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.carrier_sample_diameter_m",
+          "definitionId": "rf01.knit.carrier_sample_diameter_m",
+          "label": "载纱截面采样直径",
+          "value": 0.0017045053183580405,
+          "unit": "m",
+          "status": "WARNING",
+          "basis": "runtime_computed",
+          "method": "第一个针目第16环上两个相对顶点距离；不是布料厚度",
+          "context": {
+            "originalRecord": {
+              "id": "knit.carrier_sample_diameter_m",
+              "label": "载纱截面采样直径",
+              "value": 0.0017045053183580405,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "第一个针目第16环上两个相对顶点距离；不是布料厚度"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.short_fiber_instances",
+          "definitionId": "rf01.knit.short_fiber_instances",
+          "label": "短绒实例数",
+          "value": 307200,
+          "unit": "1",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "数字代表纤维数量，不代表每根实物羊毛",
+          "context": {
+            "originalRecord": {
+              "id": "knit.short_fiber_instances",
+              "label": "短绒几何实例数",
+              "value": 307200,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "数字代表纤维数量，不代表每根实物羊毛"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.surface_fiber_instances",
+          "definitionId": "rf01.knit.surface_fiber_instances",
+          "label": "贴伏长纤维实例数",
+          "value": 30720,
+          "unit": "1",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "当前原生实例几何数量",
+          "context": {
+            "originalRecord": {
+              "id": "knit.surface_fiber_instances",
+              "label": "贴伏长纤维实例数",
+              "value": 30720,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "当前原生实例几何数量"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.fuzz_density_control",
+          "definitionId": "rf01.knit.fuzz_density_control",
+          "label": "短绒密度控制值",
+          "value": 1,
+          "unit": "1",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "当前材质输入；GPU实际上传值单独保存，隐藏模式不冒充正在绘制",
+          "context": {
+            "originalRecord": {
+              "id": "knit.fuzz_density_control",
+              "label": "当前短绒密度控制值",
+              "value": 1,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "当前材质输入；GPU实际上传值单独保存，隐藏模式不冒充正在绘制"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.length_multiplier",
+          "definitionId": "rf01.knit.length_multiplier",
+          "label": "短绒长度倍率",
+          "value": 1.6,
+          "unit": "1",
+          "status": "PASS",
+          "basis": "runtime_computed",
+          "method": "无量纲倍率，不是毫米",
+          "context": {
+            "originalRecord": {
+              "id": "knit.length_multiplier",
+              "label": "当前短绒长度倍率",
+              "value": 1.6,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "无量纲倍率，不是毫米"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.short_fiber_sample_offset_m",
+          "definitionId": "rf01.knit.short_fiber_sample_offset_m",
+          "label": "短绒样本端点偏移",
+          "value": 0.0013019003792724326,
+          "unit": "m",
+          "status": "WARNING",
+          "basis": "runtime_computed",
+          "method": "按原shader root+length*(strand+curve)读取第0实例局部端点；非纤维弧长，隐藏模式只作最近上传记录",
+          "context": {
+            "originalRecord": {
+              "id": "knit.short_fiber_sample_offset_m",
+              "label": "短绒样本端点偏移（最近上传）",
+              "value": 0.0013019003792724326,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "按原shader root+length*(strand+curve)读取第0实例局部端点；非纤维弧长，隐藏模式只作最近上传记录"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.physical_thickness_m",
+          "definitionId": "rf01.knit.physical_thickness_m",
+          "label": "实物厚度",
+          "value": null,
+          "unit": "m",
+          "status": "UNKNOWN",
+          "basis": "unknown",
+          "method": "P02外观样片没有实物厚度证据，禁止借用R15估计",
+          "context": {
+            "originalRecord": {
+              "id": "knit.physical_thickness_m",
+              "label": "实物材料厚度",
+              "value": null,
+              "unit": "m",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "P02外观样片没有实物厚度证据，禁止借用R15估计"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.areal_density_g_m2",
+          "definitionId": "rf01.knit.areal_density_g_m2",
+          "label": "实物面密度",
+          "value": null,
+          "unit": "g/m2",
+          "status": "UNKNOWN",
+          "basis": "unknown",
+          "method": "没有实物标定或本版本物理模型",
+          "context": {
+            "originalRecord": {
+              "id": "knit.areal_density_g_m2",
+              "label": "实物面密度",
+              "value": null,
+              "unit": "g/m2",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "没有实物标定或本版本物理模型"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        },
+        {
+          "id": "rf01.knit.linear_density_tex",
+          "definitionId": "rf01.knit.linear_density_tex",
+          "label": "纱线Tex",
+          "value": null,
+          "unit": "tex",
+          "status": "UNKNOWN",
+          "basis": "unknown",
+          "method": "几何载纱直径不能反推线密度",
+          "context": {
+            "originalRecord": {
+              "id": "knit.linear_density_tex",
+              "label": "纱线 Tex",
+              "value": null,
+              "unit": "tex",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "几何载纱直径不能反推线密度"
+            },
+            "physicalCalibration": false
+          },
+          "sourceRef": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "notEquivalentTo": [
+            "physical sample certification",
+            "R15 engineering estimate"
+          ],
+          "requiredEvidence": [
+            "source pin",
+            "measurement method",
+            "native build/frame"
+          ],
+          "owner": "knit-public-p02"
+        }
+      ],
+      "checks": [
+        {
+          "id": "measurement:rf01.knit.grid_columns",
+          "status": "PASS",
+          "message": "源拓扑列数；与实际载纱顶点布局核对",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.grid_columns",
+          "expected": null,
+          "observed": 16,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.grid_rows",
+          "status": "PASS",
+          "message": "源拓扑行数；与实际载纱顶点布局核对",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.grid_rows",
+          "expected": null,
+          "observed": 20,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.column_pitch_m",
+          "status": "PASS",
+          "message": "实际载纱网格相邻针目同一截面中心差；不是标准机号",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.column_pitch_m",
+          "expected": null,
+          "observed": 0.005799999150137104,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.row_pitch_m",
+          "status": "PASS",
+          "message": "实际载纱网格相邻针目截面中心差；不是成衣拉伸后的密度",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.row_pitch_m",
+          "expected": null,
+          "observed": 0.0029000003511706965,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.carrier_nominal_diameter_m",
+          "status": "WARNING",
+          "message": "自有数字几何配方；截面存在起伏，非实物纱径",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.carrier_nominal_diameter_m",
+          "expected": null,
+          "observed": 0.00172,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.carrier_sample_diameter_m",
+          "status": "WARNING",
+          "message": "第一个针目第16环上两个相对顶点距离；不是布料厚度",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.carrier_sample_diameter_m",
+          "expected": null,
+          "observed": 0.0017045053183580405,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.short_fiber_instances",
+          "status": "PASS",
+          "message": "数字代表纤维数量，不代表每根实物羊毛",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.short_fiber_instances",
+          "expected": null,
+          "observed": 307200,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.surface_fiber_instances",
+          "status": "PASS",
+          "message": "当前原生实例几何数量",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.surface_fiber_instances",
+          "expected": null,
+          "observed": 30720,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.fuzz_density_control",
+          "status": "PASS",
+          "message": "当前材质输入；GPU实际上传值单独保存，隐藏模式不冒充正在绘制",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.fuzz_density_control",
+          "expected": null,
+          "observed": 1,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.length_multiplier",
+          "status": "PASS",
+          "message": "无量纲倍率，不是毫米",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.length_multiplier",
+          "expected": null,
+          "observed": 1.6,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.short_fiber_sample_offset_m",
+          "status": "WARNING",
+          "message": "按原shader root+length*(strand+curve)读取第0实例局部端点；非纤维弧长，隐藏模式只作最近上传记录",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.short_fiber_sample_offset_m",
+          "expected": null,
+          "observed": 0.0013019003792724326,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.physical_thickness_m",
+          "status": "UNKNOWN",
+          "message": "P02外观样片没有实物厚度证据，禁止借用R15估计",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.physical_thickness_m",
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.areal_density_g_m2",
+          "status": "UNKNOWN",
+          "message": "没有实物标定或本版本物理模型",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.areal_density_g_m2",
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "measurement:rf01.knit.linear_density_tex",
+          "status": "UNKNOWN",
+          "message": "几何载纱直径不能反推线密度",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": "rf01.knit.linear_density_tex",
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "source:transport",
+          "status": "PASS",
+          "message": "从保留版P02 C2当前实例只读获取",
+          "category": "contract",
+          "owner": "reality-platform",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "source:preservation",
+          "status": "PASS",
+          "message": "本次同步读取前后受检范围一致：metadata_and_samples",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "native:draw",
+          "status": "PASS",
+          "message": "短绒当前参与绘制，GPU数值与当前设置匹配",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "physical:solver",
+          "status": "NOT_APPLICABLE",
+          "message": "本P02外观样片没有布料物理解算；不能从旧R15借用物性",
+          "category": "contract",
+          "owner": null,
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "material:binding",
+          "status": "UNKNOWN",
+          "message": "当前样片材料参考坐标尚未绑定成衣裁片/人物版本",
+          "category": "contract",
+          "owner": "knit-public-p02",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        },
+        {
+          "id": "source:legacy",
+          "status": "WARNING",
+          "message": "S3中的R15针织历史与当前P02是不同对象，原历史继续保留",
+          "category": "contract",
+          "owner": "reality-platform",
+          "sourceRef": null,
+          "measurementId": null,
+          "expected": null,
+          "observed": null,
+          "detail": null
+        }
+      ],
+      "defects": [
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-knit-public-p02-c2:f9f9c539",
+          "objectId": "fabric-knit-public-p02-c2",
+          "code": "measurement:rf01.knit.carrier_nominal_diameter_m",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "knit-public-p02",
+          "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "measurementId": "rf01.knit.carrier_nominal_diameter_m",
+          "message": "自有数字几何配方；截面存在起伏，非实物纱径",
+          "expected": null,
+          "observed": 0.00172,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-knit-public-p02-c2:e7278e3c",
+          "objectId": "fabric-knit-public-p02-c2",
+          "code": "measurement:rf01.knit.carrier_sample_diameter_m",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "knit-public-p02",
+          "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "measurementId": "rf01.knit.carrier_sample_diameter_m",
+          "message": "第一个针目第16环上两个相对顶点距离；不是布料厚度",
+          "expected": null,
+          "observed": 0.0017045053183580405,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-knit-public-p02-c2:b7b1dd75",
+          "objectId": "fabric-knit-public-p02-c2",
+          "code": "measurement:rf01.knit.short_fiber_sample_offset_m",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "knit-public-p02",
+          "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "measurementId": "rf01.knit.short_fiber_sample_offset_m",
+          "message": "按原shader root+length*(strand+curve)读取第0实例局部端点；非纤维弧长，隐藏模式只作最近上传记录",
+          "expected": null,
+          "observed": 0.0013019003792724326,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-knit-public-p02-c2:6be870a7",
+          "objectId": "fabric-knit-public-p02-c2",
+          "code": "measurement:rf01.knit.physical_thickness_m",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "knit-public-p02",
+          "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "measurementId": "rf01.knit.physical_thickness_m",
+          "message": "P02外观样片没有实物厚度证据，禁止借用R15估计",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-knit-public-p02-c2:2783056b",
+          "objectId": "fabric-knit-public-p02-c2",
+          "code": "measurement:rf01.knit.areal_density_g_m2",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "knit-public-p02",
+          "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "measurementId": "rf01.knit.areal_density_g_m2",
+          "message": "没有实物标定或本版本物理模型",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-knit-public-p02-c2:ad7897fb",
+          "objectId": "fabric-knit-public-p02-c2",
+          "code": "measurement:rf01.knit.linear_density_tex",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "knit-public-p02",
+          "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "measurementId": "rf01.knit.linear_density_tex",
+          "message": "几何载纱直径不能反推线密度",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-knit-public-p02-c2:4a830ff4",
+          "objectId": "fabric-knit-public-p02-c2",
+          "code": "material:binding",
+          "severity": "info",
+          "state": "OPEN",
+          "owner": "knit-public-p02",
+          "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "measurementId": null,
+          "message": "当前样片材料参考坐标尚未绑定成衣裁片/人物版本",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        },
+        {
+          "schema": "kaopu/reality-defect@0.2",
+          "id": "defect:fabric-knit-public-p02-c2:4e300e92",
+          "objectId": "fabric-knit-public-p02-c2",
+          "code": "source:legacy",
+          "severity": "warning",
+          "state": "OPEN",
+          "owner": "reality-platform",
+          "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+          "measurementId": null,
+          "message": "S3中的R15针织历史与当前P02是不同对象，原历史继续保留",
+          "expected": null,
+          "observed": null,
+          "detail": null,
+          "repairAuthorized": false,
+          "verificationRequired": true,
+          "createdBy": "REALITY-HC-S2.1",
+          "createdAt": null
+        }
+      ],
+      "preservation": {
+        "passed": true,
+        "before": "{\"settings\":{\"fuzz\":1,\"length\":1.6,\"detail\":1,\"twist\":0.55,\"mottle\":0.18,\"pattern\":\"stripe\",\"color\":\"#d3c4af\",\"shape\":\"jersey\",\"mode\":\"fiber\"},\"ready\":true,\"dirty\":false,\"building\":false,\"builds\":2,\"frames\":6,\"camera\":{\"position\":[0.1702077883605926,0.04622927585102516,0.11347185890706173],\"matrix\":[0.5478763552337971,0,-0.8365593220900297,0,-0.1853533682590255,0.9751453055858087,-0.12139094640455621,0,0.8157668957801391,0.22156631737238347,0.5342590558477003,0,0.1702077883605926,0.04622927585102516,0.11347185890706173,1],\"world\":[0.5478763552337971,0,-0.8365593220900297,0,-0.1853533682590255,0.9751453055858087,-0.12139094640455621,0,0.8157668957801391,0.22156631737238347,0.5342590558477003,0,0.1702077883605926,0.04622927585102516,0.11347185890706173,1],\"projection\":[2.7023472824142782,0,0,0,0,3.2708526184841404,0,0,0,0,-1.0000800032001282,-1,0,0,-0.0016000640025601025,0],\"target\":[0,0,0.002]},\"objects\":[{\"uuid\":\"46b55e71-a4b5-4dbf-b657-7955a2d3e23b\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"2f9d50bb-5f02-4bb1-9e75-adc57ac17ec9\",\"index\":{\"count\":1474560,\"version\":0},\"attributes\":{\"position\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,-0.04664108157157898],[1,-0.03063358925282955],[2,-0.0029425465036183596],[405600,-0.04666632413864136],[811197,0.04664163291454315],[811198,0.02446454018354416],[811199,-0.00022771993826609105]]},\"normal\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,-0.28156334161758423],[1,-0.9595426321029663],[2,0],[405600,-0.28156334161758423],[811197,0.28156334161758423],[811198,-0.9595426321029663],[811199,-1.3257757043446349e-16]]},\"uv\":{\"count\":270400,\"itemSize\":2,\"version\":0,\"bytes\":2163200,\"sample\":[[0,0.06109322980046272],[1,0],[2,0.06109322980046272],[270400,0.043867893517017365],[540797,0.9166666865348816],[540798,9.084851264953613],[540799,1]]},\"color\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,0.4494512677192688],[1,0.38087210059165955],[2,0.29578420519828796],[405600,0.42859527468681335],[811197,0.4094361662864685],[811198,0.34696266055107117],[811199,0.26945021748542786]]},\"$index\":{\"count\":1474560,\"itemSize\":1,\"version\":0,\"bytes\":5898240,\"sample\":[[0,0],[1,13],[2,1],[737280,135200],[1474557,270398],[1474558,270399],[1474559,270386]]}},\"instanceCount\":null},\"material\":{\"uuid\":\"4ea6ae2b-63cf-4c53-ac57-05ce02052c1c\",\"version\":3,\"roughness\":0.88,\"sheen\":1,\"uniforms\":{}}},{\"uuid\":\"041315bf-987a-481b-afb3-1e1319d03304\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"2b9718ab-f572-4a64-80ce-568f93777822\",\"index\":{\"count\":24,\"version\":0},\"attributes\":{\"position\":{\"count\":10,\"itemSize\":3,\"version\":0,\"bytes\":120,\"sample\":[[0,0],[1,-1],[2,0],[15,0.5],[27,1],[28,1],[29,0]]},\"root\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.04640504717826843],[1,-0.029496248811483383],[2,-0.0016808643704280257],[460800,-0.044539302587509155],[921597,0.04315744712948799],[921598,0.030378475785255432],[921599,-0.00005324902303982526]]},\"strand\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.0003369170881342143],[1,0.0004800652386620641],[2,0.0005143184098415077],[460800,0.00045165183837525547],[921597,-0.0003809058398474008],[921598,-0.0009027585037983954],[921599,0.0005344742094166577]]},\"curve\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.0000993479770841077],[1,-0.00008528455509804189],[2,0.00004773916589329019],[460800,-0.00012233914458192885],[921597,-0.00007148965232772753],[921598,0.00044487728155218065],[921599,0.0002593219978734851]]},\"identity\":{\"count\":307200,\"itemSize\":2,\"version\":0,\"bytes\":2457600,\"sample\":[[0,0.6109322905540466],[1,0],[2,0.4451965391635895],[307200,0.64989173412323],[614397,0],[614398,0.3072371184825897],[614399,0]]},\"fiberColor\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,0.4494512677192688],[1,0.38087210059165955],[2,0.29578420519828796],[460800,0.42859527468681335],[921597,0.4094361662864685],[921598,0.34696266055107117],[921599,0.26945021748542786]]},\"fibreNormal\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.5746821165084839],[1,0.6688756346702576],[2,0.47153568267822266],[460800,0.6001878976821899],[921597,0.3346957266330719],[921598,-0.8262190818786621],[921599,0.45314550399780273]]},\"$index\":{\"count\":24,\"itemSize\":1,\"version\":0,\"bytes\":48,\"sample\":[[0,0],[1,2],[2,1],[12,4],[21,8],[22,9],[23,7]]}},\"instanceCount\":307200},\"material\":{\"uuid\":\"96b086e6-da42-49a9-b4bf-8ed528edf3e8\",\"version\":1,\"vertexShader\":\"varying vec3 vShadowWorld;\\nattribute vec3 fibreNormal;varying vec3 vRootNormal;\\nattribute vec3 root,strand,curve,fiberColor;attribute vec2 identity;uniform float uLength,uDensity;uniform vec2 uSize;varying float vEdge,vAlpha;varying vec3 vT,vC;\\n void main(){float t=position.x;vec3 p=root+uLength*(strand*t+curve*t*t);vec3 tangent=normalize(strand+2.*curve*t);vec4 mv=modelViewMatrix*vec4(p,1.);vec3 tv=normalize(mat3(modelViewMatrix)*tangent);vec2 across=vec2(-tv.y,tv.x);across/=max(length(across),.00001);vec4 cp=projectionMatrix*mv;\\n float actual=projectionMatrix[1][1]*.000035/max(-mv.z,.00001)*uSize.y*.5;float width=max(.7,actual)*(1.-.75*t);cp.xy+=across*position.y*width/uSize*cp.w;vShadowWorld=(modelMatrix*vec4(p,1.)).xyz;gl_Position=cp;\\n vAlpha=min(1.,actual/.7)*(1.-t*.35)*smoothstep(identity.x-.12,identity.x+.12,uDensity)*.94;vEdge=position.y;vT=normalize(mat3(modelMatrix)*tangent);vC=fiberColor;vRootNormal=normalize(mat3(modelMatrix)*fibreNormal);}\",\"fragmentShader\":\"\\n#include <packing>\\nuniform sampler2D uKS,uRS;uniform mat4 uKM,uRM;uniform vec2 uShadowStep;uniform float uShadowReady;varying vec3 vShadowWorld;\\nfloat coatShadow(sampler2D tex,mat4 matrix){\\n if(uShadowReady<.5)return 1.;vec4 h=matrix*vec4(vShadowWorld,1.);vec3 q=h.xyz/h.w;\\n if(q.x<0.||q.y<0.||q.x>1.||q.y>1.||q.z<0.||q.z>1.)return 1.;\\n float z=q.z-.000075;vec2 d=uShadowStep*.6;\\n return .25*(step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(-d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,-d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy-vec2(d.x,d.y)))));\\n}\\n\\nvarying vec3 vRootNormal;uniform vec3 uED[8],uEC[8];\\nuniform vec3 uKeyDir,uRimDir,uKey,uRim;uniform float uEnv;varying float vEdge,vAlpha;varying vec3 vT,vC;\\n void main(){float alpha=vAlpha*(1.-smoothstep(.45,1.,abs(vEdge)));if(alpha<.003)discard;vec3 T=normalize(vT);float a=sqrt(max(0.,1.-pow(dot(T,uKeyDir),2.))),b=sqrt(max(0.,1.-pow(dot(T,uRimDir),2.)));vec3 N=normalize(vRootNormal);float nl=dot(N,uKeyDir),nr=dot(N,uRimDir);\\n vec3 light=(uKey*(.55*max(nl,0.)+.45*a*clamp(.55+.55*nl,0.,1.))*coatShadow(uKS,uKM)+uRim*(.55*max(nr,0.)+.45*b*clamp(.55+.55*nr,0.,1.))*coatShadow(uRS,uRM))/3.14159265;\\n for(int i=0;i<8;i++){float nd=dot(N,uED[i]),cyl=sqrt(max(0.,1.-pow(dot(T,uED[i]),2.)));light+=uEC[i]*(.55*max(nd,0.)+.45*cyl*clamp(.55+.55*nd,0.,1.));}gl_FragColor=vec4(vC*light,alpha);\\n#include <tonemapping_fragment>\\n #include <colorspace_fragment>\\n }\",\"uniforms\":{\"uDensity\":1,\"uLength\":1.6,\"uSize\":[840,694],\"uKeyDir\":[-0.434104948922847,0.13917310096006544,-0.8900470444250977],\"uRimDir\":[0.9271572452736083,0.19611612702563078,0.3192458414092824],\"uKey\":[1.6,1.6,1.6],\"uRim\":[3.021050247089358,1.2818840845959383,0.7302290455083952],\"uEnv\":0.9,\"uED\":[[0.31786820574858127,-0.624727649563991,-0.7132146715011047],[0.7134569348331669,-0.6247754365161488,0.3172299734648638],[0.43579017774572676,0.79408569857729,-0.4236918978401233],[0.6085364163594105,0.7933648219674466,0.015990285457367887],[-0.7425351710166515,-0.5751560030551013,-0.3432740770185722],[-0.31553775074725354,-0.4224695972243506,0.8496795674102438],[-0.7193724792371339,0.5618815687266665,-0.4084021778118716],[-0.2740391168904082,0.3712424378768982,0.8871762027540767]],\"uEC\":[[0.0213997604142558,0.0213997604142558,0.0213997604142558],[0.02139712588067395,0.02139712588067395,0.02139712588067395],[0.31951581574891896,0.31951581574891896,0.31951581574891896],[0.31613638720734727,0.31613638720734727,0.31613638720734727],[0.023714527228268,0.023714527228268,0.023714527228268],[0.03426132720224819,0.03426132720224819,0.03426132720224819],[0.6110197640858231,0.6110197640858231,0.6110197640858231],[0.25868814234644927,0.25868814234644927,0.25868814234644927]],\"uKS\":{\"texture\":\"e9659df4-3e4f-4761-9ceb-1b5b1d65e7b5\",\"version\":1,\"width\":2048,\"height\":2048},\"uRS\":{\"texture\":\"590e7271-5648-4e52-8447-32e1ee6073c4\",\"version\":1,\"width\":2048,\"height\":2048},\"uKM\":[-3.5246825345065367,0.23925283086296428,0.6399896047808445,0,2.7211348642773437e-17,3.883404191143413,-0.2051792731240829,0,1.7191025364277537,0.4905409982270576,1.3121731452529821,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uRM\":[1.2767378606163007,-0.7271821218718788,-1.3668837465334047,0,-5.442269728554689e-17,3.845414420836984,-0.2891288913837989,0,-3.707915982742419,-0.25038888445105856,-0.470655818088283,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uShadowStep\":[0.00048828125,0.00048828125],\"uShadowReady\":1}}},{\"uuid\":\"8680eaa9-480f-47d8-b3ef-1288c9a328b5\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"b3c7248b-f646-4274-b4c0-cae545833e33\",\"index\":{\"count\":384,\"version\":0},\"attributes\":{\"position\":{\"count\":130,\"itemSize\":3,\"version\":0,\"bytes\":1560,\"sample\":[[0,0],[1,-1],[2,0],[195,0.5],[387,1],[388,1],[389,0]]},\"fibreMeta\":{\"count\":30720,\"itemSize\":4,\"version\":0,\"bytes\":491520,\"sample\":[[0,0],[1,0.0025718621909618378],[2,0.44890686869621277],[61440,160],[122877,0.9941567182540894],[122878,0.7982668280601501],[122879,0.502374529838562]]},\"fibreDye\":{\"count\":30720,\"itemSize\":3,\"version\":0,\"bytes\":368640,\"sample\":[[0,0.39388689398765564],[1,0.3337859511375427],[2,0.259217232465744],[46080,0.39264869689941406],[92157,0.4099348187446594],[92158,0.3473852276802063],[92159,0.26977840065956116]]},\"$index\":{\"count\":384,\"itemSize\":1,\"version\":0,\"bytes\":768,\"sample\":[[0,0],[1,2],[2,1],[192,64],[381,128],[382,129],[383,127]]}},\"instanceCount\":30720},\"material\":{\"uuid\":\"f5ef4a29-ebff-4957-82fc-3d3f7ab970d5\",\"version\":1,\"vertexShader\":\"varying vec3 vShadowWorld;\\n\\n attribute vec4 fibreMeta;attribute vec3 fibreDye;\\n uniform sampler2D uFrames;uniform vec2 uTableSize,uSize;uniform float uRadius,uTwist,uDetail;\\n varying vec3 vT,vN,vC;varying float vEdge,vCoverage;\\n vec3 surface(float t,out vec3 n,out vec3 tang){\\n  float x=(clamp(t,0.,1.)*(uTableSize.x-1.)+.5)/uTableSize.x;\\n  vec4 p=texture2D(uFrames,vec2(x,(fibreMeta.x*3.+.5)/uTableSize.y));\\n  vec3 B=normalize(texture2D(uFrames,vec2(x,(fibreMeta.x*3.+1.5)/uTableSize.y)).xyz);\\n  vec3 N=normalize(texture2D(uFrames,vec2(x,(fibreMeta.x*3.+2.5)/uTableSize.y)).xyz);\\n  float angle=fibreMeta.y*6.2831853-t*6.2831853*uTwist*1.6+.075*sin(t*57.+fibreMeta.z*27.);\\n  n=normalize(B*cos(angle)+N*sin(angle));\\n  float da=-6.2831853*uTwist*1.6+4.275*cos(t*57.+fibreMeta.z*27.);\\n  tang=normalize(cross(N,B)+(-B*sin(angle)+N*cos(angle))*(uRadius*da/.025));\\n  float breathe=1.+.038*sin(t*21.+p.w)+.022*sin(t*49.+p.w*3.);\\n  float envelope=1.+.055*cos(3.*(angle+t*6.2831853*2.8*uTwist))+.022*sin(5.*angle+p.w+t*11.);\\n  float crimp=.000012*sin(t*145.+fibreMeta.z*47.)+.000007*sin(t*283.+fibreMeta.w*35.);\\n  return p.xyz+n*(uRadius*breathe*envelope+.000095+crimp);\\n }\\n void main(){\\n  float t=position.x;vec3 n,T;vec3 p=surface(t,n,T);\\n  vec4 mv=modelViewMatrix*vec4(p,1.);vec4 cp=projectionMatrix*mv;\\n  vec3 tv=normalize(mat3(modelViewMatrix)*T);vec2 across=vec2(-tv.y,tv.x);across/=max(length(across),.00001);\\n  float actual=projectionMatrix[1][1]*(.000030+.000008*fibreMeta.w)/max(-mv.z,.00001)*uSize.y*.5;\\n  float width=max(.8,actual);cp.xy+=across*position.y*width/uSize*cp.w;\\n  vShadowWorld=(modelMatrix*vec4(p,1.)).xyz;gl_Position=cp;vEdge=position.y;\\n  vCoverage=min(1.,actual/.8)*uDetail*.96;\\n  vT=normalize(mat3(modelMatrix)*T);vN=normalize(mat3(modelMatrix)*n);vC=fibreDye;\\n }\\n \",\"fragmentShader\":\"\\n#include <packing>\\nuniform sampler2D uKS,uRS;uniform mat4 uKM,uRM;uniform vec2 uShadowStep;uniform float uShadowReady;varying vec3 vShadowWorld;\\nfloat coatShadow(sampler2D tex,mat4 matrix){\\n if(uShadowReady<.5)return 1.;vec4 h=matrix*vec4(vShadowWorld,1.);vec3 q=h.xyz/h.w;\\n if(q.x<0.||q.y<0.||q.x>1.||q.y>1.||q.z<0.||q.z>1.)return 1.;\\n float z=q.z-.000075;vec2 d=uShadowStep*.6;\\n return .25*(step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(-d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,-d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy-vec2(d.x,d.y)))));\\n}\\n\\n\\n uniform vec3 uKeyDir,uRimDir,uKey,uRim,uED[8],uEC[8];\\n varying vec3 vT,vN,vC;varying float vEdge,vCoverage;\\n vec3 response(vec3 L,vec3 radiance){\\n  float nd=dot(normalize(vN),L),cylinder=sqrt(max(0.,1.-pow(dot(normalize(vT),L),2.)));\\n  return radiance*(.64*max(nd,0.)+.36*cylinder*clamp(.55+.55*nd,0.,1.))/3.141592654;\\n }\\n void main(){\\n  float alpha=clamp(vCoverage*(1.-smoothstep(.45,1.,abs(vEdge))),0.,.96);if(alpha<.002)discard;\\n  vec3 light=response(uKeyDir,uKey)*coatShadow(uKS,uKM)+response(uRimDir,uRim)*coatShadow(uRS,uRM);\\n  for(int i=0;i<8;i++)light+=response(uED[i],uEC[i]*3.141592654);\\n  gl_FragColor=vec4(vC*light,alpha);\\n  #include <tonemapping_fragment>\\n  #include <colorspace_fragment>\\n }\\n \",\"uniforms\":{\"uFrames\":{\"texture\":\"f828f012-7580-4213-a300-b45009709d47\",\"version\":1,\"width\":97,\"height\":960},\"uTableSize\":[97,960],\"uRadius\":0.00086,\"uTwist\":0.55,\"uDetail\":1,\"uSize\":[840,694],\"uKeyDir\":[-0.434104948922847,0.13917310096006544,-0.8900470444250977],\"uRimDir\":[0.9271572452736083,0.19611612702563078,0.3192458414092824],\"uKey\":[1.6,1.6,1.6],\"uRim\":[3.021050247089358,1.2818840845959383,0.7302290455083952],\"uED\":[[0.31786820574858127,-0.624727649563991,-0.7132146715011047],[0.7134569348331669,-0.6247754365161488,0.3172299734648638],[0.43579017774572676,0.79408569857729,-0.4236918978401233],[0.6085364163594105,0.7933648219674466,0.015990285457367887],[-0.7425351710166515,-0.5751560030551013,-0.3432740770185722],[-0.31553775074725354,-0.4224695972243506,0.8496795674102438],[-0.7193724792371339,0.5618815687266665,-0.4084021778118716],[-0.2740391168904082,0.3712424378768982,0.8871762027540767]],\"uEC\":[[0.0213997604142558,0.0213997604142558,0.0213997604142558],[0.02139712588067395,0.02139712588067395,0.02139712588067395],[0.31951581574891896,0.31951581574891896,0.31951581574891896],[0.31613638720734727,0.31613638720734727,0.31613638720734727],[0.023714527228268,0.023714527228268,0.023714527228268],[0.03426132720224819,0.03426132720224819,0.03426132720224819],[0.6110197640858231,0.6110197640858231,0.6110197640858231],[0.25868814234644927,0.25868814234644927,0.25868814234644927]],\"uKS\":{\"texture\":\"e9659df4-3e4f-4761-9ceb-1b5b1d65e7b5\",\"version\":1,\"width\":2048,\"height\":2048},\"uRS\":{\"texture\":\"590e7271-5648-4e52-8447-32e1ee6073c4\",\"version\":1,\"width\":2048,\"height\":2048},\"uKM\":[-3.5246825345065367,0.23925283086296428,0.6399896047808445,0,2.7211348642773437e-17,3.883404191143413,-0.2051792731240829,0,1.7191025364277537,0.4905409982270576,1.3121731452529821,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uRM\":[1.2767378606163007,-0.7271821218718788,-1.3668837465334047,0,-5.442269728554689e-17,3.845414420836984,-0.2891288913837989,0,-3.707915982742419,-0.25038888445105856,-0.470655818088283,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uShadowStep\":[0.00048828125,0.00048828125],\"uShadowReady\":1}}}]}",
+        "after": "{\"settings\":{\"fuzz\":1,\"length\":1.6,\"detail\":1,\"twist\":0.55,\"mottle\":0.18,\"pattern\":\"stripe\",\"color\":\"#d3c4af\",\"shape\":\"jersey\",\"mode\":\"fiber\"},\"ready\":true,\"dirty\":false,\"building\":false,\"builds\":2,\"frames\":6,\"camera\":{\"position\":[0.1702077883605926,0.04622927585102516,0.11347185890706173],\"matrix\":[0.5478763552337971,0,-0.8365593220900297,0,-0.1853533682590255,0.9751453055858087,-0.12139094640455621,0,0.8157668957801391,0.22156631737238347,0.5342590558477003,0,0.1702077883605926,0.04622927585102516,0.11347185890706173,1],\"world\":[0.5478763552337971,0,-0.8365593220900297,0,-0.1853533682590255,0.9751453055858087,-0.12139094640455621,0,0.8157668957801391,0.22156631737238347,0.5342590558477003,0,0.1702077883605926,0.04622927585102516,0.11347185890706173,1],\"projection\":[2.7023472824142782,0,0,0,0,3.2708526184841404,0,0,0,0,-1.0000800032001282,-1,0,0,-0.0016000640025601025,0],\"target\":[0,0,0.002]},\"objects\":[{\"uuid\":\"46b55e71-a4b5-4dbf-b657-7955a2d3e23b\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"2f9d50bb-5f02-4bb1-9e75-adc57ac17ec9\",\"index\":{\"count\":1474560,\"version\":0},\"attributes\":{\"position\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,-0.04664108157157898],[1,-0.03063358925282955],[2,-0.0029425465036183596],[405600,-0.04666632413864136],[811197,0.04664163291454315],[811198,0.02446454018354416],[811199,-0.00022771993826609105]]},\"normal\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,-0.28156334161758423],[1,-0.9595426321029663],[2,0],[405600,-0.28156334161758423],[811197,0.28156334161758423],[811198,-0.9595426321029663],[811199,-1.3257757043446349e-16]]},\"uv\":{\"count\":270400,\"itemSize\":2,\"version\":0,\"bytes\":2163200,\"sample\":[[0,0.06109322980046272],[1,0],[2,0.06109322980046272],[270400,0.043867893517017365],[540797,0.9166666865348816],[540798,9.084851264953613],[540799,1]]},\"color\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,0.4494512677192688],[1,0.38087210059165955],[2,0.29578420519828796],[405600,0.42859527468681335],[811197,0.4094361662864685],[811198,0.34696266055107117],[811199,0.26945021748542786]]},\"$index\":{\"count\":1474560,\"itemSize\":1,\"version\":0,\"bytes\":5898240,\"sample\":[[0,0],[1,13],[2,1],[737280,135200],[1474557,270398],[1474558,270399],[1474559,270386]]}},\"instanceCount\":null},\"material\":{\"uuid\":\"4ea6ae2b-63cf-4c53-ac57-05ce02052c1c\",\"version\":3,\"roughness\":0.88,\"sheen\":1,\"uniforms\":{}}},{\"uuid\":\"041315bf-987a-481b-afb3-1e1319d03304\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"2b9718ab-f572-4a64-80ce-568f93777822\",\"index\":{\"count\":24,\"version\":0},\"attributes\":{\"position\":{\"count\":10,\"itemSize\":3,\"version\":0,\"bytes\":120,\"sample\":[[0,0],[1,-1],[2,0],[15,0.5],[27,1],[28,1],[29,0]]},\"root\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.04640504717826843],[1,-0.029496248811483383],[2,-0.0016808643704280257],[460800,-0.044539302587509155],[921597,0.04315744712948799],[921598,0.030378475785255432],[921599,-0.00005324902303982526]]},\"strand\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.0003369170881342143],[1,0.0004800652386620641],[2,0.0005143184098415077],[460800,0.00045165183837525547],[921597,-0.0003809058398474008],[921598,-0.0009027585037983954],[921599,0.0005344742094166577]]},\"curve\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.0000993479770841077],[1,-0.00008528455509804189],[2,0.00004773916589329019],[460800,-0.00012233914458192885],[921597,-0.00007148965232772753],[921598,0.00044487728155218065],[921599,0.0002593219978734851]]},\"identity\":{\"count\":307200,\"itemSize\":2,\"version\":0,\"bytes\":2457600,\"sample\":[[0,0.6109322905540466],[1,0],[2,0.4451965391635895],[307200,0.64989173412323],[614397,0],[614398,0.3072371184825897],[614399,0]]},\"fiberColor\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,0.4494512677192688],[1,0.38087210059165955],[2,0.29578420519828796],[460800,0.42859527468681335],[921597,0.4094361662864685],[921598,0.34696266055107117],[921599,0.26945021748542786]]},\"fibreNormal\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.5746821165084839],[1,0.6688756346702576],[2,0.47153568267822266],[460800,0.6001878976821899],[921597,0.3346957266330719],[921598,-0.8262190818786621],[921599,0.45314550399780273]]},\"$index\":{\"count\":24,\"itemSize\":1,\"version\":0,\"bytes\":48,\"sample\":[[0,0],[1,2],[2,1],[12,4],[21,8],[22,9],[23,7]]}},\"instanceCount\":307200},\"material\":{\"uuid\":\"96b086e6-da42-49a9-b4bf-8ed528edf3e8\",\"version\":1,\"vertexShader\":\"varying vec3 vShadowWorld;\\nattribute vec3 fibreNormal;varying vec3 vRootNormal;\\nattribute vec3 root,strand,curve,fiberColor;attribute vec2 identity;uniform float uLength,uDensity;uniform vec2 uSize;varying float vEdge,vAlpha;varying vec3 vT,vC;\\n void main(){float t=position.x;vec3 p=root+uLength*(strand*t+curve*t*t);vec3 tangent=normalize(strand+2.*curve*t);vec4 mv=modelViewMatrix*vec4(p,1.);vec3 tv=normalize(mat3(modelViewMatrix)*tangent);vec2 across=vec2(-tv.y,tv.x);across/=max(length(across),.00001);vec4 cp=projectionMatrix*mv;\\n float actual=projectionMatrix[1][1]*.000035/max(-mv.z,.00001)*uSize.y*.5;float width=max(.7,actual)*(1.-.75*t);cp.xy+=across*position.y*width/uSize*cp.w;vShadowWorld=(modelMatrix*vec4(p,1.)).xyz;gl_Position=cp;\\n vAlpha=min(1.,actual/.7)*(1.-t*.35)*smoothstep(identity.x-.12,identity.x+.12,uDensity)*.94;vEdge=position.y;vT=normalize(mat3(modelMatrix)*tangent);vC=fiberColor;vRootNormal=normalize(mat3(modelMatrix)*fibreNormal);}\",\"fragmentShader\":\"\\n#include <packing>\\nuniform sampler2D uKS,uRS;uniform mat4 uKM,uRM;uniform vec2 uShadowStep;uniform float uShadowReady;varying vec3 vShadowWorld;\\nfloat coatShadow(sampler2D tex,mat4 matrix){\\n if(uShadowReady<.5)return 1.;vec4 h=matrix*vec4(vShadowWorld,1.);vec3 q=h.xyz/h.w;\\n if(q.x<0.||q.y<0.||q.x>1.||q.y>1.||q.z<0.||q.z>1.)return 1.;\\n float z=q.z-.000075;vec2 d=uShadowStep*.6;\\n return .25*(step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(-d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,-d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy-vec2(d.x,d.y)))));\\n}\\n\\nvarying vec3 vRootNormal;uniform vec3 uED[8],uEC[8];\\nuniform vec3 uKeyDir,uRimDir,uKey,uRim;uniform float uEnv;varying float vEdge,vAlpha;varying vec3 vT,vC;\\n void main(){float alpha=vAlpha*(1.-smoothstep(.45,1.,abs(vEdge)));if(alpha<.003)discard;vec3 T=normalize(vT);float a=sqrt(max(0.,1.-pow(dot(T,uKeyDir),2.))),b=sqrt(max(0.,1.-pow(dot(T,uRimDir),2.)));vec3 N=normalize(vRootNormal);float nl=dot(N,uKeyDir),nr=dot(N,uRimDir);\\n vec3 light=(uKey*(.55*max(nl,0.)+.45*a*clamp(.55+.55*nl,0.,1.))*coatShadow(uKS,uKM)+uRim*(.55*max(nr,0.)+.45*b*clamp(.55+.55*nr,0.,1.))*coatShadow(uRS,uRM))/3.14159265;\\n for(int i=0;i<8;i++){float nd=dot(N,uED[i]),cyl=sqrt(max(0.,1.-pow(dot(T,uED[i]),2.)));light+=uEC[i]*(.55*max(nd,0.)+.45*cyl*clamp(.55+.55*nd,0.,1.));}gl_FragColor=vec4(vC*light,alpha);\\n#include <tonemapping_fragment>\\n #include <colorspace_fragment>\\n }\",\"uniforms\":{\"uDensity\":1,\"uLength\":1.6,\"uSize\":[840,694],\"uKeyDir\":[-0.434104948922847,0.13917310096006544,-0.8900470444250977],\"uRimDir\":[0.9271572452736083,0.19611612702563078,0.3192458414092824],\"uKey\":[1.6,1.6,1.6],\"uRim\":[3.021050247089358,1.2818840845959383,0.7302290455083952],\"uEnv\":0.9,\"uED\":[[0.31786820574858127,-0.624727649563991,-0.7132146715011047],[0.7134569348331669,-0.6247754365161488,0.3172299734648638],[0.43579017774572676,0.79408569857729,-0.4236918978401233],[0.6085364163594105,0.7933648219674466,0.015990285457367887],[-0.7425351710166515,-0.5751560030551013,-0.3432740770185722],[-0.31553775074725354,-0.4224695972243506,0.8496795674102438],[-0.7193724792371339,0.5618815687266665,-0.4084021778118716],[-0.2740391168904082,0.3712424378768982,0.8871762027540767]],\"uEC\":[[0.0213997604142558,0.0213997604142558,0.0213997604142558],[0.02139712588067395,0.02139712588067395,0.02139712588067395],[0.31951581574891896,0.31951581574891896,0.31951581574891896],[0.31613638720734727,0.31613638720734727,0.31613638720734727],[0.023714527228268,0.023714527228268,0.023714527228268],[0.03426132720224819,0.03426132720224819,0.03426132720224819],[0.6110197640858231,0.6110197640858231,0.6110197640858231],[0.25868814234644927,0.25868814234644927,0.25868814234644927]],\"uKS\":{\"texture\":\"e9659df4-3e4f-4761-9ceb-1b5b1d65e7b5\",\"version\":1,\"width\":2048,\"height\":2048},\"uRS\":{\"texture\":\"590e7271-5648-4e52-8447-32e1ee6073c4\",\"version\":1,\"width\":2048,\"height\":2048},\"uKM\":[-3.5246825345065367,0.23925283086296428,0.6399896047808445,0,2.7211348642773437e-17,3.883404191143413,-0.2051792731240829,0,1.7191025364277537,0.4905409982270576,1.3121731452529821,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uRM\":[1.2767378606163007,-0.7271821218718788,-1.3668837465334047,0,-5.442269728554689e-17,3.845414420836984,-0.2891288913837989,0,-3.707915982742419,-0.25038888445105856,-0.470655818088283,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uShadowStep\":[0.00048828125,0.00048828125],\"uShadowReady\":1}}},{\"uuid\":\"8680eaa9-480f-47d8-b3ef-1288c9a328b5\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"b3c7248b-f646-4274-b4c0-cae545833e33\",\"index\":{\"count\":384,\"version\":0},\"attributes\":{\"position\":{\"count\":130,\"itemSize\":3,\"version\":0,\"bytes\":1560,\"sample\":[[0,0],[1,-1],[2,0],[195,0.5],[387,1],[388,1],[389,0]]},\"fibreMeta\":{\"count\":30720,\"itemSize\":4,\"version\":0,\"bytes\":491520,\"sample\":[[0,0],[1,0.0025718621909618378],[2,0.44890686869621277],[61440,160],[122877,0.9941567182540894],[122878,0.7982668280601501],[122879,0.502374529838562]]},\"fibreDye\":{\"count\":30720,\"itemSize\":3,\"version\":0,\"bytes\":368640,\"sample\":[[0,0.39388689398765564],[1,0.3337859511375427],[2,0.259217232465744],[46080,0.39264869689941406],[92157,0.4099348187446594],[92158,0.3473852276802063],[92159,0.26977840065956116]]},\"$index\":{\"count\":384,\"itemSize\":1,\"version\":0,\"bytes\":768,\"sample\":[[0,0],[1,2],[2,1],[192,64],[381,128],[382,129],[383,127]]}},\"instanceCount\":30720},\"material\":{\"uuid\":\"f5ef4a29-ebff-4957-82fc-3d3f7ab970d5\",\"version\":1,\"vertexShader\":\"varying vec3 vShadowWorld;\\n\\n attribute vec4 fibreMeta;attribute vec3 fibreDye;\\n uniform sampler2D uFrames;uniform vec2 uTableSize,uSize;uniform float uRadius,uTwist,uDetail;\\n varying vec3 vT,vN,vC;varying float vEdge,vCoverage;\\n vec3 surface(float t,out vec3 n,out vec3 tang){\\n  float x=(clamp(t,0.,1.)*(uTableSize.x-1.)+.5)/uTableSize.x;\\n  vec4 p=texture2D(uFrames,vec2(x,(fibreMeta.x*3.+.5)/uTableSize.y));\\n  vec3 B=normalize(texture2D(uFrames,vec2(x,(fibreMeta.x*3.+1.5)/uTableSize.y)).xyz);\\n  vec3 N=normalize(texture2D(uFrames,vec2(x,(fibreMeta.x*3.+2.5)/uTableSize.y)).xyz);\\n  float angle=fibreMeta.y*6.2831853-t*6.2831853*uTwist*1.6+.075*sin(t*57.+fibreMeta.z*27.);\\n  n=normalize(B*cos(angle)+N*sin(angle));\\n  float da=-6.2831853*uTwist*1.6+4.275*cos(t*57.+fibreMeta.z*27.);\\n  tang=normalize(cross(N,B)+(-B*sin(angle)+N*cos(angle))*(uRadius*da/.025));\\n  float breathe=1.+.038*sin(t*21.+p.w)+.022*sin(t*49.+p.w*3.);\\n  float envelope=1.+.055*cos(3.*(angle+t*6.2831853*2.8*uTwist))+.022*sin(5.*angle+p.w+t*11.);\\n  float crimp=.000012*sin(t*145.+fibreMeta.z*47.)+.000007*sin(t*283.+fibreMeta.w*35.);\\n  return p.xyz+n*(uRadius*breathe*envelope+.000095+crimp);\\n }\\n void main(){\\n  float t=position.x;vec3 n,T;vec3 p=surface(t,n,T);\\n  vec4 mv=modelViewMatrix*vec4(p,1.);vec4 cp=projectionMatrix*mv;\\n  vec3 tv=normalize(mat3(modelViewMatrix)*T);vec2 across=vec2(-tv.y,tv.x);across/=max(length(across),.00001);\\n  float actual=projectionMatrix[1][1]*(.000030+.000008*fibreMeta.w)/max(-mv.z,.00001)*uSize.y*.5;\\n  float width=max(.8,actual);cp.xy+=across*position.y*width/uSize*cp.w;\\n  vShadowWorld=(modelMatrix*vec4(p,1.)).xyz;gl_Position=cp;vEdge=position.y;\\n  vCoverage=min(1.,actual/.8)*uDetail*.96;\\n  vT=normalize(mat3(modelMatrix)*T);vN=normalize(mat3(modelMatrix)*n);vC=fibreDye;\\n }\\n \",\"fragmentShader\":\"\\n#include <packing>\\nuniform sampler2D uKS,uRS;uniform mat4 uKM,uRM;uniform vec2 uShadowStep;uniform float uShadowReady;varying vec3 vShadowWorld;\\nfloat coatShadow(sampler2D tex,mat4 matrix){\\n if(uShadowReady<.5)return 1.;vec4 h=matrix*vec4(vShadowWorld,1.);vec3 q=h.xyz/h.w;\\n if(q.x<0.||q.y<0.||q.x>1.||q.y>1.||q.z<0.||q.z>1.)return 1.;\\n float z=q.z-.000075;vec2 d=uShadowStep*.6;\\n return .25*(step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(-d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,-d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy-vec2(d.x,d.y)))));\\n}\\n\\n\\n uniform vec3 uKeyDir,uRimDir,uKey,uRim,uED[8],uEC[8];\\n varying vec3 vT,vN,vC;varying float vEdge,vCoverage;\\n vec3 response(vec3 L,vec3 radiance){\\n  float nd=dot(normalize(vN),L),cylinder=sqrt(max(0.,1.-pow(dot(normalize(vT),L),2.)));\\n  return radiance*(.64*max(nd,0.)+.36*cylinder*clamp(.55+.55*nd,0.,1.))/3.141592654;\\n }\\n void main(){\\n  float alpha=clamp(vCoverage*(1.-smoothstep(.45,1.,abs(vEdge))),0.,.96);if(alpha<.002)discard;\\n  vec3 light=response(uKeyDir,uKey)*coatShadow(uKS,uKM)+response(uRimDir,uRim)*coatShadow(uRS,uRM);\\n  for(int i=0;i<8;i++)light+=response(uED[i],uEC[i]*3.141592654);\\n  gl_FragColor=vec4(vC*light,alpha);\\n  #include <tonemapping_fragment>\\n  #include <colorspace_fragment>\\n }\\n \",\"uniforms\":{\"uFrames\":{\"texture\":\"f828f012-7580-4213-a300-b45009709d47\",\"version\":1,\"width\":97,\"height\":960},\"uTableSize\":[97,960],\"uRadius\":0.00086,\"uTwist\":0.55,\"uDetail\":1,\"uSize\":[840,694],\"uKeyDir\":[-0.434104948922847,0.13917310096006544,-0.8900470444250977],\"uRimDir\":[0.9271572452736083,0.19611612702563078,0.3192458414092824],\"uKey\":[1.6,1.6,1.6],\"uRim\":[3.021050247089358,1.2818840845959383,0.7302290455083952],\"uED\":[[0.31786820574858127,-0.624727649563991,-0.7132146715011047],[0.7134569348331669,-0.6247754365161488,0.3172299734648638],[0.43579017774572676,0.79408569857729,-0.4236918978401233],[0.6085364163594105,0.7933648219674466,0.015990285457367887],[-0.7425351710166515,-0.5751560030551013,-0.3432740770185722],[-0.31553775074725354,-0.4224695972243506,0.8496795674102438],[-0.7193724792371339,0.5618815687266665,-0.4084021778118716],[-0.2740391168904082,0.3712424378768982,0.8871762027540767]],\"uEC\":[[0.0213997604142558,0.0213997604142558,0.0213997604142558],[0.02139712588067395,0.02139712588067395,0.02139712588067395],[0.31951581574891896,0.31951581574891896,0.31951581574891896],[0.31613638720734727,0.31613638720734727,0.31613638720734727],[0.023714527228268,0.023714527228268,0.023714527228268],[0.03426132720224819,0.03426132720224819,0.03426132720224819],[0.6110197640858231,0.6110197640858231,0.6110197640858231],[0.25868814234644927,0.25868814234644927,0.25868814234644927]],\"uKS\":{\"texture\":\"e9659df4-3e4f-4761-9ceb-1b5b1d65e7b5\",\"version\":1,\"width\":2048,\"height\":2048},\"uRS\":{\"texture\":\"590e7271-5648-4e52-8447-32e1ee6073c4\",\"version\":1,\"width\":2048,\"height\":2048},\"uKM\":[-3.5246825345065367,0.23925283086296428,0.6399896047808445,0,2.7211348642773437e-17,3.883404191143413,-0.2051792731240829,0,1.7191025364277537,0.4905409982270576,1.3121731452529821,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uRM\":[1.2767378606163007,-0.7271821218718788,-1.3668837465334047,0,-5.442269728554689e-17,3.845414420836984,-0.2891288913837989,0,-3.707915982742419,-0.25038888445105856,-0.470655818088283,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uShadowStep\":[0.00048828125,0.00048828125],\"uShadowReady\":1}}}]}",
+        "scope": "metadata, selected geometry samples, state/material/shader data",
+        "notChecked": [
+          "driver internal state",
+          "every GPU texture texel",
+          "physical specimen properties"
+        ],
+        "method": "same synchronous task; FNV-1a for optional full CPU arrays; source provenance separately pinned by SHA256"
+      },
+      "extensions": {
+        "owner": "knit-public-p02",
+        "originalExport": {
+          "schema": "kaopu/reality-workbench-export@1",
+          "exporterVersion": "0.3.1-b",
+          "objectId": "fabric-knit-public-p02-c2",
+          "domain": "fabric",
+          "family": "knit",
+          "source": {
+            "repository": "haihao0307/guilin-dem-pipeline",
+            "commit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+            "path": "kaopu-fabric-workbench/knit-public-p02/index.html",
+            "sha256": "aff46d61deae59656fd4605356bd04b62789db8c64c3cf88ffd729d16f201ee1"
+          },
+          "capture": {
+            "capturedAt": "2026-10-20T04:00:25.505Z",
+            "sequence": 8,
+            "nativeFrame": 6,
+            "nativeBuild": 2,
+            "elapsedMs": 0.7000000000116415,
+            "integrityMode": "metadata_and_samples"
+          },
+          "measurements": [
+            {
+              "id": "knit.grid_columns",
+              "label": "生成针目列数",
+              "value": 16,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "源拓扑列数；与实际载纱顶点布局核对"
+            },
+            {
+              "id": "knit.grid_rows",
+              "label": "生成针目行数",
+              "value": 20,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "源拓扑行数；与实际载纱顶点布局核对"
+            },
+            {
+              "id": "knit.column_pitch_m",
+              "label": "生成列间距（局部 X 投影）",
+              "value": 0.005799999150137104,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际载纱网格相邻针目同一截面中心差；不是标准机号"
+            },
+            {
+              "id": "knit.row_pitch_m",
+              "label": "生成行间距（局部 Y 投影）",
+              "value": 0.0029000003511706965,
+              "unit": "m",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "实际载纱网格相邻针目截面中心差；不是成衣拉伸后的密度"
+            },
+            {
+              "id": "knit.carrier_nominal_diameter_m",
+              "label": "载纱名义直径",
+              "value": 0.00172,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "source_declared",
+              "method": "自有数字几何配方；截面存在起伏，非实物纱径"
+            },
+            {
+              "id": "knit.carrier_sample_diameter_m",
+              "label": "载纱截面采样直径",
+              "value": 0.0017045053183580405,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "第一个针目第16环上两个相对顶点距离；不是布料厚度"
+            },
+            {
+              "id": "knit.short_fiber_instances",
+              "label": "短绒几何实例数",
+              "value": 307200,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "数字代表纤维数量，不代表每根实物羊毛"
+            },
+            {
+              "id": "knit.surface_fiber_instances",
+              "label": "贴伏长纤维实例数",
+              "value": 30720,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "当前原生实例几何数量"
+            },
+            {
+              "id": "knit.fuzz_density_control",
+              "label": "当前短绒密度控制值",
+              "value": 1,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "当前材质输入；GPU实际上传值单独保存，隐藏模式不冒充正在绘制"
+            },
+            {
+              "id": "knit.length_multiplier",
+              "label": "当前短绒长度倍率",
+              "value": 1.6,
+              "unit": "1",
+              "status": "PASS",
+              "basis": "runtime_computed",
+              "method": "无量纲倍率，不是毫米"
+            },
+            {
+              "id": "knit.short_fiber_sample_offset_m",
+              "label": "短绒样本端点偏移（最近上传）",
+              "value": 0.0013019003792724326,
+              "unit": "m",
+              "status": "WARNING",
+              "basis": "runtime_computed",
+              "method": "按原shader root+length*(strand+curve)读取第0实例局部端点；非纤维弧长，隐藏模式只作最近上传记录"
+            },
+            {
+              "id": "knit.physical_thickness_m",
+              "label": "实物材料厚度",
+              "value": null,
+              "unit": "m",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "P02外观样片没有实物厚度证据，禁止借用R15估计"
+            },
+            {
+              "id": "knit.areal_density_g_m2",
+              "label": "实物面密度",
+              "value": null,
+              "unit": "g/m2",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "没有实物标定或本版本物理模型"
+            },
+            {
+              "id": "knit.linear_density_tex",
+              "label": "纱线 Tex",
+              "value": null,
+              "unit": "tex",
+              "status": "UNKNOWN",
+              "basis": "unknown",
+              "method": "几何载纱直径不能反推线密度"
+            }
+          ],
+          "requested": {
+            "fuzz": 1,
+            "length": 1.6,
+            "detail": 1,
+            "twist": 0.55,
+            "mottle": 0.18,
+            "pattern": "stripe",
+            "color": "#d3c4af",
+            "shape": "jersey",
+            "mode": "fiber"
+          },
+          "shaderInputs": {
+            "length": 1.600000023841858,
+            "density": 1,
+            "active": true
+          },
+          "geometry": {
+            "carrierVertices": 270400,
+            "carrierTriangles": 491520,
+            "gridColumns": 16,
+            "gridRows": 20,
+            "declaredColumnPitchM": 0.0058,
+            "declaredRowPitchM": 0.0029,
+            "nominalCarrierRadiusM": 0.00086,
+            "sampleStrand": [
+              -0.0003369170881342143,
+              0.0004800652386620641,
+              0.0005143184098415077
+            ],
+            "sampleCurve": [
+              -0.0000993479770841077,
+              -0.00008528455509804189,
+              0.00004773916589329019
+            ],
+            "shortInstances": 307200,
+            "surfaceInstances": 30720
+          },
+          "capabilities": {
+            "clothPhysics": false,
+            "materialSpaceBindingToGarment": false,
+            "physicalCalibration": false
+          },
+          "preservation": {
+            "passed": true,
+            "before": "{\"settings\":{\"fuzz\":1,\"length\":1.6,\"detail\":1,\"twist\":0.55,\"mottle\":0.18,\"pattern\":\"stripe\",\"color\":\"#d3c4af\",\"shape\":\"jersey\",\"mode\":\"fiber\"},\"ready\":true,\"dirty\":false,\"building\":false,\"builds\":2,\"frames\":6,\"camera\":{\"position\":[0.1702077883605926,0.04622927585102516,0.11347185890706173],\"matrix\":[0.5478763552337971,0,-0.8365593220900297,0,-0.1853533682590255,0.9751453055858087,-0.12139094640455621,0,0.8157668957801391,0.22156631737238347,0.5342590558477003,0,0.1702077883605926,0.04622927585102516,0.11347185890706173,1],\"world\":[0.5478763552337971,0,-0.8365593220900297,0,-0.1853533682590255,0.9751453055858087,-0.12139094640455621,0,0.8157668957801391,0.22156631737238347,0.5342590558477003,0,0.1702077883605926,0.04622927585102516,0.11347185890706173,1],\"projection\":[2.7023472824142782,0,0,0,0,3.2708526184841404,0,0,0,0,-1.0000800032001282,-1,0,0,-0.0016000640025601025,0],\"target\":[0,0,0.002]},\"objects\":[{\"uuid\":\"46b55e71-a4b5-4dbf-b657-7955a2d3e23b\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"2f9d50bb-5f02-4bb1-9e75-adc57ac17ec9\",\"index\":{\"count\":1474560,\"version\":0},\"attributes\":{\"position\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,-0.04664108157157898],[1,-0.03063358925282955],[2,-0.0029425465036183596],[405600,-0.04666632413864136],[811197,0.04664163291454315],[811198,0.02446454018354416],[811199,-0.00022771993826609105]]},\"normal\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,-0.28156334161758423],[1,-0.9595426321029663],[2,0],[405600,-0.28156334161758423],[811197,0.28156334161758423],[811198,-0.9595426321029663],[811199,-1.3257757043446349e-16]]},\"uv\":{\"count\":270400,\"itemSize\":2,\"version\":0,\"bytes\":2163200,\"sample\":[[0,0.06109322980046272],[1,0],[2,0.06109322980046272],[270400,0.043867893517017365],[540797,0.9166666865348816],[540798,9.084851264953613],[540799,1]]},\"color\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,0.4494512677192688],[1,0.38087210059165955],[2,0.29578420519828796],[405600,0.42859527468681335],[811197,0.4094361662864685],[811198,0.34696266055107117],[811199,0.26945021748542786]]},\"$index\":{\"count\":1474560,\"itemSize\":1,\"version\":0,\"bytes\":5898240,\"sample\":[[0,0],[1,13],[2,1],[737280,135200],[1474557,270398],[1474558,270399],[1474559,270386]]}},\"instanceCount\":null},\"material\":{\"uuid\":\"4ea6ae2b-63cf-4c53-ac57-05ce02052c1c\",\"version\":3,\"roughness\":0.88,\"sheen\":1,\"uniforms\":{}}},{\"uuid\":\"041315bf-987a-481b-afb3-1e1319d03304\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"2b9718ab-f572-4a64-80ce-568f93777822\",\"index\":{\"count\":24,\"version\":0},\"attributes\":{\"position\":{\"count\":10,\"itemSize\":3,\"version\":0,\"bytes\":120,\"sample\":[[0,0],[1,-1],[2,0],[15,0.5],[27,1],[28,1],[29,0]]},\"root\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.04640504717826843],[1,-0.029496248811483383],[2,-0.0016808643704280257],[460800,-0.044539302587509155],[921597,0.04315744712948799],[921598,0.030378475785255432],[921599,-0.00005324902303982526]]},\"strand\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.0003369170881342143],[1,0.0004800652386620641],[2,0.0005143184098415077],[460800,0.00045165183837525547],[921597,-0.0003809058398474008],[921598,-0.0009027585037983954],[921599,0.0005344742094166577]]},\"curve\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.0000993479770841077],[1,-0.00008528455509804189],[2,0.00004773916589329019],[460800,-0.00012233914458192885],[921597,-0.00007148965232772753],[921598,0.00044487728155218065],[921599,0.0002593219978734851]]},\"identity\":{\"count\":307200,\"itemSize\":2,\"version\":0,\"bytes\":2457600,\"sample\":[[0,0.6109322905540466],[1,0],[2,0.4451965391635895],[307200,0.64989173412323],[614397,0],[614398,0.3072371184825897],[614399,0]]},\"fiberColor\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,0.4494512677192688],[1,0.38087210059165955],[2,0.29578420519828796],[460800,0.42859527468681335],[921597,0.4094361662864685],[921598,0.34696266055107117],[921599,0.26945021748542786]]},\"fibreNormal\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.5746821165084839],[1,0.6688756346702576],[2,0.47153568267822266],[460800,0.6001878976821899],[921597,0.3346957266330719],[921598,-0.8262190818786621],[921599,0.45314550399780273]]},\"$index\":{\"count\":24,\"itemSize\":1,\"version\":0,\"bytes\":48,\"sample\":[[0,0],[1,2],[2,1],[12,4],[21,8],[22,9],[23,7]]}},\"instanceCount\":307200},\"material\":{\"uuid\":\"96b086e6-da42-49a9-b4bf-8ed528edf3e8\",\"version\":1,\"vertexShader\":\"varying vec3 vShadowWorld;\\nattribute vec3 fibreNormal;varying vec3 vRootNormal;\\nattribute vec3 root,strand,curve,fiberColor;attribute vec2 identity;uniform float uLength,uDensity;uniform vec2 uSize;varying float vEdge,vAlpha;varying vec3 vT,vC;\\n void main(){float t=position.x;vec3 p=root+uLength*(strand*t+curve*t*t);vec3 tangent=normalize(strand+2.*curve*t);vec4 mv=modelViewMatrix*vec4(p,1.);vec3 tv=normalize(mat3(modelViewMatrix)*tangent);vec2 across=vec2(-tv.y,tv.x);across/=max(length(across),.00001);vec4 cp=projectionMatrix*mv;\\n float actual=projectionMatrix[1][1]*.000035/max(-mv.z,.00001)*uSize.y*.5;float width=max(.7,actual)*(1.-.75*t);cp.xy+=across*position.y*width/uSize*cp.w;vShadowWorld=(modelMatrix*vec4(p,1.)).xyz;gl_Position=cp;\\n vAlpha=min(1.,actual/.7)*(1.-t*.35)*smoothstep(identity.x-.12,identity.x+.12,uDensity)*.94;vEdge=position.y;vT=normalize(mat3(modelMatrix)*tangent);vC=fiberColor;vRootNormal=normalize(mat3(modelMatrix)*fibreNormal);}\",\"fragmentShader\":\"\\n#include <packing>\\nuniform sampler2D uKS,uRS;uniform mat4 uKM,uRM;uniform vec2 uShadowStep;uniform float uShadowReady;varying vec3 vShadowWorld;\\nfloat coatShadow(sampler2D tex,mat4 matrix){\\n if(uShadowReady<.5)return 1.;vec4 h=matrix*vec4(vShadowWorld,1.);vec3 q=h.xyz/h.w;\\n if(q.x<0.||q.y<0.||q.x>1.||q.y>1.||q.z<0.||q.z>1.)return 1.;\\n float z=q.z-.000075;vec2 d=uShadowStep*.6;\\n return .25*(step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(-d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,-d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy-vec2(d.x,d.y)))));\\n}\\n\\nvarying vec3 vRootNormal;uniform vec3 uED[8],uEC[8];\\nuniform vec3 uKeyDir,uRimDir,uKey,uRim;uniform float uEnv;varying float vEdge,vAlpha;varying vec3 vT,vC;\\n void main(){float alpha=vAlpha*(1.-smoothstep(.45,1.,abs(vEdge)));if(alpha<.003)discard;vec3 T=normalize(vT);float a=sqrt(max(0.,1.-pow(dot(T,uKeyDir),2.))),b=sqrt(max(0.,1.-pow(dot(T,uRimDir),2.)));vec3 N=normalize(vRootNormal);float nl=dot(N,uKeyDir),nr=dot(N,uRimDir);\\n vec3 light=(uKey*(.55*max(nl,0.)+.45*a*clamp(.55+.55*nl,0.,1.))*coatShadow(uKS,uKM)+uRim*(.55*max(nr,0.)+.45*b*clamp(.55+.55*nr,0.,1.))*coatShadow(uRS,uRM))/3.14159265;\\n for(int i=0;i<8;i++){float nd=dot(N,uED[i]),cyl=sqrt(max(0.,1.-pow(dot(T,uED[i]),2.)));light+=uEC[i]*(.55*max(nd,0.)+.45*cyl*clamp(.55+.55*nd,0.,1.));}gl_FragColor=vec4(vC*light,alpha);\\n#include <tonemapping_fragment>\\n #include <colorspace_fragment>\\n }\",\"uniforms\":{\"uDensity\":1,\"uLength\":1.6,\"uSize\":[840,694],\"uKeyDir\":[-0.434104948922847,0.13917310096006544,-0.8900470444250977],\"uRimDir\":[0.9271572452736083,0.19611612702563078,0.3192458414092824],\"uKey\":[1.6,1.6,1.6],\"uRim\":[3.021050247089358,1.2818840845959383,0.7302290455083952],\"uEnv\":0.9,\"uED\":[[0.31786820574858127,-0.624727649563991,-0.7132146715011047],[0.7134569348331669,-0.6247754365161488,0.3172299734648638],[0.43579017774572676,0.79408569857729,-0.4236918978401233],[0.6085364163594105,0.7933648219674466,0.015990285457367887],[-0.7425351710166515,-0.5751560030551013,-0.3432740770185722],[-0.31553775074725354,-0.4224695972243506,0.8496795674102438],[-0.7193724792371339,0.5618815687266665,-0.4084021778118716],[-0.2740391168904082,0.3712424378768982,0.8871762027540767]],\"uEC\":[[0.0213997604142558,0.0213997604142558,0.0213997604142558],[0.02139712588067395,0.02139712588067395,0.02139712588067395],[0.31951581574891896,0.31951581574891896,0.31951581574891896],[0.31613638720734727,0.31613638720734727,0.31613638720734727],[0.023714527228268,0.023714527228268,0.023714527228268],[0.03426132720224819,0.03426132720224819,0.03426132720224819],[0.6110197640858231,0.6110197640858231,0.6110197640858231],[0.25868814234644927,0.25868814234644927,0.25868814234644927]],\"uKS\":{\"texture\":\"e9659df4-3e4f-4761-9ceb-1b5b1d65e7b5\",\"version\":1,\"width\":2048,\"height\":2048},\"uRS\":{\"texture\":\"590e7271-5648-4e52-8447-32e1ee6073c4\",\"version\":1,\"width\":2048,\"height\":2048},\"uKM\":[-3.5246825345065367,0.23925283086296428,0.6399896047808445,0,2.7211348642773437e-17,3.883404191143413,-0.2051792731240829,0,1.7191025364277537,0.4905409982270576,1.3121731452529821,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uRM\":[1.2767378606163007,-0.7271821218718788,-1.3668837465334047,0,-5.442269728554689e-17,3.845414420836984,-0.2891288913837989,0,-3.707915982742419,-0.25038888445105856,-0.470655818088283,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uShadowStep\":[0.00048828125,0.00048828125],\"uShadowReady\":1}}},{\"uuid\":\"8680eaa9-480f-47d8-b3ef-1288c9a328b5\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"b3c7248b-f646-4274-b4c0-cae545833e33\",\"index\":{\"count\":384,\"version\":0},\"attributes\":{\"position\":{\"count\":130,\"itemSize\":3,\"version\":0,\"bytes\":1560,\"sample\":[[0,0],[1,-1],[2,0],[195,0.5],[387,1],[388,1],[389,0]]},\"fibreMeta\":{\"count\":30720,\"itemSize\":4,\"version\":0,\"bytes\":491520,\"sample\":[[0,0],[1,0.0025718621909618378],[2,0.44890686869621277],[61440,160],[122877,0.9941567182540894],[122878,0.7982668280601501],[122879,0.502374529838562]]},\"fibreDye\":{\"count\":30720,\"itemSize\":3,\"version\":0,\"bytes\":368640,\"sample\":[[0,0.39388689398765564],[1,0.3337859511375427],[2,0.259217232465744],[46080,0.39264869689941406],[92157,0.4099348187446594],[92158,0.3473852276802063],[92159,0.26977840065956116]]},\"$index\":{\"count\":384,\"itemSize\":1,\"version\":0,\"bytes\":768,\"sample\":[[0,0],[1,2],[2,1],[192,64],[381,128],[382,129],[383,127]]}},\"instanceCount\":30720},\"material\":{\"uuid\":\"f5ef4a29-ebff-4957-82fc-3d3f7ab970d5\",\"version\":1,\"vertexShader\":\"varying vec3 vShadowWorld;\\n\\n attribute vec4 fibreMeta;attribute vec3 fibreDye;\\n uniform sampler2D uFrames;uniform vec2 uTableSize,uSize;uniform float uRadius,uTwist,uDetail;\\n varying vec3 vT,vN,vC;varying float vEdge,vCoverage;\\n vec3 surface(float t,out vec3 n,out vec3 tang){\\n  float x=(clamp(t,0.,1.)*(uTableSize.x-1.)+.5)/uTableSize.x;\\n  vec4 p=texture2D(uFrames,vec2(x,(fibreMeta.x*3.+.5)/uTableSize.y));\\n  vec3 B=normalize(texture2D(uFrames,vec2(x,(fibreMeta.x*3.+1.5)/uTableSize.y)).xyz);\\n  vec3 N=normalize(texture2D(uFrames,vec2(x,(fibreMeta.x*3.+2.5)/uTableSize.y)).xyz);\\n  float angle=fibreMeta.y*6.2831853-t*6.2831853*uTwist*1.6+.075*sin(t*57.+fibreMeta.z*27.);\\n  n=normalize(B*cos(angle)+N*sin(angle));\\n  float da=-6.2831853*uTwist*1.6+4.275*cos(t*57.+fibreMeta.z*27.);\\n  tang=normalize(cross(N,B)+(-B*sin(angle)+N*cos(angle))*(uRadius*da/.025));\\n  float breathe=1.+.038*sin(t*21.+p.w)+.022*sin(t*49.+p.w*3.);\\n  float envelope=1.+.055*cos(3.*(angle+t*6.2831853*2.8*uTwist))+.022*sin(5.*angle+p.w+t*11.);\\n  float crimp=.000012*sin(t*145.+fibreMeta.z*47.)+.000007*sin(t*283.+fibreMeta.w*35.);\\n  return p.xyz+n*(uRadius*breathe*envelope+.000095+crimp);\\n }\\n void main(){\\n  float t=position.x;vec3 n,T;vec3 p=surface(t,n,T);\\n  vec4 mv=modelViewMatrix*vec4(p,1.);vec4 cp=projectionMatrix*mv;\\n  vec3 tv=normalize(mat3(modelViewMatrix)*T);vec2 across=vec2(-tv.y,tv.x);across/=max(length(across),.00001);\\n  float actual=projectionMatrix[1][1]*(.000030+.000008*fibreMeta.w)/max(-mv.z,.00001)*uSize.y*.5;\\n  float width=max(.8,actual);cp.xy+=across*position.y*width/uSize*cp.w;\\n  vShadowWorld=(modelMatrix*vec4(p,1.)).xyz;gl_Position=cp;vEdge=position.y;\\n  vCoverage=min(1.,actual/.8)*uDetail*.96;\\n  vT=normalize(mat3(modelMatrix)*T);vN=normalize(mat3(modelMatrix)*n);vC=fibreDye;\\n }\\n \",\"fragmentShader\":\"\\n#include <packing>\\nuniform sampler2D uKS,uRS;uniform mat4 uKM,uRM;uniform vec2 uShadowStep;uniform float uShadowReady;varying vec3 vShadowWorld;\\nfloat coatShadow(sampler2D tex,mat4 matrix){\\n if(uShadowReady<.5)return 1.;vec4 h=matrix*vec4(vShadowWorld,1.);vec3 q=h.xyz/h.w;\\n if(q.x<0.||q.y<0.||q.x>1.||q.y>1.||q.z<0.||q.z>1.)return 1.;\\n float z=q.z-.000075;vec2 d=uShadowStep*.6;\\n return .25*(step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(-d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,-d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy-vec2(d.x,d.y)))));\\n}\\n\\n\\n uniform vec3 uKeyDir,uRimDir,uKey,uRim,uED[8],uEC[8];\\n varying vec3 vT,vN,vC;varying float vEdge,vCoverage;\\n vec3 response(vec3 L,vec3 radiance){\\n  float nd=dot(normalize(vN),L),cylinder=sqrt(max(0.,1.-pow(dot(normalize(vT),L),2.)));\\n  return radiance*(.64*max(nd,0.)+.36*cylinder*clamp(.55+.55*nd,0.,1.))/3.141592654;\\n }\\n void main(){\\n  float alpha=clamp(vCoverage*(1.-smoothstep(.45,1.,abs(vEdge))),0.,.96);if(alpha<.002)discard;\\n  vec3 light=response(uKeyDir,uKey)*coatShadow(uKS,uKM)+response(uRimDir,uRim)*coatShadow(uRS,uRM);\\n  for(int i=0;i<8;i++)light+=response(uED[i],uEC[i]*3.141592654);\\n  gl_FragColor=vec4(vC*light,alpha);\\n  #include <tonemapping_fragment>\\n  #include <colorspace_fragment>\\n }\\n \",\"uniforms\":{\"uFrames\":{\"texture\":\"f828f012-7580-4213-a300-b45009709d47\",\"version\":1,\"width\":97,\"height\":960},\"uTableSize\":[97,960],\"uRadius\":0.00086,\"uTwist\":0.55,\"uDetail\":1,\"uSize\":[840,694],\"uKeyDir\":[-0.434104948922847,0.13917310096006544,-0.8900470444250977],\"uRimDir\":[0.9271572452736083,0.19611612702563078,0.3192458414092824],\"uKey\":[1.6,1.6,1.6],\"uRim\":[3.021050247089358,1.2818840845959383,0.7302290455083952],\"uED\":[[0.31786820574858127,-0.624727649563991,-0.7132146715011047],[0.7134569348331669,-0.6247754365161488,0.3172299734648638],[0.43579017774572676,0.79408569857729,-0.4236918978401233],[0.6085364163594105,0.7933648219674466,0.015990285457367887],[-0.7425351710166515,-0.5751560030551013,-0.3432740770185722],[-0.31553775074725354,-0.4224695972243506,0.8496795674102438],[-0.7193724792371339,0.5618815687266665,-0.4084021778118716],[-0.2740391168904082,0.3712424378768982,0.8871762027540767]],\"uEC\":[[0.0213997604142558,0.0213997604142558,0.0213997604142558],[0.02139712588067395,0.02139712588067395,0.02139712588067395],[0.31951581574891896,0.31951581574891896,0.31951581574891896],[0.31613638720734727,0.31613638720734727,0.31613638720734727],[0.023714527228268,0.023714527228268,0.023714527228268],[0.03426132720224819,0.03426132720224819,0.03426132720224819],[0.6110197640858231,0.6110197640858231,0.6110197640858231],[0.25868814234644927,0.25868814234644927,0.25868814234644927]],\"uKS\":{\"texture\":\"e9659df4-3e4f-4761-9ceb-1b5b1d65e7b5\",\"version\":1,\"width\":2048,\"height\":2048},\"uRS\":{\"texture\":\"590e7271-5648-4e52-8447-32e1ee6073c4\",\"version\":1,\"width\":2048,\"height\":2048},\"uKM\":[-3.5246825345065367,0.23925283086296428,0.6399896047808445,0,2.7211348642773437e-17,3.883404191143413,-0.2051792731240829,0,1.7191025364277537,0.4905409982270576,1.3121731452529821,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uRM\":[1.2767378606163007,-0.7271821218718788,-1.3668837465334047,0,-5.442269728554689e-17,3.845414420836984,-0.2891288913837989,0,-3.707915982742419,-0.25038888445105856,-0.470655818088283,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uShadowStep\":[0.00048828125,0.00048828125],\"uShadowReady\":1}}}]}",
+            "after": "{\"settings\":{\"fuzz\":1,\"length\":1.6,\"detail\":1,\"twist\":0.55,\"mottle\":0.18,\"pattern\":\"stripe\",\"color\":\"#d3c4af\",\"shape\":\"jersey\",\"mode\":\"fiber\"},\"ready\":true,\"dirty\":false,\"building\":false,\"builds\":2,\"frames\":6,\"camera\":{\"position\":[0.1702077883605926,0.04622927585102516,0.11347185890706173],\"matrix\":[0.5478763552337971,0,-0.8365593220900297,0,-0.1853533682590255,0.9751453055858087,-0.12139094640455621,0,0.8157668957801391,0.22156631737238347,0.5342590558477003,0,0.1702077883605926,0.04622927585102516,0.11347185890706173,1],\"world\":[0.5478763552337971,0,-0.8365593220900297,0,-0.1853533682590255,0.9751453055858087,-0.12139094640455621,0,0.8157668957801391,0.22156631737238347,0.5342590558477003,0,0.1702077883605926,0.04622927585102516,0.11347185890706173,1],\"projection\":[2.7023472824142782,0,0,0,0,3.2708526184841404,0,0,0,0,-1.0000800032001282,-1,0,0,-0.0016000640025601025,0],\"target\":[0,0,0.002]},\"objects\":[{\"uuid\":\"46b55e71-a4b5-4dbf-b657-7955a2d3e23b\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"2f9d50bb-5f02-4bb1-9e75-adc57ac17ec9\",\"index\":{\"count\":1474560,\"version\":0},\"attributes\":{\"position\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,-0.04664108157157898],[1,-0.03063358925282955],[2,-0.0029425465036183596],[405600,-0.04666632413864136],[811197,0.04664163291454315],[811198,0.02446454018354416],[811199,-0.00022771993826609105]]},\"normal\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,-0.28156334161758423],[1,-0.9595426321029663],[2,0],[405600,-0.28156334161758423],[811197,0.28156334161758423],[811198,-0.9595426321029663],[811199,-1.3257757043446349e-16]]},\"uv\":{\"count\":270400,\"itemSize\":2,\"version\":0,\"bytes\":2163200,\"sample\":[[0,0.06109322980046272],[1,0],[2,0.06109322980046272],[270400,0.043867893517017365],[540797,0.9166666865348816],[540798,9.084851264953613],[540799,1]]},\"color\":{\"count\":270400,\"itemSize\":3,\"version\":0,\"bytes\":3244800,\"sample\":[[0,0.4494512677192688],[1,0.38087210059165955],[2,0.29578420519828796],[405600,0.42859527468681335],[811197,0.4094361662864685],[811198,0.34696266055107117],[811199,0.26945021748542786]]},\"$index\":{\"count\":1474560,\"itemSize\":1,\"version\":0,\"bytes\":5898240,\"sample\":[[0,0],[1,13],[2,1],[737280,135200],[1474557,270398],[1474558,270399],[1474559,270386]]}},\"instanceCount\":null},\"material\":{\"uuid\":\"4ea6ae2b-63cf-4c53-ac57-05ce02052c1c\",\"version\":3,\"roughness\":0.88,\"sheen\":1,\"uniforms\":{}}},{\"uuid\":\"041315bf-987a-481b-afb3-1e1319d03304\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"2b9718ab-f572-4a64-80ce-568f93777822\",\"index\":{\"count\":24,\"version\":0},\"attributes\":{\"position\":{\"count\":10,\"itemSize\":3,\"version\":0,\"bytes\":120,\"sample\":[[0,0],[1,-1],[2,0],[15,0.5],[27,1],[28,1],[29,0]]},\"root\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.04640504717826843],[1,-0.029496248811483383],[2,-0.0016808643704280257],[460800,-0.044539302587509155],[921597,0.04315744712948799],[921598,0.030378475785255432],[921599,-0.00005324902303982526]]},\"strand\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.0003369170881342143],[1,0.0004800652386620641],[2,0.0005143184098415077],[460800,0.00045165183837525547],[921597,-0.0003809058398474008],[921598,-0.0009027585037983954],[921599,0.0005344742094166577]]},\"curve\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.0000993479770841077],[1,-0.00008528455509804189],[2,0.00004773916589329019],[460800,-0.00012233914458192885],[921597,-0.00007148965232772753],[921598,0.00044487728155218065],[921599,0.0002593219978734851]]},\"identity\":{\"count\":307200,\"itemSize\":2,\"version\":0,\"bytes\":2457600,\"sample\":[[0,0.6109322905540466],[1,0],[2,0.4451965391635895],[307200,0.64989173412323],[614397,0],[614398,0.3072371184825897],[614399,0]]},\"fiberColor\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,0.4494512677192688],[1,0.38087210059165955],[2,0.29578420519828796],[460800,0.42859527468681335],[921597,0.4094361662864685],[921598,0.34696266055107117],[921599,0.26945021748542786]]},\"fibreNormal\":{\"count\":307200,\"itemSize\":3,\"version\":0,\"bytes\":3686400,\"sample\":[[0,-0.5746821165084839],[1,0.6688756346702576],[2,0.47153568267822266],[460800,0.6001878976821899],[921597,0.3346957266330719],[921598,-0.8262190818786621],[921599,0.45314550399780273]]},\"$index\":{\"count\":24,\"itemSize\":1,\"version\":0,\"bytes\":48,\"sample\":[[0,0],[1,2],[2,1],[12,4],[21,8],[22,9],[23,7]]}},\"instanceCount\":307200},\"material\":{\"uuid\":\"96b086e6-da42-49a9-b4bf-8ed528edf3e8\",\"version\":1,\"vertexShader\":\"varying vec3 vShadowWorld;\\nattribute vec3 fibreNormal;varying vec3 vRootNormal;\\nattribute vec3 root,strand,curve,fiberColor;attribute vec2 identity;uniform float uLength,uDensity;uniform vec2 uSize;varying float vEdge,vAlpha;varying vec3 vT,vC;\\n void main(){float t=position.x;vec3 p=root+uLength*(strand*t+curve*t*t);vec3 tangent=normalize(strand+2.*curve*t);vec4 mv=modelViewMatrix*vec4(p,1.);vec3 tv=normalize(mat3(modelViewMatrix)*tangent);vec2 across=vec2(-tv.y,tv.x);across/=max(length(across),.00001);vec4 cp=projectionMatrix*mv;\\n float actual=projectionMatrix[1][1]*.000035/max(-mv.z,.00001)*uSize.y*.5;float width=max(.7,actual)*(1.-.75*t);cp.xy+=across*position.y*width/uSize*cp.w;vShadowWorld=(modelMatrix*vec4(p,1.)).xyz;gl_Position=cp;\\n vAlpha=min(1.,actual/.7)*(1.-t*.35)*smoothstep(identity.x-.12,identity.x+.12,uDensity)*.94;vEdge=position.y;vT=normalize(mat3(modelMatrix)*tangent);vC=fiberColor;vRootNormal=normalize(mat3(modelMatrix)*fibreNormal);}\",\"fragmentShader\":\"\\n#include <packing>\\nuniform sampler2D uKS,uRS;uniform mat4 uKM,uRM;uniform vec2 uShadowStep;uniform float uShadowReady;varying vec3 vShadowWorld;\\nfloat coatShadow(sampler2D tex,mat4 matrix){\\n if(uShadowReady<.5)return 1.;vec4 h=matrix*vec4(vShadowWorld,1.);vec3 q=h.xyz/h.w;\\n if(q.x<0.||q.y<0.||q.x>1.||q.y>1.||q.z<0.||q.z>1.)return 1.;\\n float z=q.z-.000075;vec2 d=uShadowStep*.6;\\n return .25*(step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(-d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,-d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy-vec2(d.x,d.y)))));\\n}\\n\\nvarying vec3 vRootNormal;uniform vec3 uED[8],uEC[8];\\nuniform vec3 uKeyDir,uRimDir,uKey,uRim;uniform float uEnv;varying float vEdge,vAlpha;varying vec3 vT,vC;\\n void main(){float alpha=vAlpha*(1.-smoothstep(.45,1.,abs(vEdge)));if(alpha<.003)discard;vec3 T=normalize(vT);float a=sqrt(max(0.,1.-pow(dot(T,uKeyDir),2.))),b=sqrt(max(0.,1.-pow(dot(T,uRimDir),2.)));vec3 N=normalize(vRootNormal);float nl=dot(N,uKeyDir),nr=dot(N,uRimDir);\\n vec3 light=(uKey*(.55*max(nl,0.)+.45*a*clamp(.55+.55*nl,0.,1.))*coatShadow(uKS,uKM)+uRim*(.55*max(nr,0.)+.45*b*clamp(.55+.55*nr,0.,1.))*coatShadow(uRS,uRM))/3.14159265;\\n for(int i=0;i<8;i++){float nd=dot(N,uED[i]),cyl=sqrt(max(0.,1.-pow(dot(T,uED[i]),2.)));light+=uEC[i]*(.55*max(nd,0.)+.45*cyl*clamp(.55+.55*nd,0.,1.));}gl_FragColor=vec4(vC*light,alpha);\\n#include <tonemapping_fragment>\\n #include <colorspace_fragment>\\n }\",\"uniforms\":{\"uDensity\":1,\"uLength\":1.6,\"uSize\":[840,694],\"uKeyDir\":[-0.434104948922847,0.13917310096006544,-0.8900470444250977],\"uRimDir\":[0.9271572452736083,0.19611612702563078,0.3192458414092824],\"uKey\":[1.6,1.6,1.6],\"uRim\":[3.021050247089358,1.2818840845959383,0.7302290455083952],\"uEnv\":0.9,\"uED\":[[0.31786820574858127,-0.624727649563991,-0.7132146715011047],[0.7134569348331669,-0.6247754365161488,0.3172299734648638],[0.43579017774572676,0.79408569857729,-0.4236918978401233],[0.6085364163594105,0.7933648219674466,0.015990285457367887],[-0.7425351710166515,-0.5751560030551013,-0.3432740770185722],[-0.31553775074725354,-0.4224695972243506,0.8496795674102438],[-0.7193724792371339,0.5618815687266665,-0.4084021778118716],[-0.2740391168904082,0.3712424378768982,0.8871762027540767]],\"uEC\":[[0.0213997604142558,0.0213997604142558,0.0213997604142558],[0.02139712588067395,0.02139712588067395,0.02139712588067395],[0.31951581574891896,0.31951581574891896,0.31951581574891896],[0.31613638720734727,0.31613638720734727,0.31613638720734727],[0.023714527228268,0.023714527228268,0.023714527228268],[0.03426132720224819,0.03426132720224819,0.03426132720224819],[0.6110197640858231,0.6110197640858231,0.6110197640858231],[0.25868814234644927,0.25868814234644927,0.25868814234644927]],\"uKS\":{\"texture\":\"e9659df4-3e4f-4761-9ceb-1b5b1d65e7b5\",\"version\":1,\"width\":2048,\"height\":2048},\"uRS\":{\"texture\":\"590e7271-5648-4e52-8447-32e1ee6073c4\",\"version\":1,\"width\":2048,\"height\":2048},\"uKM\":[-3.5246825345065367,0.23925283086296428,0.6399896047808445,0,2.7211348642773437e-17,3.883404191143413,-0.2051792731240829,0,1.7191025364277537,0.4905409982270576,1.3121731452529821,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uRM\":[1.2767378606163007,-0.7271821218718788,-1.3668837465334047,0,-5.442269728554689e-17,3.845414420836984,-0.2891288913837989,0,-3.707915982742419,-0.25038888445105856,-0.470655818088283,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uShadowStep\":[0.00048828125,0.00048828125],\"uShadowReady\":1}}},{\"uuid\":\"8680eaa9-480f-47d8-b3ef-1288c9a328b5\",\"visible\":true,\"matrix\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"world\":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],\"geometry\":{\"uuid\":\"b3c7248b-f646-4274-b4c0-cae545833e33\",\"index\":{\"count\":384,\"version\":0},\"attributes\":{\"position\":{\"count\":130,\"itemSize\":3,\"version\":0,\"bytes\":1560,\"sample\":[[0,0],[1,-1],[2,0],[195,0.5],[387,1],[388,1],[389,0]]},\"fibreMeta\":{\"count\":30720,\"itemSize\":4,\"version\":0,\"bytes\":491520,\"sample\":[[0,0],[1,0.0025718621909618378],[2,0.44890686869621277],[61440,160],[122877,0.9941567182540894],[122878,0.7982668280601501],[122879,0.502374529838562]]},\"fibreDye\":{\"count\":30720,\"itemSize\":3,\"version\":0,\"bytes\":368640,\"sample\":[[0,0.39388689398765564],[1,0.3337859511375427],[2,0.259217232465744],[46080,0.39264869689941406],[92157,0.4099348187446594],[92158,0.3473852276802063],[92159,0.26977840065956116]]},\"$index\":{\"count\":384,\"itemSize\":1,\"version\":0,\"bytes\":768,\"sample\":[[0,0],[1,2],[2,1],[192,64],[381,128],[382,129],[383,127]]}},\"instanceCount\":30720},\"material\":{\"uuid\":\"f5ef4a29-ebff-4957-82fc-3d3f7ab970d5\",\"version\":1,\"vertexShader\":\"varying vec3 vShadowWorld;\\n\\n attribute vec4 fibreMeta;attribute vec3 fibreDye;\\n uniform sampler2D uFrames;uniform vec2 uTableSize,uSize;uniform float uRadius,uTwist,uDetail;\\n varying vec3 vT,vN,vC;varying float vEdge,vCoverage;\\n vec3 surface(float t,out vec3 n,out vec3 tang){\\n  float x=(clamp(t,0.,1.)*(uTableSize.x-1.)+.5)/uTableSize.x;\\n  vec4 p=texture2D(uFrames,vec2(x,(fibreMeta.x*3.+.5)/uTableSize.y));\\n  vec3 B=normalize(texture2D(uFrames,vec2(x,(fibreMeta.x*3.+1.5)/uTableSize.y)).xyz);\\n  vec3 N=normalize(texture2D(uFrames,vec2(x,(fibreMeta.x*3.+2.5)/uTableSize.y)).xyz);\\n  float angle=fibreMeta.y*6.2831853-t*6.2831853*uTwist*1.6+.075*sin(t*57.+fibreMeta.z*27.);\\n  n=normalize(B*cos(angle)+N*sin(angle));\\n  float da=-6.2831853*uTwist*1.6+4.275*cos(t*57.+fibreMeta.z*27.);\\n  tang=normalize(cross(N,B)+(-B*sin(angle)+N*cos(angle))*(uRadius*da/.025));\\n  float breathe=1.+.038*sin(t*21.+p.w)+.022*sin(t*49.+p.w*3.);\\n  float envelope=1.+.055*cos(3.*(angle+t*6.2831853*2.8*uTwist))+.022*sin(5.*angle+p.w+t*11.);\\n  float crimp=.000012*sin(t*145.+fibreMeta.z*47.)+.000007*sin(t*283.+fibreMeta.w*35.);\\n  return p.xyz+n*(uRadius*breathe*envelope+.000095+crimp);\\n }\\n void main(){\\n  float t=position.x;vec3 n,T;vec3 p=surface(t,n,T);\\n  vec4 mv=modelViewMatrix*vec4(p,1.);vec4 cp=projectionMatrix*mv;\\n  vec3 tv=normalize(mat3(modelViewMatrix)*T);vec2 across=vec2(-tv.y,tv.x);across/=max(length(across),.00001);\\n  float actual=projectionMatrix[1][1]*(.000030+.000008*fibreMeta.w)/max(-mv.z,.00001)*uSize.y*.5;\\n  float width=max(.8,actual);cp.xy+=across*position.y*width/uSize*cp.w;\\n  vShadowWorld=(modelMatrix*vec4(p,1.)).xyz;gl_Position=cp;vEdge=position.y;\\n  vCoverage=min(1.,actual/.8)*uDetail*.96;\\n  vT=normalize(mat3(modelMatrix)*T);vN=normalize(mat3(modelMatrix)*n);vC=fibreDye;\\n }\\n \",\"fragmentShader\":\"\\n#include <packing>\\nuniform sampler2D uKS,uRS;uniform mat4 uKM,uRM;uniform vec2 uShadowStep;uniform float uShadowReady;varying vec3 vShadowWorld;\\nfloat coatShadow(sampler2D tex,mat4 matrix){\\n if(uShadowReady<.5)return 1.;vec4 h=matrix*vec4(vShadowWorld,1.);vec3 q=h.xyz/h.w;\\n if(q.x<0.||q.y<0.||q.x>1.||q.y>1.||q.z<0.||q.z>1.)return 1.;\\n float z=q.z-.000075;vec2 d=uShadowStep*.6;\\n return .25*(step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(-d.x,d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy+vec2(d.x,-d.y))))+step(z,unpackRGBAToDepth(texture2D(tex,q.xy-vec2(d.x,d.y)))));\\n}\\n\\n\\n uniform vec3 uKeyDir,uRimDir,uKey,uRim,uED[8],uEC[8];\\n varying vec3 vT,vN,vC;varying float vEdge,vCoverage;\\n vec3 response(vec3 L,vec3 radiance){\\n  float nd=dot(normalize(vN),L),cylinder=sqrt(max(0.,1.-pow(dot(normalize(vT),L),2.)));\\n  return radiance*(.64*max(nd,0.)+.36*cylinder*clamp(.55+.55*nd,0.,1.))/3.141592654;\\n }\\n void main(){\\n  float alpha=clamp(vCoverage*(1.-smoothstep(.45,1.,abs(vEdge))),0.,.96);if(alpha<.002)discard;\\n  vec3 light=response(uKeyDir,uKey)*coatShadow(uKS,uKM)+response(uRimDir,uRim)*coatShadow(uRS,uRM);\\n  for(int i=0;i<8;i++)light+=response(uED[i],uEC[i]*3.141592654);\\n  gl_FragColor=vec4(vC*light,alpha);\\n  #include <tonemapping_fragment>\\n  #include <colorspace_fragment>\\n }\\n \",\"uniforms\":{\"uFrames\":{\"texture\":\"f828f012-7580-4213-a300-b45009709d47\",\"version\":1,\"width\":97,\"height\":960},\"uTableSize\":[97,960],\"uRadius\":0.00086,\"uTwist\":0.55,\"uDetail\":1,\"uSize\":[840,694],\"uKeyDir\":[-0.434104948922847,0.13917310096006544,-0.8900470444250977],\"uRimDir\":[0.9271572452736083,0.19611612702563078,0.3192458414092824],\"uKey\":[1.6,1.6,1.6],\"uRim\":[3.021050247089358,1.2818840845959383,0.7302290455083952],\"uED\":[[0.31786820574858127,-0.624727649563991,-0.7132146715011047],[0.7134569348331669,-0.6247754365161488,0.3172299734648638],[0.43579017774572676,0.79408569857729,-0.4236918978401233],[0.6085364163594105,0.7933648219674466,0.015990285457367887],[-0.7425351710166515,-0.5751560030551013,-0.3432740770185722],[-0.31553775074725354,-0.4224695972243506,0.8496795674102438],[-0.7193724792371339,0.5618815687266665,-0.4084021778118716],[-0.2740391168904082,0.3712424378768982,0.8871762027540767]],\"uEC\":[[0.0213997604142558,0.0213997604142558,0.0213997604142558],[0.02139712588067395,0.02139712588067395,0.02139712588067395],[0.31951581574891896,0.31951581574891896,0.31951581574891896],[0.31613638720734727,0.31613638720734727,0.31613638720734727],[0.023714527228268,0.023714527228268,0.023714527228268],[0.03426132720224819,0.03426132720224819,0.03426132720224819],[0.6110197640858231,0.6110197640858231,0.6110197640858231],[0.25868814234644927,0.25868814234644927,0.25868814234644927]],\"uKS\":{\"texture\":\"e9659df4-3e4f-4761-9ceb-1b5b1d65e7b5\",\"version\":1,\"width\":2048,\"height\":2048},\"uRS\":{\"texture\":\"590e7271-5648-4e52-8447-32e1ee6073c4\",\"version\":1,\"width\":2048,\"height\":2048},\"uKM\":[-3.5246825345065367,0.23925283086296428,0.6399896047808445,0,2.7211348642773437e-17,3.883404191143413,-0.2051792731240829,0,1.7191025364277537,0.4905409982270576,1.3121731452529821,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uRM\":[1.2767378606163007,-0.7271821218718788,-1.3668837465334047,0,-5.442269728554689e-17,3.845414420836984,-0.2891288913837989,0,-3.707915982742419,-0.25038888445105856,-0.470655818088283,0,0.5000000000000001,0.5000000000000001,0.43609022556390986,1.0000000000000002],\"uShadowStep\":[0.00048828125,0.00048828125],\"uShadowReady\":1}}}]}",
+            "scope": "metadata, selected geometry samples, state/material/shader data",
+            "notChecked": [
+              "driver internal state",
+              "every GPU texture texel",
+              "physical specimen properties"
+            ],
+            "method": "same synchronous task; FNV-1a for optional full CPU arrays; source provenance separately pinned by SHA256"
+          },
+          "authorities": {
+            "sourceWriteAPI": false,
+            "repairAuthorized": false,
+            "physicalCertification": false,
+            "manufacturingCertification": false,
+            "productionReady": false
+          }
+        },
+        "sourceAuthority": "retained-public-native-copy-not-production-installation",
+        "capturedAt": "2026-10-20T04:00:25.505Z",
+        "unsupportedOriginalMeasurements": []
+      },
+      "status": "PARTIAL",
+      "counts": {
+        "PASS": 11,
+        "FAIL": 0,
+        "WARNING": 4,
+        "UNKNOWN": 4,
+        "NOT_APPLICABLE": 1
+      },
+      "hostModified": false,
+      "physicalCertification": false,
+      "manufacturingCertification": false,
+      "aestheticAcceptance": false,
+      "productionReady": false,
+      "contractVersion": "0.2.0"
+    }
+  ],
+  "counts": {
+    "PASS": 11,
+    "FAIL": 0,
+    "WARNING": 4,
+    "UNKNOWN": 4,
+    "NOT_APPLICABLE": 1
+  },
+  "defects": [
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-knit-public-p02-c2:f9f9c539",
+      "objectId": "fabric-knit-public-p02-c2",
+      "code": "measurement:rf01.knit.carrier_nominal_diameter_m",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "knit-public-p02",
+      "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+      "measurementId": "rf01.knit.carrier_nominal_diameter_m",
+      "message": "自有数字几何配方；截面存在起伏，非实物纱径",
+      "expected": null,
+      "observed": 0.00172,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-knit-public-p02-c2:e7278e3c",
+      "objectId": "fabric-knit-public-p02-c2",
+      "code": "measurement:rf01.knit.carrier_sample_diameter_m",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "knit-public-p02",
+      "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+      "measurementId": "rf01.knit.carrier_sample_diameter_m",
+      "message": "第一个针目第16环上两个相对顶点距离；不是布料厚度",
+      "expected": null,
+      "observed": 0.0017045053183580405,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-knit-public-p02-c2:b7b1dd75",
+      "objectId": "fabric-knit-public-p02-c2",
+      "code": "measurement:rf01.knit.short_fiber_sample_offset_m",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "knit-public-p02",
+      "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+      "measurementId": "rf01.knit.short_fiber_sample_offset_m",
+      "message": "按原shader root+length*(strand+curve)读取第0实例局部端点；非纤维弧长，隐藏模式只作最近上传记录",
+      "expected": null,
+      "observed": 0.0013019003792724326,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-knit-public-p02-c2:6be870a7",
+      "objectId": "fabric-knit-public-p02-c2",
+      "code": "measurement:rf01.knit.physical_thickness_m",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "knit-public-p02",
+      "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+      "measurementId": "rf01.knit.physical_thickness_m",
+      "message": "P02外观样片没有实物厚度证据，禁止借用R15估计",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-knit-public-p02-c2:2783056b",
+      "objectId": "fabric-knit-public-p02-c2",
+      "code": "measurement:rf01.knit.areal_density_g_m2",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "knit-public-p02",
+      "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+      "measurementId": "rf01.knit.areal_density_g_m2",
+      "message": "没有实物标定或本版本物理模型",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-knit-public-p02-c2:ad7897fb",
+      "objectId": "fabric-knit-public-p02-c2",
+      "code": "measurement:rf01.knit.linear_density_tex",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "knit-public-p02",
+      "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+      "measurementId": "rf01.knit.linear_density_tex",
+      "message": "几何载纱直径不能反推线密度",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-knit-public-p02-c2:4a830ff4",
+      "objectId": "fabric-knit-public-p02-c2",
+      "code": "material:binding",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "knit-public-p02",
+      "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+      "measurementId": null,
+      "message": "当前样片材料参考坐标尚未绑定成衣裁片/人物版本",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fabric-knit-public-p02-c2:4e300e92",
+      "objectId": "fabric-knit-public-p02-c2",
+      "code": "source:legacy",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "reality-platform",
+      "sourceCommit": "6f1a7f1353d2b47822525769313d63cc51890a0c",
+      "measurementId": null,
+      "message": "S3中的R15针织历史与当前P02是不同对象，原历史继续保留",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    }
+  ],
+  "status": "PARTIAL",
+  "sourceWriteAPI": false,
+  "automaticRepair": false,
+  "physicalCertification": false,
+  "manufacturingCertification": false,
+  "aestheticAcceptance": false,
+  "productionReady": false
+}

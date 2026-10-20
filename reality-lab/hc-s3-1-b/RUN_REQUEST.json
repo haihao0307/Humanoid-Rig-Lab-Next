@@ -1,0 +1,12 @@
+{
+  "task":"RF01-S3.1-B-KNIT-20261020",
+  "request":3,
+  "previousRun":39366277320,
+  "rootCauseReview":"ROOT_CAUSE_REVIEW.md",
+  "previousFailure":"Candidate DOM screenshot had 695 rows while baseline had 694 because the embedded canvas element had a fractional viewport offset. Their common full 840x694 area is byte-identical RGB (MAE0, changed pixels0).",
+  "correction":"Compare complete preserved native canvas PNG bytes and exact drawing-buffer dimensions, not viewport element clipping. Preserve zero-difference requirement and original shaders, geometry, lighting and P02 source pin.",
+  "requiredGates":["46 protocol checks","real retained P02 controls and unchanged canvas","full canvas original-vs-candidate equality","read lifecycle and invalid-import cases","old denim live regression","file and fixed public HTTPS verification"],
+  "sourceRendererChanged":false,
+  "nativeBaseline":"KNIT-P02 C2 retained",
+  "thresholdsRelaxed":false
+}
