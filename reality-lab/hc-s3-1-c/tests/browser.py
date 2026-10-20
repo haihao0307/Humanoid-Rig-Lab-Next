@@ -1,5 +1,5 @@
 from pathlib import Path
-import os,json,hashlib,time,traceback,base64,io
+import os,json,hashlib,time,traceback,base64,io,math
 from PIL import Image,ImageStat
 from playwright.sync_api import sync_playwright
 R=Path(__file__).resolve().parents[1];Q=Path(os.environ.get('RF31C_QA',str(R/'qa/file')));Q.mkdir(parents=True,exist_ok=True)
@@ -65,7 +65,10 @@ with sync_playwright() as pw:
   check('per-panel table shows generated values','2.31000' in page.locator('#part-rows').inner_text())
   page.frame_locator('#native').locator('details.craftParameters:has(#pitchMM) > summary').click();pitch=page.frame_locator('#native').locator('#pitchMM');maximum=float(pitch.get_attribute('max'));pitch.focus();pitch.press('End');page.wait_for_function('(v)=>__REALITY_S31C__.report().native?.requested.pitch===v',arg=maximum,timeout=180000)
   check('original requested stitch pitch is read',abs(state()['native']['measurements'][6]['value']-maximum*.001)<1e-12)
-  check('actual generated seam data follows current build',all(abs(s['pitchM']-maximum*.001)<1e-12 for s in state()['native']['seams']))
+  seams=state()['native']['seams'];report['redistributedSeams']=seams
+  check('actual generated seam pitch matches length divided by integer intervals',all(abs(s['pitchM']-s['pathLengthM']/s['intervalCount'])<1e-12 and s['holeCount']==s['intervalCount']+1 for s in seams))
+  check('integer allocation matches original source rule',all(s['intervalCount']==(s['controlPointCount']-1 if s['knotHoles'] else max(4,math.floor(s['pathLengthM']/(maximum*.001)+.5))) for s in seams))
+  check('requested and generated differences are not erased',any(abs(s['pitchM']-maximum*.001)>1e-6 for s in seams) and any(c['id']=='seam:integer-distribution' and c['status']=='WARNING' for c in state()['common']['checks']))
   page.frame_locator('#native').locator('[data-product="wallet"]').click();page.wait_for_function('__REALITY_S31C__.report().native?.productId==="wallet"',timeout=180000);wallet=state()['native'];report['walletLeather']=wallet
   check('product change creates separate current object',wallet['objectId']=='fabric-leather-r17-wallet')
   check('wallet layers are read separately',len(wallet['parts'])==3 and len(set(p['id'] for p in wallet['parts']))==3)
@@ -85,7 +88,7 @@ with sync_playwright() as pw:
   page.locator('#file').set_input_files({'name':'wrong-unit.json','mimeType':'application/json','buffer':json.dumps(bad).encode()});page.wait_for_function('document.getElementById("status").textContent.includes("SEMANTICS")');check('invalid import does not replace current object',state()['common']==before)
   page.locator('#file').set_input_files(str(out));page.wait_for_function('__REALITY_S31C__.report().common.sourceMode==="imported_unverified"');check('file import is never current live proof',not state()['following'])
   page.locator('#restore-live').click();page.wait_for_function('__REALITY_S31C__.report().common.sourceMode==="live_read_only"')
-  mode=native_eval('()=>{LEATHER_ATELIER.switchMode("physics");try{KAOPU_REALITY.read();return "not rejected";}catch(e){return e.message;}}');check('unsupported physical specimen tab cannot report old product live',mode.startswith('NATIVE_MODE_UNSUPPORTED'))
+  mode=native_eval('async()=>{await LEATHER_ATELIER.switchMode("physics");try{KAOPU_REALITY.read();return "not rejected";}catch(e){return e.message;}}');check('unsupported physical specimen tab cannot report old product live',mode.startswith('NATIVE_MODE_UNSUPPORTED'))
   native_eval('()=>LEATHER_ATELIER.switchMode("products")');page.evaluate('__REALITY_S31C__.capture(false)')
   check('supported product mode resumes real capture',state()['native']['family']=='leather')
   page.locator('#load-knit').click();page.wait_for_function('__REALITY_S31C__.report().native?.family==="knit"&&__REALITY_S31C__.report().common.sourceMode==="live_read_only"',timeout=180000)
