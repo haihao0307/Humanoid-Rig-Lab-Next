@@ -74,7 +74,7 @@ with sync_playwright() as pw:
   check('imported raw snapshot preserved',state()['common']['extensions']['originalExport']==original)
   page.locator('#restore-live').click();check('explicit refresh restores live mode',state()['common']['sourceMode']=='live_read_only')
   for o in state()['history']:
-   page.locator('[data-history="'+o['objectId']+'"]').click();check(o['family']+' original history not rebranded',state()['common']['sourceMode']=='fixed_snapshot' and state()['common']['extensions']['originalS3Object']['id']==o['objectId'])
+   page.locator('[data-history="'+o['objectId']+'"]').click();check(o['objectId']+' original history not rebranded',state()['common']['sourceMode']=='fixed_snapshot' and state()['common']['extensions']['originalS3Object']['id']==o['objectId'])
   page.locator('#read').click();check('live read remains available after history review',state()['common']['sourceMode']=='live_read_only')
   page.locator('#close').click();check('native disposed and retained result not live',state()['iframeCount']==0 and not state()['nativeReady'] and state()['common']['sourceMode']!='live_read_only')
   page.set_viewport_size({'width':390,'height':844});page.evaluate('scrollTo(0,0)');page.wait_for_timeout(200)
