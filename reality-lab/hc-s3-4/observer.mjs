@@ -6,6 +6,7 @@ export function createObserver(world, verbose=false){
  const copy=x=>JSON.parse(JSON.stringify(x));
  const emit=(key,data)=>self.postMessage({__RF34_DIAG__:{key,data}});
  const safe=fn=>(...args)=>{try{return fn(...args);}catch(e){report.errors.push(String(e.stack||e));}};
+ function pack(a){if(!a)return null;const bytes=new Uint8Array(a.buffer,a.byteOffset,a.byteLength);let s='';for(let i=0;i<bytes.length;i+=16384)s+=String.fromCharCode(...bytes.subarray(i,i+16384));return {type:a.constructor.name,length:a.length,bytes:bytes.length,base64:btoa(s)};}
  const lineage=world.solvers.map(s=>{
   const members=Array.from({length:s.count},()=>[]),edges=[];let offset=0;
   for(const p of s.packet.spec.panels){
@@ -23,7 +24,7 @@ export function createObserver(world, verbose=false){
   if(!report.firstCrossing){const si=states.findIndex(s=>s.overLimitCount||s.invalidCount);if(si>=0)report.firstCrossing={event:copy(event),previous:previous?copy(previous):null,worstEdge:edge(si,states[si].maxEdgeIndex),firstEnumeratedOverLimit:states[si].firstOverIndex>=0?edge(si,states[si].firstOverIndex):null,initialCondition:stage==='coupled-construction'};}
   previous=event;return event;
  }
- function state(){return {solvers:world.solvers.map((s,i)=>({role:s.role,p:Array.from(s.p),v:Array.from(s.v),old:Array.from(s.old),packedEdges:backend?.solvers?.[i]?Array.from(backend.solvers[i].edges.view):null,packedBends:backend?.solvers?.[i]?Array.from(backend.solvers[i].bends.view):null,time:s.time,steps:s.steps,contacts:s.contacts})),actor:{positions:Array.from(world.actor.positions),native:Array.from(world.actor.native),previous:backend?.actorPrevious?Array.from(backend.actorPrevious):null,target:backend?.actorTarget?Array.from(backend.actorTarget):null,waistPrevious:backend?.waist?Array.from(backend.waist.previous):null,waistTarget:backend?.waist?Array.from(backend.waist.target):null},world:{elapsed:world.elapsed,motionTime:world.motionTime,bodyRevision:world.bodyRevision,clothRevision:world.clothRevision,pairContacts:world.pairContacts,frameSequence:world.frameSequence}};}
+ function state(){return {solvers:world.solvers.map((s,i)=>({role:s.role,p:pack(s.p),v:pack(s.v),old:pack(s.old),packedEdges:pack(backend?.solvers?.[i]?.edges?.view),packedBends:pack(backend?.solvers?.[i]?.bends?.view),time:s.time,steps:s.steps,contacts:s.contacts})),actor:{positions:pack(world.actor.positions),native:pack(world.actor.native),previous:pack(backend?.actorPrevious),target:pack(backend?.actorTarget),waistPrevious:pack(backend?.waist?.previous),waistTarget:pack(backend?.waist?.target)},world:{elapsed:world.elapsed,motionTime:world.motionTime,bodyRevision:world.bodyRevision,clothRevision:world.clothRevision,pairContacts:world.pairContacts,frameSequence:world.frameSequence}};}
  function topEdges(){return world.solvers.map((s,si)=>{const rows=s.edges.map((_,i)=>edge(si,i));rows.sort((a,b)=>b.ratio-a.ratio);return {role:s.role,top:rows.slice(0,8)};});}
  function gate(b){backend=b;const event=mark('original-safety-gate');report.gate={event,edges:topEdges(),originalPredicate:'!Number.isFinite(r.maxEdgeStretch)||r.maxEdgeStretch>1.45',originalAudits:[]};emit('gateState',state());}
  const api={
