@@ -1,0 +1,73 @@
+name: Reality HC S3.5 metric-contact experiment
+on:
+  push:
+    branches: [feature/reality-hc-s35-metric-contact-20261020]
+    paths: [.github/workflows/reality-hc-s35.yml, reality-lab/hc-s3-5/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  experiment:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        case: [baseline, previous-only, metric-only, combined]
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: platform
+          sparse-checkout: |
+            reality-lab/hc-s3-5
+            reality-lab/hc-s3-4
+      - uses: actions/checkout@v4
+        with:
+          repository: haihao0307/guilin-dem-pipeline
+          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
+          path: host
+          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+      - name: Verify candidate scope and reversible patches
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+        run: |
+          git fetch --filter=blob:none --depth=1 origin bbb0a2e379d0c7b26faf71cb2ea8f9b1069c5caf
+          python - <<'PY'
+          import subprocess,ast
+          from pathlib import Path
+          paths=subprocess.check_output(['git','diff','--name-only','bbb0a2e379d0c7b26faf71cb2ea8f9b1069c5caf','HEAD'],text=True).splitlines()
+          assert paths and all(p.startswith('reality-lab/hc-s3-5/') or p=='.github/workflows/reality-hc-s35.yml' for p in paths),paths
+          for p in Path('reality-lab/hc-s3-5').rglob('*.py'):ast.parse(p.read_text())
+          PY
+          python reality-lab/hc-s3-5/instrument.py "$GARMENT_HOST" reality-lab/hc-s3-5
+      - name: Install same pinned browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Native D03 controlled experiment
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+          RF35_CASE: ${{ matrix.case }}
+        run: python reality-lab/hc-s3-5/run_case.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s35-${{ matrix.case }}
+          path: |
+            platform/reality-lab/hc-s3-5/qa/${{ matrix.case }}/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.case == 'baseline'
+        with:
+          name: reality-s35-experiment-code
+          path: |
+            platform/reality-lab/hc-s3-5/*.mjs
+            platform/reality-lab/hc-s3-5/*.py
+            platform/reality-lab/hc-s3-5/TASK_ANCHOR.json
+            platform/reality-lab/hc-s3-5/_generated/*patches.json
+          retention-days: 30
