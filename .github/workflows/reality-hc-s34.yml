@@ -1,0 +1,59 @@
+name: Reality HC S3.4 first-fault diagnosis
+on:
+  push:
+    branches: [feature/reality-hc-s34-first-fault-20261020]
+    paths: [.github/workflows/reality-hc-s34.yml, reality-lab/hc-s3-4/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: platform
+          sparse-checkout: reality-lab/hc-s3-4
+      - uses: actions/checkout@v4
+        with:
+          repository: haihao0307/guilin-dem-pipeline
+          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
+          path: host
+          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+      - name: Validate exact reversible source instrumentation
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+        run: |
+          python -m py_compile reality-lab/hc-s3-4/capture.py reality-lab/hc-s3-4/instrument.py
+          python reality-lab/hc-s3-4/instrument.py "$GARMENT_HOST" reality-lab/hc-s3-4
+      - name: Install fixed software browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Reproduce original guard and compare exact numerical states
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+        run: python reality-lab/hc-s3-4/capture.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s34-native-diagnosis
+          path: |
+            platform/reality-lab/hc-s3-4/diagnosis.json
+            platform/reality-lab/hc-s3-4/qa/
+            platform/reality-lab/hc-s3-4/_generated/*patches.json
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reality-s34-source
+          path: |
+            platform/reality-lab/hc-s3-4/*.py
+            platform/reality-lab/hc-s3-4/*.mjs
+            platform/reality-lab/hc-s3-4/TASK_ANCHOR.json
+          retention-days: 7
