@@ -1,0 +1,33 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),R=path.resolve(__dirname,'..'),C=require('../review.js'),x=JSON.parse(fs.readFileSync(R+'/EVIDENCE.json','utf8')),checks=[];
+const copy=x=>JSON.parse(JSON.stringify(x));function test(name,f){f();checks.push({name,passed:true});console.log('PASS',name);}
+function reject(name,fn,regex){test(name,()=>{const z=copy(x);fn(z);assert.throws(()=>C.validate(z),regex);});}
+test('four real cases validate',()=>assert(C.validate(x)));
+test('source bundle not mutated by summary',()=>{const b=JSON.stringify(x);for(const a of Object.values(x.cases))C.summary(a);C.compare(x,'walk');assert.equal(JSON.stringify(x),b);});
+test('all initial fitting and regional states are identical',()=>{for(const i of [0,1])assert.equal(new Set(Object.values(x.cases).map(a=>a.checkpoints[i].stateSHA256)).size,1);});
+test('every planned horizon comes from actual clip',()=>{for(const a of Object.values(x.cases))assert(a.plannedSeconds>=.65+2*a.walkingClip.durationSeconds);});
+test('completion and termination are kept separate',()=>{for(const a of Object.values(x.cases)){const s=C.summary(a);assert.equal(s.failure,a.failure);assert.equal(s.completedSteps,a.completedSteps);}});
+test('all remaining pair observations retained',()=>{for(const a of Object.values(x.cases)){const s=C.summary(a);assert.equal(s.channels.pair.violatingCheckpoints,a.checkpoints.filter(r=>r.stage==='fixed-step'&&r.pair.beyondMargin>0).length);}});
+test('timing warmup exclusion explicit',()=>{for(const a of Object.values(x.cases)){const s=C.summary(a);assert.equal(s.timing.excludedWarmupSteps,12);assert.equal(s.timing.stepAdjustedMS.count,a.frames.filter(r=>r.accepted&&r.step>12).length);}});
+test('matched timing stops at shared successful step',()=>{for(const m of ['static','walk'])assert.equal(C.compare(x,m).matchedStepRange[1],Math.min(x.cases['baseline-'+m].completedSteps,x.cases['coverage-'+m].completedSteps));});
+test('fine corrections do not imply persistent coarse correction',()=>{for(const a of Object.values(x.cases))assert(C.summary(a).correction.coarseStateUnchanged);});
+test('positive samples not certified as continuous contact',()=>{assert.equal(x.fitCertified,false);assert.equal(x.continuousCollisionCertified,false);assert.equal(x.productionChanged,false);});
+test('stats use observed finite values only',()=>{assert.deepEqual(C.stats([1,2,3,4]),{count:4,mean:2.5,median:2,p95:4,max:4});assert.equal(C.stats([]).median,null);});
+reject('wrong source rejected',z=>z.hostCommit='0'.repeat(40),/SOURCE/);
+reject('partial case set rejected',z=>delete z.cases['baseline-walk'],/CASE_SET/);
+reject('swapped case rejected',z=>z.cases['coverage-walk'].variant='baseline',/CASE_IDENTITY/);
+reject('manufactured frame count rejected',z=>z.cases['coverage-walk'].completedSteps--,/FAILURE|FRAME/);
+reject('fake frame rate rejected',z=>z.cases['coverage-walk'].dtSeconds=1/30,/HORIZON/);
+reject('invented clip duration rejected',z=>z.cases['coverage-walk'].walkingClip.durationSeconds+=1,/CLIP/);
+reject('unbounded horizon rejected',z=>z.cases['coverage-walk'].plannedSteps=9999,/HORIZON/);
+reject('safety threshold cannot be increased',z=>z.cases['coverage-walk'].originalFitGate=2,/PROTECTED/);
+reject('production promotion rejected',z=>z.productionChanged=true,/AUTHORITY/);
+reject('continuous certification rejected',z=>z.continuousCollisionCertified=true,/AUTHORITY/);
+reject('missing source read-only proof rejected',z=>z.cases['coverage-walk'].checkpoints[0].readOnlyVerified=false,/CHECKPOINT/);
+reject('negative timing rejected',z=>z.cases['coverage-walk'].frames[0].stepWallMS=-1,/TIMING/);
+reject('subtracted observation cost must be correct',z=>z.cases['coverage-walk'].frames[0].adjustedStepMS+=10,/TIMING_ARITHMETIC/);
+reject('incorrect phase order rejected',z=>z.cases['coverage-walk'].checkpoints[0].stage='fixed-step',/INITIAL/);
+reject('invalid actual witness coordinates rejected',z=>z.cases['coverage-walk'].checkpoints[0].body[1].witness.point[0]=Infinity,/WITNESS/);
+reject('count cannot exceed eligible samples',z=>z.cases['coverage-walk'].checkpoints[0].body[1].beyondMargin=1e9,/MEASUREMENT/);
+reject('fine pass cannot claim changed coarse data unchanged',z=>z.cases['coverage-walk'].frames[0].fineCalls[0].coarseStateUnchanged=false,/CORRECTION/);
+reject('numeric string correction rejected',z=>z.cases['coverage-walk'].frames[0].fineCalls[0].targetCorrectionM='0',/CORRECTION/);
+const q=R+'/qa/review';fs.mkdirSync(q,{recursive:true});fs.writeFileSync(q+'/PROTOCOL.json',JSON.stringify({passed:true,count:checks.length,checks,actualEvidenceUsed:true,negativeCasesAreSynthetic:true,fitCertified:false},null,2));
