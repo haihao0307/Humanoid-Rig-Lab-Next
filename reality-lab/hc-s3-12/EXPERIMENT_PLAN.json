@@ -1,0 +1,13 @@
+{
+ "version":"RF01-S3.12-A",
+ "purpose":"Resolve a real frozen local contact state; do not claim a new full-motion candidate unless this local gate passes.",
+ "fixtures":["baseline-step30","guarded-step30","guarded-step102"],
+ "mobileScopes":["original_three_corners","one_ring_neighbors_with_positive_native_weight"],
+ "seeds":["zero_displacement","original_guided_translation"],
+ "method":"Successive linearized contact halfspaces, finite dual-coordinate minimum-norm projection, exact full-body endpoint re-evaluation; scratch only until independently accepted.",
+ "limits":{"nonlinearIterations":20,"linearSweeps":300,"perIterationCoordinateTrustM":0.003,"maximumPerVertexDisplacementM":0.02,"minimumRelativeEdgeLength":0.9,"maximumRelativeEdgeLength":1.1,"comparisonToleranceM":1e-7},
+ "acceptance":["all originally safe checked samples stay safe","all checked affected sample clearances meet the original 1mm terminal margin","zero strict endpoint crossings for all affected triangles against full native body","no flipped affected triangles","no more than10percent edge compression or expansion relative to the captured state","20mm displacement bound","unchanged vertices outside the declared mobile set","input and source arrays remain byte-identical; rejected trials are never applied"],
+ "semantics":{"additionalShapeAndTrustLimits":"Conservative experimental admissibility limits, not physical material calibration or the original solver's safety thresholds.","fixedBoundaryWitness":"An actual edge/body crossing whose two endpoints are fixed proves that crossing cannot be removed by the chosen variables.","linearResidual":"A finite iterative failure does not prove nonlinear infeasibility.","localSuccess":"Only a frozen endpoint candidate, not cloth dynamics, CCD, self-collision or production certification."},
+ "conditionalNext":"Only after local acceptance, integrate into a separately scoped original180-step regression. If local acceptance fails, keep HOLD and explain the exact blocked degrees of freedom/residuals.",
+ "nativeLimitsChanged":false,"productionChanged":false,"fullMotionCandidateExecuted":false,"fitCertified":false
+}
