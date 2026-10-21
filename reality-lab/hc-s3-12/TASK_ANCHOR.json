@@ -1,0 +1,17 @@
+{
+ "taskId":"RF01-S3.12-LOCAL-CONTACT-20261021",
+ "baseCommit":"7c3483d72d224d1e51d9e7d0088af87f94554616",
+ "branch":"feature/reality-hc-s312-local-solve-20261021",
+ "primaryDefect":"S3.11 rejects unsafe centroid proposals but has no jointly feasible displacement to remove pre-existing local triangle/body crossings.",
+ "scope":"Original D03 terminal guided-centroid contact; exact step30 face866 then same180-step static/walk regression.",
+ "allowedPaths":["reality-lab/hc-s3-12/",".github/workflows/reality-hc-s312.yml"],
+ "nativeSource":"haihao0307/guilin-dem-pipeline@c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef",
+ "candidate":"Bounded linearized multi-contact minimum-norm proposals on three corners then one mobile ring, revalidated against exact original body surface and affected triangles before any native write.",
+ "protected":["S3.6 atomic fit","original1.45fit gate","original32contact-pass limit","4mm/1mm source margin schedule","source cloth topology/material/character","upper-body and garment-pair failures","old pages and branches"],
+ "forbidden":["merge","force push","production source install","thickness inflation","relax safety margins","infer global or continuous collision safety from endpoint checks","count refusal as resolution"],
+ "acceptance":["reference guarded trajectory exactly matches S3.11","all candidate initial states match","preview cannot mutate original state","commit only independently revalidated local proposal","rollback on rejected candidate","source limits unchanged","all three residual contact channels and computational costs retained","fixed public and standalone actual interactions"],
+ "status":"IMPLEMENTING_LOCAL_CANDIDATE",
+ "approval":{"mergeAuthorized":false,"productionSourceWriteAuthorized":false,"userVisualAccepted":false},
+ "researchBoundary":"IPC reference separates nonlinear solution and collision feasibility; this experiment is neither IPC nor certified CCD and does not inherit those guarantees.",
+ "next":"If bounded local solve cannot satisfy all constraints, retain exact failure reasons and rollback; no unsupported physical success claim."
+}

@@ -1,0 +1,72 @@
+name: Reality S3.12 local candidate verification
+on:
+  push:
+    branches: [feature/reality-hc-s312-local-solve-20261021]
+    paths: [.github/workflows/reality-hc-s312-candidate.yml, reality-lab/hc-s3-12/CANDIDATE_RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        motion: [static, walk]
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: platform
+          sparse-checkout: reality-lab
+      - uses: actions/checkout@v4
+        with:
+          repository: haihao0307/guilin-dem-pipeline
+          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
+          path: host
+          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+      - name: Scope, syntax and synthetic local-solve verification
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 7c3483d72d224d1e51d9e7d0088af87f94554616
+          python - <<'PY'
+          import ast,json,subprocess
+          from pathlib import Path
+          r=Path('reality-lab/hc-s3-12');files=subprocess.check_output(['git','diff','--name-only','7c3483d72d224d1e51d9e7d0088af87f94554616','HEAD'],text=True).splitlines()
+          assert files and all(p.startswith('reality-lab/hc-s3-12/') or p in ['.github/workflows/reality-hc-s312.yml','.github/workflows/reality-hc-s312-candidate.yml'] for p in files)
+          for p in r.rglob('*.py'):ast.parse(p.read_text(),filename=str(p))
+          q=r/'qa/source';q.mkdir(parents=True,exist_ok=True);(q/'SCOPE.json').write_text(json.dumps({'passed':True,'files':files,'productionChanged':False,'existingFixtureWorkflowPreserved':True},indent=2))
+          PY
+          node --check reality-lab/hc-s3-12/local-solve.mjs
+          node reality-lab/hc-s3-12/tests/unit.mjs
+      - name: Install pinned browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Same-runner guarded-reference and local-solve candidate
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+          RF312_MOTION: ${{ matrix.motion }}
+        run: python reality-lab/hc-s3-12/run_native.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf312-candidate-native-${{ matrix.motion }}
+          path: platform/reality-lab/hc-s3-12/qa/native/${{ matrix.motion }}/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf312-candidate-source-${{ matrix.motion }}
+          path: |
+            platform/reality-lab/hc-s3-12/*.mjs
+            platform/reality-lab/hc-s3-12/*.py
+            platform/reality-lab/hc-s3-12/*.json
+            platform/reality-lab/hc-s3-12/tests/
+            platform/reality-lab/hc-s3-12/qa/source/
+          retention-days: 7

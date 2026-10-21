@@ -1,0 +1,54 @@
+name: Reality HC S3.12 local contact solve
+on:
+  push:
+    branches: [feature/reality-hc-s312-local-solve-20261021]
+    paths: [.github/workflows/reality-hc-s312.yml, reality-lab/hc-s3-12/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fixtures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: platform
+          sparse-checkout: |
+            reality-lab/hc-s3-4
+            reality-lab/hc-s3-5
+            reality-lab/hc-s3-6
+            reality-lab/hc-s3-7
+            reality-lab/hc-s3-8
+            reality-lab/hc-s3-9
+            reality-lab/hc-s3-10
+            reality-lab/hc-s3-11
+            reality-lab/hc-s3-12
+      - uses: actions/checkout@v4
+        with:
+          repository: haihao0307/guilin-dem-pipeline
+          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
+          path: host
+          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+      - name: Install fixed browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Capture true failures and verify both old trajectories remain identical
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+        run: python reality-lab/hc-s3-12/capture_fixture.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf312-fixtures-and-native-toolkit
+          path: |
+            platform/reality-lab/hc-s3-12/qa/fixtures/
+            platform/reality-lab/hc-s3-12/_toolkit/
+            platform/reality-lab/hc-s3-11/qa/native/walk/*/REPORT.json
+            platform/reality-lab/hc-s3-11/qa/native/walk/RUN.json
+          retention-days: 30

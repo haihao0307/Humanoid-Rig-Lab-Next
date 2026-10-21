@@ -1,0 +1,4 @@
+/* Same strict segment/triangle predicate as S3.7. Boundary, coplanar and swept contacts are NOT certified. */
+const sub=(a,b)=>a.map((v,i)=>v-b[i]),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0);
+export function segmentTriangle(p,q,t){const d=sub(q,p),e1=sub(t[1],t[0]),e2=sub(t[2],t[0]),h=cross(d,e2),det=dot(e1,h);if(Math.abs(det)<1e-16)return null;const a=sub(p,t[0]),u=dot(a,h)/det,k=cross(a,e1),b=dot(d,k)/det,s=dot(e2,k)/det;if(u<1e-9||b<1e-9||u+b>1-1e-9||s<1e-9||s>1-1e-9)return null;return{point:p.map((x,i)=>x+d[i]*s),segmentFraction:s,barycentric:[1-u-b,u,b]};}
+export function triangleCrossing(a,b){for(const [first,second,role]of [[a,b,'source-edge'],[b,a,'target-edge']])for(let i=0;i<3;i++){const r=segmentTriangle(first[i],first[(i+1)%3],second);if(r)return{...r,role,edge:i};}return null;}
