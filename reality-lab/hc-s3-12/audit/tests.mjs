@@ -1,0 +1,37 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';import {LocalityAudit,validateFixture} from './locality-audit.mjs';import {segmentTriangle} from '../strict-crossing.mjs';
+const directory=process.argv[2],output=process.argv[3],results=[];if(!directory||!output)throw Error('Missing fixture directory or report output');
+const fixture=JSON.parse(fs.readFileSync(directory+'/baseline-step30.json')),later=JSON.parse(fs.readFileSync(directory+'/guarded-step102.json')),copy=x=>JSON.parse(JSON.stringify(x));
+function test(name,fn){fn();results.push({name,passed:true});console.log('PASS',name);}
+function reject(name,fn,pattern){test(name,()=>{const x=copy(fixture);fn(x);assert.throws(()=>validateFixture(x),pattern);});}
+test('actual native fixture valid',()=>assert(validateFixture(fixture)));
+reject('wrong capture scope rejected',x=>x.step=31,/SCOPE/);
+reject('wrong schema rejected',x=>x.schema='invented',/SCHEMA/);
+reject('changed source margin rejected',x=>x.margin=.00001,/SCOPE/);
+reject('relaxed source gate rejected',x=>x.limits.globalFitGate=2,/LIMITS/);
+reject('production mutation rejected',x=>x.limits.productionChanged=true,/LIMITS/);
+reject('empty body cannot validate',x=>x.body.positions=[],/GEOMETRY/);
+reject('nonfinite geometry rejected',x=>x.body.positions[0]=Infinity,/GEOMETRY/);
+reject('numeric-string position rejected',x=>x.cloth.positions[0]='0',/GEOMETRY/);
+reject('out-of-range topology rejected',x=>x.body.faces[0]=x.body.positions.length,/GEOMETRY/);
+reject('negative weights rejected',x=>x.cloth.weights[0]=-1,/WEIGHTS/);
+reject('duplicate mobile nodes rejected',x=>x.movable.push(x.movable[0]),/MOBILE/);
+reject('fixed-weight movable node rejected',x=>x.cloth.weights[x.movable[0]]=0,/MOBILE/);
+const source=JSON.stringify(fixture),a=new LocalityAudit(fixture),zero=a.inspect(a.rings(0)),one=a.inspect(a.rings(1));
+test('source arrays untouched by constructing BVH and audit',()=>assert.equal(JSON.stringify(fixture),source));
+test('three-corner scope reproduces real fixed edge',()=>{assert.equal(zero.mobileCount,3);assert.equal(zero.affectedFaceCount,14);assert.equal(zero.strictCrossingPairs.length,24);assert.equal(zero.fixedEdgeWitnesses.length,2);assert(zero.fixedEdgeWitnesses.every(w=>w.edge.includes(48)&&w.edge.includes(49)));});
+test('fixed witnesses endpoints are outside mobile set',()=>assert(zero.fixedEdgeWitnesses.every(w=>w.edge.every(n=>!zero.mobileNodes.includes(n)))));
+test('reported witness independently intersects exact original triangle',()=>{const w=zero.fixedEdgeWitnesses[0],p=id=>fixture.cloth.positions.slice(id*3,id*3+3),b=fixture.body,tri=b.faces.slice(w.bodyFaceOffset,w.bodyFaceOffset+3).map(id=>b.positions.slice(id*3,id*3+3));const hit=segmentTriangle(p(w.edge[0]),p(w.edge[1]),tri);assert(hit);assert(Math.hypot(...hit.point.map((x,i)=>x-w.point[i]))<1e-12);});
+test('arbitrary original-three-node displacement cannot change fixed edge',()=>{const f=copy(fixture),w=zero.fixedEdgeWitnesses[0],before=w.edge.map(id=>f.cloth.positions.slice(id*3,id*3+3));for(const n of f.movable)for(let k=0;k<3;k++)f.cloth.positions[n*3+k]+=.017*(k+1);assert.deepEqual(w.edge.map(id=>f.cloth.positions.slice(id*3,id*3+3)),before);const bt=f.body.faces.slice(w.bodyFaceOffset,w.bodyFaceOffset+3).map(id=>f.body.positions.slice(id*3,id*3+3));assert(segmentTriangle(before[0],before[1],bt));});
+test('one ring removes this obstruction but not crossings',()=>{assert.equal(one.mobileCount,13);assert.equal(one.fixedEdgeWitnesses.length,0);assert.equal(one.strictCrossingPairs.length,32);assert.equal(one.sufficientForSolution,false);assert.equal(one.necessaryMobilityCondition,'NOT_BLOCKED_BY_THIS_TEST');});
+test('no fake geometric change when scope grows',()=>{const map=new Map(zero.geometry.cloth.map(t=>[t.faceOffset,t]));for(const t of one.geometry.cloth)if(map.has(t.faceOffset))assert.deepEqual(t,map.get(t.faceOffset));});
+const b=new LocalityAudit(later),oneB=b.inspect(b.rings(1)),wide=b.inspect(b.rings(2)),adapt=b.enrich(b.rings(1),24);
+test('step102 one ring still has fixed crossing',()=>{assert.equal(oneB.mobileCount,12);assert.equal(oneB.fixedEdgeWitnesses.length,2);assert(oneB.fixedEdgeWitnesses.some(w=>w.edge.includes(448)&&w.edge.includes(468)));assert(oneB.fixedEdgeWitnesses.some(w=>w.edge.includes(468)&&w.edge.includes(469)));});
+test('uniform two-ring expansion exceeds current24 budget and remains blocked',()=>{assert.equal(wide.mobileCount,27);assert.equal(wide.fixedEdgeWitnesses.length,4);});
+test('adaptive scope reaches21 nodes without claiming a solve',()=>{assert.equal(adapt.final.mobileCount,21);assert.equal(adapt.final.fixedEdgeWitnesses.length,0);assert.equal(adapt.status,'NECESSARY_CONDITION_ONLY');assert.equal(adapt.solverExecuted,false);assert.equal(adapt.final.sufficientForSolution,false);});
+test('adaptive choice deterministic',()=>assert.deepEqual(b.enrich(b.rings(1),24),adapt));
+test('budget exhaustion is explicit',()=>assert.equal(b.enrich(b.rings(1),12).status,'NODE_BUDGET_REACHED'));
+test('enrichment only grows eligible node set one at a time',()=>{for(let i=1;i<adapt.steps.length;i++){const p=adapt.steps[i-1],n=adapt.steps[i];assert.equal(n.mobileCount,p.mobileCount+1);assert(p.mobileNodes.every(id=>n.mobileNodes.includes(id)));assert(n.mobileNodes.every(id=>later.cloth.weights[id]>0));}});
+test('all audits remain read only',()=>{assert.equal(JSON.stringify(fixture),source);assert.deepEqual(later,JSON.parse(fs.readFileSync(directory+'/guarded-step102.json')));});
+test('invalid budget and duplicate scopes rejected',()=>{assert.throws(()=>b.enrich(b.rings(1),11),/BUDGET/);assert.throws(()=>a.inspect([427,427]),/MOBILE/);assert.throws(()=>a.rings(3),/RING/);});
+test('predicate detects strict crossing without pretending coplanar certification',()=>{assert(segmentTriangle([.2,.2,-1],[.2,.2,1],[[0,0,0],[1,0,0],[0,1,0]]));assert.equal(segmentTriangle([.2,.2,0],[.3,.3,0],[[0,0,0],[1,0,0],[0,1,0]]),null);});
+fs.writeFileSync(output,JSON.stringify({passed:true,count:results.length,results,actualNativeFixtures:true,syntheticNegativeCasesLabelled:true,solverExecuted:false,productionChanged:false,fitCertified:false},null,2));
