@@ -1,5 +1,5 @@
 (function(root){'use strict';
-const finite=x=>typeof x==='number'&&Number.isFinite(x),hash=x=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x),sha=x=>typeof x==='string'&&/^[a-f0-9]{40}$/.test(x);
+const finite=x=>typeof x==='number'&&Number.isFinite(x),hash=x=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x),sha=x=>typeof x==='string'&&/^[a-f0-9]{40}$/.test(x),point=p=>Array.isArray(p)&&p.length===3&&p.every(finite);
 function validate(d,source){
  if(!d||d.schema!=='kaopu/local-contact-solve-review@1'||d.version!=='RF01-S3.12-LOCAL')throw Error('SCHEMA_MISMATCH');
  if(!d.source||!sha(d.source.nativeCommit)||!sha(d.source.nativeCodeCommit)||!hash(d.source.localModuleSHA256)||JSON.stringify(d.source)!==JSON.stringify(source))throw Error('SOURCE_MISMATCH');
@@ -7,7 +7,7 @@ function validate(d,source){
  if(!Array.isArray(d.cases)||d.cases.length!==4)throw Error('CASE_SET');const seen=new Set();
  for(const c of d.cases){const key=c.motion+':'+c.mode;if(!['static:reference','static:local','walk:reference','walk:local'].includes(key)||seen.has(key))throw Error('CASE_ID');seen.add(key);
   if(c.plannedSteps!==180||!Number.isInteger(c.completedSteps)||c.completedSteps<0||c.completedSteps>180||c.dtSeconds!==1/60||c.fitGate!==1.45||c.passCap!==32)throw Error('SOURCE_LIMITS');
-  if(!Array.isArray(c.points)||c.points.length>40||!hash(c.initialStateSHA256))throw Error('POINT_SET');let step=0;
+  if(!Array.isArray(c.points)||c.points.length<1||c.points.length>40||!hash(c.initialStateSHA256))throw Error('POINT_SET');let step=0;
   for(const p of c.points){if(!Number.isInteger(p.step)||p.step<=step||p.step>180||!hash(p.stateSHA256))throw Error('POINT_STEP');step=p.step;
    for(const k of ['top','bottom','pair']){const ch=p[k];if(!ch||!finite(ch.minimumM)||!['negative','beyondMargin','count'].every(n=>Number.isInteger(ch[n])&&ch[n]>=0)||ch.beyondMargin>ch.negative||ch.negative>ch.count)throw Error('CONTACT_VALUE');}
   }
@@ -19,10 +19,18 @@ function validate(d,source){
  const e=d.exact;if(!e||e.step!==30||e.faceOffset!==2598||!finite(e.budgetM)||e.budgetM<=0||!Array.isArray(e.scopes)||e.scopes.length<1||e.scopes.length>6)throw Error('EXACT_CASE');
  for(const s of e.scopes){if(!Array.isArray(s.nodes)||s.nodes.length>24||!['zero','guide','normal'].includes(s.seed)||!Array.isArray(s.iterations)||s.iterations.length>12)throw Error('LOCAL_SCOPE');
   for(const p of [s.before,s.after]){if(!p?.geometry||!Array.isArray(p.samples)||!Array.isArray(p.crossingPairs))throw Error('GEOMETRY_REQUIRED');
-   for(const sample of p.samples)if(!finite(sample.distanceM)||!Array.isArray(sample.point)||sample.point.length!==3||!sample.point.every(finite))throw Error('SAMPLE_VALUE');
-   for(const group of [p.geometry.cloth,p.geometry.body]){if(!Array.isArray(group)||group.length>4000)throw Error('GEOMETRY_SIZE');for(const f of group)if(!Array.isArray(f.triangle)||f.triangle.length!==3||f.triangle.some(p=>p.length!==3||!p.every(finite)))throw Error('GEOMETRY_VALUE');}
+   for(const sample of p.samples)if(!finite(sample.distanceM)||!point(sample.point))throw Error('SAMPLE_VALUE');
+   for(const group of [p.geometry.cloth,p.geometry.body]){if(!Array.isArray(group)||group.length>4000)throw Error('GEOMETRY_SIZE');for(const f of group)if(!Array.isArray(f.triangle)||f.triangle.length!==3||!f.triangle.every(point))throw Error('GEOMETRY_VALUE');}
   }
   if(s.status==='LOCAL_FEASIBLE'&&(!s.decision.allowed||s.after.crossingPairs.length!==0))throw Error('FALSE_LOCAL_SUCCESS');
+ }
+ const audit=d.boundaryAudit;if(!audit||audit.schema!=='kaopu/fixed-boundary-obstruction@1'||!hash(audit.codeSHA256)||!Array.isArray(audit.cases)||audit.cases.length!==2)throw Error('BOUNDARY_AUDIT');
+ for(const c of audit.cases){if(!hash(c.fixtureSHA256)||!Array.isArray(c.stages)||c.stages.length>5||c.scopeClosureIsNotASolution!==true||c.productionChanged!==false)throw Error('BOUNDARY_SCOPE');
+  for(const s of c.stages){if(!Array.isArray(s.movableNodes)||s.movableNodes.length>24||!Array.isArray(s.hits)||s.hits.length>1000)throw Error('BOUNDARY_SCOPE');
+   for(const h of s.hits){if(!Array.isArray(h.nodeIds)||h.nodeIds.length!==2||h.nodeIds.some(n=>!Number.isInteger(n)||s.movableNodes.includes(n))||!Array.isArray(h.edge)||h.edge.length!==2||!h.edge.every(point)||!point(h.point)||!finite(h.segmentFraction)||h.segmentFraction<=0||h.segmentFraction>=1||!point(h.barycentric)||h.barycentric.some(v=>v<=0)||Math.abs(h.barycentric.reduce((a,b)=>a+b,0)-1)>1e-7)throw Error('BOUNDARY_WITNESS');
+    if(!h.point.every((v,k)=>Math.abs(v-h.edge[0][k]-h.segmentFraction*(h.edge[1][k]-h.edge[0][k]))<1e-10))throw Error('BOUNDARY_WITNESS_RECONSTRUCTION');
+   }
+  }
  }
  return true;
 }
