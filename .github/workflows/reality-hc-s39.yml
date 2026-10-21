@@ -6,65 +6,182 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
-  native:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    defaults:
-      run:
-        working-directory: platform
+    timeout-minutes: 40
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          path: platform
-          sparse-checkout: |
-            reality-lab/hc-s3-6
-            reality-lab/hc-s3-7
-            reality-lab/hc-s3-8
-            reality-lab/hc-s3-9
-      - uses: actions/checkout@v4
-        with:
-          repository: haihao0307/guilin-dem-pipeline
-          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
-          path: host
-          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-      - name: Verify syntax and frozen candidate module
+          sparse-checkout: reality-lab/hc-s3-9
+      - name: Enforce scope, syntax and current evidence
+        run: |
+          git fetch --filter=blob:none --depth=1 origin ccc7e5da63b4bc5791c328396c39a42e770da5b8
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json,ast,shutil
+          r=Path('reality-lab/hc-s3-9');changed=subprocess.check_output(['git','diff','--name-only','ccc7e5da63b4bc5791c328396c39a42e770da5b8','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s3-9/') or p=='.github/workflows/reality-hc-s39.yml' for p in changed)
+          for p in r.rglob('*.py'):ast.parse(p.read_text())
+          for p in r.glob('*.js'):subprocess.run(['node','--check',str(p)],check=True)
+          for n in ['native','file','public','review']:shutil.rmtree(r/'qa'/n,ignore_errors=True)
+          q=r/'qa/review';q.mkdir(parents=True);(q/'SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'productionSourceChanged':False,'otherDomainsTouched':[]},indent=2))
+          PY
+      - name: Require completed frozen native experiment
         env:
-          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+          GH_TOKEN: ${{ github.token }}
         run: |
           python - <<'PY'
-          import ast,sys,os,subprocess
-          from pathlib import Path
-          r=Path('reality-lab/hc-s3-9');sys.path.insert(0,str(r.resolve()))
-          for p in r.rglob('*.py'):ast.parse(p.read_text())
-          from instrument import assemble
-          q=r/'_syntax';q.mkdir(exist_ok=True)
-          for v in ['baseline','coverage']:
-            out,m=assemble(Path(os.environ['GARMENT_HOST']),v,'walk')
-            for n,b in out.items():
-              p=q/(v+'-'+n);p.write_bytes(b);subprocess.run(['node','--check',str(p)],check=True)
+          import urllib.request,json,os,time
+          u='https://api.github.com/repos/haihao0307/Humanoid-Rig-Lab-Next/actions/runs/39555540346'
+          for i in range(90):
+            q=urllib.request.Request(u,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+            x=json.load(urllib.request.urlopen(q,timeout=60))
+            if x['status']=='completed':
+              assert x['conclusion']=='success',x['conclusion']
+              assert x['head_sha']=='bd9f57851becd8c26a71956e4820cc708eac5c97'
+              break
+            time.sleep(20)
+          else:raise RuntimeError('NATIVE_RUN_NOT_COMPLETED_NO_FALLBACK')
           PY
-      - name: Install pinned Chromium
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf39-native-endurance
+          run-id: 39555540346
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-9/qa/native
+      - name: Validate actual evidence and construct single file
+        env:
+          NATIVE_RUN_ID: '39555540346'
+        run: |
+          python reality-lab/hc-s3-9/build.py
+          node reality-lab/hc-s3-9/tests/review.cjs
+      - name: Install pinned independent Chromium
         run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
-      - name: Execute two-cycle A/B without concurrent native cases
+      - name: Verify actual standalone interactions
         env:
-          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-        run: python reality-lab/hc-s3-9/run_native.py
+          RF39_QA: ${{ github.workspace }}/reality-lab/hc-s3-9/qa/file
+        run: python reality-lab/hc-s3-9/tests/browser.py
+      - name: Freeze new verified inspector, not production fit
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-9')
+          for n in ['qa/native/RUN.json','qa/review/SCOPE.json','qa/review/PROTOCOL.json','qa/file/BROWSER.json']:assert json.loads((r/n).read_text())['passed'],n
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s39-endurance-cost-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-9/preview.html reality-lab/hc-s3-9/BUILD_MANIFEST.json reality-lab/hc-s3-9/EVIDENCE.json reality-lab/hc-s3-9/SUMMARY.json reality-lab/hc-s3-9/qa/native reality-lab/hc-s3-9/qa/review reality-lab/hc-s3-9/qa/file
+          git commit -m 'build(reality): freeze actual S3.9 endurance costs and explicit residual failures'
+          git push origin HEAD:refs/heads/feature/reality-hc-s39-endurance-cost-20261021
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-9/preview.html" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rf39-native-endurance
-          path: platform/reality-lab/hc-s3-9/qa/native/
+          name: rf39-build-evidence
+          path: |
+            reality-lab/hc-s3-9/qa/review/
+            reality-lab/hc-s3-9/qa/file/
+            reality-lab/hc-s3-9/SUMMARY.json
           retention-days: 30
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rf39-native-source
+          name: rf39-reviewed-source
           path: |
-            platform/reality-lab/hc-s3-9/*.py
-            platform/reality-lab/hc-s3-9/*.mjs
-            platform/reality-lab/hc-s3-9/*.json
+            reality-lab/hc-s3-9/*.js
+            reality-lab/hc-s3-9/*.mjs
+            reality-lab/hc-s3-9/*.py
+            reality-lab/hc-s3-9/BUILD_MANIFEST.json
+            reality-lab/hc-s3-9/README.md
+            reality-lab/hc-s3-9/index.template.html
+            reality-lab/hc-s3-9/tests/
           retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: rf39-standalone
+          path: |
+            reality-lab/hc-s3-9/preview.html
+            reality-lab/hc-s3-9/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-9
+      - name: Verify fixed public content bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF39_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,urllib.request,hashlib,time
+          r=Path('reality-lab/hc-s3-9');m=json.loads((r/'BUILD_MANIFEST.json').read_text());u='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-9/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(u,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'BYTES.json').write_text(json.dumps({'passed':True,'publicCommit':os.environ['BUILD_SHA'],'url':os.environ['RF39_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install pinned public browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify exact public interaction and 3D
+        env:
+          RF39_URL: ${{ needs.build.outputs.url }}
+          RF39_QA: ${{ github.workspace }}/reality-lab/hc-s3-9/qa/public
+        run: python reality-lab/hc-s3-9/tests/browser.py
+      - name: Persist actual study verdict and bounded next action
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF39_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-9');m=json.loads((r/'BUILD_MANIFEST.json').read_text());s=json.loads((r/'SUMMARY.json').read_text());p=json.loads((r/'qa/review/PROTOCOL.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());b=json.loads((r/'qa/public/BROWSER.json').read_text());n=json.loads((r/'qa/native/RUN.json').read_text())
+          assert n['passed'] and p['passed'] and f['passed'] and f['fileVerified'] and b['passed'] and b['publicVerified']
+          d={'version':'REALITY-HC-S3.9','status':'ENDURANCE_AND_COST_RECORDED_NOT_PRODUCTION_CERTIFIED','sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'fixedURL':os.environ['RF39_URL'],'workflowRun':os.environ['GITHUB_RUN_ID'],'nativeRun':m['nativeRun'],'nativeCodeCommit':m['nativeCodeCommit'],'html':m['html'],'summary':s,'protocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'sourceProductionChanged':False,'productionInstalled':False,'fitCertified':False,'continuousCollisionCertified':False,'physicalDeviceTested':False,'userVisualAccepted':False,'performanceScope':m['performanceBenchmarkScope'],'next':'Use the sustained failure and cost evidence to select one bounded contact or reconstruction correction; do not merge coverage merely because the initial 0.2 seconds passed. Preserve fitting rollback and original thresholds.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.9-ENDURANCE-COST-20261021','frameworkId':'RF01','status':d['status'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'fixedURL':d['fixedURL'],'lastActuallyCompletedStep':'Four same-runner duration/cost/correction studies and current standalone/public inspector','nextAction':d['next'],'userAccepted':False,'productionChanged':False},ensure_ascii=False,indent=2));print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s39-endurance-cost-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3-9/qa/public reality-lab/hc-s3-9/DELIVERY.json reality-lab/hc-s3-9/TASK_STATE.json
+          git commit -m 'docs(reality): record S3.9 public endurance evidence and remaining contact work'
+          git push origin HEAD:refs/heads/feature/reality-hc-s39-endurance-cost-20261021
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf39-public-evidence
+          path: reality-lab/hc-s3-9/qa/public/
+          retention-days: 30
