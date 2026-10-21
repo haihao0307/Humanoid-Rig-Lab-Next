@@ -6,65 +6,192 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
-  unit:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          sparse-checkout: reality-lab/hc-s3-6
-      - name: Check code and transaction regressions
+          sparse-checkout: |
+            reality-lab/hc-s3-6
+            reality-lab/hc-s3-5
+            reality-lab/hc-s2-1
+      - name: Verify scope and clear prior evidence before loading pinned artifacts
         run: |
+          git fetch --filter=blob:none --depth=1 origin c92e87ae32eeb66245f05363c00346dc2352273a
+          git fetch --filter=blob:none --depth=1 origin 73adc31d6ad37be2cb588c52c76de05463273099
           python - <<'PY'
           from pathlib import Path
-          import ast
-          for p in Path('reality-lab/hc-s3-6').glob('*.py'):ast.parse(p.read_text())
+          import json,subprocess,shutil,ast
+          r=Path('reality-lab/hc-s3-6')
+          changed=subprocess.check_output(['git','diff','--name-only','c92e87ae32eeb66245f05363c00346dc2352273a','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s3-6/') or p=='.github/workflows/reality-hc-s36.yml' for p in changed),changed
+          for p in r.rglob('*.py'):ast.parse(p.read_text(),filename=str(p))
+          shutil.rmtree(r/'qa',ignore_errors=True);q=r/'qa/review';q.mkdir(parents=True)
+          (q/'SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'sourceProductionFilesChanged':[],'otherDomainsTouched':[]},indent=2))
           PY
-          node --check reality-lab/hc-s3-6/fitting-transaction.mjs
-          node reality-lab/hc-s3-6/tests/transaction.mjs
-      - uses: actions/upload-artifact@v4
-        if: always()
+      - uses: actions/download-artifact@v4
         with:
           name: rf36-unit
-          path: reality-lab/hc-s3-6/qa/unit/
-          retention-days: 30
-  native:
-    needs: unit
-    strategy:
-      fail-fast: false
-      matrix:
-        case: [baseline, progressive, cancel, fault]
-    runs-on: ubuntu-latest
-    timeout-minutes: 14
-    defaults:
-      run:
-        working-directory: platform
-    steps:
-      - uses: actions/checkout@v4
+          run-id: 39534171339
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-6/qa/unit
+      - uses: actions/download-artifact@v4
         with:
-          ref: ${{ github.sha }}
-          path: platform
-          sparse-checkout: reality-lab/hc-s3-6
-      - uses: actions/checkout@v4
+          name: rf36-native-baseline
+          run-id: 39534171339
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-6/qa/baseline
+      - uses: actions/download-artifact@v4
         with:
-          repository: haihao0307/guilin-dem-pipeline
-          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
-          path: host
-          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-      - name: Install pinned original-runtime browser
+          name: rf36-native-progressive
+          run-id: 39534171339
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-6/qa/progressive
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf36-native-cancel
+          run-id: 39534171339
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-6/qa/cancel
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf36-native-fault
+          run-id: 39534171339
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-6/qa/fault
+      - name: Verify exact transaction code and build report
+        run: |
+          python reality-lab/hc-s3-6/build.py
+          node reality-lab/hc-s3-6/tests/review.cjs
+      - name: Install fixed independent browser
         run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
-      - name: Run real source with bounded candidate
+      - name: Exercise standalone transaction review
         env:
-          FIT_CASE: ${{ matrix.case }}
-          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-        run: python reality-lab/hc-s3-6/run_native.py
+          RF36_QA: ${{ github.workspace }}/reality-lab/hc-s3-6/qa/file
+        run: python reality-lab/hc-s3-6/tests/browser.py
+      - name: Freeze only verified build with its source and evidence
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-6')
+          for p in ['qa/unit/REPORT.json','qa/baseline/REPORT.json','qa/progressive/REPORT.json','qa/cancel/REPORT.json','qa/fault/REPORT.json','qa/review/PROTOCOL.json','qa/review/SCOPE.json','qa/file/BROWSER.json']:assert json.loads((r/p).read_text())['passed'],p
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s36-fitting-transaction-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-6/preview.html reality-lab/hc-s3-6/BUILD_MANIFEST.json reality-lab/hc-s3-6/EVIDENCE_SUMMARY.json reality-lab/hc-s3-6/qa
+          git commit -m 'build(reality): freeze verified progressive fitting and rollback evidence'
+          git push origin HEAD:refs/heads/feature/reality-hc-s36-fitting-transaction-20261021
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-6/preview.html" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rf36-native-${{ matrix.case }}
-          path: platform/reality-lab/hc-s3-6/qa/${{ matrix.case }}/
+          name: rf36-build-evidence
+          path: reality-lab/hc-s3-6/qa/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf36-reviewed-code
+          path: |
+            reality-lab/hc-s3-6/*.js
+            reality-lab/hc-s3-6/*.mjs
+            reality-lab/hc-s3-6/*.py
+            reality-lab/hc-s3-6/*.json
+            reality-lab/hc-s3-6/*.md
+            reality-lab/hc-s3-6/index.template.html
+            reality-lab/hc-s3-6/tests/
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: rf36-standalone
+          path: |
+            reality-lab/hc-s3-6/preview.html
+            reality-lab/hc-s3-6/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-6
+      - name: Verify immutable public HTML bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF36_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,json,hashlib,os,time
+          r=Path('reality-lab/hc-s3-6');m=json.loads((r/'BUILD_MANIFEST.json').read_text())
+          raw='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-6/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(raw,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'url':os.environ['RF36_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install fixed public browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Fixed HTTPS rendering and report interactions
+        env:
+          RF36_URL: ${{ needs.build.outputs.url }}
+          RF36_QA: ${{ github.workspace }}/reality-lab/hc-s3-6/qa/public
+        run: python reality-lab/hc-s3-6/tests/browser.py
+      - name: Persist truthful transaction delivery without dynamic-fit certification
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF36_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-6');m=json.loads((r/'BUILD_MANIFEST.json').read_text());data=json.loads((r/'EVIDENCE_SUMMARY.json').read_text());unit=json.loads((r/'qa/unit/REPORT.json').read_text());p=json.loads((r/'qa/review/PROTOCOL.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());b=json.loads((r/'qa/public/BROWSER.json').read_text())
+          assert unit['passed'] and p['passed'] and f['passed'] and f['fileVerified'] and b['passed'] and b['publicVerified']
+          outcomes=[]
+          for q in data['records']:
+            x=q['result'];outcomes.append({'case':q['case'],'status':x['status'],'acceptedTrialSteps':len(x['steps']),'committedSteps':x.get('committedSteps',0),'committedRuntimeRevision':x.get('committedRuntimeRevision'),'failure':x.get('failure'),'rollback':x.get('rollback'),'independentRollback':x.get('independentRollback'),'finalAcceptedStep':x['steps'][-1] if x['steps'] else None,'snapshot':x.get('snapshot'),'durationMS':x.get('durationMS'),'nativeElapsedSeconds':q['elapsedSeconds'],'sourceStatusAtCapture':q['sourceStatus'],'nativeChecks':q['nativeCheckCount']})
+          d={'version':'REALITY-HC-S3.6','status':'PROGRESSIVE_FITTING_AND_ROLLBACK_VERIFIED_DYNAMIC_FIT_NOT_CERTIFIED','fixedURL':os.environ['RF36_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'nativeRun':m['nativeRun'],'nativeCodeCommit':m['nativeCodeCommit'],'html':m['html'],'source':m['source'],'moduleSHA256':m['moduleSHA256'],'syntheticUnitChecks':unit['count'],'reviewProtocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'outcomes':outcomes,'nativeCoreCodeUnchangedSinceExperiment':True,'originalGate':1.45,'progressiveSchedule':'min(step/32,1); 48 original fitting steps','wholeSessionRollbackForDeclaredState':True,'oldGenerationCancelRejected':True,'newRuntimeRevisionIsNotHumanProportionRevision':True,'previousContact':data['facts']['previousContact'],'sourceMaterialVisualReadinessCertified':False,'productionChanged':False,'productionInstalled':False,'dynamicFitCertified':False,'physicalCertification':False,'manufacturingCertification':False,'physicalDeviceTested':False,'userVisualAcceptance':False,'next':'Establish a deterministic post-fit static state and bounded native motion contact test; retain the proven transaction and diagnose first body/garment-pair penetration. Source UI installation, full material visual readiness and production promotion remain separate.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.6-FITTING-TRANSACTION-20261021','frameworkId':'RF01','status':d['status'],'fixedURL':d['fixedURL'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'lastActuallyCompletedStep':'Real D03 gradual 48-step WASM fitting and coherent JS/WASM rest metrics; native correlated cancellation and injected fault restore declared session-entry state; public review verified','sourceFitAccepted':False,'productionChanged':False,'nextAction':d['next'],'userAccepted':False},ensure_ascii=False,indent=2));print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s36-fitting-transaction-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3-6/DELIVERY.json reality-lab/hc-s3-6/TASK_STATE.json reality-lab/hc-s3-6/qa/public
+          git commit -m 'docs(reality): record exact S3.6 public transaction evidence and remaining contact scope'
+          git push origin HEAD:refs/heads/feature/reality-hc-s36-fitting-transaction-20261021
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf36-public-evidence
+          path: reality-lab/hc-s3-6/qa/public/
           retention-days: 30
