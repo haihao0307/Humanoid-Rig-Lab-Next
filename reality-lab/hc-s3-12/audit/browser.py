@@ -1,0 +1,56 @@
+from pathlib import Path
+import json,os,hashlib,traceback
+from playwright.sync_api import sync_playwright
+R=Path(__file__).resolve().parent;Q=Path(os.environ.get('AUDIT_QA',str(R/'qa/file')));Q.mkdir(parents=True,exist_ok=True)
+M=json.loads((R/'BUILD_MANIFEST.json').read_text());URL=os.environ.get('AUDIT_URL',(R/'preview.html').as_uri());report={'passed':False,'url':URL,'sourceCommit':M['sourceCommit'],'checks':[],'pageErrors':[],'consoleErrors':[],'requestFailures':[],'solverExecuted':False,'fitCertified':False,'physicalDeviceTested':False};requests=[]
+def save():(Q/'BROWSER.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+def check(name,ok,detail=None):
+ if not ok:raise AssertionError(name+': '+str(detail))
+ report['checks'].append({'name':name,'passed':True,'detail':detail});print('PASS',name,flush=True);save()
+def shot(page,name):
+ p=Q/(name+'.png');page.screenshot(path=str(p),timeout=60000);report.setdefault('screenshots',[]).append({'file':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+with sync_playwright() as pw:
+ browser=pw.chromium.launch(headless=True,args=['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
+ context=browser.new_context(viewport={'width':1440,'height':1080},device_scale_factor=1,accept_downloads=True);page=context.new_page();page.set_default_timeout(60000)
+ page.on('pageerror',lambda e:report['pageErrors'].append(str(e)));page.on('console',lambda e:report['consoleErrors'].append(e.text) if e.type=='error' else None);page.on('request',lambda r:requests.append(r.url) if r.url.startswith(('http:','https:')) else None);page.on('requestfailed',lambda r:report['requestFailures'].append({'url':r.url,'reason':r.failure}))
+ state=lambda:page.evaluate('__RF312_AUDIT__.report()')
+ try:
+  page.goto(URL,wait_until='domcontentloaded',timeout=120000);page.wait_for_function('!!window.__RF312_AUDIT__')
+  check('source identity',state()['sourceCommit']==M['sourceCommit'])
+  check('payload hash verified',state()['verifiedPayloadSHA256']==M['dataSHA256'])
+  check('initial actual step102 one ring',state()['fixture']=='guarded-step102.json' and state()['scope']=='ring1' and state()['selected']['mobileCount']==12)
+  check('initial fixed-edge obstruction visible',state()['selected']['fixedEdgeWitnesses'] and '固定边阻碍' in page.locator('#banner').inner_text())
+  check('no solver or production claims',not any(state()[k] for k in ['solverExecuted','productionChanged','fitCertified','live']))
+  check('full original body used in recorded computation',state()['record']['bodyTriangles']>1000)
+  page.locator('[data-fixture="guarded-step30.json"]').click();page.locator('[data-scope="ring0"]').click();s=state()['selected'];check('step30 exact fixed-edge witness',s['mobileCount']==3 and len(s['fixedEdgeWitnesses'])==2 and all(set(w['edge'])=={48,49} for w in s['fixedEdgeWitnesses']))
+  original={t['faceOffset']:t for t in s['geometry']['cloth']}
+  page.locator('[data-scope="ring1"]').click();s=state()['selected'];check('step30 one-ring has no fixed witnesses but still crossings',s['mobileCount']==13 and not s['fixedEdgeWitnesses'] and len(s['strictCrossingPairs'])==32)
+  check('no witnesses never called a solved garment','仍未求解' in page.locator('#banner').inner_text() and not s['sufficientForSolution'])
+  check('scope selection does not move shared geometry',all(original[t['faceOffset']]==t for t in s['geometry']['cloth'] if t['faceOffset'] in original))
+  page.locator('[data-fixture="guarded-step102.json"]').click();page.locator('[data-scope="ring1"]').click();check('step102 one-ring still blocked',len(state()['selected']['fixedEdgeWitnesses'])==2)
+  page.locator('#witness').select_option('1');check('witness selection works',state()['witness']==1 and '468' in page.locator('#witness-text').inner_text())
+  shot(page,'01-fixed-boundary')
+  page.locator('[data-scope="adaptive"]').click();s=state()['selected'];check('adaptive21 within24 removes only fixed-edge obstruction',s['mobileCount']==21 and not s['fixedEdgeWitnesses'] and not s['sufficientForSolution'])
+  check('enrichment trace visible',len(page.locator('#trace p').all())==10)
+  check('geometry still unmoved',state()['originalGeometryNotMoved'])
+  page.locator('[data-scope="ring2"]').click();check('two-ring over-budget and obstruction retained',state()['selected']['mobileCount']==27 and len(state()['selected']['fixedEdgeWitnesses'])==4)
+  page.locator('[data-scope="adaptive"]').click();shot(page,'02-adaptive-mobility')
+  canvas=page.locator('#canvas');box=canvas.bounding_box();check('real WebGL drawing size',box['width']>300 and box['height']>250 and state()['draws']>0)
+  first=canvas.screenshot();cam=state()['camera'];page.mouse.move(box['x']+box['width']*.5,box['y']+box['height']*.5);page.mouse.down();page.mouse.move(box['x']+box['width']*.65,box['y']+box['height']*.6,steps=8);page.mouse.up();check('actual orbit changes camera and pixels',state()['camera']!=cam and hashlib.sha256(first).hexdigest()!=hashlib.sha256(canvas.screenshot()).hexdigest())
+  old=state()['camera']['zoom'];page.mouse.wheel(0,-150);page.wait_for_timeout(100);check('wheel zoom changes',state()['camera']['zoom']!=old)
+  first=canvas.screenshot();page.locator('#show-body').uncheck();check('body visibility changes actual pixels',hashlib.sha256(first).hexdigest()!=hashlib.sha256(canvas.screenshot()).hexdigest());page.locator('#show-body').check()
+  page.locator('#view-reset').click();check('camera reset works',state()['camera']=={'yaw':-.5,'pitch':.25,'zoom':1})
+  with page.expect_download() as ev:page.locator('#export').click()
+  p=Q/'EXPORTED_REVIEW.json';ev.value.save_as(p);x=json.loads(p.read_text());check('export preserves audit and no-solve distinction',x['schema']=='kaopu/contact-locality-review@1' and len(x['audit']['records'])==3 and not x['solverExecuted'] and not x['fitCertified'])
+  page.locator('#reset').click();check('default restores unresolved original state',state()['scope']=='ring1' and state()['fixture']=='guarded-step102.json' and len(state()['selected']['fixedEdgeWitnesses'])==2)
+  check('no hidden native workbench loaded',page.locator('iframe').count()==0)
+  page.set_viewport_size({'width':390,'height':844});page.evaluate('scrollTo(0,0)');page.wait_for_timeout(100);check('390px viewport no horizontal page overflow',page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'));shot(page,'03-mobile-audit')
+  if URL.startswith('file:'):check('file viewer no network dependencies',not requests,requests)
+  check('zero page errors',not report['pageErrors'],report['pageErrors']);check('zero console errors',not report['consoleErrors'],report['consoleErrors']);check('zero failed requests',not report['requestFailures'],report['requestFailures'])
+  report['passed']=True;report['publicVerified']=URL.startswith('https:');report['fileVerified']=URL.startswith('file:')
+ except Exception as e:
+  report['failure']=str(e);report['trace']=traceback.format_exc();print(report['trace'],flush=True)
+  try:report['lastState']=state();shot(page,'FAILURE')
+  except Exception as e2:report['captureFailure']=str(e2)
+ finally:save();context.close();browser.close()
+if not report['passed']:raise SystemExit(1)
