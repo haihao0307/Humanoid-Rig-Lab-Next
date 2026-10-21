@@ -1,0 +1,17 @@
+{
+ "taskId":"RF01-S3.7-CONTACT-ORIGIN-20261021","frameworkId":"RF01",
+ "baseCommit":"99df096fd59d8813de8942225dce8e965aa533d1",
+ "allowedPaths":["reality-lab/hc-s3-7/",".github/workflows/reality-hc-s37.yml"],
+ "primaryDefect":"Previous contact sampling had no controlled post-fit start; distinguish inherited fit/transition contact violations from motion-created ones.",
+ "source":{"repository":"haihao0307/guilin-dem-pipeline","commit":"c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49","directory":"kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef","sourcePR":283,"branchHeadAtRead":"bd430222b3c62819bdf38d2c84d4bf3eec8ac5be"},
+ "transactionSHA256":"db7e42558409bd93e782e96d60d2c39fb20f3dfa215879289589f99b19763a96",
+ "conditions":["static","walk","walk-repeat"],
+ "captureBoundaries":["after 48-step WASM fitting commit","after original ReducedCloth constructor, no motion step","after explicit motion selection, no motion step","12 original fixed steps at 1/60 second"],
+ "measurement":{"reportMarginM":0.00005,"marginMeaning":"numerical reporting margin, not manufacturing tolerance","bodySamples":"all physics control vertices and face centroids","pairSamples":"top vertices, edge midpoints and face centroids against bottom within native 25mm search, interior barycentric eligibility","signMeaning":"native normal-oriented closest distance, not unconditional global insideness","bodyWitnessCheck":"independent solid-angle winding for minimum witness","localIntersectionCheck":"strict segment-triangle test on witness triangle pair; absence is not a no-collision certificate"},
+ "protected":["S3.6 transaction exact bytes","1.45 original strain gate","original contact/solver functions","original native body and paper parameters","original time step and iterations","source production branches"],
+ "acceptance":["all cases start from same post-fit physics state","walk repeat matches per-step numerical state hashes","probe queries copied surfaces and does not mutate measured state","explicit initial residual versus later new violating sample IDs","no automatic app walk before capture","native code tests and fixed HTTPS inspector real browser checks","negative distances remain measurement-limited; no fake full-surface certification"],
+ "forbidden":["hide body","increase collision thickness to conceal errors","disable safety gate","merge","force-push","claim diagnostic replay is a live try-on"],
+ "scope":["human","garment","pattern","fabric","footwear"],
+ "excluded":["architecture","aircraft","terrain","animals","vegetation","full-world"],
+ "approval":{"implementationRequested":true,"mergeAuthorized":false,"productionPromotion":false}
+}

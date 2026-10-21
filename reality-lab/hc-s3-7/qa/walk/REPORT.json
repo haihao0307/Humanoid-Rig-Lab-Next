@@ -1,0 +1,5699 @@
+{
+  "case": "walk",
+  "passed": true,
+  "checks": [
+    {
+      "name": "native contact sequence returned",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "unchanged S3.6 transaction completed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "three pre-motion boundaries recorded",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "no unknown automatic frames",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all probes preserve checked state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "fixed steps have explicit times",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "motion time controlled",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "terminal scope explicit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "actual surfaces sampled",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "finite raw distance measurements",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "source contact code untouched",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "no unhandled page errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "no failed requests",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "codeCommit": "9a0a830347d47ca32926f22e6c24257abc758f30",
+  "assembly": {
+    "case": "walk",
+    "prior": {
+      "mode": "progressive",
+      "sourcePin": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "sourceFiles": {
+        "live-cloth-worker.mjs": "7cd945c060e4206bdef1b2b1eba302d8bd4a0cd9c44d0858b6031db3cf21d3c7",
+        "wasm-cloth.mjs": "33df85592209c3ddd60224a75fe3129666028ab185f0da5eb1a9fd9e35b62de5",
+        "gpu-cloth.mjs": "ae88c3615826d6f99f32576a84f447f8e5654492be8df7e66dee80b7032a80f4",
+        "coupled-cloth.mjs": "1f0e93ba23658fd0b3d16abd27325b4c3d29cba267b94078f05fafc7105cdd68"
+      },
+      "workerBeforeSHA256": "7cd945c060e4206bdef1b2b1eba302d8bd4a0cd9c44d0858b6031db3cf21d3c7",
+      "workerCandidateSHA256": "207796b005e6ce79887040223bdbbf4a20987fb8c60b5c1436fa9daad791ea28",
+      "moduleSHA256": "db7e42558409bd93e782e96d60d2c39fb20f3dfa215879289589f99b19763a96",
+      "reverseExact": true,
+      "protectedKernelChanged": false,
+      "gpuExecutionTested": false,
+      "productionSourceChanged": false
+    },
+    "sourceContactFiles": {
+      "mesh-contact.mjs": "0fe9b8e0840c7b35c4ee3fce9b7d648c220043783ad6166314812472ddde8ff3",
+      "native-motion.mjs": "9bc07e1720923f5caab4b7ea4862ed5b24d0b860d82efdd37afaf16191166503",
+      "reduced-cloth.mjs": "a851fdee4a269c05e6cd0d8efd3479d9985a557247659235b67d6646940cf4e2",
+      "lower-body-contact.mjs": "f60b9420e22a102a510db3b9634c6e29cebe5f1887bb3b9276b18ac8c12c6df6"
+    },
+    "transactionSHA256": "db7e42558409bd93e782e96d60d2c39fb20f3dfa215879289589f99b19763a96",
+    "probeSHA256": "55349ab8a0d09cad19ae6e9155794e83223ce72077326c7102392a49b24de2ec",
+    "workerSHA256": "fcb0899523b3061227d06016440dd97009b767478adb05e0ad00fed2219c762e",
+    "removableToS36": true,
+    "sourceSolverChanged": false,
+    "automaticMotionBeforeCapture": false
+  },
+  "fitCertified": false,
+  "physicalDeviceTested": false,
+  "result": {
+    "schema": "kaopu/contact-origin@1",
+    "case": "walk",
+    "records": [
+      {
+        "stage": "fit-committed",
+        "step": 0,
+        "frame": 48,
+        "simulationSeconds": 0.7999999999999984,
+        "motion": "idle",
+        "motionTime": 0,
+        "backend": "wasm",
+        "stateSHA256": "478d40e16d40bf037d665dd4aeec27073c3eb63121f7fbaa4c3c4c93e18ddf3d",
+        "stateBytes": 1756349,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0037963264818439875,
+            "witness": {
+              "id": "top:v76",
+              "role": "top",
+              "kind": "vertex",
+              "nodeIds": [
+                76
+              ],
+              "materialSites": [
+                {
+                  "node": 76,
+                  "sites": [
+                    {
+                      "panel": "left_btorso",
+                      "localVertex": 76
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 24,
+              "sourceFace": {
+                "panel": "left_btorso",
+                "localTriangle": 8
+              },
+              "targetFaceOffset": 29025,
+              "targetTriangleId": 9675,
+              "point": [
+                0.20415984030998838,
+                0.37950501078383464,
+                -0.04375720844150965
+              ],
+              "closest": [
+                0.20056219140358003,
+                0.380189882464529,
+                -0.04275722449966275
+              ],
+              "barycentric": [
+                0.2829401250040975,
+                0.6301163910260491,
+                0.08694348396985338
+              ],
+              "queryDirection": [
+                0.9476658352789674,
+                -0.1804037887599444,
+                -0.2634083097513714
+              ],
+              "orientedDistanceM": 0.0037963264818439875,
+              "sourceTriangle": [
+                [
+                  0.2079307169662133,
+                  0.376189319903772,
+                  -0.034464502513591774
+                ],
+                [
+                  0.21193049802460487,
+                  0.36533955646590566,
+                  -0.03221977297937816
+                ],
+                [
+                  0.20415984030998838,
+                  0.37950501078383464,
+                  -0.04375720844150965
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.20119288563728333,
+                  0.3661036193370819,
+                  -0.030840734019875526
+                ],
+                [
+                  0.19980822503566742,
+                  0.38641056418418884,
+                  -0.04973021149635315
+                ],
+                [
+                  0.20397403836250305,
+                  0.3809468746185303,
+                  -0.031000850722193718
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.001614697097744642,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.003279182077223073,
+            "witness": {
+              "id": "bottom:v2891",
+              "role": "bottom",
+              "kind": "vertex",
+              "nodeIds": [
+                2891
+              ],
+              "materialSites": [
+                {
+                  "node": 2891,
+                  "sites": [
+                    {
+                      "panel": "wb_front",
+                      "localVertex": 59
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 17124,
+              "sourceFace": {
+                "panel": "wb_front",
+                "localTriangle": 108
+              },
+              "targetFaceOffset": 16185,
+              "targetTriangleId": 5395,
+              "point": [
+                -0.1209275330376721,
+                0.15997262653702554,
+                0.10262822718452091
+              ],
+              "closest": [
+                -0.11924158162890752,
+                0.15988274659399326,
+                0.09981708426060078
+              ],
+              "barycentric": [
+                0.02835698279942178,
+                0.275491425736824,
+                0.6961515914637543
+              ],
+              "queryDirection": [
+                -0.5141377846857182,
+                0.02740925661206096,
+                0.8572695439652782
+              ],
+              "orientedDistanceM": 0.003279182077223073,
+              "sourceTriangle": [
+                [
+                  -0.10928799077150422,
+                  0.16221379515416467,
+                  0.1106280984282609
+                ],
+                [
+                  -0.1209275330376721,
+                  0.15997262653702554,
+                  0.10262822718452091
+                ],
+                [
+                  -0.13029465391707865,
+                  0.14740692638220737,
+                  0.1147006725821675
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.10176466405391693,
+                  0.16002601385116577,
+                  0.11029408872127533
+                ],
+                [
+                  -0.1181405708193779,
+                  0.17346246540546417,
+                  0.10004322230815887
+                ],
+                [
+                  -0.1203891932964325,
+                  0.15450294315814972,
+                  0.0993008241057396
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0009435225552604961,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 793,
+          "negative": 0,
+          "beyondMargin": 0,
+          "minimumM": 0.002100999999999999,
+          "witness": {
+            "id": "top-to-bottom:e5156",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              1701,
+              1702
+            ],
+            "materialSites": [
+              {
+                "node": 1701,
+                "sites": [
+                  {
+                    "panel": "right_ftorso",
+                    "localVertex": 96
+                  }
+                ]
+              },
+              {
+                "node": 1702,
+                "sites": [
+                  {
+                    "panel": "right_ftorso",
+                    "localVertex": 97
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 9804,
+            "sourceFace": {
+              "panel": "right_ftorso",
+              "localTriangle": 177
+            },
+            "targetFaceOffset": 16305,
+            "targetTriangleId": 5435,
+            "point": [
+              -0.17283891614116811,
+              0.08156725678967769,
+              0.060806294982768405
+            ],
+            "closest": [
+              -0.1707866038281322,
+              0.08144789325852572,
+              0.06037274277461793
+            ],
+            "barycentric": [
+              0.3013248376185942,
+              0.47690439560381737,
+              0.22177076677758847
+            ],
+            "queryDirection": [
+              -0.9768264221970034,
+              0.05681272306138363,
+              0.20635516808685053
+            ],
+            "orientedDistanceM": 0.002100999999999999,
+            "sourceTriangle": [
+              [
+                -0.17507224767409763,
+                0.08018283841570703,
+                0.05168637045768689
+              ],
+              [
+                -0.1706055846082386,
+                0.08295167516364836,
+                0.06992621950784991
+              ],
+              [
+                -0.17313275225506827,
+                0.08831380339372175,
+                0.060322914284491574
+              ]
+            ],
+            "targetTriangle": [
+              [
+                -0.17327043722704777,
+                0.07684617067449098,
+                0.049881909316485784
+              ],
+              [
+                -0.16917705666962152,
+                0.0795928646579264,
+                0.06850259691840212
+              ],
+              [
+                -0.17087299672609577,
+                0.09168948026748684,
+                0.057144118466116146
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_f_r",
+              "localTriangle": 1293
+            }
+          },
+          "newSincePrevious": 0,
+          "newSinceInitial": 0
+        },
+        "measurementMS": 167,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "regional-created",
+        "step": 0,
+        "frame": 48,
+        "simulationSeconds": 0.7999999999999984,
+        "motion": "idle",
+        "motionTime": 0,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "f6e6843a5aad78d682e64e559086254cd9f38e53752a61c6cb408dee3f7c998d",
+        "stateBytes": 1804541,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.003999999964139189,
+            "witness": {
+              "id": "top:v1179",
+              "role": "top",
+              "kind": "vertex",
+              "nodeIds": [
+                1179
+              ],
+              "materialSites": [
+                {
+                  "node": 1179,
+                  "sites": [
+                    {
+                      "panel": "right_btorso",
+                      "localVertex": 40
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 6570,
+              "sourceFace": {
+                "panel": "right_btorso",
+                "localTriangle": 78
+              },
+              "targetFaceOffset": 1860,
+              "targetTriangleId": 620,
+              "point": [
+                -0.2021185682228543,
+                0.3861451144429099,
+                -0.060003732516375745
+              ],
+              "closest": [
+                -0.20254407062773044,
+                0.38980545940508027,
+                -0.058447833363322425
+              ],
+              "barycentric": [
+                5.551115123125783e-17,
+                0.6169187049348523,
+                0.3830812950651476
+              ],
+              "queryDirection": [
+                0.1063756021727175,
+                -0.915086248746529,
+                -0.38897479175056776
+              ],
+              "orientedDistanceM": 0.003999999964139189,
+              "sourceTriangle": [
+                [
+                  -0.20178513970764012,
+                  0.3809266798244114,
+                  -0.05254396259910672
+                ],
+                [
+                  -0.2021185682228543,
+                  0.3861451144429099,
+                  -0.060003732516375745
+                ],
+                [
+                  -0.20454926825886083,
+                  0.375805094381513,
+                  -0.060991425296339594
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.19926726818084717,
+                  0.40176308155059814,
+                  -0.07343674451112747
+                ],
+                [
+                  -0.19981352984905243,
+                  0.3864125609397888,
+                  -0.04971909895539284
+                ],
+                [
+                  -0.2069413661956787,
+                  0.3952694237232208,
+                  -0.0725046917796135
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.001584457635474125,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.003999999906332934,
+            "witness": {
+              "id": "bottom:v2878",
+              "role": "bottom",
+              "kind": "vertex",
+              "nodeIds": [
+                2878
+              ],
+              "materialSites": [
+                {
+                  "node": 2878,
+                  "sites": [
+                    {
+                      "panel": "wb_front",
+                      "localVertex": 46
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 17046,
+              "sourceFace": {
+                "panel": "wb_front",
+                "localTriangle": 82
+              },
+              "targetFaceOffset": 43710,
+              "targetTriangleId": 14570,
+              "point": [
+                0.08097214598071678,
+                0.1657445925357495,
+                0.12516854881462922
+              ],
+              "closest": [
+                0.07934651310286184,
+                0.16606959655036493,
+                0.12152826182215398
+              ],
+              "barycentric": [
+                0.006545914434077635,
+                0.8964019357148107,
+                0.09705214985111162
+              ],
+              "queryDirection": [
+                0.4064082289805025,
+                -0.08125100555649523,
+                0.9100717694297465
+              ],
+              "orientedDistanceM": 0.003999999906332934,
+              "sourceTriangle": [
+                [
+                  0.09530081176914756,
+                  0.16405906461720274,
+                  0.11830137842560523
+                ],
+                [
+                  0.08097214598071678,
+                  0.1657445925357495,
+                  0.12516854881462922
+                ],
+                [
+                  0.08789666165887926,
+                  0.1446597713472465,
+                  0.12570887181155793
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.05867685377597809,
+                  0.16473206877708435,
+                  0.1306392401456833
+                ],
+                [
+                  0.07975714653730392,
+                  0.1639135330915451,
+                  0.12115239351987839
+                ],
+                [
+                  0.0769478976726532,
+                  0.18607383966445923,
+                  0.12438537925481796
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0009979914773640794,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 794,
+          "negative": 0,
+          "beyondMargin": 0,
+          "minimumM": 0.0021009999864747375,
+          "witness": {
+            "id": "top-to-bottom:e1539",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              566,
+              5
+            ],
+            "materialSites": [
+              {
+                "node": 566,
+                "sites": [
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 22
+                  }
+                ]
+              },
+              {
+                "node": 5,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 5
+                  },
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 1
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 2961,
+            "sourceFace": {
+              "panel": "left_ftorso",
+              "localTriangle": 2
+            },
+            "targetFaceOffset": 8817,
+            "targetTriangleId": 2939,
+            "point": [
+              0.17399511031805787,
+              0.07481803215587829,
+              0.0072798024323006425
+            ],
+            "closest": [
+              0.17199743593468833,
+              0.07448244095143726,
+              0.007837365473308395
+            ],
+            "barycentric": [
+              0.08722481761858025,
+              0.4124902112315961,
+              0.5002849711498236
+            ],
+            "queryDirection": [
+              0.9508207502282892,
+              0.15972927491737748,
+              -0.2653798403603448
+            ],
+            "orientedDistanceM": 0.0021009999864747375,
+            "sourceTriangle": [
+              [
+                0.17182993554291506,
+                0.07402835820581678,
+                -0.002006537213223079
+              ],
+              [
+                0.1711047062330662,
+                0.08948146649157415,
+                -0.0029353306795251595
+              ],
+              [
+                0.17616028509320064,
+                0.0756077061059398,
+                0.016566142077824364
+              ]
+            ],
+            "targetTriangle": [
+              [
+                0.1701728952404257,
+                0.07616777702877472,
+                0.0023146639744848693
+              ],
+              [
+                0.16932110801732192,
+                0.08047580985545867,
+                0.0018557820691579511
+              ],
+              [
+                0.17452220555619263,
+                0.0692470065725859,
+                0.013732128264395705
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_f_l",
+              "localTriangle": 119
+            }
+          },
+          "newSincePrevious": 0,
+          "newSinceInitial": 0
+        },
+        "measurementMS": 130.5,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "motion-selected",
+        "step": 0,
+        "frame": 48,
+        "simulationSeconds": 0.7999999999999984,
+        "motion": "walk",
+        "motionTime": 0,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "c6da2a75e2960ec5f60a8da8786f8566466b4cca2b00808016ca7c9d0b5591b1",
+        "stateBytes": 1804541,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.003999999964139189,
+            "witness": {
+              "id": "top:v1179",
+              "role": "top",
+              "kind": "vertex",
+              "nodeIds": [
+                1179
+              ],
+              "materialSites": [
+                {
+                  "node": 1179,
+                  "sites": [
+                    {
+                      "panel": "right_btorso",
+                      "localVertex": 40
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 6570,
+              "sourceFace": {
+                "panel": "right_btorso",
+                "localTriangle": 78
+              },
+              "targetFaceOffset": 1860,
+              "targetTriangleId": 620,
+              "point": [
+                -0.2021185682228543,
+                0.3861451144429099,
+                -0.060003732516375745
+              ],
+              "closest": [
+                -0.20254407062773044,
+                0.38980545940508027,
+                -0.058447833363322425
+              ],
+              "barycentric": [
+                5.551115123125783e-17,
+                0.6169187049348523,
+                0.3830812950651476
+              ],
+              "queryDirection": [
+                0.1063756021727175,
+                -0.915086248746529,
+                -0.38897479175056776
+              ],
+              "orientedDistanceM": 0.003999999964139189,
+              "sourceTriangle": [
+                [
+                  -0.20178513970764012,
+                  0.3809266798244114,
+                  -0.05254396259910672
+                ],
+                [
+                  -0.2021185682228543,
+                  0.3861451144429099,
+                  -0.060003732516375745
+                ],
+                [
+                  -0.20454926825886083,
+                  0.375805094381513,
+                  -0.060991425296339594
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.19926726818084717,
+                  0.40176308155059814,
+                  -0.07343674451112747
+                ],
+                [
+                  -0.19981352984905243,
+                  0.3864125609397888,
+                  -0.04971909895539284
+                ],
+                [
+                  -0.2069413661956787,
+                  0.3952694237232208,
+                  -0.0725046917796135
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.001584457635474125,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.003999999906332934,
+            "witness": {
+              "id": "bottom:v2878",
+              "role": "bottom",
+              "kind": "vertex",
+              "nodeIds": [
+                2878
+              ],
+              "materialSites": [
+                {
+                  "node": 2878,
+                  "sites": [
+                    {
+                      "panel": "wb_front",
+                      "localVertex": 46
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 17046,
+              "sourceFace": {
+                "panel": "wb_front",
+                "localTriangle": 82
+              },
+              "targetFaceOffset": 43710,
+              "targetTriangleId": 14570,
+              "point": [
+                0.08097214598071678,
+                0.1657445925357495,
+                0.12516854881462922
+              ],
+              "closest": [
+                0.07934651310286184,
+                0.16606959655036493,
+                0.12152826182215398
+              ],
+              "barycentric": [
+                0.006545914434077635,
+                0.8964019357148107,
+                0.09705214985111162
+              ],
+              "queryDirection": [
+                0.4064082289805025,
+                -0.08125100555649523,
+                0.9100717694297465
+              ],
+              "orientedDistanceM": 0.003999999906332934,
+              "sourceTriangle": [
+                [
+                  0.09530081176914756,
+                  0.16405906461720274,
+                  0.11830137842560523
+                ],
+                [
+                  0.08097214598071678,
+                  0.1657445925357495,
+                  0.12516854881462922
+                ],
+                [
+                  0.08789666165887926,
+                  0.1446597713472465,
+                  0.12570887181155793
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.05867685377597809,
+                  0.16473206877708435,
+                  0.1306392401456833
+                ],
+                [
+                  0.07975714653730392,
+                  0.1639135330915451,
+                  0.12115239351987839
+                ],
+                [
+                  0.0769478976726532,
+                  0.18607383966445923,
+                  0.12438537925481796
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0009979914773640794,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 794,
+          "negative": 0,
+          "beyondMargin": 0,
+          "minimumM": 0.0021009999864747375,
+          "witness": {
+            "id": "top-to-bottom:e1539",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              566,
+              5
+            ],
+            "materialSites": [
+              {
+                "node": 566,
+                "sites": [
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 22
+                  }
+                ]
+              },
+              {
+                "node": 5,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 5
+                  },
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 1
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 2961,
+            "sourceFace": {
+              "panel": "left_ftorso",
+              "localTriangle": 2
+            },
+            "targetFaceOffset": 8817,
+            "targetTriangleId": 2939,
+            "point": [
+              0.17399511031805787,
+              0.07481803215587829,
+              0.0072798024323006425
+            ],
+            "closest": [
+              0.17199743593468833,
+              0.07448244095143726,
+              0.007837365473308395
+            ],
+            "barycentric": [
+              0.08722481761858025,
+              0.4124902112315961,
+              0.5002849711498236
+            ],
+            "queryDirection": [
+              0.9508207502282892,
+              0.15972927491737748,
+              -0.2653798403603448
+            ],
+            "orientedDistanceM": 0.0021009999864747375,
+            "sourceTriangle": [
+              [
+                0.17182993554291506,
+                0.07402835820581678,
+                -0.002006537213223079
+              ],
+              [
+                0.1711047062330662,
+                0.08948146649157415,
+                -0.0029353306795251595
+              ],
+              [
+                0.17616028509320064,
+                0.0756077061059398,
+                0.016566142077824364
+              ]
+            ],
+            "targetTriangle": [
+              [
+                0.1701728952404257,
+                0.07616777702877472,
+                0.0023146639744848693
+              ],
+              [
+                0.16932110801732192,
+                0.08047580985545867,
+                0.0018557820691579511
+              ],
+              [
+                0.17452220555619263,
+                0.0692470065725859,
+                0.013732128264395705
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_f_l",
+              "localTriangle": 119
+            }
+          },
+          "newSincePrevious": 0,
+          "newSinceInitial": 0
+        },
+        "measurementMS": 126.5,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 1,
+        "frame": 49,
+        "simulationSeconds": 0.8166666666666651,
+        "motion": "walk",
+        "motionTime": 0.016666666666666666,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "05ff3f4326dc3227ea08fb6614867e7e3023125528b11b00a4ad29b7e8c2993f",
+        "stateBytes": 1804560,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0037711310118623523,
+            "witness": {
+              "id": "top:t4145",
+              "role": "top",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                2174,
+                2175,
+                2183
+              ],
+              "materialSites": [
+                {
+                  "node": 2174,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 569
+                    }
+                  ]
+                },
+                {
+                  "node": 2175,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 570
+                    }
+                  ]
+                },
+                {
+                  "node": 2183,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 578
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 12435,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 1054
+              },
+              "targetFaceOffset": 924,
+              "targetTriangleId": 308,
+              "point": [
+                -0.07414011964933674,
+                0.4885643384019975,
+                0.08656709845502537
+              ],
+              "closest": [
+                -0.07365397840700055,
+                0.4857202708668969,
+                0.08413885306855458
+              ],
+              "barycentric": [
+                0.01239572732211247,
+                0.5995803983794206,
+                0.38802387429846696
+              ],
+              "queryDirection": [
+                -0.1289112578711791,
+                0.7541683187760835,
+                0.643903746338322
+              ],
+              "orientedDistanceM": 0.0037711310118623523,
+              "sourceTriangle": [
+                [
+                  -0.08386960534829269,
+                  0.48511077215982895,
+                  0.08834678601788525
+                ],
+                [
+                  -0.06509992895065655,
+                  0.4856997419513504,
+                  0.09146820575491811
+                ],
+                [
+                  -0.07345082464906098,
+                  0.4948825010948129,
+                  0.07988630359227276
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.06817471981048584,
+                  0.5034040212631226,
+                  0.06452383100986481
+                ],
+                [
+                  -0.08662638813257217,
+                  0.486233651638031,
+                  0.08094044774770737
+                ],
+                [
+                  -0.053783852607011795,
+                  0.48436206579208374,
+                  0.08970769494771957
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.008130039925843742,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.003999989064860288,
+            "witness": {
+              "id": "bottom:v2811",
+              "role": "bottom",
+              "kind": "vertex",
+              "nodeIds": [
+                2811
+              ],
+              "materialSites": [
+                {
+                  "node": 2811,
+                  "sites": [
+                    {
+                      "panel": "wb_back",
+                      "localVertex": 11
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 16440,
+              "sourceFace": {
+                "panel": "wb_back",
+                "localTriangle": 2
+              },
+              "targetFaceOffset": 16530,
+              "targetTriangleId": 5510,
+              "point": [
+                -0.1464289266532312,
+                0.14869764224593243,
+                -0.01473289527004318
+              ],
+              "closest": [
+                -0.14350390469717866,
+                0.14780263335435348,
+                -0.012155470555409005
+              ],
+              "barycentric": [
+                0.09630653290141411,
+                0.18681277410589098,
+                0.716880692992695
+              ],
+              "queryDirection": [
+                -0.7312574881138352,
+                0.22375283458686485,
+                -0.6443579401945688
+              ],
+              "orientedDistanceM": 0.003999989064860288,
+              "sourceTriangle": [
+                [
+                  -0.15579457384019574,
+                  0.1471038380579008,
+                  0.00023009728752203167
+                ],
+                [
+                  -0.1464289266532312,
+                  0.14869764224593243,
+                  -0.01473289527004318
+                ],
+                [
+                  -0.16176311745977862,
+                  0.134713251184858,
+                  -0.001412912391307334
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.13384969532489777,
+                  0.1400682032108307,
+                  -0.025797443464398384
+                ],
+                [
+                  -0.14683672785758972,
+                  0.1356475055217743,
+                  -0.012594034895300865
+                ],
+                [
+                  -0.14393235743045807,
+                  0.15200920403003693,
+                  -0.01020850706845522
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.000882802859020166,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 806,
+          "negative": 0,
+          "beyondMargin": 0,
+          "minimumM": 0.001983276868651271,
+          "witness": {
+            "id": "top-to-bottom:e3283",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              1157,
+              1141
+            ],
+            "materialSites": [
+              {
+                "node": 1157,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 18
+                  }
+                ]
+              },
+              {
+                "node": 1141,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 1
+                  },
+                  {
+                    "panel": "right_ftorso",
+                    "localVertex": 5
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 6339,
+            "sourceFace": {
+              "panel": "right_btorso",
+              "localTriangle": 1
+            },
+            "targetFaceOffset": 4548,
+            "targetTriangleId": 1516,
+            "point": [
+              -0.16934284847294467,
+              0.0727696218683161,
+              -0.013688594483831295
+            ],
+            "closest": [
+              -0.16758132297101763,
+              0.07211425130741492,
+              -0.013055424307897575
+            ],
+            "barycentric": [
+              0.08405726827264937,
+              0.6118124046516124,
+              0.3041303270757383
+            ],
+            "queryDirection": [
+              -0.8881894050047425,
+              0.33044834599763884,
+              -0.31925455590288176
+            ],
+            "orientedDistanceM": 0.001983276868651271,
+            "sourceTriangle": [
+              [
+                -0.17270546124244346,
+                0.07303321121904637,
+                -0.004850013973037617
+              ],
+              [
+                -0.16942727213940528,
+                0.07920884805104823,
+                -0.01453816665177283
+              ],
+              [
+                -0.16598023570344586,
+                0.07250603251758585,
+                -0.022527174994624973
+              ]
+            ],
+            "targetTriangle": [
+              [
+                -0.17378792270647267,
+                0.06708393018405209,
+                -0.0009949078332150134
+              ],
+              [
+                -0.16683477300858787,
+                0.07668324866345354,
+                -0.010403183841542832
+              ],
+              [
+                -0.16736772608332154,
+                0.06431320683449748,
+                -0.021724233208357376
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_r",
+              "localTriangle": 128
+            }
+          },
+          "newSincePrevious": 0,
+          "newSinceInitial": 0
+        },
+        "measurementMS": 128.70000000001164,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 2,
+        "frame": 50,
+        "simulationSeconds": 0.8333333333333318,
+        "motion": "walk",
+        "motionTime": 0.03333333333333333,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "45795bdc62d70f1ce062d9ad99e76ebff2985f379eff3d3a01137cc8b5afb407",
+        "stateBytes": 1804559,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0032437938659051527,
+            "witness": {
+              "id": "top:t4175",
+              "role": "top",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                2193,
+                2194,
+                2200
+              ],
+              "materialSites": [
+                {
+                  "node": 2193,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 588
+                    }
+                  ]
+                },
+                {
+                  "node": 2194,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 589
+                    }
+                  ]
+                },
+                {
+                  "node": 2200,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 595
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 12525,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 1084
+              },
+              "targetFaceOffset": 495,
+              "targetTriangleId": 165,
+              "point": [
+                -0.17278831199868624,
+                0.5159657643207538,
+                0.04668658689598965
+              ],
+              "closest": [
+                -0.17319666618294022,
+                0.5138675623105187,
+                0.0442467111145345
+              ],
+              "barycentric": [
+                0.8373524529418355,
+                0.16264754705816456,
+                0
+              ],
+              "queryDirection": [
+                0.1258878341642172,
+                0.6468358030665596,
+                0.7521673331650885
+              ],
+              "orientedDistanceM": 0.0032437938659051527,
+              "sourceTriangle": [
+                [
+                  -0.18232527382746594,
+                  0.5127407387623591,
+                  0.050565669114048806
+                ],
+                [
+                  -0.16380033915541942,
+                  0.5117413563050516,
+                  0.04987930828561134
+                ],
+                [
+                  -0.1722393230131734,
+                  0.5234151978948508,
+                  0.039614783288308815
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.1784515529870987,
+                  0.5130199193954468,
+                  0.045855145901441574
+                ],
+                [
+                  -0.1461431235074997,
+                  0.5182314515113831,
+                  0.035966064780950546
+                ],
+                [
+                  -0.15985241532325745,
+                  0.5289435982704163,
+                  0.02569633163511753
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.003217239666615963,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0034170110210136047,
+            "witness": {
+              "id": "bottom:t244",
+              "role": "bottom",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                85,
+                747,
+                738
+              ],
+              "materialSites": [
+                {
+                  "node": 85,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 87
+                    },
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 106
+                    }
+                  ]
+                },
+                {
+                  "node": 747,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 768
+                    }
+                  ]
+                },
+                {
+                  "node": 738,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 759
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 732,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 244
+              },
+              "targetFaceOffset": 44058,
+              "targetTriangleId": 14686,
+              "point": [
+                0.07946556893269434,
+                0.06553288704011932,
+                -0.0772884773819945
+              ],
+              "closest": [
+                0.07884559116926922,
+                0.06381186876755032,
+                -0.07440235749604547
+              ],
+              "barycentric": [
+                0.7979289268233583,
+                0.1780758596417716,
+                0.023995213534870108
+              ],
+              "queryDirection": [
+                0.1814386197798143,
+                0.5036619027522146,
+                -0.8446328876905129
+              ],
+              "orientedDistanceM": 0.0034170110210136047,
+              "sourceTriangle": [
+                [
+                  0.06746158725253297,
+                  0.06674657353352358,
+                  -0.07838240169202733
+                ],
+                [
+                  0.08871211341892915,
+                  0.07160056413211605,
+                  -0.07175785809225094
+                ],
+                [
+                  0.0822230061266209,
+                  0.05825152345471833,
+                  -0.08172517236170522
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.0750502347946167,
+                  0.06481999158859253,
+                  -0.07461649924516678
+                ],
+                [
+                  0.0942712053656578,
+                  0.06268496811389923,
+                  -0.07176070660352707
+                ],
+                [
+                  0.0905768945813179,
+                  0.03865116089582443,
+                  -0.08688586205244064
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0006895373930487314,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 849,
+          "negative": 0,
+          "beyondMargin": 0,
+          "minimumM": 0.0014784235385430042,
+          "witness": {
+            "id": "top-to-bottom:e3283",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              1157,
+              1141
+            ],
+            "materialSites": [
+              {
+                "node": 1157,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 18
+                  }
+                ]
+              },
+              {
+                "node": 1141,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 1
+                  },
+                  {
+                    "panel": "right_ftorso",
+                    "localVertex": 5
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 6339,
+            "sourceFace": {
+              "panel": "right_btorso",
+              "localTriangle": 1
+            },
+            "targetFaceOffset": 4548,
+            "targetTriangleId": 1516,
+            "point": [
+              -0.16937613587955963,
+              0.06883548176189203,
+              -0.013647806666765844
+            ],
+            "closest": [
+              -0.16805971853981183,
+              0.0683571369883075,
+              -0.013174554276900017
+            ],
+            "barycentric": [
+              0.14079517036073608,
+              0.49178454167433727,
+              0.36742028796492665
+            ],
+            "queryDirection": [
+              -0.8904196297125635,
+              0.3235505666095747,
+              -0.32010609783189786
+            ],
+            "orientedDistanceM": 0.0014784235385430042,
+            "sourceTriangle": [
+              [
+                -0.1727353938851578,
+                0.06910318623449209,
+                -0.0048074381933368255
+              ],
+              [
+                -0.16945944605579313,
+                0.07528034499558017,
+                -0.014496106216397147
+              ],
+              [
+                -0.16601687787396147,
+                0.06856777728929195,
+                -0.022488175140194862
+              ]
+            ],
+            "targetTriangle": [
+              [
+                -0.17383172106013733,
+                0.06458776023448717,
+                -0.0009288632734027312
+              ],
+              [
+                -0.1668828352017627,
+                0.07440177294547393,
+                -0.01033854031478558
+              ],
+              [
+                -0.16742312591597855,
+                0.061710937631432344,
+                -0.02166304029610569
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_r",
+              "localTriangle": 128
+            }
+          },
+          "newSincePrevious": 0,
+          "newSinceInitial": 0
+        },
+        "measurementMS": 126.79999999998836,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 3,
+        "frame": 51,
+        "simulationSeconds": 0.8499999999999985,
+        "motion": "walk",
+        "motionTime": 0.05,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "7e698a1b20ccc2864bd80db2ee96720a04ece2a5e17325e1b23e8e11ac626b57",
+        "stateBytes": 1804544,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.003189776227650413,
+            "witness": {
+              "id": "top:t4120",
+              "role": "top",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                2160,
+                2161,
+                2170
+              ],
+              "materialSites": [
+                {
+                  "node": 2160,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 555
+                    }
+                  ]
+                },
+                {
+                  "node": 2161,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 556
+                    }
+                  ]
+                },
+                {
+                  "node": 2170,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 565
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 12360,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 1029
+              },
+              "targetFaceOffset": 609,
+              "targetTriangleId": 203,
+              "point": [
+                -0.1575673192442971,
+                0.4665977073903825,
+                0.08138748213308293
+              ],
+              "closest": [
+                -0.15628012046827444,
+                0.4651846726156897,
+                0.07883383289738152
+              ],
+              "barycentric": [
+                0,
+                0.3259313169836855,
+                0.6740686830163145
+              ],
+              "queryDirection": [
+                -0.4035388955703648,
+                0.44298868442368133,
+                0.8005731604509524
+              ],
+              "orientedDistanceM": 0.003189776227650413,
+              "sourceTriangle": [
+                [
+                  -0.16642024371849562,
+                  0.460873898659748,
+                  0.08107432201950789
+                ],
+                [
+                  -0.14892493793659942,
+                  0.46417553334232076,
+                  0.08675460472448872
+                ],
+                [
+                  -0.15735677607779616,
+                  0.4747436901690787,
+                  0.0763335196552522
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.1764896810054779,
+                  0.4420545995235443,
+                  0.08077681064605713
+                ],
+                [
+                  -0.15044642984867096,
+                  0.455820232629776,
+                  0.08695609122514725
+                ],
+                [
+                  -0.15910087525844574,
+                  0.46971264481544495,
+                  0.07490649074316025
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.003366838328227877,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0030426232796835185,
+            "witness": {
+              "id": "bottom:t252",
+              "role": "bottom",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                99,
+                721,
+                730
+              ],
+              "materialSites": [
+                {
+                  "node": 99,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 111
+                    },
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 124
+                    }
+                  ]
+                },
+                {
+                  "node": 721,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 742
+                    }
+                  ]
+                },
+                {
+                  "node": 730,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 751
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 756,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 252
+              },
+              "targetFaceOffset": 45345,
+              "targetTriangleId": 15115,
+              "point": [
+                0.1077566695558742,
+                0.04002959758142475,
+                -0.08288990706057209
+              ],
+              "closest": [
+                0.1066755678755154,
+                0.039080841687249256,
+                -0.08020874353850471
+              ],
+              "barycentric": [
+                0.7487503745413113,
+                0.25124962545868873,
+                0
+              ],
+              "queryDirection": [
+                0.35531894059235947,
+                0.311821677205526,
+                -0.8812012778480612
+              ],
+              "orientedDistanceM": 0.0030426232796835185,
+              "sourceTriangle": [
+                [
+                  0.12094795195609105,
+                  0.04259462689860175,
+                  -0.07486966618115823
+                ],
+                [
+                  0.10732782585193844,
+                  0.032237405432989884,
+                  -0.08763996877823117
+                ],
+                [
+                  0.09499423085959308,
+                  0.0452567604126826,
+                  -0.08616008622232686
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.11212144047021866,
+                  0.03928808495402336,
+                  -0.07793951779603958
+                ],
+                [
+                  0.09044629335403442,
+                  0.03846323490142822,
+                  -0.08697127550840378
+                ],
+                [
+                  0.09414250403642654,
+                  0.06244545802474022,
+                  -0.07185209542512894
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0006213441034990271,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 903,
+          "negative": 0,
+          "beyondMargin": 0,
+          "minimumM": 0.00024736420853960185,
+          "witness": {
+            "id": "top-to-bottom:e26",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              5,
+              96
+            ],
+            "materialSites": [
+              {
+                "node": 5,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 5
+                  },
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 1
+                  }
+                ]
+              },
+              {
+                "node": 96,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 96
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 30,
+            "sourceFace": {
+              "panel": "left_btorso",
+              "localTriangle": 10
+            },
+            "targetFaceOffset": 894,
+            "targetTriangleId": 298,
+            "point": [
+              0.1679828159225873,
+              0.06227809540787246,
+              -0.010881443908707437
+            ],
+            "closest": [
+              0.1677711411272025,
+              0.062191273528783446,
+              -0.010787397143868406
+            ],
+            "barycentric": [
+              0.24036023993583272,
+              0.6812748667268518,
+              0.07836489333731551
+            ],
+            "queryDirection": [
+              0.8557211919803375,
+              0.350988041485844,
+              -0.38019552381594696
+            ],
+            "orientedDistanceM": 0.00024736420853960185,
+            "sourceTriangle": [
+              [
+                0.17175958192376675,
+                0.06280890101181588,
+                -0.002179310395341123
+              ],
+              [
+                0.1642060499214078,
+                0.06174728980392903,
+                -0.019583577422073752
+              ],
+              [
+                0.1624965873381795,
+                0.06828867358329035,
+                -0.023269177598771285
+              ]
+            ],
+            "targetTriangle": [
+              [
+                0.17022494641022748,
+                0.07002845621459054,
+                0.001970592573243157
+              ],
+              [
+                0.16783974310125116,
+                0.05837740080062472,
+                -0.014153874327716379
+              ],
+              [
+                0.1596484474029736,
+                0.07130949590333893,
+                -0.02065172722610833
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_l",
+              "localTriangle": 298
+            }
+          },
+          "newSincePrevious": 0,
+          "newSinceInitial": 0
+        },
+        "measurementMS": 138.5,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 4,
+        "frame": 52,
+        "simulationSeconds": 0.8666666666666653,
+        "motion": "walk",
+        "motionTime": 0.06666666666666667,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "0fc39fb1d55adc5d7d0918dfd5c0a75bec8fd1f4b564ee65f52d53520d6b5dc2",
+        "stateBytes": 1804559,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0032064122030591355,
+            "witness": {
+              "id": "top:t3933",
+              "role": "top",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                2053,
+                2054,
+                2071
+              ],
+              "materialSites": [
+                {
+                  "node": 2053,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 448
+                    }
+                  ]
+                },
+                {
+                  "node": 2054,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 449
+                    }
+                  ]
+                },
+                {
+                  "node": 2071,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 466
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 11799,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 842
+              },
+              "targetFaceOffset": 2955,
+              "targetTriangleId": 985,
+              "point": [
+                -0.04631470976939514,
+                0.37145707699664476,
+                0.14664981627401405
+              ],
+              "closest": [
+                -0.04663447273161818,
+                0.370668388158735,
+                0.14355840870126124
+              ],
+              "barycentric": [
+                0.16983745324219546,
+                0.8301625467578045,
+                0
+              ],
+              "queryDirection": [
+                0.09972609320721863,
+                0.24597237908379843,
+                0.9641329239588705
+              ],
+              "orientedDistanceM": 0.0032064122030591355,
+              "sourceTriangle": [
+                [
+                  -0.05568530804422983,
+                  0.36662315879665147,
+                  0.14794069454959963
+                ],
+                [
+                  -0.03675297553412867,
+                  0.36709266812634744,
+                  0.14685202747289552
+                ],
+                [
+                  -0.046505845729826904,
+                  0.3806554040669354,
+                  0.14515672679954694
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.039963748306035995,
+                  0.3625214993953705,
+                  0.1449468731880188
+                ],
+                [
+                  -0.04799919202923775,
+                  0.3723351061344147,
+                  0.14327435195446014
+                ],
+                [
+                  -0.05965297669172287,
+                  0.3654591143131256,
+                  0.1445736587047577
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0029100243651194514,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0028970091530488404,
+            "witness": {
+              "id": "bottom:t1332",
+              "role": "bottom",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                701,
+                711,
+                712
+              ],
+              "materialSites": [
+                {
+                  "node": 701,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 722
+                    }
+                  ]
+                },
+                {
+                  "node": 711,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 732
+                    }
+                  ]
+                },
+                {
+                  "node": 712,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 733
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 3996,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 1332
+              },
+              "targetFaceOffset": 44964,
+              "targetTriangleId": 14988,
+              "point": [
+                0.10958216256138752,
+                0.012629637243225118,
+                -0.09152567272717933
+              ],
+              "closest": [
+                0.10855558595102341,
+                0.011736708083247782,
+                -0.08896804100795855
+              ],
+              "barycentric": [
+                0.03445528559354305,
+                0.0051797151469074616,
+                0.9603649992595494
+              ],
+              "queryDirection": [
+                0.3543573927903295,
+                0.3082244869808604,
+                -0.8828524813354864
+              ],
+              "orientedDistanceM": 0.0028970091530488404,
+              "sourceTriangle": [
+                [
+                  0.11128841736744648,
+                  0.0035186025487080313,
+                  -0.09387533867554022
+                ],
+                [
+                  0.10013383092484332,
+                  0.016984456769615415,
+                  -0.09463185449244783
+                ],
+                [
+                  0.11732423939187277,
+                  0.017385852411351904,
+                  -0.08606982501354993
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.0902634784579277,
+                  0.038163453340530396,
+                  -0.08708389103412628
+                ],
+                [
+                  0.11195842921733856,
+                  0.0390150211751461,
+                  -0.07807871699333191
+                ],
+                [
+                  0.10919350385665894,
+                  0.010641463100910187,
+                  -0.0890943706035614
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0005691836380148284,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 990,
+          "negative": 26,
+          "beyondMargin": 26,
+          "minimumM": -0.0020452028846430085,
+          "witness": {
+            "id": "top-to-bottom:e4826",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              1141,
+              1699
+            ],
+            "materialSites": [
+              {
+                "node": 1141,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 1
+                  },
+                  {
+                    "panel": "right_ftorso",
+                    "localVertex": 5
+                  }
+                ]
+              },
+              {
+                "node": 1699,
+                "sites": [
+                  {
+                    "panel": "right_ftorso",
+                    "localVertex": 94
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 9303,
+            "sourceFace": {
+              "panel": "right_ftorso",
+              "localTriangle": 10
+            },
+            "targetFaceOffset": 13131,
+            "targetTriangleId": 4377,
+            "point": [
+              -0.17474424826700496,
+              0.056776826543766624,
+              0.004726894115588269
+            ],
+            "closest": [
+              -0.17653531156981628,
+              0.05768939640429113,
+              0.004349848582082043
+            ],
+            "barycentric": [
+              0.3230518317023529,
+              0.3334912427363951,
+              0.343456925561252
+            ],
+            "queryDirection": [
+              -0.8757386938283849,
+              0.44620016301404614,
+              -0.18435605403130417
+            ],
+            "orientedDistanceM": -0.0020452028846430085,
+            "sourceTriangle": [
+              [
+                -0.17284982490950523,
+                0.05613712870478062,
+                -0.0046251398144246305
+              ],
+              [
+                -0.17663867162450467,
+                0.05741652438275263,
+                0.014078928045601168
+              ],
+              [
+                -0.17473125293828806,
+                0.06344298124148054,
+                0.004248913587857022
+              ]
+            ],
+            "targetTriangle": [
+              [
+                -0.17594320521987764,
+                0.05694032910278922,
+                -0.00027578955072684485
+              ],
+              [
+                -0.17789880029830615,
+                0.053153849332803246,
+                -0.00015069255218114815
+              ],
+              [
+                -0.17576831434249168,
+                0.06279790539799184,
+                0.013070627534357658
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_f_r",
+              "localTriangle": 235
+            }
+          },
+          "newSincePrevious": 26,
+          "newSinceInitial": 26
+        },
+        "measurementMS": 147.5,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 5,
+        "frame": 53,
+        "simulationSeconds": 0.883333333333332,
+        "motion": "walk",
+        "motionTime": 0.08333333333333333,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "422c253b687e80160574c3a59b62bb49ae0f347288dcca4975c3db1e72c5e287",
+        "stateBytes": 1804556,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0031756793121718195,
+            "witness": {
+              "id": "top:t3933",
+              "role": "top",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                2053,
+                2054,
+                2071
+              ],
+              "materialSites": [
+                {
+                  "node": 2053,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 448
+                    }
+                  ]
+                },
+                {
+                  "node": 2054,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 449
+                    }
+                  ]
+                },
+                {
+                  "node": 2071,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 466
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 11799,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 842
+              },
+              "targetFaceOffset": 2955,
+              "targetTriangleId": 985,
+              "point": [
+                -0.04632731260902362,
+                0.3702843052358001,
+                0.14667290860745105
+              ],
+              "closest": [
+                -0.04637647852128124,
+                0.36971478772389105,
+                0.14354910137740998
+              ],
+              "barycentric": [
+                0.20430988186539367,
+                0.7956901181346063,
+                0
+              ],
+              "queryDirection": [
+                0.015482014216352445,
+                0.17933722392124868,
+                0.9836658311398362
+              ],
+              "orientedDistanceM": 0.0031756793121718195,
+              "sourceTriangle": [
+                [
+                  -0.05569394164333303,
+                  0.36539280394259793,
+                  0.147955470242807
+                ],
+                [
+                  -0.03676245899496008,
+                  0.3659093924536205,
+                  0.146859839640532
+                ],
+                [
+                  -0.04652553718877774,
+                  0.37955071931118184,
+                  0.14520341593901406
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.03997351601719856,
+                  0.36191117763519287,
+                  0.1448710411787033
+                ],
+                [
+                  -0.04802057147026062,
+                  0.37171852588653564,
+                  0.14320966601371765
+                ],
+                [
+                  -0.059666670858860016,
+                  0.3648347854614258,
+                  0.14453347027301788
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0029004276559729237,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.002753688554853045,
+            "witness": {
+              "id": "bottom:t49",
+              "role": "bottom",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                17,
+                190,
+                191
+              ],
+              "materialSites": [
+                {
+                  "node": 17,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 19
+                    }
+                  ]
+                },
+                {
+                  "node": 190,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 211
+                    }
+                  ]
+                },
+                {
+                  "node": 191,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 212
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 147,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 49
+              },
+              "targetFaceOffset": 46326,
+              "targetTriangleId": 15442,
+              "point": [
+                0.18738043198686716,
+                -0.41660574156466007,
+                -0.04904171958539527
+              ],
+              "closest": [
+                0.18568283167662447,
+                -0.4173850879283641,
+                -0.04701846154718712
+              ],
+              "barycentric": [
+                0.25820544033295156,
+                0.550576289716707,
+                0.1912182699503414
+              ],
+              "queryDirection": [
+                0.6164823205045719,
+                0.2830190663103571,
+                -0.7347446880448418
+              ],
+              "orientedDistanceM": 0.002753688554853045,
+              "sourceTriangle": [
+                [
+                  0.18806713327787497,
+                  -0.4207847101789013,
+                  -0.05062501900339966
+                ],
+                [
+                  0.17971199854730183,
+                  -0.41630877971672575,
+                  -0.054173102257140705
+                ],
+                [
+                  0.19436216413542468,
+                  -0.4127237347983532,
+                  -0.04232703749564545
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.19690555334091187,
+                  -0.4226732552051544,
+                  -0.03963908553123474
+                ],
+                [
+                  0.18328556418418884,
+                  -0.4209860861301422,
+                  -0.05041695386171341
+                ],
+                [
+                  0.17743106186389923,
+                  -0.3998759984970093,
+                  -0.04719765856862068
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.00020508828665302423,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 1065,
+          "negative": 105,
+          "beyondMargin": 104,
+          "minimumM": -0.005306306177887475,
+          "witness": {
+            "id": "top-to-bottom:e3283",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              1157,
+              1141
+            ],
+            "materialSites": [
+              {
+                "node": 1157,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 18
+                  }
+                ]
+              },
+              {
+                "node": 1141,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 1
+                  },
+                  {
+                    "panel": "right_ftorso",
+                    "localVertex": 5
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 6339,
+            "sourceFace": {
+              "panel": "right_btorso",
+              "localTriangle": 1
+            },
+            "targetFaceOffset": 4539,
+            "targetTriangleId": 1513,
+            "point": [
+              -0.16961536386598994,
+              0.04770290042443682,
+              -0.013327780937190357
+            ],
+            "closest": [
+              -0.17404309501338056,
+              0.05015822042377987,
+              -0.014916329281037592
+            ],
+            "barycentric": [
+              0.1442029667515179,
+              0.34659264937971396,
+              0.5092043838687681
+            ],
+            "queryDirection": [
+              -0.8344281311624894,
+              0.4627173625176209,
+              -0.2993698988699631
+            ],
+            "orientedDistanceM": -0.005306306177887475,
+            "sourceTriangle": [
+              [
+                -0.1729634093175965,
+                0.048029539463166016,
+                -0.0044701879480627486
+              ],
+              [
+                -0.16967610809265693,
+                0.05421399295463747,
+                -0.014165264198391755
+              ],
+              [
+                -0.16626731841438339,
+                0.04737626138570762,
+                -0.022185373926317968
+              ]
+            ],
+            "targetTriangle": [
+              [
+                -0.17801947132913715,
+                0.05268898564549273,
+                7.859600518078293e-05
+              ],
+              [
+                -0.16780589123297449,
+                0.0573521138266436,
+                -0.02118201905024373
+              ],
+              [
+                -0.17716239989691604,
+                0.0445449646908658,
+                -0.01489800794464296
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_r",
+              "localTriangle": 125
+            }
+          },
+          "newSincePrevious": 79,
+          "newSinceInitial": 104
+        },
+        "measurementMS": 131.70000000001164,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 6,
+        "frame": 54,
+        "simulationSeconds": 0.8999999999999987,
+        "motion": "walk",
+        "motionTime": 0.09999999999999999,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "398531b9dc6d2445c7c9343163cfec246d30987a5e3fe452024d0ccec6d6388c",
+        "stateBytes": 1804559,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0032153277531059396,
+            "witness": {
+              "id": "top:t4175",
+              "role": "top",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                2193,
+                2194,
+                2200
+              ],
+              "materialSites": [
+                {
+                  "node": 2193,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 588
+                    }
+                  ]
+                },
+                {
+                  "node": 2194,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 589
+                    }
+                  ]
+                },
+                {
+                  "node": 2200,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 595
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 12525,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 1084
+              },
+              "targetFaceOffset": 495,
+              "targetTriangleId": 165,
+              "point": [
+                -0.17480427733647028,
+                0.5136262245205437,
+                0.04777046278551478
+              ],
+              "closest": [
+                -0.17525512586872605,
+                0.5117001295955468,
+                0.045235659735817016
+              ],
+              "barycentric": [
+                0.8425021579262946,
+                0.15749784207370549,
+                0
+              ],
+              "queryDirection": [
+                0.14021853038784637,
+                0.599035331044056,
+                0.788349818225901
+              ],
+              "orientedDistanceM": 0.0032153277531059396,
+              "sourceTriangle": [
+                [
+                  -0.1843639940020959,
+                  0.5102172847753131,
+                  0.05166510733346112
+                ],
+                [
+                  -0.165680961756649,
+                  0.5094846599845503,
+                  0.05094472366890768
+                ],
+                [
+                  -0.17436787625066585,
+                  0.5211767288017679,
+                  0.04070155735417552
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.1803636997938156,
+                  0.510825514793396,
+                  0.046808872371912
+                ],
+                [
+                  -0.14792786538600922,
+                  0.5163787007331848,
+                  0.03682008385658264
+                ],
+                [
+                  -0.16192643344402313,
+                  0.5270035266876221,
+                  0.026628533378243446
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0031714155629593375,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0018378388652325196,
+            "witness": {
+              "id": "bottom:t48",
+              "role": "bottom",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                17,
+                18,
+                190
+              ],
+              "materialSites": [
+                {
+                  "node": 17,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 19
+                    }
+                  ]
+                },
+                {
+                  "node": 18,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 20
+                    }
+                  ]
+                },
+                {
+                  "node": 190,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 211
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 144,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 48
+              },
+              "targetFaceOffset": 46470,
+              "targetTriangleId": 15490,
+              "point": [
+                0.17958151970264835,
+                -0.428688704904636,
+                -0.05746042900647619
+              ],
+              "closest": [
+                0.17914840183137054,
+                -0.4292003965965142,
+                -0.05574922118256883
+              ],
+              "barycentric": [
+                0.21752506732735816,
+                0.41483910048528916,
+                0.3676358321873527
+              ],
+              "queryDirection": [
+                0.23566694527542997,
+                0.2784203237607906,
+                -0.9310978542674685
+              ],
+              "orientedDistanceM": 0.0018378388652325196,
+              "sourceTriangle": [
+                [
+                  0.18856948270802296,
+                  -0.4287290379008564,
+                  -0.05379237075338085
+                ],
+                [
+                  0.1706293430393178,
+                  -0.4328869909614876,
+                  -0.06154342286280267
+                ],
+                [
+                  0.17954573336060434,
+                  -0.42445008585156396,
+                  -0.05704549340324505
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.16473977267742157,
+                  -0.42227670550346375,
+                  -0.05732579156756401
+                ],
+                [
+                  0.1819198727607727,
+                  -0.4213619828224182,
+                  -0.052703872323036194
+                ],
+                [
+                  0.18454647064208984,
+                  -0.44214189052581787,
+                  -0.05825274810194969
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.00020159068553167,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 1131,
+          "negative": 168,
+          "beyondMargin": 168,
+          "minimumM": -0.008686158522862785,
+          "witness": {
+            "id": "top-to-bottom:e26",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              5,
+              96
+            ],
+            "materialSites": [
+              {
+                "node": 5,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 5
+                  },
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 1
+                  }
+                ]
+              },
+              {
+                "node": 96,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 96
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 30,
+            "sourceFace": {
+              "panel": "left_btorso",
+              "localTriangle": 10
+            },
+            "targetFaceOffset": 4059,
+            "targetTriangleId": 1353,
+            "point": [
+              0.16826038228229157,
+              0.03871612586256695,
+              -0.011382344258477516
+            ],
+            "closest": [
+              0.17497268624501558,
+              0.04288439061154137,
+              -0.014990653333204703
+            ],
+            "barycentric": [
+              0.14780470987672523,
+              0.27862558597400194,
+              0.5735697041492729
+            ],
+            "queryDirection": [
+              0.7727586303032117,
+              0.4798743584984261,
+              -0.41540907470543836
+            ],
+            "orientedDistanceM": -0.008686158522862785,
+            "sourceTriangle": [
+              [
+                0.1722128588884893,
+                0.039247903019647076,
+                -0.002693700386772433
+              ],
+              [
+                0.16430790567609385,
+                0.03818434870548683,
+                -0.0200709881301826
+              ],
+              [
+                0.1625276042101584,
+                0.044726176282748185,
+                -0.0237643130104871
+              ]
+            ],
+            "targetTriangle": [
+              [
+                0.1789664382309041,
+                0.03247945711004411,
+                -0.019580958627367983
+              ],
+              [
+                0.16844601377601234,
+                0.04414068300345578,
+                -0.025680549732500023
+              ],
+              [
+                0.17711401724394668,
+                0.044955390814359696,
+                -0.008614885289583101
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_l",
+              "localTriangle": 1353
+            }
+          },
+          "newSincePrevious": 66,
+          "newSinceInitial": 168
+        },
+        "measurementMS": 138.40000000002328,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 7,
+        "frame": 55,
+        "simulationSeconds": 0.9166666666666654,
+        "motion": "walk",
+        "motionTime": 0.11666666666666665,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "39be6407e9375c13f2b9c408f4c22c9d07aeddaa8c00dc4a6f530c2fcd5fa94e",
+        "stateBytes": 1804559,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0032420929375802645,
+            "witness": {
+              "id": "top:t4120",
+              "role": "top",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                2160,
+                2161,
+                2170
+              ],
+              "materialSites": [
+                {
+                  "node": 2160,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 555
+                    }
+                  ]
+                },
+                {
+                  "node": 2161,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 556
+                    }
+                  ]
+                },
+                {
+                  "node": 2170,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 565
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 12360,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 1029
+              },
+              "targetFaceOffset": 600,
+              "targetTriangleId": 200,
+              "point": [
+                -0.15879322752214556,
+                0.46536658821742893,
+                0.08175961581117676
+              ],
+              "closest": [
+                -0.15799472699605063,
+                0.46360753697341184,
+                0.07915590648664457
+              ],
+              "barycentric": [
+                0.0077611980792168245,
+                0.7417437247039549,
+                0.2504950772168283
+              ],
+              "queryDirection": [
+                -0.24629168301723203,
+                0.5425665697695771,
+                0.8030952149309657
+              ],
+              "orientedDistanceM": 0.0032420929375802645,
+              "sourceTriangle": [
+                [
+                  -0.16766249864663152,
+                  0.45980702313656224,
+                  0.08184631306221081
+                ],
+                [
+                  -0.15001795590900982,
+                  0.4629745495477511,
+                  0.08697718196243137
+                ],
+                [
+                  -0.15869922801079542,
+                  0.47331819196797353,
+                  0.07645535240888811
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.12667560577392578,
+                  0.4759009778499603,
+                  0.08045541495084763
+                ],
+                [
+                  -0.16047948598861694,
+                  0.46698278188705444,
+                  0.07611358910799026
+                ],
+                [
+                  -0.1516074538230896,
+                  0.45323216915130615,
+                  0.08812428265810013
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.00337952178923281,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0010391488355845232,
+            "witness": {
+              "id": "bottom:t48",
+              "role": "bottom",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                17,
+                18,
+                190
+              ],
+              "materialSites": [
+                {
+                  "node": 17,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 19
+                    }
+                  ]
+                },
+                {
+                  "node": 18,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 20
+                    }
+                  ]
+                },
+                {
+                  "node": 190,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 211
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 144,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 48
+              },
+              "targetFaceOffset": 46470,
+              "targetTriangleId": 15490,
+              "point": [
+                0.1795404410800704,
+                -0.43670716223576145,
+                -0.0614659998991423
+              ],
+              "closest": [
+                0.17929758146170394,
+                -0.43700186376127736,
+                -0.06049956287629903
+              ],
+              "barycentric": [
+                0.1695154151935394,
+                0.10761651839017976,
+                0.7228680664162809
+              ],
+              "queryDirection": [
+                0.23371013857687126,
+                0.283598956592341,
+                -0.9300275280582371
+              ],
+              "orientedDistanceM": 0.0010391488355845232,
+              "sourceTriangle": [
+                [
+                  0.18897975338233758,
+                  -0.436701570370401,
+                  -0.057548333595830656
+                ],
+                [
+                  0.17024079930200273,
+                  -0.44087714226099095,
+                  -0.06589233009011593
+                ],
+                [
+                  0.17940077055587092,
+                  -0.4325427740758923,
+                  -0.06095733601148032
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.16317585110664368,
+                  -0.42269670963287354,
+                  -0.060188695788383484
+                ],
+                [
+                  0.18037231266498566,
+                  -0.42186102271080017,
+                  -0.05561250075697899
+                ],
+                [
+                  0.18291819095611572,
+                  -0.44261056184768677,
+                  -0.061300020664930344
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.00019901892828703543,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 1206,
+          "negative": 203,
+          "beyondMargin": 202,
+          "minimumM": -0.01074245755209917,
+          "witness": {
+            "id": "top-to-bottom:v1157",
+            "role": "top-to-bottom",
+            "kind": "vertex",
+            "nodeIds": [
+              1157
+            ],
+            "materialSites": [
+              {
+                "node": 1157,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 18
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 6339,
+            "sourceFace": {
+              "panel": "right_btorso",
+              "localTriangle": 1
+            },
+            "targetFaceOffset": 8325,
+            "targetTriangleId": 2775,
+            "point": [
+              -0.16713902422351387,
+              0.029984767843802905,
+              -0.02172867903083493
+            ],
+            "closest": [
+              -0.17480000722978462,
+              0.03346634410913935,
+              -0.028406130666371446
+            ],
+            "barycentric": [
+              0.6320048841535164,
+              0.24902815011738105,
+              0.11896696572910262
+            ],
+            "queryDirection": [
+              -0.713149944425307,
+              0.3240949520583506,
+              -0.6215944166548448
+            ],
+            "orientedDistanceM": -0.01074245755209917,
+            "sourceTriangle": [
+              [
+                -0.17426302487160575,
+                0.030940585405274425,
+                -0.003917461614909797
+              ],
+              [
+                -0.17068403994067022,
+                0.03707058851509056,
+                -0.013650618286261266
+              ],
+              [
+                -0.16713902422351387,
+                0.029984767843802905,
+                -0.02172867903083493
+              ]
+            ],
+            "targetTriangle": [
+              [
+                -0.17881883435029944,
+                0.030759934275441686,
+                -0.025206467800911764
+              ],
+              [
+                -0.1682582259951434,
+                0.04299980457463434,
+                -0.030940781025508984
+              ],
+              [
+                -0.16714384248004444,
+                0.027888024224672216,
+                -0.04009847954624623
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_r",
+              "localTriangle": 1387
+            }
+          },
+          "newSincePrevious": 37,
+          "newSinceInitial": 202
+        },
+        "measurementMS": 134.79999999998836,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 8,
+        "frame": 56,
+        "simulationSeconds": 0.9333333333333321,
+        "motion": "walk",
+        "motionTime": 0.13333333333333333,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "402dadec02dc55567a9f02a521057554fb9cc5ab8e37f28ce0709ef2a825c486",
+        "stateBytes": 1804559,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0032461545387714457,
+            "witness": {
+              "id": "top:t4120",
+              "role": "top",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                2160,
+                2161,
+                2170
+              ],
+              "materialSites": [
+                {
+                  "node": 2160,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 555
+                    }
+                  ]
+                },
+                {
+                  "node": 2161,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 556
+                    }
+                  ]
+                },
+                {
+                  "node": 2170,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 565
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 12360,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 1029
+              },
+              "targetFaceOffset": 600,
+              "targetTriangleId": 200,
+              "point": [
+                -0.159283721184312,
+                0.4644271370904313,
+                0.08211569231663829
+              ],
+              "closest": [
+                -0.15848538371546625,
+                0.46266562466373634,
+                0.07950853859159203
+              ],
+              "barycentric": [
+                0.013485503475252486,
+                0.7559172755345823,
+                0.2305972209901652
+              ],
+              "queryDirection": [
+                -0.24593329100958097,
+                0.5426458924415988,
+                0.8031514500948482
+              ],
+              "orientedDistanceM": 0.0032461545387714457,
+              "sourceTriangle": [
+                [
+                  -0.1681377683967119,
+                  0.4589044450148062,
+                  0.0822388458188628
+                ],
+                [
+                  -0.1504744825181652,
+                  0.4620696996171408,
+                  0.08730447613381102
+                ],
+                [
+                  -0.15923891263805887,
+                  0.4723072666393469,
+                  0.07680375499724106
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.1272050142288208,
+                  0.47470736503601074,
+                  0.08095096051692963
+                ],
+                [
+                  -0.16100363433361053,
+                  0.46570491790771484,
+                  0.07668393850326538
+                ],
+                [
+                  -0.1520596444606781,
+                  0.45199835300445557,
+                  0.08868346363306046
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0033783099237452395,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.00013533544156939982,
+            "witness": {
+              "id": "bottom:t414",
+              "role": "bottom",
+              "kind": "triangle-centroid",
+              "nodeIds": [
+                190,
+                211,
+                191
+              ],
+              "materialSites": [
+                {
+                  "node": 190,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 211
+                    }
+                  ]
+                },
+                {
+                  "node": 211,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 232
+                    }
+                  ]
+                },
+                {
+                  "node": 191,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 212
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 1242,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 414
+              },
+              "targetFaceOffset": 46476,
+              "targetTriangleId": 15492,
+              "point": [
+                0.18596109920976459,
+                -0.4342512818406872,
+                -0.05840679712808843
+              ],
+              "closest": [
+                0.1858848683525864,
+                -0.4342900032410792,
+                -0.05830189149758965
+              ],
+              "barycentric": [
+                0.4356268929733144,
+                0.11107024437654689,
+                0.4533028626501387
+              ],
+              "queryDirection": [
+                0.5632734211686978,
+                0.28611426499214826,
+                -0.7751526819749214
+              ],
+              "orientedDistanceM": 0.00013533544156939982,
+              "sourceTriangle": [
+                [
+                  0.1791909811912901,
+                  -0.44029837042730824,
+                  -0.06553128085762416
+                ],
+                [
+                  0.18382097281885243,
+                  -0.42554089796488276,
+                  -0.057210481906784176
+                ],
+                [
+                  0.19487134361915123,
+                  -0.43691457712987064,
+                  -0.05247862861985694
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.1946173459291458,
+                  -0.4442642629146576,
+                  -0.0556379072368145
+                ],
+                [
+                  0.18111740052700043,
+                  -0.4432247281074524,
+                  -0.06506409496068954
+                ],
+                [
+                  0.178661048412323,
+                  -0.4225154519081116,
+                  -0.05920509248971939
+                ]
+              ],
+              "localIntersection": {
+                "point": [
+                  0.1848398006718255,
+                  -0.43907936559979815,
+                  -0.06082908876400615
+                ],
+                "segmentFraction": 0.6397519823586166,
+                "barycentric": [
+                  0.3150331485126134,
+                  0.4689839080033953,
+                  0.21598294348399133
+                ],
+                "role": "source-edge",
+                "edge": 2
+              },
+              "windingNumber": 0.00019980970333127387,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 1248,
+          "negative": 226,
+          "beyondMargin": 225,
+          "minimumM": -0.013095776890862595,
+          "witness": {
+            "id": "top-to-bottom:e26",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              5,
+              96
+            ],
+            "materialSites": [
+              {
+                "node": 5,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 5
+                  },
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 1
+                  }
+                ]
+              },
+              {
+                "node": 96,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 96
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 30,
+            "sourceFace": {
+              "panel": "left_btorso",
+              "localTriangle": 10
+            },
+            "targetFaceOffset": 4014,
+            "targetTriangleId": 1338,
+            "point": [
+              0.17061151559911938,
+              0.022781961509844125,
+              -0.013296167869889514
+            ],
+            "closest": [
+              0.1817160170622264,
+              0.02712406417994431,
+              -0.018712399404214264
+            ],
+            "barycentric": [
+              0.11588641454119275,
+              0.5235259198911595,
+              0.36058766556764776
+            ],
+            "queryDirection": [
+              0.8479452235365305,
+              0.33156510730797717,
+              -0.413586118598573
+            ],
+            "orientedDistanceM": -0.013095776890862595,
+            "sourceTriangle": [
+              [
+                0.17473039924268902,
+                0.02321834683599728,
+                -0.0044082092805355485
+              ],
+              [
+                0.16649263195554975,
+                0.02234557618369097,
+                -0.02218412645924348
+              ],
+              [
+                0.16464580362880946,
+                0.02892632994111996,
+                -0.025967837191218892
+              ]
+            ],
+            "targetTriangle": [
+              [
+                0.17905622794983037,
+                0.01957071840018251,
+                -0.030220961136411827
+              ],
+              [
+                0.17861642019771304,
+                0.03305229995630671,
+                -0.02031470710995119
+              ],
+              [
+                0.1870710330759262,
+                0.020944554616194877,
+                -0.012687413586008587
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_l",
+              "localTriangle": 1338
+            }
+          },
+          "newSincePrevious": 27,
+          "newSinceInitial": 225
+        },
+        "measurementMS": 140.09999999997672,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 9,
+        "frame": 57,
+        "simulationSeconds": 0.9499999999999988,
+        "motion": "walk",
+        "motionTime": 0.15,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "0256ca227046d90bcb0d32e00e8ab3627182564555ad96f492680b1e8ef49241",
+        "stateBytes": 1804545,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.002929183975096361,
+            "witness": {
+              "id": "top:v1696",
+              "role": "top",
+              "kind": "vertex",
+              "nodeIds": [
+                1696
+              ],
+              "materialSites": [
+                {
+                  "node": 1696,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 72
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 9657,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 128
+              },
+              "targetFaceOffset": 1878,
+              "targetTriangleId": 626,
+              "point": [
+                -0.2050483584086276,
+                0.3693074286789254,
+                0.0007203094539833925
+              ],
+              "closest": [
+                -0.20213370460190072,
+                0.3695251465974772,
+                0.0005266322616365307
+              ],
+              "barycentric": [
+                0.4437469705698763,
+                0.40628270912927283,
+                0.14997032030085083
+              ],
+              "queryDirection": [
+                -0.9950395166390961,
+                -0.07432715746187779,
+                0.06611984566127856
+              ],
+              "orientedDistanceM": 0.002929183975096361,
+              "sourceTriangle": [
+                [
+                  -0.20564520943254272,
+                  0.37230501057290644,
+                  0.010999151027791988
+                ],
+                [
+                  -0.2050483584086276,
+                  0.3693074286789254,
+                  0.0007203094539833925
+                ],
+                [
+                  -0.20702192704119074,
+                  0.363012219954844,
+                  -0.0005392133451653372
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.20210394263267517,
+                  0.3646617829799652,
+                  -0.004492521286010742
+                ],
+                [
+                  -0.20169058442115784,
+                  0.37181317806243896,
+                  0.00976720079779625
+                ],
+                [
+                  -0.20342221856117249,
+                  0.37771686911582947,
+                  -0.009655709378421307
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.001722061585820946,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 6,
+            "beyondMargin": 5,
+            "minimumM": -0.0015938241796034616,
+            "witness": {
+              "id": "bottom:v211",
+              "role": "bottom",
+              "kind": "vertex",
+              "nodeIds": [
+                211
+              ],
+              "materialSites": [
+                {
+                  "node": 211,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 232
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 1242,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 414
+              },
+              "targetFaceOffset": 46479,
+              "targetTriangleId": 15493,
+              "point": [
+                0.18293181342070736,
+                -0.43293095795222414,
+                -0.060604882628054475
+              ],
+              "closest": [
+                0.18389942256911748,
+                -0.43240010245753496,
+                -0.061754752401185324
+              ],
+              "barycentric": [
+                0.5478481263896962,
+                0.04172528923854431,
+                0.41042658437175955
+              ],
+              "queryDirection": [
+                0.6070990519486683,
+                0.33307029814370764,
+                -0.7214533371033013
+              ],
+              "orientedDistanceM": -0.0015938241796034616,
+              "sourceTriangle": [
+                [
+                  0.17880443092070158,
+                  -0.4474543071789867,
+                  -0.07084367313779114
+                ],
+                [
+                  0.18293181342070736,
+                  -0.43293095795222414,
+                  -0.060604882628054475
+                ],
+                [
+                  0.1948638566346883,
+                  -0.44419374166384046,
+                  -0.05718275068507352
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.17680320143699646,
+                  -0.4233470559120178,
+                  -0.06354670226573944
+                ],
+                [
+                  0.19053897261619568,
+                  -0.4255468249320984,
+                  -0.05300368368625641
+                ],
+                [
+                  0.19269664585590363,
+                  -0.44518107175827026,
+                  -0.06025247275829315
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 1.0002011532195847,
+              "windingInsideSupport": true
+            },
+            "newSincePrevious": 5,
+            "newSinceInitial": 5
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 1299,
+          "negative": 245,
+          "beyondMargin": 240,
+          "minimumM": -0.013830840498460105,
+          "witness": {
+            "id": "top-to-bottom:e3283",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              1157,
+              1141
+            ],
+            "materialSites": [
+              {
+                "node": 1157,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 18
+                  }
+                ]
+              },
+              {
+                "node": 1141,
+                "sites": [
+                  {
+                    "panel": "right_btorso",
+                    "localVertex": 1
+                  },
+                  {
+                    "panel": "right_ftorso",
+                    "localVertex": 5
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 6339,
+            "sourceFace": {
+              "panel": "right_btorso",
+              "localTriangle": 1
+            },
+            "targetFaceOffset": 4515,
+            "targetTriangleId": 1505,
+            "point": [
+              -0.1729437151158173,
+              0.01446892326761258,
+              -0.012407355622769773
+            ],
+            "closest": [
+              -0.18507572789989746,
+              0.020485516818943006,
+              -0.015219297432062576
+            ],
+            "barycentric": [
+              0.18852534944101673,
+              0.2684293042730538,
+              0.5430453462859295
+            ],
+            "queryDirection": [
+              -0.8771710428900478,
+              0.43501286505330605,
+              -0.2033095392579994
+            ],
+            "orientedDistanceM": -0.013830840498460105,
+            "sourceTriangle": [
+              [
+                -0.17670597064885316,
+                0.015141207377808975,
+                -0.003431781781749893
+              ],
+              [
+                -0.17289571457371156,
+                0.021255812835250236,
+                -0.013225923087150095
+              ],
+              [
+                -0.16918145958278144,
+                0.013796639157416184,
+                -0.021382929463789654
+              ]
+            ],
+            "targetTriangle": [
+              [
+                -0.1866274389091997,
+                0.02540553860554976,
+                0.0020026624946030314
+              ],
+              [
+                -0.17934647212621144,
+                0.027687450343412467,
+                -0.024528272960177688
+              ],
+              [
+                -0.18736902309078748,
+                0.015217524281050419,
+                -0.016596667100806903
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_r",
+              "localTriangle": 117
+            }
+          },
+          "newSincePrevious": 20,
+          "newSinceInitial": 240
+        },
+        "measurementMS": 131.5,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 10,
+        "frame": 58,
+        "simulationSeconds": 0.9666666666666656,
+        "motion": "walk",
+        "motionTime": 0.16666666666666666,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "04f3d86f80fcaf559dea65cfb7056af1527d42a2db8fe4a5a7b256f77386bdbb",
+        "stateBytes": 1804560,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0023048248690351503,
+            "witness": {
+              "id": "top:v1696",
+              "role": "top",
+              "kind": "vertex",
+              "nodeIds": [
+                1696
+              ],
+              "materialSites": [
+                {
+                  "node": 1696,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 72
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 9657,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 128
+              },
+              "targetFaceOffset": 1878,
+              "targetTriangleId": 626,
+              "point": [
+                -0.20409449756972467,
+                0.3666187760021059,
+                0.0015364186638852164
+              ],
+              "closest": [
+                -0.20179523380801412,
+                0.3667392622881865,
+                0.0014311243816375499
+              ],
+              "barycentric": [
+                0.49747852969888057,
+                0.39392803029173884,
+                0.10859344000938058
+              ],
+              "queryDirection": [
+                -0.9975871887711247,
+                -0.052275679466708046,
+                0.045684287627348025
+              ],
+              "orientedDistanceM": 0.0023048248690351503,
+              "sourceTriangle": [
+                [
+                  -0.20484850573842614,
+                  0.3695847964496484,
+                  0.01181543405021498
+                ],
+                [
+                  -0.20409449756972467,
+                  0.3666187760021059,
+                  0.0015364186638852164
+                ],
+                [
+                  -0.20579862458063647,
+                  0.36028235808411246,
+                  0.0002370912437816362
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.20180554687976837,
+                  0.3625216484069824,
+                  -0.0036202145274728537
+                ],
+                [
+                  -0.20152465999126434,
+                  0.36961424350738525,
+                  0.01062931027263403
+                ],
+                [
+                  -0.2027295082807541,
+                  0.3756314814090729,
+                  -0.008795005269348621
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0017336092084587194,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 12,
+            "beyondMargin": 12,
+            "minimumM": -0.0036514028200205955,
+            "witness": {
+              "id": "bottom:v211",
+              "role": "bottom",
+              "kind": "vertex",
+              "nodeIds": [
+                211
+              ],
+              "materialSites": [
+                {
+                  "node": 211,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 232
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 1242,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 414
+              },
+              "targetFaceOffset": 46476,
+              "targetTriangleId": 15492,
+              "point": [
+                0.18190770816714177,
+                -0.4395381024376602,
+                -0.06470096982041969
+              ],
+              "closest": [
+                0.18394664772450453,
+                -0.4384489688772178,
+                -0.06752749703999386
+              ],
+              "barycentric": [
+                0.5655386668006754,
+                0.08220315184454298,
+                0.3522581813547816
+              ],
+              "queryDirection": [
+                0.5583989655108106,
+                0.2982781177882454,
+                -0.7740935084117153
+              ],
+              "orientedDistanceM": -0.0036514028200205955,
+              "sourceTriangle": [
+                [
+                  0.17824581689881724,
+                  -0.4537932485681357,
+                  -0.07691889088676361
+                ],
+                [
+                  0.18190770816714177,
+                  -0.4395381024376602,
+                  -0.06470096982041969
+                ],
+                [
+                  0.1947175594128427,
+                  -0.45069805792734674,
+                  -0.06263764639571734
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.19063851237297058,
+                  -0.44628095626831055,
+                  -0.06571812927722931
+                ],
+                [
+                  0.17706306278705597,
+                  -0.444950133562088,
+                  -0.07499809563159943
+                ],
+                [
+                  0.17480944097042084,
+                  -0.4243578612804413,
+                  -0.06868903338909149
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 1.0001995285249448,
+              "windingInsideSupport": true
+            },
+            "newSincePrevious": 7,
+            "newSinceInitial": 12
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 1332,
+          "negative": 248,
+          "beyondMargin": 245,
+          "minimumM": -0.014614208555972789,
+          "witness": {
+            "id": "top-to-bottom:e26",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              5,
+              96
+            ],
+            "materialSites": [
+              {
+                "node": 5,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 5
+                  },
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 1
+                  }
+                ]
+              },
+              {
+                "node": 96,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 96
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 30,
+            "sourceFace": {
+              "panel": "left_btorso",
+              "localTriangle": 10
+            },
+            "targetFaceOffset": 3975,
+            "targetTriangleId": 1325,
+            "point": [
+              0.17288626069194796,
+              0.008916285840150629,
+              -0.01564158333445897
+            ],
+            "closest": [
+              0.18464367756629468,
+              0.015295988733998426,
+              -0.02152695767654845
+            ],
+            "barycentric": [
+              0.2213526102462075,
+              0.31205333107746547,
+              0.46659405867632703
+            ],
+            "queryDirection": [
+              0.8045195762271711,
+              0.4365411147249865,
+              -0.4027159130477948
+            ],
+            "orientedDistanceM": -0.014614208555972789,
+            "sourceTriangle": [
+              [
+                0.17713079528303216,
+                0.009184816354689117,
+                -0.0064473711230994294
+              ],
+              [
+                0.16864172610086373,
+                0.008647755325612141,
+                -0.024835795545818516
+              ],
+              [
+                0.16673294445832695,
+                0.01527743614106778,
+                -0.028711853122351954
+              ]
+            ],
+            "targetTriangle": [
+              [
+                0.1884604423528607,
+                0.005895619693382207,
+                -0.024092005537091742
+              ],
+              [
+                0.17867861140083555,
+                0.01729620857894206,
+                -0.03127535394200609
+              ],
+              [
+                0.18682237637294194,
+                0.018417805079128043,
+                -0.013790469181865363
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_l",
+              "localTriangle": 1325
+            }
+          },
+          "newSincePrevious": 14,
+          "newSinceInitial": 245
+        },
+        "measurementMS": 138,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 11,
+        "frame": 59,
+        "simulationSeconds": 0.9833333333333323,
+        "motion": "walk",
+        "motionTime": 0.18333333333333332,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "d02869a69f323be4eedcdfcfe61b40093037e2fbd6fddd1a15297934492e0b82",
+        "stateBytes": 1804560,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0016141736830612638,
+            "witness": {
+              "id": "top:v1696",
+              "role": "top",
+              "kind": "vertex",
+              "nodeIds": [
+                1696
+              ],
+              "materialSites": [
+                {
+                  "node": 1696,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 72
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 9657,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 128
+              },
+              "targetFaceOffset": 1878,
+              "targetTriangleId": 626,
+              "point": [
+                -0.20312062008421275,
+                0.3634841080864648,
+                0.002535640715523061
+              ],
+              "closest": [
+                -0.20150757938622313,
+                0.36353074634769456,
+                0.002497153596818368
+              ],
+              "barycentric": [
+                0.5506677609489334,
+                0.38109776869771766,
+                0.06823447035334888
+              ],
+              "queryDirection": [
+                -0.9992981021289514,
+                -0.028892963451924703,
+                0.02384323267599221
+              ],
+              "orientedDistanceM": 0.0016141736830612638,
+              "sourceTriangle": [
+                [
+                  -0.20404827321439623,
+                  0.36641360111907684,
+                  0.012811805996032108
+                ],
+                [
+                  -0.20312062008421275,
+                  0.3634841080864648,
+                  0.002535640715523061
+                ],
+                [
+                  -0.20453641645032283,
+                  0.35711022993071456,
+                  0.0011972985295784272
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.20152516663074493,
+                  0.35995349287986755,
+                  -0.002574824495241046
+                ],
+                [
+                  -0.20138868689537048,
+                  0.36698096990585327,
+                  0.011661021038889885
+                ],
+                [
+                  -0.20202967524528503,
+                  0.37313008308410645,
+                  -0.007752132602035999
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0017460905569547174,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 19,
+            "beyondMargin": 18,
+            "minimumM": -0.005163892144395535,
+            "witness": {
+              "id": "bottom:v211",
+              "role": "bottom",
+              "kind": "vertex",
+              "nodeIds": [
+                211
+              ],
+              "materialSites": [
+                {
+                  "node": 211,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 232
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 1242,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 414
+              },
+              "targetFaceOffset": 46476,
+              "targetTriangleId": 15492,
+              "point": [
+                0.1806314588236136,
+                -0.4451188561750547,
+                -0.07000752065323088
+              ],
+              "closest": [
+                0.18349842490365317,
+                -0.4435367311525784,
+                -0.07400041033216101
+              ],
+              "barycentric": [
+                0.6639820935511216,
+                0.16344828923264165,
+                0.17256961721623676
+              ],
+              "queryDirection": [
+                0.5551948026550388,
+                0.3063822748880216,
+                -0.7732325864442556
+              ],
+              "orientedDistanceM": -0.005163892144395535,
+              "sourceTriangle": [
+                [
+                  0.17725549466748702,
+                  -0.4591502662121315,
+                  -0.0838164080355283
+                ],
+                [
+                  0.1806314588236136,
+                  -0.4451188561750547,
+                  -0.07000752065323088
+                ],
+                [
+                  0.19421504704279047,
+                  -0.4562434503927801,
+                  -0.06895419652408823
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.18844516575336456,
+                  -0.44758108258247375,
+                  -0.07205107808113098
+                ],
+                [
+                  0.17482343316078186,
+                  -0.4460793435573578,
+                  -0.08123668283224106
+                ],
+                [
+                  0.17268171906471252,
+                  -0.4255673885345459,
+                  -0.07464690506458282
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 1.0001984299178595,
+              "windingInsideSupport": true
+            },
+            "newSincePrevious": 6,
+            "newSinceInitial": 18
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 1313,
+          "negative": 250,
+          "beyondMargin": 249,
+          "minimumM": -0.015295180525459506,
+          "witness": {
+            "id": "top-to-bottom:e26",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              5,
+              96
+            ],
+            "materialSites": [
+              {
+                "node": 5,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 5
+                  },
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 1
+                  }
+                ]
+              },
+              {
+                "node": 96,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 96
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 30,
+            "sourceFace": {
+              "panel": "left_btorso",
+              "localTriangle": 10
+            },
+            "targetFaceOffset": 3975,
+            "targetTriangleId": 1325,
+            "point": [
+              0.17359655186969514,
+              0.002966301087654742,
+              -0.0167190394013638
+            ],
+            "closest": [
+              0.18584533914571674,
+              0.00974616505599317,
+              -0.022878844767119544
+            ],
+            "barycentric": [
+              0.4815791286695752,
+              0.19662117069015175,
+              0.3217997006402731
+            ],
+            "queryDirection": [
+              0.8008265908096316,
+              0.44326799262375777,
+              -0.402728516705146
+            ],
+            "orientedDistanceM": -0.015295180525459506,
+            "sourceTriangle": [
+              [
+                0.17789584071330608,
+                0.0031722451158709072,
+                -0.007419083171337089
+              ],
+              [
+                0.1692972630260842,
+                0.002760357059438577,
+                -0.026018995631390516
+              ],
+              [
+                0.16736305157182618,
+                0.009413292794120773,
+                -0.0299275975653106
+              ]
+            ],
+            "targetTriangle": [
+              [
+                0.18830859510840176,
+                0.0035333060699562603,
+                -0.024818912638892698
+              ],
+              [
+                0.1784568170483939,
+                0.014886899947123451,
+                -0.03191272634144599
+              ],
+              [
+                0.18667345428602128,
+                0.015902808149814936,
+                -0.01445575251167142
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_l",
+              "localTriangle": 1325
+            }
+          },
+          "newSincePrevious": 12,
+          "newSinceInitial": 249
+        },
+        "measurementMS": 134.90000000002328,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      },
+      {
+        "stage": "fixed-step",
+        "step": 12,
+        "frame": 60,
+        "simulationSeconds": 0.999999999999999,
+        "motion": "walk",
+        "motionTime": 0.19999999999999998,
+        "backend": "regional-implicit-worker",
+        "stateSHA256": "288c9bb048490fdaee32dae1b76544d013efd2f7458d99b0858aebe19928b056",
+        "stateBytes": 1804557,
+        "body": [
+          {
+            "count": 6446,
+            "eligible": 6446,
+            "negative": 0,
+            "beyondMargin": 0,
+            "minimumM": 0.0008578946656976837,
+            "witness": {
+              "id": "top:v1696",
+              "role": "top",
+              "kind": "vertex",
+              "nodeIds": [
+                1696
+              ],
+              "materialSites": [
+                {
+                  "node": 1696,
+                  "sites": [
+                    {
+                      "panel": "right_ftorso",
+                      "localVertex": 72
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 9657,
+              "sourceFace": {
+                "panel": "right_ftorso",
+                "localTriangle": 128
+              },
+              "targetFaceOffset": 1878,
+              "targetTriangleId": 626,
+              "point": [
+                -0.20211233937271855,
+                0.3601246910829741,
+                0.0036691287773865148
+              ],
+              "closest": [
+                -0.20125445290915114,
+                0.36012840625451453,
+                0.003668608622822298
+              ],
+              "barycentric": [
+                0.5768743314721202,
+                0.3749808841989552,
+                0.0481447843289245
+              ],
+              "queryDirection": [
+                -0.999990439233856,
+                -0.0043305684123666486,
+                0.0006063151864848413
+              ],
+              "orientedDistanceM": 0.0008578946656976837,
+              "sourceTriangle": [
+                [
+                  -0.20323049152305733,
+                  0.3630125587862835,
+                  0.013938360654896922
+                ],
+                [
+                  -0.20211233937271855,
+                  0.3601246910829741,
+                  0.0036691287773865148
+                ],
+                [
+                  -0.203222388695212,
+                  0.3537186587801302,
+                  0.002294403362723169
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  -0.20124347507953644,
+                  0.35688185691833496,
+                  -0.0014140272978693247
+                ],
+                [
+                  -0.20126497745513916,
+                  0.36383768916130066,
+                  0.012803887017071247
+                ],
+                [
+                  -0.20130401849746704,
+                  0.37013864517211914,
+                  -0.006581983994692564
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 0.0017610878608446334,
+              "windingInsideSupport": false
+            },
+            "newSincePrevious": 0,
+            "newSinceInitial": 0
+          },
+          {
+            "count": 8735,
+            "eligible": 8735,
+            "negative": 21,
+            "beyondMargin": 20,
+            "minimumM": -0.005857933324718508,
+            "witness": {
+              "id": "bottom:v211",
+              "role": "bottom",
+              "kind": "vertex",
+              "nodeIds": [
+                211
+              ],
+              "materialSites": [
+                {
+                  "node": 211,
+                  "sites": [
+                    {
+                      "panel": "pant_b_l",
+                      "localVertex": 232
+                    }
+                  ]
+                }
+              ],
+              "sourceFaceOffset": 1242,
+              "sourceFace": {
+                "panel": "pant_b_l",
+                "localTriangle": 414
+              },
+              "targetFaceOffset": 46476,
+              "targetTriangleId": 15492,
+              "point": [
+                0.1789795219810104,
+                -0.4496229516454882,
+                -0.07692799300807825
+              ],
+              "closest": [
+                0.18221126619132158,
+                -0.4477722434535718,
+                -0.08144972844752417
+              ],
+              "barycentric": [
+                0.7208899446537121,
+                0.2349349304356402,
+                0.044175124910647665
+              ],
+              "queryDirection": [
+                0.551686752164679,
+                0.3159319318482236,
+                -0.7718994377019828
+              ],
+              "orientedDistanceM": -0.005857933324718508,
+              "sourceTriangle": [
+                [
+                  0.17537512534046248,
+                  -0.4635999872490809,
+                  -0.09163481890164325
+                ],
+                [
+                  0.1789795219810104,
+                  -0.4496229516454882,
+                  -0.07692799300807825
+                ],
+                [
+                  0.19303681046101473,
+                  -0.46083956796383685,
+                  -0.07626585519495294
+                ]
+              ],
+              "targetTriangle": [
+                [
+                  0.18611638247966766,
+                  -0.44914567470550537,
+                  -0.07922082394361496
+                ],
+                [
+                  0.1724454164505005,
+                  -0.44745588302612305,
+                  -0.08830002695322037
+                ],
+                [
+                  0.17042137682437897,
+                  -0.42704182863235474,
+                  -0.0813913345336914
+                ]
+              ],
+              "localIntersection": null,
+              "windingNumber": 1.0001978954048432,
+              "windingInsideSupport": true
+            },
+            "newSincePrevious": 3,
+            "newSinceInitial": 20
+          }
+        ],
+        "pair": {
+          "count": 12996,
+          "eligible": 1323,
+          "negative": 253,
+          "beyondMargin": 253,
+          "minimumM": -0.015421035561114465,
+          "witness": {
+            "id": "top-to-bottom:e26",
+            "role": "top-to-bottom",
+            "kind": "edge-midpoint",
+            "nodeIds": [
+              5,
+              96
+            ],
+            "materialSites": [
+              {
+                "node": 5,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 5
+                  },
+                  {
+                    "panel": "left_ftorso",
+                    "localVertex": 1
+                  }
+                ]
+              },
+              {
+                "node": 96,
+                "sites": [
+                  {
+                    "panel": "left_btorso",
+                    "localVertex": 96
+                  }
+                ]
+              }
+            ],
+            "sourceFaceOffset": 30,
+            "sourceFace": {
+              "panel": "left_btorso",
+              "localTriangle": 10
+            },
+            "targetFaceOffset": 951,
+            "targetTriangleId": 317,
+            "point": [
+              0.17404259018210494,
+              -0.0022869842071521138,
+              -0.017714642155889287
+            ],
+            "closest": [
+              0.18872252160531683,
+              0.0017482850873352502,
+              -0.020169138623175507
+            ],
+            "barycentric": [
+              0.1892725835973748,
+              0.7547748854071642,
+              0.055952530995461
+            ],
+            "queryDirection": [
+              0.9519419992927495,
+              0.26167304254603113,
+              -0.1591654761159786
+            ],
+            "orientedDistanceM": -0.015421035561114465,
+            "sourceTriangle": [
+              [
+                0.17838883677710793,
+                -0.0021282045958654072,
+                -0.008339318881690606
+              ],
+              [
+                0.16969634358710192,
+                -0.0024457638184388203,
+                -0.027089965430087966
+              ],
+              [
+                0.16774190461784266,
+                0.004227962447459224,
+                -0.031022537765938205
+              ]
+            ],
+            "targetTriangle": [
+              [
+                0.191700322499053,
+                0.0031386688575412453,
+                -7.357665969597394e-05
+              ],
+              [
+                0.18813990128792601,
+                0.0005762215401955671,
+                -0.02558060224720473
+              ],
+              [
+                0.1865087006557062,
+                0.012855603917182951,
+                -0.015148849101945876
+              ]
+            ],
+            "localIntersection": null,
+            "targetFace": {
+              "panel": "pant_b_l",
+              "localTriangle": 317
+            }
+          },
+          "newSincePrevious": 7,
+          "newSinceInitial": 253
+        },
+        "measurementMS": 136.5,
+        "readOnlyVerified": true,
+        "semantics": "oriented closest-triangle distance on physics control surfaces; body witness additionally tested with solid-angle winding; open garment pair requires separate local crossing evidence",
+        "continuousCollision": false,
+        "fullRenderedYarnCollision": false
+      }
+    ],
+    "motionFailure": null,
+    "dt": 0.016666666666666666,
+    "plannedSteps": 12,
+    "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+    "probeSurface": "original physics control triangles; not rendered yarn",
+    "epsilonM": 5e-05,
+    "completedSteps": 12,
+    "originalGate": 1.45,
+    "dynamicFitCertified": false,
+    "productionChanged": false,
+    "automaticAppFramesBeforeMeasurement": 0
+  },
+  "fit": {
+    "schema": "RF01-fitting-transaction@1",
+    "status": "COMMITTED",
+    "identity": {
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "generation": 1,
+      "bindingToken": "{\"source\":\"d413d108704af47cf531ee8c25d93f682c3176e3\",\"targetIdentity\":{\"geometrySHA256\":\"90df3ac15d0874d1eb68a0ee52e61e81c08ac920a903a9b965fb58f14c218b67\",\"topologySHA256\":\"e8526431b9b24bec71d8161ed409794a8398ffc68ad25800abb27e0fc09644de\",\"stateSHA256\":\"f2b06d550c0f1cbd4cf0c43fe041462b1097667117583542ec69587bc95404c5\",\"adapterFingerprint\":\"4ac1f6b9ffac5ab45d1a427a1eb5e9578af0e7f105d58bff4d48555e4e2027a5\"}}"
+    },
+    "baseRuntimeRevision": 0,
+    "committedRuntimeRevision": 1,
+    "plannedSteps": 48,
+    "committedSteps": 48,
+    "steps": [
+      {
+        "step": 1,
+        "fraction": 0.03125,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2186288546395292,
+          1.128881463741115
+        ],
+        "elapsedSimulation": 0.016666666666666666
+      },
+      {
+        "step": 2,
+        "fraction": 0.0625,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1741366417461319,
+          1.1393509455605546
+        ],
+        "elapsedSimulation": 0.03333333333333333
+      },
+      {
+        "step": 3,
+        "fraction": 0.09375,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1521960623347458,
+          1.141637349486821
+        ],
+        "elapsedSimulation": 0.049999999999999996
+      },
+      {
+        "step": 4,
+        "fraction": 0.125,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1608404493294184,
+          1.1486457727827022
+        ],
+        "elapsedSimulation": 0.06666666666666667
+      },
+      {
+        "step": 5,
+        "fraction": 0.15625,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1805552732439668,
+          1.1603476656485892
+        ],
+        "elapsedSimulation": 0.08333333333333333
+      },
+      {
+        "step": 6,
+        "fraction": 0.1875,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1831910398920433,
+          1.1705390925893362
+        ],
+        "elapsedSimulation": 0.09999999999999999
+      },
+      {
+        "step": 7,
+        "fraction": 0.21875,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1752197562595141,
+          1.1768354170235162
+        ],
+        "elapsedSimulation": 0.11666666666666665
+      },
+      {
+        "step": 8,
+        "fraction": 0.25,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1659090142155017,
+          1.1802148500957155
+        ],
+        "elapsedSimulation": 0.13333333333333333
+      },
+      {
+        "step": 9,
+        "fraction": 0.28125,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1530067472210102,
+          1.1807638780804026
+        ],
+        "elapsedSimulation": 0.15000000000000005
+      },
+      {
+        "step": 10,
+        "fraction": 0.3125,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2117248060091963,
+          1.1793780355685428
+        ],
+        "elapsedSimulation": 0.16666666666666677
+      },
+      {
+        "step": 11,
+        "fraction": 0.34375,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2830570817941158,
+          1.1769989356554638
+        ],
+        "elapsedSimulation": 0.1833333333333335
+      },
+      {
+        "step": 12,
+        "fraction": 0.375,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2959114328587706,
+          1.1748432325643534
+        ],
+        "elapsedSimulation": 0.2000000000000002
+      },
+      {
+        "step": 13,
+        "fraction": 0.40625,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.3027110225453513,
+          1.174137677435818
+        ],
+        "elapsedSimulation": 0.21666666666666692
+      },
+      {
+        "step": 14,
+        "fraction": 0.4375,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2498631481581641,
+          1.1738670689451642
+        ],
+        "elapsedSimulation": 0.23333333333333364
+      },
+      {
+        "step": 15,
+        "fraction": 0.46875,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2592040450338182,
+          1.1742853697847981
+        ],
+        "elapsedSimulation": 0.25000000000000033
+      },
+      {
+        "step": 16,
+        "fraction": 0.5,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2647252139826393,
+          1.1752115781928474
+        ],
+        "elapsedSimulation": 0.26666666666666694
+      },
+      {
+        "step": 17,
+        "fraction": 0.53125,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.3014282067613556,
+          1.1763478716868685
+        ],
+        "elapsedSimulation": 0.28333333333333355
+      },
+      {
+        "step": 18,
+        "fraction": 0.5625,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2681470406971747,
+          1.1774018573375917
+        ],
+        "elapsedSimulation": 0.30000000000000016
+      },
+      {
+        "step": 19,
+        "fraction": 0.59375,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2608905767964025,
+          1.178375190236601
+        ],
+        "elapsedSimulation": 0.31666666666666676
+      },
+      {
+        "step": 20,
+        "fraction": 0.625,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1816244735815173,
+          1.1785291089031233
+        ],
+        "elapsedSimulation": 0.33333333333333337
+      },
+      {
+        "step": 21,
+        "fraction": 0.65625,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2325711205901815,
+          1.1781543153602525
+        ],
+        "elapsedSimulation": 0.35
+      },
+      {
+        "step": 22,
+        "fraction": 0.6875,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.183640714820939,
+          1.177795835941202
+        ],
+        "elapsedSimulation": 0.3666666666666666
+      },
+      {
+        "step": 23,
+        "fraction": 0.71875,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.256898610329889,
+          1.1768188140555147
+        ],
+        "elapsedSimulation": 0.3833333333333332
+      },
+      {
+        "step": 24,
+        "fraction": 0.75,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2008880720241555,
+          1.176019758844558
+        ],
+        "elapsedSimulation": 0.3999999999999998
+      },
+      {
+        "step": 25,
+        "fraction": 0.78125,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2501308515305292,
+          1.176387338034819
+        ],
+        "elapsedSimulation": 0.4166666666666664
+      },
+      {
+        "step": 26,
+        "fraction": 0.8125,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2137250482272284,
+          1.1773186820207253
+        ],
+        "elapsedSimulation": 0.433333333333333
+      },
+      {
+        "step": 27,
+        "fraction": 0.84375,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1881322770554357,
+          1.1782048197003916
+        ],
+        "elapsedSimulation": 0.4499999999999996
+      },
+      {
+        "step": 28,
+        "fraction": 0.875,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2447155780883683,
+          1.180068878986318
+        ],
+        "elapsedSimulation": 0.46666666666666623
+      },
+      {
+        "step": 29,
+        "fraction": 0.90625,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2510884787532508,
+          1.1831270925513242
+        ],
+        "elapsedSimulation": 0.48333333333333284
+      },
+      {
+        "step": 30,
+        "fraction": 0.9375,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.3700356221318415,
+          1.1860440025062473
+        ],
+        "elapsedSimulation": 0.49999999999999944
+      },
+      {
+        "step": 31,
+        "fraction": 0.96875,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.3930809489073608,
+          1.1887163351537697
+        ],
+        "elapsedSimulation": 0.516666666666666
+      },
+      {
+        "step": 32,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2950568516357885,
+          1.190627890762743
+        ],
+        "elapsedSimulation": 0.5333333333333327
+      },
+      {
+        "step": 33,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.253147507572742,
+          1.2119903314135427
+        ],
+        "elapsedSimulation": 0.5499999999999993
+      },
+      {
+        "step": 34,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2544116284232716,
+          1.2122102147153555
+        ],
+        "elapsedSimulation": 0.5666666666666659
+      },
+      {
+        "step": 35,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2644321917556285,
+          1.2142042479554624
+        ],
+        "elapsedSimulation": 0.5833333333333325
+      },
+      {
+        "step": 36,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2415241086158364,
+          1.2134105831396351
+        ],
+        "elapsedSimulation": 0.5999999999999991
+      },
+      {
+        "step": 37,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2517708745021308,
+          1.2090236137716326
+        ],
+        "elapsedSimulation": 0.6166666666666657
+      },
+      {
+        "step": 38,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2586256633949338,
+          1.204427243511309
+        ],
+        "elapsedSimulation": 0.6333333333333323
+      },
+      {
+        "step": 39,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2614423490443225,
+          1.2010300165252117
+        ],
+        "elapsedSimulation": 0.6499999999999989
+      },
+      {
+        "step": 40,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.264560052884452,
+          1.199844593325668
+        ],
+        "elapsedSimulation": 0.6666666666666655
+      },
+      {
+        "step": 41,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2446910151580446,
+          1.1988771731962622
+        ],
+        "elapsedSimulation": 0.6833333333333321
+      },
+      {
+        "step": 42,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.3272412545085246,
+          1.1988842499781125
+        ],
+        "elapsedSimulation": 0.6999999999999987
+      },
+      {
+        "step": 43,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.236061376572649,
+          1.1995121845319854
+        ],
+        "elapsedSimulation": 0.7166666666666653
+      },
+      {
+        "step": 44,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.285755219105704,
+          1.200339718737667
+        ],
+        "elapsedSimulation": 0.733333333333332
+      },
+      {
+        "step": 45,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2962322564149786,
+          1.2010995600954841
+        ],
+        "elapsedSimulation": 0.7499999999999986
+      },
+      {
+        "step": 46,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.255799989868407,
+          1.2013880215515815
+        ],
+        "elapsedSimulation": 0.7666666666666652
+      },
+      {
+        "step": 47,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.2233223432888725,
+          1.2010594451595924
+        ],
+        "elapsedSimulation": 0.7833333333333318
+      },
+      {
+        "step": 48,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.287066047325567,
+          1.1999544796301014
+        ],
+        "elapsedSimulation": 0.7999999999999984
+      }
+    ],
+    "snapshot": {
+      "bytes": 11514124,
+      "arrayCount": 18702,
+      "scalarCount": 15618,
+      "excluded": [
+        "WASM internal instrumentation counters",
+        "safetyTrips and metrics.rollbacks (monotonic failure diagnostics)",
+        "GPU state",
+        "source binding/recipe structures (never written)"
+      ]
+    },
+    "originalGate": 1.45,
+    "dt": 0.016666666666666666,
+    "schedule": "fraction=min(step/32,1); native 48 fitting steps",
+    "rollback": null,
+    "fitCertified": false,
+    "productionInstalled": false,
+    "attemptedStep": 48,
+    "durationMS": 15771.600000000035,
+    "independentChecks": {
+      "finalMetricsMatchTarget": true,
+      "bodyFinalErrorM": 0,
+      "worldRuntimeRevision": 1
+    }
+  },
+  "elapsedSeconds": 195.033551296,
+  "contactSHA256": "550aa650f91de1d88f6f8bcf0ed229e2e1f047733fb972c6b6442b265580425c"
+}
