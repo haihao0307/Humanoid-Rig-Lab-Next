@@ -1,0 +1,74 @@
+name: Reality S3.11 joint contact guard
+on:
+  push:
+    branches: [feature/reality-hc-s311-joint-guard-20261021]
+    paths: [.github/workflows/reality-hc-s311.yml, reality-lab/hc-s3-11/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        motion: [static, walk]
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: platform
+          sparse-checkout: reality-lab
+      - uses: actions/checkout@v4
+        with:
+          repository: haihao0307/guilin-dem-pipeline
+          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
+          path: host
+          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+      - name: Check exact scope, syntax and synthetic guard cases
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 4ab4a1c6efefe005d5c90b51c5a6726b0281dd31
+          python - <<'PY'
+          import ast,json,subprocess
+          from pathlib import Path
+          r=Path('reality-lab/hc-s3-11')
+          files=subprocess.check_output(['git','diff','--name-only','4ab4a1c6efefe005d5c90b51c5a6726b0281dd31','HEAD'],text=True).splitlines()
+          assert files and all(f.startswith('reality-lab/hc-s3-11/') or f=='.github/workflows/reality-hc-s311.yml' for f in files)
+          for f in r.rglob('*.py'):ast.parse(f.read_text(),filename=str(f))
+          q=r/'qa/source';q.mkdir(parents=True,exist_ok=True);(q/'SCOPE.json').write_text(json.dumps({'passed':True,'files':files,'productionChanged':False},indent=2))
+          PY
+          node --check reality-lab/hc-s3-11/joint-guard.mjs
+          node reality-lab/hc-s3-11/tests/unit.mjs
+      - name: Install pinned Chromium
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Same-runner pair, source limits preserved
+        env:
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+          RF311_MOTION: ${{ matrix.motion }}
+        run: python reality-lab/hc-s3-11/run_native.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf311-native-${{ matrix.motion }}
+          path: |
+            platform/reality-lab/hc-s3-11/qa/native/${{ matrix.motion }}/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf311-source-${{ matrix.motion }}
+          path: |
+            platform/reality-lab/hc-s3-11/*.mjs
+            platform/reality-lab/hc-s3-11/*.py
+            platform/reality-lab/hc-s3-11/*.json
+            platform/reality-lab/hc-s3-11/tests/
+            platform/reality-lab/hc-s3-11/qa/source/
+          retention-days: 7
