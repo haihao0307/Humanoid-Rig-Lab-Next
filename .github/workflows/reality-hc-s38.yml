@@ -7,7 +7,11 @@ on:
 permissions:
   contents: read
 jobs:
-  native:
+  candidate:
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [static, walk]
     runs-on: ubuntu-latest
     timeout-minutes: 12
     defaults:
@@ -28,42 +32,20 @@ jobs:
           ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
           path: host
           sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-      - name: Check syntax and reversible source insertions
-        env:
-          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import ast,os,sys,subprocess
-          r=Path('reality-lab/hc-s3-8');sys.path.insert(0,str(r))
-          for p in r.rglob('*.py'):ast.parse(p.read_text())
-          from instrument import assemble
-          responses,meta=assemble(Path(os.environ['GARMENT_HOST']),'static')
-          out=r/'_generated';out.mkdir(exist_ok=True)
-          for name,data in responses.items():
-            p=out/name;p.write_bytes(data)
-            subprocess.run(['node','--check',str(p)],check=True)
-          PY
+      - name: Validate candidate syntax
+        run: python -m py_compile reality-lab/hc-s3-8/run_candidate.py
       - name: Install pinned Chromium
         run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
-      - name: Trace actual static steps and compare exact endpoints
+      - name: Record complete fine coverage outcome without certifying fit
         env:
           GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-        run: python reality-lab/hc-s3-8/run_native.py
+          CONTACT_CASE: ${{ matrix.case }}
+        run: python reality-lab/hc-s3-8/run_candidate.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rf38-native-trace
-          path: platform/reality-lab/hc-s3-8/qa/
+          name: rf38-coverage-${{ matrix.case }}
+          path: platform/reality-lab/hc-s3-8/qa/coverage-${{ matrix.case }}/
           retention-days: 30
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: rf38-code-review
-          path: |
-            platform/reality-lab/hc-s3-8/*.py
-            platform/reality-lab/hc-s3-8/*.mjs
-            platform/reality-lab/hc-s3-8/*.json
-          retention-days: 7
