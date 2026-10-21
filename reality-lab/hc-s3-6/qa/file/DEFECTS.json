@@ -1,0 +1,60 @@
+{
+  "schema": "kaopu/reality-defect-bundle@0.2",
+  "version": "0.2.0",
+  "generatedAt": null,
+  "sourceObjects": [
+    {
+      "objectId": "fit-d03-cancel",
+      "domain": "garment",
+      "commit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49"
+    }
+  ],
+  "defects": [
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fit-d03-cancel:e3cf69c2",
+      "objectId": "fit-d03-cancel",
+      "code": "contact:retained",
+      "severity": "warning",
+      "state": "OPEN",
+      "owner": "garment-fitting",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "S3.5已发现运动接触失败，历史结果保留；本轮未重做动态接触认证",
+      "expected": null,
+      "observed": null,
+      "detail": {
+        "stage": "S3.5",
+        "sourceCommit": "8a869688d1f8490d75d7883b5e1f82f545210407",
+        "bodyMinimumSampleMM": -37.074691305825176,
+        "pairMinimumSampleMM": -8.905275057161742,
+        "retestedInS36": false,
+        "status": "retained failed historical sample, not full surface penetration proof"
+      },
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    },
+    {
+      "schema": "kaopu/reality-defect@0.2",
+      "id": "defect:fit-d03-cancel:69d5ebb9",
+      "objectId": "fit-d03-cancel",
+      "code": "fit:dynamic",
+      "severity": "info",
+      "state": "OPEN",
+      "owner": "garment-fitting",
+      "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "measurementId": null,
+      "message": "初始化完成、事务恢复与动态无穿插是不同验收；后者未完成",
+      "expected": null,
+      "observed": null,
+      "detail": null,
+      "repairAuthorized": false,
+      "verificationRequired": true,
+      "createdBy": "REALITY-HC-S2.1",
+      "createdAt": null
+    }
+  ],
+  "automaticRepair": false
+}

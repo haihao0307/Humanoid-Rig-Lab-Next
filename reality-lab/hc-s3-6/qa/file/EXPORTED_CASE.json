@@ -1,0 +1,119 @@
+{
+  "schema": "kaopu/fitting-review-export@1",
+  "record": {
+    "schema": "kaopu/fitting-transaction-observation@1",
+    "case": "cancel",
+    "source": {
+      "repository": "haihao0307/guilin-dem-pipeline",
+      "commit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+      "path": "kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef/live-cloth-worker.mjs",
+      "sha256": "7cd945c060e4206bdef1b2b1eba302d8bd4a0cd9c44d0858b6031db3cf21d3c7"
+    },
+    "moduleSHA256": "db7e42558409bd93e782e96d60d2c39fb20f3dfa215879289589f99b19763a96",
+    "nativeRun": "39534171339",
+    "codeCommit": "73adc31d6ad37be2cb588c52c76de05463273099",
+    "rawReportSHA256": "af5d133d86b08bedc35b1d08211c27c1229f0c53cc8ea403a5d96248829c9416",
+    "elapsedSeconds": 248.42282448599997,
+    "sourceStatus": "载入 D03 失败：FITTING_CANCELLED_BY_MESSAGE。保留此前搭配。",
+    "nativeCheckCount": 17,
+    "result": {
+      "schema": "RF01-fitting-transaction@1",
+      "status": "CANCELLED",
+      "identity": {
+        "sourceCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+        "generation": 1,
+        "bindingToken": "{\"source\":\"d413d108704af47cf531ee8c25d93f682c3176e3\",\"targetIdentity\":{\"geometrySHA256\":\"90df3ac15d0874d1eb68a0ee52e61e81c08ac920a903a9b965fb58f14c218b67\",\"topologySHA256\":\"e8526431b9b24bec71d8161ed409794a8398ffc68ad25800abb27e0fc09644de\",\"stateSHA256\":\"f2b06d550c0f1cbd4cf0c43fe041462b1097667117583542ec69587bc95404c5\",\"adapterFingerprint\":\"4ac1f6b9ffac5ab45d1a427a1eb5e9578af0e7f105d58bff4d48555e4e2027a5\"}}"
+      },
+      "baseRuntimeRevision": 0,
+      "committedRuntimeRevision": 0,
+      "plannedSteps": 48,
+      "committedSteps": 0,
+      "steps": [
+        {
+          "step": 1,
+          "fraction": 0.03125,
+          "bodyPreviousErrorM": 0,
+          "jsWasmMetricErrorM": 0,
+          "maxActiveRatios": [
+            1.2186288546395292,
+            1.128881463741115
+          ],
+          "elapsedSimulation": 0.016666666666666666
+        },
+        {
+          "step": 2,
+          "fraction": 0.0625,
+          "bodyPreviousErrorM": 0,
+          "jsWasmMetricErrorM": 0,
+          "maxActiveRatios": [
+            1.1741366417461319,
+            1.1393509455605546
+          ],
+          "elapsedSimulation": 0.03333333333333333
+        },
+        {
+          "step": 3,
+          "fraction": 0.09375,
+          "bodyPreviousErrorM": 0,
+          "jsWasmMetricErrorM": 0,
+          "maxActiveRatios": [
+            1.1521960623347458,
+            1.141637349486821
+          ],
+          "elapsedSimulation": 0.049999999999999996
+        },
+        {
+          "step": 4,
+          "fraction": 0.125,
+          "bodyPreviousErrorM": 0,
+          "jsWasmMetricErrorM": 0,
+          "maxActiveRatios": [
+            1.1608404493294184,
+            1.1486457727827022
+          ],
+          "elapsedSimulation": 0.06666666666666667
+        }
+      ],
+      "snapshot": {
+        "bytes": 11514124,
+        "arrayCount": 18702,
+        "scalarCount": 15618,
+        "excluded": [
+          "WASM internal instrumentation counters",
+          "safetyTrips and metrics.rollbacks (monotonic failure diagnostics)",
+          "GPU state",
+          "source binding/recipe structures (never written)"
+        ]
+      },
+      "originalGate": 1.45,
+      "dt": 0.016666666666666666,
+      "schedule": "fraction=min(step/32,1); native 48 fitting steps",
+      "rollback": {
+        "exact": true,
+        "changedPaths": [],
+        "restoredTo": "transaction entry, not merely the last successful step",
+        "stateRevisionRestored": true
+      },
+      "fitCertified": false,
+      "productionInstalled": false,
+      "attemptedStep": 4,
+      "failure": {
+        "code": "FITTING_CANCELLED",
+        "message": "FITTING_CANCELLED_BY_MESSAGE",
+        "nativeSafetyTrips": 0
+      },
+      "durationMS": 2788.8000000000466,
+      "committedStepsBeforeRollback": 4,
+      "independentRollback": {
+        "equal": true,
+        "beforeSHA256": "eb7a846db8665a7baf77582ea1a39685c9d07cc5008bf8cb9c9210da638b2213",
+        "afterSHA256": "eb7a846db8665a7baf77582ea1a39685c9d07cc5008bf8cb9c9210da638b2213",
+        "scope": "independent SHA256 arrays, edge rest values, frame/time/revisions"
+      }
+    },
+    "fitCertified": false,
+    "productionInstalled": false
+  },
+  "imported": false,
+  "live": false
+}

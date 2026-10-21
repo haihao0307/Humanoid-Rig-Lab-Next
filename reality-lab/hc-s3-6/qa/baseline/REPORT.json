@@ -1,0 +1,324 @@
+{
+  "version": "REALITY-HC-S3.6",
+  "case": "baseline",
+  "passed": true,
+  "checks": [
+    {
+      "name": "native transaction outcome received",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "only reviewed worker and additive module served",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "same unmodified original failure step",
+      "passed": true,
+      "detail": {
+        "status": "NATIVE_FAILED",
+        "plannedSteps": 48,
+        "steps": [
+          {
+            "step": 1,
+            "maxActiveRatios": [
+              1.243329477808017,
+              1.1271671230194067
+            ]
+          },
+          {
+            "step": 2,
+            "maxActiveRatios": [
+              1.2335564171712659,
+              1.131733327353591
+            ]
+          },
+          {
+            "step": 3,
+            "maxActiveRatios": [
+              1.2065900552998596,
+              1.127706886265698
+            ]
+          },
+          {
+            "step": 4,
+            "maxActiveRatios": [
+              1.2104331372100834,
+              1.1293724910370364
+            ]
+          },
+          {
+            "step": 5,
+            "maxActiveRatios": [
+              1.2161296940764739,
+              1.138984439044298
+            ]
+          },
+          {
+            "step": 6,
+            "maxActiveRatios": [
+              1.2280027682650685,
+              1.1429094772371668
+            ]
+          },
+          {
+            "step": 7,
+            "maxActiveRatios": [
+              1.2454704017498528,
+              1.1456716954553656
+            ]
+          },
+          {
+            "step": 8,
+            "maxActiveRatios": [
+              1.2647005864535694,
+              1.1538118383306435
+            ]
+          },
+          {
+            "step": 9,
+            "maxActiveRatios": [
+              1.3286100292790821,
+              1.1576330836597468
+            ]
+          },
+          {
+            "step": 10,
+            "maxActiveRatios": [
+              1.4071388282431083,
+              1.1686382598754705
+            ]
+          }
+        ],
+        "originalGate": 1.45,
+        "failure": {
+          "message": "物理应变超出工程安全范围，已完整回滚本步状态"
+        },
+        "failedStep": 11,
+        "failedRatiosBeforeRollback": null
+      }
+    },
+    {
+      "name": "original protection still rejects",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "no unhandled page errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "no failed resource requests",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "all protected checked-out source files unchanged",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "codeCommit": "73adc31d6ad37be2cb588c52c76de05463273099",
+  "assembly": {
+    "mode": "baseline",
+    "sourcePin": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+    "sourceFiles": {
+      "live-cloth-worker.mjs": "7cd945c060e4206bdef1b2b1eba302d8bd4a0cd9c44d0858b6031db3cf21d3c7",
+      "wasm-cloth.mjs": "33df85592209c3ddd60224a75fe3129666028ab185f0da5eb1a9fd9e35b62de5",
+      "gpu-cloth.mjs": "ae88c3615826d6f99f32576a84f447f8e5654492be8df7e66dee80b7032a80f4",
+      "coupled-cloth.mjs": "1f0e93ba23658fd0b3d16abd27325b4c3d29cba267b94078f05fafc7105cdd68"
+    },
+    "workerBeforeSHA256": "7cd945c060e4206bdef1b2b1eba302d8bd4a0cd9c44d0858b6031db3cf21d3c7",
+    "workerCandidateSHA256": "21e53a9bc736e7e7b93d1e52fd18540744f302b90b612922b2fc7a8e9bd4998c",
+    "moduleSHA256": "db7e42558409bd93e782e96d60d2c39fb20f3dfa215879289589f99b19763a96",
+    "reverseExact": true,
+    "protectedKernelChanged": false,
+    "gpuExecutionTested": false,
+    "productionSourceChanged": false
+  },
+  "productionChanged": false,
+  "fitCertified": false,
+  "physicalDeviceTested": false,
+  "result": {
+    "status": "NATIVE_FAILED",
+    "plannedSteps": 48,
+    "steps": [
+      {
+        "step": 1,
+        "maxActiveRatios": [
+          1.243329477808017,
+          1.1271671230194067
+        ]
+      },
+      {
+        "step": 2,
+        "maxActiveRatios": [
+          1.2335564171712659,
+          1.131733327353591
+        ]
+      },
+      {
+        "step": 3,
+        "maxActiveRatios": [
+          1.2065900552998596,
+          1.127706886265698
+        ]
+      },
+      {
+        "step": 4,
+        "maxActiveRatios": [
+          1.2104331372100834,
+          1.1293724910370364
+        ]
+      },
+      {
+        "step": 5,
+        "maxActiveRatios": [
+          1.2161296940764739,
+          1.138984439044298
+        ]
+      },
+      {
+        "step": 6,
+        "maxActiveRatios": [
+          1.2280027682650685,
+          1.1429094772371668
+        ]
+      },
+      {
+        "step": 7,
+        "maxActiveRatios": [
+          1.2454704017498528,
+          1.1456716954553656
+        ]
+      },
+      {
+        "step": 8,
+        "maxActiveRatios": [
+          1.2647005864535694,
+          1.1538118383306435
+        ]
+      },
+      {
+        "step": 9,
+        "maxActiveRatios": [
+          1.3286100292790821,
+          1.1576330836597468
+        ]
+      },
+      {
+        "step": 10,
+        "maxActiveRatios": [
+          1.4071388282431083,
+          1.1686382598754705
+        ]
+      }
+    ],
+    "originalGate": 1.45,
+    "failure": {
+      "message": "物理应变超出工程安全范围，已完整回滚本步状态"
+    },
+    "failedStep": 11,
+    "failedRatiosBeforeRollback": null
+  },
+  "messages": [
+    {
+      "rf36": true,
+      "kind": "report",
+      "report": {
+        "status": "NATIVE_FAILED",
+        "plannedSteps": 48,
+        "steps": [
+          {
+            "step": 1,
+            "maxActiveRatios": [
+              1.243329477808017,
+              1.1271671230194067
+            ]
+          },
+          {
+            "step": 2,
+            "maxActiveRatios": [
+              1.2335564171712659,
+              1.131733327353591
+            ]
+          },
+          {
+            "step": 3,
+            "maxActiveRatios": [
+              1.2065900552998596,
+              1.127706886265698
+            ]
+          },
+          {
+            "step": 4,
+            "maxActiveRatios": [
+              1.2104331372100834,
+              1.1293724910370364
+            ]
+          },
+          {
+            "step": 5,
+            "maxActiveRatios": [
+              1.2161296940764739,
+              1.138984439044298
+            ]
+          },
+          {
+            "step": 6,
+            "maxActiveRatios": [
+              1.2280027682650685,
+              1.1429094772371668
+            ]
+          },
+          {
+            "step": 7,
+            "maxActiveRatios": [
+              1.2454704017498528,
+              1.1456716954553656
+            ]
+          },
+          {
+            "step": 8,
+            "maxActiveRatios": [
+              1.2647005864535694,
+              1.1538118383306435
+            ]
+          },
+          {
+            "step": 9,
+            "maxActiveRatios": [
+              1.3286100292790821,
+              1.1576330836597468
+            ]
+          },
+          {
+            "step": 10,
+            "maxActiveRatios": [
+              1.4071388282431083,
+              1.1686382598754705
+            ]
+          }
+        ],
+        "originalGate": 1.45,
+        "failure": {
+          "message": "物理应变超出工程安全范围，已完整回滚本步状态"
+        },
+        "failedStep": 11,
+        "failedRatiosBeforeRollback": null
+      }
+    }
+  ],
+  "elapsedSeconds": 179.159984592,
+  "sourceStatus": "载入 D03 失败：物理应变超出工程安全范围，已完整回滚本步状态。保留此前搭配。"
+}
