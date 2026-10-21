@@ -6,44 +6,170 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
-  native:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 16
-    strategy:
-      fail-fast: false
-      matrix:
-        case: [static, walk, walk-repeat]
-    defaults:
-      run:
-        working-directory: platform
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          path: platform
           sparse-checkout: |
             reality-lab/hc-s3-7
             reality-lab/hc-s3-6
-      - uses: actions/checkout@v4
-        with:
-          repository: haihao0307/guilin-dem-pipeline
-          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
-          path: host
-          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-      - name: Check code and install fixed browser
+      - name: Scope and fresh evidence gate
         run: |
-          node --check reality-lab/hc-s3-7/contact-probe.mjs
+          git fetch --filter=blob:none --depth=1 origin 99df096fd59d8813de8942225dce8e965aa533d1 9a0a830347d47ca32926f22e6c24257abc758f30
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json,shutil
+          r=Path('reality-lab/hc-s3-7');paths=subprocess.check_output(['git','diff','--name-only','99df096fd59d8813de8942225dce8e965aa533d1','HEAD'],text=True).splitlines()
+          assert paths and all(p.startswith('reality-lab/hc-s3-7/') or p=='.github/workflows/reality-hc-s37.yml' for p in paths)
+          shutil.rmtree(r/'qa',ignore_errors=True);(r/'qa/review').mkdir(parents=True)
+          (r/'qa/review/SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':paths,'productionChanged':False},indent=2))
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf37-native-static
+          run-id: 39537947995
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-7/qa/static
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf37-native-walk
+          run-id: 39537947995
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-7/qa/walk
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf37-native-walk-repeat
+          run-id: 39537947995
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-7/qa/walk-repeat
+      - name: Independent geometry fixtures and replay protocol
+        env:
+          NATIVE_RUN: '39537947995'
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,hashlib,shutil,subprocess
+          r=Path('reality-lab/hc-s3-7');g=r/'_geometry';(g/'tests').mkdir(parents=True,exist_ok=True)
+          b=urllib.request.urlopen('https://raw.githubusercontent.com/haihao0307/guilin-dem-pipeline/c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef/mesh-contact.mjs',timeout=90).read()
+          assert hashlib.sha256(b).hexdigest()=='0fe9b8e0840c7b35c4ee3fce9b7d648c220043783ad6166314812472ddde8ff3'
+          (g/'mesh-contact.mjs').write_bytes(b);shutil.copy2(r/'contact-probe.mjs',g/'contact-probe.mjs');shutil.copy2(r/'tests/geometry.mjs',g/'tests/geometry.mjs')
+          out=subprocess.check_output(['node',str(g/'tests/geometry.mjs')]);(r/'qa/review/GEOMETRY.json').write_bytes(out)
+          PY
+          python reality-lab/hc-s3-7/build.py
+          node reality-lab/hc-s3-7/tests/review.cjs
+      - name: Install fixed browser
+        run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
-      - name: Measure actual native surfaces with fixed initial state and steps
+      - name: Standalone real 3D witness and review controls
         env:
-          CONTACT_CASE: ${{ matrix.case }}
-          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-        run: python reality-lab/hc-s3-7/run_native.py
+          RF37_QA: ${{ github.workspace }}/reality-lab/hc-s3-7/qa/file
+        run: python reality-lab/hc-s3-7/tests/browser.py
+      - name: Freeze verified new web build
+        id: freeze
+        run: |
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s37-contact-origin-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-7/preview.html reality-lab/hc-s3-7/BUILD_MANIFEST.json reality-lab/hc-s3-7/EVIDENCE.json reality-lab/hc-s3-7/qa
+          git commit -m 'build(reality): freeze S3.7 controlled contact origin and actual triangle witnesses'
+          git push origin HEAD:refs/heads/feature/reality-hc-s37-contact-origin-20261021
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-7/preview.html" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rf37-native-${{ matrix.case }}
-          path: platform/reality-lab/hc-s3-7/qa/${{ matrix.case }}/
+          name: rf37-build-evidence
+          path: reality-lab/hc-s3-7/qa/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: rf37-standalone
+          path: |
+            reality-lab/hc-s3-7/preview.html
+            reality-lab/hc-s3-7/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-7
+      - name: Read exact immutable public bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,hashlib,json,os,time
+          r=Path('reality-lab/hc-s3-7');m=json.loads((r/'BUILD_MANIFEST.json').read_text());u='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-7/preview.html'
+          for i in range(10):
+            try:b=urllib.request.urlopen(u,timeout=90).read();break
+            except Exception:
+              if i==9:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          (r/'qa/public').mkdir(exist_ok=True);(r/'qa/public/BYTES.json').write_text(json.dumps({'passed':True,'publicCommit':os.environ['BUILD_SHA'],'html':m['html']},indent=2))
+          PY
+      - name: Install independent browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Real fixed HTTPS interactions
+        env:
+          RF37_URL: ${{ needs.build.outputs.url }}
+          RF37_QA: ${{ github.workspace }}/reality-lab/hc-s3-7/qa/public
+        run: python reality-lab/hc-s3-7/tests/browser.py
+      - name: Preserve delivery and local next task
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF37_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-7');m=json.loads((r/'BUILD_MANIFEST.json').read_text());e=json.loads((r/'EVIDENCE.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());b=json.loads((r/'qa/public/BROWSER.json').read_text());p=json.loads((r/'qa/review/PROTOCOL.json').read_text());g=json.loads((r/'qa/review/GEOMETRY.json').read_text())
+          assert f['passed'] and f['fileVerified'] and b['passed'] and b['publicVerified'] and p['passed'] and g['passed']
+          first={}
+          for name,x in e['cases'].items():
+            first[name]={}
+            for k in ['top','bottom','pair']:
+              get=lambda v:v['pair'] if k=='pair' else v['body'][0 if k=='top' else 1]
+              q=next((v for v in x['records'] if get(v)['beyondMargin']>0),None)
+              first[name][k]={'stage':q['stage'],'step':q['step'],'measurement':get(q)} if q else None
+          d={'version':'REALITY-HC-S3.7','status':'CONTACT_ONSET_VERIFIED_STATIC_FAILURE_NOT_REPAIRED','fixedURL':os.environ['RF37_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'nativeRun':m['nativeRun'],'html':m['html'],'nativeChecks':{k:v['checks'] for k,v in m['evidence'].items()},'geometryFixtureChecks':g['count'],'reviewProtocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'validation':e['validation'],'firstReportedViolations':first,'initialResidualAtSampledSites':False,'productionChanged':False,'sourceSolverChanged':False,'dynamicFitCertified':False,'fullSurfaceCertified':False,'physicalDeviceTested':False,'userAccepted':False,'next':'Hold the verified S3.6 transaction. Diagnose original static-body step7→8 lower-garment/body crossing by coarse contact and fine expansion phases. Do not first modify walk animation, widen 1.45, or claim oriented garment-pair negative distance is a closed-volume depth.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.7-CONTACT-ORIGIN-20261021','frameworkId':'RF01','status':d['status'],'fixedURL':d['fixedURL'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'lastActuallyCompletedStep':'Same post-fit initial state, static/walk/repeat measurements, actual local triangle witnesses and verified file/public inspector','nextAction':d['next'],'productionChanged':False,'userAccepted':False},ensure_ascii=False,indent=2))
+          PY
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s37-contact-origin-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-7/qa/public reality-lab/hc-s3-7/DELIVERY.json reality-lab/hc-s3-7/TASK_STATE.json
+          git commit -m 'docs(reality): persist verified contact onset and unchanged-source handoff'
+          git push origin HEAD:refs/heads/feature/reality-hc-s37-contact-origin-20261021
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf37-public-evidence
+          path: reality-lab/hc-s3-7/qa/public/
           retention-days: 30
