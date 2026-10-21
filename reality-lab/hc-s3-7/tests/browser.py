@@ -34,7 +34,7 @@ with sync_playwright() as pw:
   shot(p,'02-original-triangle-witness')
   p.locator('#case').select_option('walk');p.locator('#channel').select_option('pair');p.locator('#first').click();check('pair onset is step4',state()['record']['step']==4)
   check('unproven local crossing not falsely claimed','未证实' in p.locator('#proof').inner_text())
-  p.locator('#frame').fill('14');p.locator('#frame').dispatch_event('input');check('last fixed step selectable',state()['record']['step']==12)
+  p.locator('#frame').focus();p.locator('#frame').press('End');check('last fixed step selectable',state()['record']['step']==12)
   p.locator('#initial').click();check('initial sample restores positive values',state()['frame']==0 and state()['record']['pair']['minimumM']>0)
   original=p.evaluate('__RF37VIEW__.raw()')
   with p.expect_download() as ev:p.locator('#export').click()
