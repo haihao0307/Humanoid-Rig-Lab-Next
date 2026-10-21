@@ -28,22 +28,26 @@ try:
   try:
    started=time.monotonic();page.goto('http://127.0.0.1:8765/index.html?look=D03',wait_until='domcontentloaded',timeout=120000);page.wait_for_function('__RF310_RUN.result || __RF310_RUN.errors.length',polling=500,timeout=720000)
    raw=page.evaluate('__RF310_RUN');check('native traced run returned',raw['result'] is not None,raw['errors']);x=raw['result'];trace=x.pop('contactTrace');old=json.loads((R.parent/'hc-s3-9/qa/native/coverage-walk/ENDURANCE.json').read_text())
+   # Persist actual raw outputs before assertions so failed gates do not discard evidence.
+   (Q/'ENDURANCE.json').write_text(json.dumps(x,ensure_ascii=False,indent=2));(Q/'TRACE.json').write_text(json.dumps(trace,ensure_ascii=False,indent=2))
    report['elapsedSeconds']=time.monotonic()-started
    check('original progressive48 fitting committed',raw['fit']['status']=='COMMITTED' and raw['fit']['committedSteps']==48)
    check('all original180 steps completed',x['completedSteps']==old['completedSteps']==180 and x['failure'] is None)
    check('same actual gait duration',x['walkingClip']==old['walkingClip'])
    checks=[]
    for a,b in zip(old['checkpoints'],x['checkpoints']):checks.append({'stage':a['stage'],'step':a['step'],'identical':all(a[k]==b[k] for k in ['stage','step','stateSHA256','body','pair'])})
-   check('all40 original checkpoints exactly preserved',len(checks)==len(old['checkpoints'])==len(x['checkpoints'])==40 and all(c['identical'] for c in checks),checks)
+   initials=[c for c in checks if c['step']==0];motion=[c for c in checks if c['step']>0]
+   check('all40 original checkpoints exactly preserved',len(motion)==40 and all(c['identical'] for c in motion),motion)
+   check('three initial checkpoints and full43-entry coverage preserved',len(initials)==3 and len(checks)==len(old['checkpoints'])==len(x['checkpoints'])==43 and all(c['identical'] for c in initials),initials)
    check('original final state identical',x['finalState']==old['finalState'])
-   stable=['accepted','motionTime','frame'];check('every step and fine contact count preserved',all(all(a[k]==b[k] for k in stable) and all(a['lower'][k]==b['lower'][k] for k in ['passes','queries','contacts','guidedCrotchContacts','maxCorrectionMM','maxFineOffsetMM']) for a,b in zip(old['frames'],x['frames'])))
+   stable=['accepted','motionTime','frame'];check('every step and fine contact count preserved',len(x['frames'])==len(old['frames'])==180 and all(all(a[k]==b[k] for k in stable) and all(a['lower'][k]==b['lower'][k] for k in ['passes','queries','contacts','guidedCrotchContacts','maxCorrectionMM','maxFineOffsetMM']) for a,b in zip(old['frames'],x['frames'])))
    check('all six target steps traced',[s['step'] for s in trace['steps']]==list(range(25,31)))
    check('target covered, not the previous omission',all(trace['rows'][s['firstRow']]['vertexCovered'] and len(trace['rows'][s['firstRow']]['incidentFaces'])==len(trace['rows'][s['firstRow']]['incidentCovered']) for s in trace['steps']))
    check('native iteration cap retained',all(s['passes']<=32 for s in trace['steps']) and trace['steps'][-1]['passes']==32)
    check('trace uses independent copies and exact undo',assembly['candidateRemovalExact'] and assembly['enduranceRemovalExact'])
    check('prior source files unchanged',before=={n:sha((H/n).read_bytes()) for n in before})
    check('no unhandled page errors',not report['pageErrors'],report['pageErrors']);check('no console errors',not report['consoleErrors'],report['consoleErrors']);check('no failed requests',not report['failedRequests'],report['failedRequests'])
-   (Q/'ENDURANCE.json').write_text(json.dumps(x,ensure_ascii=False,indent=2));(Q/'TRACE.json').write_text(json.dumps(trace,ensure_ascii=False,indent=2));report['traceSHA256']=sha((Q/'TRACE.json').read_bytes());report['enduranceSHA256']=sha((Q/'ENDURANCE.json').read_bytes());report['traceRows']=len(trace['rows']);report['passed']=True
+   report['traceSHA256']=sha((Q/'TRACE.json').read_bytes());report['enduranceSHA256']=sha((Q/'ENDURANCE.json').read_bytes());report['traceRows']=len(trace['rows']);report['passed']=True
   except Exception as e:
    report['failure']=str(e);report['stack']=traceback.format_exc();print(report['stack'],flush=True)
    try:report['lastState']=page.evaluate('__RF310_RUN');report['status']=page.locator('#status').inner_text()
