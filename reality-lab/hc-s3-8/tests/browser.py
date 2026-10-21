@@ -1,0 +1,55 @@
+from pathlib import Path
+import os,json,hashlib,traceback
+from playwright.sync_api import sync_playwright
+R=Path(__file__).resolve().parents[1];Q=Path(os.environ.get('RF38_QA',str(R/'qa/file')));Q.mkdir(parents=True,exist_ok=True)
+URL=os.environ.get('RF38_URL',(R/'preview.html').as_uri());M=json.loads((R/'BUILD_MANIFEST.json').read_text())
+report={'passed':False,'url':URL,'sourceCommit':M['sourceCommit'],'checks':[],'errors':[],'consoleErrors':[],'failedRequests':[],'fitCertified':False,'physicalDeviceTested':False};requests=[]
+def save():(Q/'BROWSER.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+def check(name,ok=True,detail=None):
+ if not ok:raise AssertionError(name+': '+str(detail))
+ report['checks'].append({'name':name,'passed':True,'detail':detail});print('PASS',name,flush=True);save()
+def shot(page,name):
+ p=Q/(name+'.png');page.screenshot(path=str(p),timeout=60000);report.setdefault('screenshots',[]).append({'file':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+with sync_playwright() as pw:
+ browser=pw.chromium.launch(headless=True,args=['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
+ ctx=browser.new_context(viewport={'width':1440,'height':1080},device_scale_factor=1,accept_downloads=True);page=ctx.new_page();page.set_default_timeout(60000)
+ page.on('pageerror',lambda e:report['errors'].append(str(e)));page.on('console',lambda e:report['consoleErrors'].append(e.text) if e.type=='error' else None)
+ page.on('request',lambda r:requests.append(r.url) if r.url.startswith(('http:','https:')) else None);page.on('requestfailed',lambda r:report['failedRequests'].append({'url':r.url,'failure':r.failure}))
+ state=lambda:page.evaluate('__RF38VIEW__.report()')
+ try:
+  page.goto(URL,wait_until='domcontentloaded',timeout=120000);page.wait_for_function('!!window.__RF38VIEW__')
+  check('exact current source identity',state()['sourceCommit']==M['sourceCommit'])
+  check('native data not advertised as live try-on','非实时' in page.locator('#mode').inner_text())
+  check('target coverage visible','未包含' in page.locator('#coverage').inner_text() and '652 / 2955' in page.locator('#coverage').inner_text())
+  check('no heavy source engine loaded',page.locator('iframe').count()==0)
+  page.locator('#reconstruction').click();check('step8 reconstruction selected',state()['step']==8 and state()['row']['stage']=='after-fine-reconstruction')
+  check('actual negative node distance shown',state()['row']['actualFine']['distanceM']<-.00005 and '-' in page.locator('#actual').inner_text())
+  check('positive coarse controls separately shown',all(c['contact']['distanceM']>.0039 for c in state()['row']['coarse']) and page.locator('#bindings tr').count()==8)
+  check('current local crossings visible',state()['row']['crossings'] and '存在严格局部交叉' in page.locator('#intersection').inner_text())
+  check('native triangle geometry drawn',state()['drawCount']>0)
+  shot(page,'01-step8-reconstruction')
+  box=page.locator('#witness').bounding_box();old=state();page.mouse.move(box['x']+box['width']*.5,box['y']+box['height']*.5);page.mouse.down();page.mouse.move(box['x']+box['width']*.65,box['y']+box['height']*.6,steps=8);page.mouse.up();check('local 3D drag changes view only',state()['yaw']!=old['yaw'] and state()['row']==old['row'])
+  oldzoom=state()['zoom'];page.mouse.wheel(0,-160);page.wait_for_timeout(100);check('local view zoom responds',state()['zoom']!=oldzoom)
+  page.locator('#camera').click();check('camera reset works',state()['yaw']==.5 and state()['zoom']==1)
+  page.locator('#step7').click();page.locator('#final').click();check('step7 positive point still reports neighbouring crossing',state()['row']['actualFine']['distanceM']>0 and state()['row']['crossings'])
+  shot(page,'02-step7-neighbour-crossing')
+  page.locator('#step8').click();check('pre-expansion semantics warned','上一' in page.locator('#position-semantics').inner_text())
+  page.locator('#slider').focus();page.locator('#slider').press('End');check('phase timeline reaches final state',state()['row']['stage']=='step-complete')
+  check('uncovered node unchanged by fine contact',abs(state()['summary']['steps'][1]['correctedAfterReconstructionM'])<1e-15)
+  with page.expect_download() as ev:page.locator('#export').click()
+  p=Q/'EXPORTED.json';ev.value.save_as(p);d=json.loads(p.read_text());check('export preserves actual complete phase records',d['schema']=='kaopu/contact-propagation-study@1' and len(d['trace']['rows'])==M['phaseRows'])
+  before=page.evaluate('__RF38VIEW__.raw()');bad=json.loads(json.dumps(d));bad['trace']['rows'][0]['actualFine']['distanceM']='false-number'
+  page.locator('#file').set_input_files({'name':'invalid.json','mimeType':'application/json','buffer':json.dumps(bad).encode()});page.wait_for_function('document.querySelector("#status").textContent.includes("拒绝导入")');check('invalid import atomically rejected',page.evaluate('__RF38VIEW__.raw()')==before)
+  page.locator('#file').set_input_files(str(p));page.wait_for_function('__RF38VIEW__.report().imported');check('external report clearly unverified','未复验' in page.locator('#mode').inner_text() and not state()['independentlyVerified'])
+  page.locator('#restore').click();check('restore clears stale imported message',not state()['imported'] and '已恢复' in page.locator('#status').inner_text())
+  check('never grants fit acceptance',state()['fitCertified'] is False)
+  page.set_viewport_size({'width':390,'height':844});page.evaluate('scrollTo(0,0)');page.wait_for_timeout(200);check('390px layout fits',page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'));shot(page,'03-mobile')
+  if URL.startswith('file:'):check('standalone has zero HTTP dependencies',not requests,requests)
+  check('no unhandled page errors',not report['errors'],report['errors']);check('no console errors',not report['consoleErrors'],report['consoleErrors']);check('no failed network requests',not report['failedRequests'],report['failedRequests'])
+  report['passed']=True;report['publicVerified']=URL.startswith('https:');report['fileVerified']=URL.startswith('file:')
+ except Exception as e:
+  report['failure']=str(e);report['traceback']=traceback.format_exc();print(report['traceback'],flush=True)
+  try:report['lastState']=state();shot(page,'FAILURE')
+  except Exception as e2:report['captureFailure']=str(e2)
+ finally:save();ctx.close();browser.close()
+if not report['passed']:raise SystemExit(1)
