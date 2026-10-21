@@ -6,46 +6,191 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
-  candidate:
-    strategy:
-      fail-fast: false
-      matrix:
-        case: [static, walk]
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 12
-    defaults:
-      run:
-        working-directory: platform
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          path: platform
           sparse-checkout: |
             reality-lab/hc-s3-8
             reality-lab/hc-s3-7
-            reality-lab/hc-s3-6
-      - uses: actions/checkout@v4
+      - name: Enforce scope and remove stale generated evidence
+        run: |
+          git fetch --filter=blob:none --depth=1 origin e9490bb7936583bcae7bc9ef81a9c0bf2814d0ee
+          python - <<'PY'
+          from pathlib import Path
+          import json,subprocess,shutil,ast
+          r=Path('reality-lab/hc-s3-8')
+          changed=subprocess.check_output(['git','diff','--name-only','e9490bb7936583bcae7bc9ef81a9c0bf2814d0ee','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s3-8/') or p=='.github/workflows/reality-hc-s38.yml' for p in changed),changed
+          for p in r.rglob('*.py'):ast.parse(p.read_text(),filename=str(p))
+          shutil.rmtree(r/'qa',ignore_errors=True)
+          q=r/'qa/review';q.mkdir(parents=True)
+          (q/'SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'productionChanged':False,'excludedDomainsTouched':[]},indent=2))
+          PY
+      - name: Retrieve exact observation-only native trace
+        uses: actions/download-artifact@v4
         with:
-          repository: haihao0307/guilin-dem-pipeline
-          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
-          path: host
-          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-      - name: Validate candidate syntax
-        run: python -m py_compile reality-lab/hc-s3-8/run_candidate.py
+          name: rf38-native-trace
+          run-id: 39550625955
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-8/qa
+      - name: Retrieve static coverage-only candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: rf38-coverage-static
+          run-id: 39551377763
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-8/qa/coverage-static
+      - name: Retrieve walking coverage-only candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: rf38-coverage-walk
+          run-id: 39551377763
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-8/qa/coverage-walk
+      - name: Revalidate exact source evidence and build inspector
+        env:
+          NATIVE_RUN_ID: '39550625955'
+          CANDIDATE_RUN_ID: '39551377763'
+        run: |
+          python reality-lab/hc-s3-8/build.py
+          node reality-lab/hc-s3-8/tests/protocol.cjs
       - name: Install pinned Chromium
         run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
-      - name: Record complete fine coverage outcome without certifying fit
+      - name: Verify standalone interactive trace and candidate comparison
         env:
-          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-          CONTACT_CASE: ${{ matrix.case }}
-        run: python reality-lab/hc-s3-8/run_candidate.py
+          RF38_QA: ${{ github.workspace }}/reality-lab/hc-s3-8/qa/file
+        run: python reality-lab/hc-s3-8/tests/browser.py
+      - name: Freeze passing inspector without certifying whole clothing
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-8')
+          for n in ['qa/review/SCOPE.json','qa/review/PROTOCOL.json','qa/static/REPORT.json','qa/static/TRACE_VERIFICATION.json','qa/coverage-static/REPORT.json','qa/coverage-static/CANDIDATE_COMPARISON.json','qa/coverage-walk/REPORT.json','qa/coverage-walk/CANDIDATE_COMPARISON.json','qa/file/BROWSER.json']:assert json.loads((r/n).read_text())['passed'],n
+          c=json.loads((r/'CANDIDATES.json').read_text());assert c['fitCertified'] is False and c['productionChanged'] is False
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s38-contact-propagation-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-8/preview.html reality-lab/hc-s3-8/BUILD_MANIFEST.json reality-lab/hc-s3-8/STUDY.json reality-lab/hc-s3-8/CANDIDATES.json reality-lab/hc-s3-8/qa
+          git commit -m 'build(reality): freeze S3.8 native phase trace and bounded coverage comparisons'
+          git push origin HEAD:refs/heads/feature/reality-hc-s38-contact-propagation-20261021
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-8/preview.html" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rf38-coverage-${{ matrix.case }}
-          path: platform/reality-lab/hc-s3-8/qa/coverage-${{ matrix.case }}/
+          name: rf38-build-evidence
+          path: reality-lab/hc-s3-8/qa/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf38-reviewed-source
+          path: |
+            reality-lab/hc-s3-8/*.js
+            reality-lab/hc-s3-8/*.mjs
+            reality-lab/hc-s3-8/*.py
+            reality-lab/hc-s3-8/*.json
+            reality-lab/hc-s3-8/*.md
+            reality-lab/hc-s3-8/index.template.html
+            reality-lab/hc-s3-8/tests/
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: rf38-standalone
+          path: |
+            reality-lab/hc-s3-8/preview.html
+            reality-lab/hc-s3-8/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-8
+      - name: Verify immutable public bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF38_URL: ${{ needs.build.outputs.url }}
+        run: |
+          from_error=0
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,json,hashlib,os,time
+          r=Path('reality-lab/hc-s3-8');m=json.loads((r/'BUILD_MANIFEST.json').read_text())
+          url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-8/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(url,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True)
+          (q/'BYTES.json').write_text(json.dumps({'passed':True,'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'url':os.environ['RF38_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install independent pinned Chromium
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify exact fixed HTTPS interactions
+        env:
+          RF38_URL: ${{ needs.build.outputs.url }}
+          RF38_QA: ${{ github.workspace }}/reality-lab/hc-s3-8/qa/public
+        run: python reality-lab/hc-s3-8/tests/browser.py
+      - name: Record native result, remaining pair failure and next boundary
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF38_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-8');m=json.loads((r/'BUILD_MANIFEST.json').read_text());s=json.loads((r/'STUDY.json').read_text());c=json.loads((r/'CANDIDATES.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());b=json.loads((r/'qa/public/BROWSER.json').read_text());p=json.loads((r/'qa/review/PROTOCOL.json').read_text())
+          assert f['passed'] and f['fileVerified'] and b['passed'] and b['publicVerified'] and p['passed']
+          results={}
+          for name,case in c['cases'].items():
+            steps=[v for v in case['comparison'] if v['stage']=='fixed-step'];last=steps[-1]
+            results[name]={'completedSteps':case['completedSteps'],'dtSeconds':1/60,'simulatedSeconds':case['completedSteps']/60,'samePostFitState':case['samePostFitState'],'samePostRegionalState':case['samePostRegionalState'],'bodyViolationsAtAllRecordedSteps':[sum(v['bodyViolationAfter'][i] for v in steps) for i in [0,1]],'step12':last,'pairFailureRemaining':any(v['pairViolationAfter']>0 for v in steps)}
+          d={'version':'REALITY-HC-S3.8','status':'PHASE_DIAGNOSIS_AND_BOUNDED_COVERAGE_CANDIDATE_VERIFIED_PAIR_FAILURE_REMAINS','fixedURL':os.environ['RF38_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'html':m['html'],'nativeTraceRun':m['nativeRun'],'nativeTraceSourceCommit':m['nativeCodeCommit'],'candidateRun':m['candidateRun'],'candidateEvidence':m['candidateEvidence'],'nativeEndpointComparisons':len(s['endpointComparison']),'phaseRows':len(s['trace']['rows']),'targetCoverage':s['trace']['coverage'],'candidateResults':results,'protocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'earliestCrossingClarification':'New local neighbour checks already find strict intersection at step7 despite positive target-node distance. S3.7 step8 was first sampled negative beyond its margin, not first possible full-surface crossing.','sourceSolverArithmeticChangedInTrace':False,'candidateChange':'original contact coverage extended to all physical fine vertices and triangle centroids; equations, clearances, timestep and loop caps unchanged','productionChanged':False,'productionInstalled':False,'fitCertified':False,'continuousCollisionCertified':False,'allRenderedSurfaceCertified':False,'physicalDeviceTested':False,'userVisualAccepted':False,'performanceBenchmarkCompleted':False,'next':'Keep the coverage candidate isolated. Verify longer identical-start static/walk sequences and per-stage cost, then address retained upper/lower garment contact failures. Preserve S3.6 rollback and all existing thresholds before considering source integration.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          (r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.8-CONTACT-PROPAGATION-20261021','frameworkId':'RF01','status':d['status'],'fixedURL':d['fixedURL'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'lastActuallyCompletedStep':'Exact-state phase attribution plus real static/walk coverage-only comparison and verified interactive public replay','nextAction':d['next'],'fitCertified':False,'productionChanged':False,'userAccepted':False},ensure_ascii=False,indent=2))
+          print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s38-contact-propagation-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3-8/DELIVERY.json reality-lab/hc-s3-8/TASK_STATE.json reality-lab/hc-s3-8/qa/public
+          git commit -m 'docs(reality): persist S3.8 public evidence and remaining garment contact failures'
+          git push origin HEAD:refs/heads/feature/reality-hc-s38-contact-propagation-20261021
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf38-public-evidence
+          path: reality-lab/hc-s3-8/qa/public/
           retention-days: 30
