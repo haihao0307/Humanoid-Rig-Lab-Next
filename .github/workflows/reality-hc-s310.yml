@@ -6,56 +6,155 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
-  native:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    defaults:
-      run:
-        working-directory: platform
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          path: platform
-          sparse-checkout: reality-lab
-      - uses: actions/checkout@v4
-        with:
-          repository: haihao0307/guilin-dem-pipeline
-          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
-          path: host
-          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-      - name: Check bounded source and syntax
+          sparse-checkout: reality-lab/hc-s3-10
+      - name: Scope and fresh evidence directories
         run: |
           git fetch --filter=blob:none --depth=1 origin 00490a73be8ea08cb8063bdc0b8e6c7a39e5da69
           python - <<'PY'
           from pathlib import Path
-          import ast,subprocess
-          changed=subprocess.check_output(['git','diff','--name-only','00490a73be8ea08cb8063bdc0b8e6c7a39e5da69','HEAD'],text=True).splitlines()
+          import json,subprocess,shutil,ast
+          r=Path('reality-lab/hc-s3-10');changed=subprocess.check_output(['git','diff','--name-only','00490a73be8ea08cb8063bdc0b8e6c7a39e5da69','HEAD'],text=True).splitlines()
           assert changed and all(p.startswith('reality-lab/hc-s3-10/') or p=='.github/workflows/reality-hc-s310.yml' for p in changed)
-          for p in Path('reality-lab/hc-s3-10').glob('*.py'):ast.parse(p.read_text())
+          for p in r.rglob('*.py'):ast.parse(p.read_text())
+          shutil.rmtree(r/'qa',ignore_errors=True);q=r/'qa/source';q.mkdir(parents=True)
+          (q/'SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'productionChanged':False},indent=2))
           PY
-          node --check reality-lab/hc-s3-10/trace.mjs
-      - name: Install fixed Chromium
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf310-native-trace
+          run-id: 39561337403
+          github-token: ${{ github.token }}
+          path: reality-lab/hc-s3-10/qa/native
+      - name: Build from passing native evidence and check report semantics
+        run: |
+          python reality-lab/hc-s3-10/build.py
+          node reality-lab/hc-s3-10/tests/protocol.cjs
+      - name: Install fixed browser
         run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
-      - name: Trace original candidate without changing arithmetic
-        env:
-          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
-        run: python reality-lab/hc-s3-10/run_native.py
+      - name: Standalone data and actual local3D interactions
+        run: python reality-lab/hc-s3-10/tests/browser.py
+      - name: Freeze tested file and source evidence
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-10')
+          for name in ['qa/native/REPORT.json','qa/source/SCOPE.json','qa/source/PROTOCOL.json','qa/file/BROWSER.json']:assert json.loads((r/name).read_text())['passed'],name
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s310-walk-contact-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-10/preview.html reality-lab/hc-s3-10/BUILD_MANIFEST.json reality-lab/hc-s3-10/review-data.json reality-lab/hc-s3-10/ANALYSIS.json reality-lab/hc-s3-10/qa/native reality-lab/hc-s3-10/qa/source reality-lab/hc-s3-10/qa/file
+          git commit -m 'build(reality): freeze tested S3.10 native contact iteration review'
+          git push origin HEAD:refs/heads/feature/reality-hc-s310-walk-contact-20261021
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-10/preview.html" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rf310-native-trace
-          path: platform/reality-lab/hc-s3-10/qa/native/
+          name: rf310-build-evidence
+          path: reality-lab/hc-s3-10/qa/
           retention-days: 30
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rf310-source-inspection
+          name: rf310-page-source
           path: |
-            platform/reality-lab/hc-s3-10/*.py
-            platform/reality-lab/hc-s3-10/*.mjs
-            platform/reality-lab/hc-s3-10/TASK_ANCHOR.json
+            reality-lab/hc-s3-10/*.js
+            reality-lab/hc-s3-10/*.py
+            reality-lab/hc-s3-10/*.json
+            reality-lab/hc-s3-10/index.template.html
+            reality-lab/hc-s3-10/tests/
           retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: rf310-standalone
+          path: |
+            reality-lab/hc-s3-10/preview.html
+            reality-lab/hc-s3-10/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-10
+      - name: Verify immutable public bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF310_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,json,hashlib,os,time
+          r=Path('reality-lab/hc-s3-10');m=json.loads((r/'BUILD_MANIFEST.json').read_text());url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-10/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(url,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'url':os.environ['RF310_URL'],'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'html':m['html']},indent=2))
+          PY
+      - name: Install separate fixed browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Fixed HTTPS per-pass and local3D verification
+        env:
+          RF310_URL: ${{ needs.build.outputs.url }}
+          RF310_QA: ${{ github.workspace }}/reality-lab/hc-s3-10/qa/public
+        run: python reality-lab/hc-s3-10/tests/browser.py
+      - name: Persist delivery and exact bounded next step
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF310_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-10');m=json.loads((r/'BUILD_MANIFEST.json').read_text());n=json.loads((r/'qa/native/REPORT.json').read_text());p=json.loads((r/'qa/source/PROTOCOL.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());b=json.loads((r/'qa/public/BROWSER.json').read_text());a=json.loads((r/'ANALYSIS.json').read_text())
+          assert n['passed'] and p['passed'] and f['passed'] and f['fileVerified'] and b['passed'] and b['publicVerified']
+          d={'version':'RF01-S3.10','status':'ITERATION_TRACE_PUBLIC_VERIFIED_CONTACT_STILL_FAILED','fixedURL':os.environ['RF310_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'nativeRun':m['nativeRun'],'nativeCodeCommit':m['nativeCodeCommit'],'html':m['html'],'nativeChecks':len(n['checks']),'protocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'rows':m['rowCount'],'steps':a['steps'],'allOriginal43CheckpointsEqual':True,'originalFinalStateEqual':True,'candidateArithmeticChanged':False,'productionChanged':False,'fitCertified':False,'continuousCollisionCertified':False,'physicalDeviceTested':False,'userVisualAccepted':False,'fiveSecondABBAPatchExecuted':False,'next':'Test a source-scoped contact displacement guard that validates all affected vertices/centroid and local triangle intersections together; preserve native limits and rollback. Do not just add a final vertex pass or disable crotch guidance, and keep upper/intergarment failures separately visible.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.10-WALK-CONTACT-448-20261021','status':d['status'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'fixedURL':d['fixedURL'],'nextAction':d['next'],'productionChanged':False,'userAccepted':False,'fitCertified':False},ensure_ascii=False,indent=2));print(json.dumps({k:v for k,v in d.items() if k!='steps'},ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s310-walk-contact-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3-10/DELIVERY.json reality-lab/hc-s3-10/TASK_STATE.json reality-lab/hc-s3-10/qa/public
+          git commit -m 'docs(reality): record S3.10 exact public iteration evidence and remaining contact failure'
+          git push origin HEAD:refs/heads/feature/reality-hc-s310-walk-contact-20261021
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf310-public-evidence
+          path: reality-lab/hc-s3-10/qa/public/
+          retention-days: 30
