@@ -1,0 +1,146 @@
+name: Reality S3.12 independent locality audit
+on:
+  push:
+    branches: [audit/reality-hc-s312-locality-20261021]
+    paths: [.github/workflows/reality-hc-s312-audit.yml, reality-lab/hc-s3-12/audit/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: reality-lab/hc-s3-12
+      - name: Bound audit paths and clean regenerated evidence
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 6711e0199bf0b6fe92654ee7e77efb454d43b989
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json,shutil
+          r=Path('reality-lab/hc-s3-12/audit');paths=subprocess.check_output(['git','diff','--name-only','6711e0199bf0b6fe92654ee7e77efb454d43b989','HEAD'],text=True).splitlines()
+          assert paths and all(p.startswith('reality-lab/hc-s3-12/audit/') or p=='.github/workflows/reality-hc-s312-audit.yml' for p in paths),paths
+          shutil.rmtree(r/'qa',ignore_errors=True);(r/'qa').mkdir()
+          (r/'qa/SCOPE.json').write_text(json.dumps({'passed':True,'paths':paths,'candidateSourceModified':False,'nativeProductionChanged':False},indent=2))
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf312-fixtures-and-native-toolkit
+          run-id: 39570430770
+          github-token: ${{ github.token }}
+          path: _fixtures
+      - name: Full-body independent geometry audit and negative tests
+        run: |
+          cp _fixtures/hc-s3-12/_toolkit/mesh-contact.mjs reality-lab/hc-s3-12/audit/mesh-contact.mjs
+          node reality-lab/hc-s3-12/audit/run-audit.mjs _fixtures/hc-s3-12/qa/fixtures reality-lab/hc-s3-12/audit/LOCALITY_AUDIT.json
+          node reality-lab/hc-s3-12/audit/tests.mjs _fixtures/hc-s3-12/qa/fixtures reality-lab/hc-s3-12/audit/qa/TESTS.json
+          python reality-lab/hc-s3-12/audit/build.py
+      - name: Install pinned browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Standalone audit controls and actual 3D
+        run: python reality-lab/hc-s3-12/audit/browser.py
+      - name: Freeze verified audit, not collision safety
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-12/audit')
+          for n in ['qa/SCOPE.json','qa/TESTS.json','qa/file/BROWSER.json']:assert json.loads((r/n).read_text())['passed'],n
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin audit/reality-hc-s312-locality-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-12/audit/LOCALITY_AUDIT.json reality-lab/hc-s3-12/audit/BUILD_MANIFEST.json reality-lab/hc-s3-12/audit/preview.html reality-lab/hc-s3-12/audit/qa/SCOPE.json reality-lab/hc-s3-12/audit/qa/TESTS.json reality-lab/hc-s3-12/audit/qa/file
+          git commit -m 'build(reality): freeze actual fixed-boundary mobility evidence and audit viewer'
+          git push origin HEAD:refs/heads/audit/reality-hc-s312-locality-20261021
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-12/audit/preview.html" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf312-locality-build
+          path: |
+            reality-lab/hc-s3-12/audit/qa/
+            reality-lab/hc-s3-12/audit/LOCALITY_AUDIT.json
+            reality-lab/hc-s3-12/audit/BUILD_MANIFEST.json
+            reality-lab/hc-s3-12/audit/preview.html
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-12/audit
+      - name: Verify public immutable bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          AUDIT_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,urllib.request,hashlib,os,time
+          r=Path('reality-lab/hc-s3-12/audit');m=json.loads((r/'BUILD_MANIFEST.json').read_text());url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-12/audit/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(url,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'url':os.environ['AUDIT_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install independent pinned browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Actual fixed HTTPS interactions
+        env:
+          AUDIT_URL: ${{ needs.build.outputs.url }}
+          AUDIT_QA: ${{ github.workspace }}/reality-lab/hc-s3-12/audit/qa/public
+        run: python reality-lab/hc-s3-12/audit/browser.py
+      - name: Record audit delivery and unsolved contact boundary
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          AUDIT_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-12/audit');m=json.loads((r/'BUILD_MANIFEST.json').read_text());t=json.loads((r/'qa/TESTS.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());p=json.loads((r/'qa/public/BROWSER.json').read_text());d=json.loads((r/'LOCALITY_AUDIT.json').read_text())
+          assert t['passed'] and f['passed'] and f['fileVerified'] and p['passed'] and p['publicVerified']
+          result={'version':m['version'],'status':'INDEPENDENT_AUDIT_VERIFIED_NOT_CONTACT_REPAIR','fixedURL':os.environ['AUDIT_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'html':m['html'],'fixtureRun':m['sourceFixtureRun'],'unitGeometryChecks':t['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(p['checks']),'summary':[{'fixture':x['fixture'],'scopes':[{'nodes':s['mobileCount'],'faces':s['affectedFaceCount'],'fixedEdgeWitnesses':len(s['fixedEdgeWitnesses'])} for s in x['scopes']],'adaptiveNodes':x['adaptive']['final']['mobileCount'],'adaptiveFixedWitnesses':len(x['adaptive']['final']['fixedEdgeWitnesses'])} for x in d['records']],'solverExecuted':False,'newMotionCandidateExecuted':False,'originalInputMoved':False,'candidateSourceModified':False,'productionChanged':False,'fitCertified':False,'continuousCollisionCertified':False,'userVisualAccepted':False,'physicalDeviceTested':False,'next':'Integrate a fixed-boundary necessary-condition gate and bounded adaptive variable selection before the separate local solver. No-obstruction does not authorize a move. Full original constraints and dynamic regression still required.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'task':'RF01-S3.12-INDEPENDENT-LOCALITY','status':result['status'],'fixedURL':result['fixedURL'],'sourceCommit':result['sourceCommit'],'publicCommit':result['publicCommit'],'nextAction':result['next'],'productionChanged':False},ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+          git fetch --filter=blob:none --depth=1 origin audit/reality-hc-s312-locality-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-12/audit/DELIVERY.json reality-lab/hc-s3-12/audit/TASK_STATE.json reality-lab/hc-s3-12/audit/qa/public
+          git commit -m 'docs(reality): record verified locality proof without claiming a contact solution'
+          git push origin HEAD:refs/heads/audit/reality-hc-s312-locality-20261021
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf312-locality-public
+          path: reality-lab/hc-s3-12/audit/qa/public/
+          retention-days: 30
