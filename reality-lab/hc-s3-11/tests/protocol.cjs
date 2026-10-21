@@ -1,0 +1,36 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const R=path.resolve(__dirname,'..'),V=require('../review.js'),x=JSON.parse(fs.readFileSync(R+'/review-data.json','utf8')),clone=x=>JSON.parse(JSON.stringify(x)),checks=[];
+function test(name,f){f();checks.push({name,passed:true});console.log('PASS',name);}
+function bad(name,edit,re){test(name,()=>{const a=clone(x);edit(a);assert.throws(()=>V.validate(a,x.source),re);});}
+test('actual four case data valid',()=>assert(V.validate(x,x.source)));
+test('summary computes actual points not claimed fields',()=>{const a=clone(x);a.claimedMinimum=9999;assert.deepEqual(V.summary(a),V.summary(x));});
+test('known real bad guide must fail',()=>assert.equal(x.regression.choices[0].decision.allowed,false));
+test('known same operation positive-to-negative point retained',()=>{const s=V.summary(x);assert(s.regression.before448MM>0);assert(s.regression.guide448MM<0);});
+test('no complete certification despite completed steps',()=>{assert.equal(V.summary(x).fullyCertified,false);assert.equal(V.summary(x).candidateVerdict,'HOLD_NOT_PRODUCTION_READY');});
+test('all three channels retained in summary',()=>{for(const c of Object.values(V.summary(x).cases))assert.deepEqual(Object.keys(c.channels),['top','bottom','pair']);});
+test('missing and failed points cannot be averaged away',()=>{const s=V.summary(x);for(const c of x.cases)for(const k of ['top','bottom','pair'])assert.equal(s.cases[c.motion+':'+c.mode].channels[k].violatingCheckpoints,c.points.filter(p=>p[k].beyondMargin>0).length);});
+test('same start states retained for paired modes',()=>{for(const motion of ['static','walk']){const a=x.cases.filter(c=>c.motion===motion);assert.equal(a[0].initialStateSHA256,a[1].initialStateSHA256);}});
+test('reference regression decision is not applied',()=>assert.equal(x.regression.applied,false));
+test('summary cannot mutate raw evidence',()=>{const s=JSON.stringify(x);V.summary(x);assert.equal(JSON.stringify(x),s);});
+bad('wrong native source rejected',a=>a.source.nativeCommit='0'.repeat(40),/SOURCE_PIN/);
+bad('wrong guard bytes rejected',a=>a.source.guardSHA256='0'.repeat(64),/SOURCE_PIN/);
+bad('wrong execution revision rejected',a=>a.source.nativeCodeCommit='0'.repeat(40),/SOURCE_PIN/);
+bad('no fit certification escalation',a=>a.fitCertified=true,/ESCALATION/);
+bad('no production promotion',a=>a.productionChanged=true,/ESCALATION/);
+bad('no continuous collision promotion',a=>a.continuousCollisionCertified=true,/ESCALATION/);
+bad('no unrun five second ABBA claim',a=>a.fiveSecondABBAExecuted=true,/ESCALATION/);
+bad('different guard scope rejected',a=>a.scope='all-contact-certified',/SCOPE/);
+bad('duplicate case rejected',a=>a.cases[1]=a.cases[0],/CASE/);
+bad('old12 steps not complete180',a=>a.cases[0].completedSteps=12,/HORIZON/);
+bad('changed pass cap rejected',a=>a.cases[0].passCap=64,/LIMIT/);
+bad('changed fit gate rejected',a=>a.cases[0].fitGate=2,/LIMIT/);
+bad('hidden upper channel rejected',a=>delete a.cases[0].points[0].top,/CONTACT/);
+bad('string distance rejected',a=>a.cases[0].points[0].bottom.minimumM='0',/CONTACT/);
+bad('negative rejection count rejected',a=>a.cases[0].guard.blocked=-1,/COUNTER/);
+bad('inconsistent counters rejected',a=>a.cases[0].guard.calls++,/ACCOUNTING/);
+bad('nonfinite timing rejected',a=>a.cases[0].cost.step.medianMS=Infinity,/COST/);
+bad('wrong local operation rejected',a=>a.regression.faceOffset=0,/REGRESSION/);
+bad('bad guide cannot be quietly passed',a=>a.regression.choices[0].decision.allowed=true,/KNOWN_BAD/);
+bad('malformed actual triangle rejected',a=>a.regression.before.geometry.cloth[0].triangle[0][0]=null,/GEOMETRY/);
+test('oversized or malformed input rejected',()=>{assert.throws(()=>V.parse(' '.repeat(5000001)),/TOO_LARGE/);assert.throws(()=>V.parse('{'));});
+const q=R+'/qa/source';fs.mkdirSync(q,{recursive:true});fs.writeFileSync(q+'/PROTOCOL.json',JSON.stringify({passed:true,count:checks.length,checks,negativeCasesAreSynthetic:true,realDataSource:x.source},null,2));
