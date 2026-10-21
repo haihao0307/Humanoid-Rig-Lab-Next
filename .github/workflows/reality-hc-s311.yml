@@ -1,0 +1,184 @@
+name: Reality S3.11 joint contact guard
+on:
+  push:
+    branches: [feature/reality-hc-s311-joint-guard-20261021]
+    paths: [.github/workflows/reality-hc-s311.yml, reality-lab/hc-s3-11/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    permissions:
+      contents: write
+      actions: read
+    defaults:
+      run:
+        working-directory: platform
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: platform
+          sparse-checkout: |
+            reality-lab/hc-s3-11
+            reality-lab/hc-s3-7
+      - uses: actions/checkout@v4
+        with:
+          repository: haihao0307/guilin-dem-pipeline
+          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
+          path: host
+          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+      - name: Bounded scope and fresh evidence directories
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 4ab4a1c6efefe005d5c90b51c5a6726b0281dd31
+          python - <<'PY'
+          import ast,json,shutil,subprocess
+          from pathlib import Path
+          r=Path('reality-lab/hc-s3-11');files=subprocess.check_output(['git','diff','--name-only','4ab4a1c6efefe005d5c90b51c5a6726b0281dd31','HEAD'],text=True).splitlines()
+          assert files and all(f.startswith('reality-lab/hc-s3-11/') or f=='.github/workflows/reality-hc-s311.yml' for f in files)
+          for f in r.rglob('*.py'):ast.parse(f.read_text(),filename=str(f))
+          shutil.rmtree(r/'qa',ignore_errors=True);q=r/'qa/source';q.mkdir(parents=True);(q/'SCOPE.json').write_text(json.dumps({'passed':True,'files':files,'productionChanged':False},indent=2))
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf311-native-static
+          run-id: 39566121382
+          github-token: ${{ github.token }}
+          path: platform/reality-lab/hc-s3-11/qa/native/static
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf311-native-walk
+          run-id: 39566121382
+          github-token: ${{ github.token }}
+          path: platform/reality-lab/hc-s3-11/qa/native/walk
+      - name: Verify source-bound native evidence and report contract
+        env:
+          RF311_NATIVE_RUN: '39566121382'
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+        run: |
+          node reality-lab/hc-s3-11/tests/unit.mjs
+          python reality-lab/hc-s3-11/build.py
+          node reality-lab/hc-s3-11/tests/protocol.cjs
+      - name: Install pinned browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Standalone page and real local geometry interactions
+        env:
+          RF311_QA: ${{ github.workspace }}/platform/reality-lab/hc-s3-11/qa/file
+        run: python reality-lab/hc-s3-11/tests/browser.py
+      - name: Freeze verified page without certifying garment
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-11')
+          for n in ['qa/source/SCOPE.json','qa/source/UNIT.json','qa/source/PROTOCOL.json','qa/file/BROWSER.json','qa/native/static/RUN.json','qa/native/walk/RUN.json']:assert json.loads((r/n).read_text())['passed'],n
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s311-joint-guard-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-11/preview.html reality-lab/hc-s3-11/BUILD_MANIFEST.json reality-lab/hc-s3-11/ANALYSIS.json reality-lab/hc-s3-11/review-data.json reality-lab/hc-s3-11/qa/native reality-lab/hc-s3-11/qa/source reality-lab/hc-s3-11/qa/file
+          git commit -m 'build(reality): freeze joint guard evidence with unresolved contacts and cost'
+          git push origin HEAD:refs/heads/feature/reality-hc-s311-joint-guard-20261021
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-11/preview.html" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf311-build-evidence
+          path: platform/reality-lab/hc-s3-11/qa/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf311-page-source
+          path: |
+            platform/reality-lab/hc-s3-11/*.js
+            platform/reality-lab/hc-s3-11/*.mjs
+            platform/reality-lab/hc-s3-11/*.py
+            platform/reality-lab/hc-s3-11/*.json
+            platform/reality-lab/hc-s3-11/index.template.html
+            platform/reality-lab/hc-s3-11/tests/
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: rf311-standalone
+          path: |
+            platform/reality-lab/hc-s3-11/preview.html
+            platform/reality-lab/hc-s3-11/BUILD_MANIFEST.json
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-11
+      - name: Verify immutable public HTML bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF311_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,hashlib,json,os,time
+          r=Path('reality-lab/hc-s3-11');m=json.loads((r/'BUILD_MANIFEST.json').read_text());u='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-11/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(u,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'url':os.environ['RF311_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install independent pinned browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify fixed HTTPS geometry and all interactions
+        env:
+          RF311_URL: ${{ needs.build.outputs.url }}
+          RF311_QA: ${{ github.workspace }}/reality-lab/hc-s3-11/qa/public
+        run: python reality-lab/hc-s3-11/tests/browser.py
+      - name: Persist candidate result and explicit hold
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF311_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-11');read=lambda p:json.loads((r/p).read_text());m=read('BUILD_MANIFEST.json');f=read('qa/file/BROWSER.json');b=read('qa/public/BROWSER.json');u=read('qa/source/UNIT.json');p=read('qa/source/PROTOCOL.json');a=read('ANALYSIS.json')
+          assert f['passed'] and f['fileVerified'] and b['passed'] and b['publicVerified'] and u['passed'] and p['passed'];assert a==b['summary']==f['summary']
+          d={'version':'RF01-S3.11','status':'JOINT_GUARD_PUBLIC_VERIFIED_RESIDUAL_CONTACT_REMAINS','fixedURL':os.environ['RF311_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'nativeRun':m['nativeRun'],'nativeCodeCommit':m['source']['nativeCodeCommit'],'source':m['source'],'html':m['html'],'nativeEvidence':m['evidence'],'syntheticUnitChecks':u['count'],'protocolChecks':p['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(b['checks']),'analysis':a,'candidateVerdict':'HOLD_NOT_PRODUCTION_READY','knownBadMoveRejected':True,'scope':'terminal guided face translations only; not all contact operations','fitCertified':False,'continuousCollisionCertified':False,'productionChanged':False,'physicalDeviceTested':False,'userVisualAcceptance':False,'fiveSecondABBAExecuted':False,'next':'Preserve the guarded candidate as evidence, not production. Study a small coupled local contact solve that resolves the remaining centroid/face intersections without sacrificing safe corners; track all affected samples and avoid relying on per-pair rejection alone. Preserve the original limits and all upper/pair failures; separately remove the first-use BVH spike after correctness is established.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.11-JOINT-GUARD-20261021','frameworkId':'RF01','status':d['status'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'fixedURL':d['fixedURL'],'lastActuallyCompletedStep':'Native joint-guard static/walk comparisons, exact bad-operation rejection, residual/cost analysis and fixed public interactive review','candidateVerdict':d['candidateVerdict'],'nextAction':d['next'],'productionChanged':False,'userAccepted':False},ensure_ascii=False,indent=2));print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s311-joint-guard-20261021
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git add -f reality-lab/hc-s3-11/DELIVERY.json reality-lab/hc-s3-11/TASK_STATE.json reality-lab/hc-s3-11/qa/public
+          git commit -m 'docs(reality): publish joint guard validation while retaining contact and performance limits'
+          git push origin HEAD:refs/heads/feature/reality-hc-s311-joint-guard-20261021
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf311-public-evidence
+          path: reality-lab/hc-s3-11/qa/public/
+          retention-days: 30

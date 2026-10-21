@@ -1,0 +1,528 @@
+{
+  "version": "RF01-S3.11",
+  "status": "JOINT_GUARD_PUBLIC_VERIFIED_RESIDUAL_CONTACT_REMAINS",
+  "fixedURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/9e00b93e109b1299d2b4521b12de33cffbefdf56/reality-lab/hc-s3-11/preview.html",
+  "sourceCommit": "ed7cdb8f915ce118ca31c32272208afe2e0c90ff",
+  "publicCommit": "9e00b93e109b1299d2b4521b12de33cffbefdf56",
+  "workflowRun": "39567662162",
+  "nativeRun": "39566121382",
+  "nativeCodeCommit": "c3f67e3d70aced8bda73867d99b1897be2c76c31",
+  "source": {
+    "nativeCommit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+    "coverageSHA256": "b0ac0923ff63895d14ae1f5c60f0354c521e598f8e146416a69f95f9ccd5675a",
+    "guardSHA256": "f8a7b82c53618ebf8fc9d52ace6f89de4385e7ba17b28b49b6031650ae9da963",
+    "nativeCodeCommit": "c3f67e3d70aced8bda73867d99b1897be2c76c31"
+  },
+  "html": {
+    "bytes": 372219,
+    "sha256": "5244d8e729c349230bad19430fd489eefe6c125cd38c1d747218e03f3a8a3abe"
+  },
+  "nativeEvidence": [
+    {
+      "motion": "static",
+      "mode": "baseline",
+      "dataSHA256": "7b5b318a6887c747d61e781a4393fb687798a6f87dd742c122e59d4c2e8e602c",
+      "reportSHA256": "d8ba7f4bbc63087607ea8418dd2b86475198658dd7d3bfd35fa517aab52612ce",
+      "codeCommit": "c3f67e3d70aced8bda73867d99b1897be2c76c31",
+      "checks": 16
+    },
+    {
+      "motion": "static",
+      "mode": "guarded",
+      "dataSHA256": "784a636288742f93f09d3ea14d3cdc320c69ad0d37a60aa46c66ab4e5a3cff5a",
+      "reportSHA256": "08d0bb232978162f0b8cd8d05d47ac0fc832d9beda4f69ec92f6a1ade9e2e051",
+      "codeCommit": "c3f67e3d70aced8bda73867d99b1897be2c76c31",
+      "checks": 16
+    },
+    {
+      "motion": "walk",
+      "mode": "baseline",
+      "dataSHA256": "dea90f7336dc742ef0656e0e1ebe82fbab0f496633e1eb521d0dfa6dac4909b1",
+      "reportSHA256": "acc08cd0d926d25d5777474228f595266d38f1b000ba6edf90eafd8e087b13d0",
+      "codeCommit": "c3f67e3d70aced8bda73867d99b1897be2c76c31",
+      "checks": 19
+    },
+    {
+      "motion": "walk",
+      "mode": "guarded",
+      "dataSHA256": "60bee16c831899798ce0fd6b2ed6e844b4eaf012c4bd58af379e5783a8b9a43f",
+      "reportSHA256": "71bb75b5905ec871baf44a860bb4cd0663a1baa1b3b31d444ebd12db4ecb828d",
+      "codeCommit": "c3f67e3d70aced8bda73867d99b1897be2c76c31",
+      "checks": 16
+    }
+  ],
+  "syntheticUnitChecks": 23,
+  "protocolChecks": 31,
+  "fileBrowserChecks": 39,
+  "publicBrowserChecks": 38,
+  "analysis": {
+    "candidateVerdict": "HOLD_NOT_PRODUCTION_READY",
+    "fullyCertified": false,
+    "cases": {
+      "static:baseline": {
+        "channels": {
+          "top": {
+            "minimumMM": 3.1749970647061865,
+            "violatingCheckpoints": 0,
+            "violationSteps": [],
+            "checkpoints": 40
+          },
+          "bottom": {
+            "minimumMM": 3.991080320838541,
+            "violatingCheckpoints": 0,
+            "violationSteps": [],
+            "checkpoints": 40
+          },
+          "pair": {
+            "minimumMM": -15.538901718636378,
+            "violatingCheckpoints": 37,
+            "violationSteps": [
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              18,
+              24,
+              30,
+              36,
+              42,
+              48,
+              54,
+              60,
+              66,
+              72,
+              78,
+              84,
+              90,
+              96,
+              102,
+              108,
+              114,
+              120,
+              126,
+              132,
+              138,
+              144,
+              150,
+              156,
+              162,
+              168,
+              174,
+              180
+            ],
+            "checkpoints": 40
+          }
+        },
+        "completedSteps": 180,
+        "guard": {
+          "calls": 0,
+          "guideAccepted": 0,
+          "normalAccepted": 0,
+          "blocked": 0,
+          "queryCount": 0,
+          "trianglePairs": 0,
+          "acceptedWithResidual": 0,
+          "guardWallMS": 0,
+          "observerMS": 0
+        },
+        "cost": {
+          "step": {
+            "medianMS": 38,
+            "p95MS": 43.464999999967404,
+            "maxMS": 51.5,
+            "totalMS": 6530.699999999022
+          },
+          "fine": {
+            "medianMS": 30.699999999953434,
+            "p95MS": 35.86500000003143,
+            "maxMS": 40.5,
+            "totalMS": 5255.599999999977
+          },
+          "guard": {
+            "medianMS": 0,
+            "p95MS": 0,
+            "maxMS": 0,
+            "totalMS": 0
+          },
+          "scope": "worker CPU wall time; source fine-observer and baseline-only guard replay overhead excluded; candidate guard remains included; not complete rendered frame time",
+          "warmupExcludedSteps": 12,
+          "sampleSteps": 168
+        }
+      },
+      "static:guarded": {
+        "channels": {
+          "top": {
+            "minimumMM": 3.1749970647061865,
+            "violatingCheckpoints": 0,
+            "violationSteps": [],
+            "checkpoints": 40
+          },
+          "bottom": {
+            "minimumMM": 3.991080320838541,
+            "violatingCheckpoints": 0,
+            "violationSteps": [],
+            "checkpoints": 40
+          },
+          "pair": {
+            "minimumMM": -15.538901718636378,
+            "violatingCheckpoints": 37,
+            "violationSteps": [
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              18,
+              24,
+              30,
+              36,
+              42,
+              48,
+              54,
+              60,
+              66,
+              72,
+              78,
+              84,
+              90,
+              96,
+              102,
+              108,
+              114,
+              120,
+              126,
+              132,
+              138,
+              144,
+              150,
+              156,
+              162,
+              168,
+              174,
+              180
+            ],
+            "checkpoints": 40
+          }
+        },
+        "completedSteps": 180,
+        "guard": {
+          "calls": 0,
+          "guideAccepted": 0,
+          "normalAccepted": 0,
+          "blocked": 0,
+          "queryCount": 0,
+          "trianglePairs": 0,
+          "acceptedWithResidual": 0,
+          "guardWallMS": 0,
+          "observerMS": 0
+        },
+        "cost": {
+          "step": {
+            "medianMS": 38.59999999997672,
+            "p95MS": 44.49500000015833,
+            "maxMS": 72.3000000002794,
+            "totalMS": 6656.600000000093
+          },
+          "fine": {
+            "medianMS": 31.300000000046566,
+            "p95MS": 35.25999999993947,
+            "maxMS": 48.10000000009313,
+            "totalMS": 5360.699999999953
+          },
+          "guard": {
+            "medianMS": 0,
+            "p95MS": 0,
+            "maxMS": 0,
+            "totalMS": 0
+          },
+          "scope": "worker CPU wall time; source fine-observer and baseline-only guard replay overhead excluded; candidate guard remains included; not complete rendered frame time",
+          "warmupExcludedSteps": 12,
+          "sampleSteps": 168
+        }
+      },
+      "walk:baseline": {
+        "channels": {
+          "top": {
+            "minimumMM": -42.266452093784046,
+            "violatingCheckpoints": 28,
+            "violationSteps": [
+              18,
+              24,
+              30,
+              36,
+              42,
+              48,
+              54,
+              60,
+              66,
+              72,
+              78,
+              84,
+              90,
+              96,
+              102,
+              108,
+              114,
+              120,
+              126,
+              132,
+              138,
+              144,
+              150,
+              156,
+              162,
+              168,
+              174,
+              180
+            ],
+            "checkpoints": 40
+          },
+          "bottom": {
+            "minimumMM": -4.9076273778502175,
+            "violatingCheckpoints": 3,
+            "violationSteps": [
+              30,
+              102,
+              174
+            ],
+            "checkpoints": 40
+          },
+          "pair": {
+            "minimumMM": -18.165453987072585,
+            "violatingCheckpoints": 37,
+            "violationSteps": [
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              18,
+              24,
+              30,
+              36,
+              42,
+              48,
+              54,
+              60,
+              66,
+              72,
+              78,
+              84,
+              90,
+              96,
+              102,
+              108,
+              114,
+              120,
+              126,
+              132,
+              138,
+              144,
+              150,
+              156,
+              162,
+              168,
+              174,
+              180
+            ],
+            "checkpoints": 40
+          }
+        },
+        "completedSteps": 180,
+        "guard": {
+          "calls": 1,
+          "guideAccepted": 0,
+          "normalAccepted": 0,
+          "blocked": 1,
+          "queryCount": 51,
+          "trianglePairs": 1566,
+          "acceptedWithResidual": 0,
+          "guardWallMS": 0,
+          "observerMS": 213.89999999996508
+        },
+        "cost": {
+          "step": {
+            "medianMS": 53,
+            "p95MS": 73.44999999998836,
+            "maxMS": 86.40000000002328,
+            "totalMS": 9472.100000000268
+          },
+          "fine": {
+            "medianMS": 41.45000000001164,
+            "p95MS": 61,
+            "maxMS": 72,
+            "totalMS": 7504.699999999895
+          },
+          "guard": {
+            "medianMS": 0,
+            "p95MS": 0,
+            "maxMS": 0,
+            "totalMS": 0
+          },
+          "scope": "worker CPU wall time; source fine-observer and baseline-only guard replay overhead excluded; candidate guard remains included; not complete rendered frame time",
+          "warmupExcludedSteps": 12,
+          "sampleSteps": 168
+        }
+      },
+      "walk:guarded": {
+        "channels": {
+          "top": {
+            "minimumMM": -42.266452093784046,
+            "violatingCheckpoints": 28,
+            "violationSteps": [
+              18,
+              24,
+              30,
+              36,
+              42,
+              48,
+              54,
+              60,
+              66,
+              72,
+              78,
+              84,
+              90,
+              96,
+              102,
+              108,
+              114,
+              120,
+              126,
+              132,
+              138,
+              144,
+              150,
+              156,
+              162,
+              168,
+              174,
+              180
+            ],
+            "checkpoints": 40
+          },
+          "bottom": {
+            "minimumMM": -0.2517811920940869,
+            "violatingCheckpoints": 2,
+            "violationSteps": [
+              102,
+              174
+            ],
+            "checkpoints": 40
+          },
+          "pair": {
+            "minimumMM": -18.165453987072585,
+            "violatingCheckpoints": 37,
+            "violationSteps": [
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              18,
+              24,
+              30,
+              36,
+              42,
+              48,
+              54,
+              60,
+              66,
+              72,
+              78,
+              84,
+              90,
+              96,
+              102,
+              108,
+              114,
+              120,
+              126,
+              132,
+              138,
+              144,
+              150,
+              156,
+              162,
+              168,
+              174,
+              180
+            ],
+            "checkpoints": 40
+          }
+        },
+        "completedSteps": 180,
+        "guard": {
+          "calls": 9,
+          "guideAccepted": 0,
+          "normalAccepted": 0,
+          "blocked": 9,
+          "queryCount": 441,
+          "trianglePairs": 16297,
+          "acceptedWithResidual": 0,
+          "guardWallMS": 312.5999999998603,
+          "observerMS": 0
+        },
+        "cost": {
+          "step": {
+            "medianMS": 51.84999999997672,
+            "p95MS": 79.76500000005471,
+            "maxMS": 298.5999999998603,
+            "totalMS": 9778.699999999604
+          },
+          "fine": {
+            "medianMS": 40.70000000006985,
+            "p95MS": 67.78500000000932,
+            "maxMS": 281.39999999990687,
+            "totalMS": 7841.000000000233
+          },
+          "guard": {
+            "medianMS": 0,
+            "p95MS": 0,
+            "maxMS": 219.80000000004657,
+            "totalMS": 312.5999999998603
+          },
+          "scope": "worker CPU wall time; source fine-observer and baseline-only guard replay overhead excluded; candidate guard remains included; not complete rendered frame time",
+          "warmupExcludedSteps": 12,
+          "sampleSteps": 168
+        }
+      }
+    },
+    "regression": {
+      "before448MM": 2.1700219815206636,
+      "guide448MM": -0.6738472227069727,
+      "normal448MM": 1.1433805545869435,
+      "selected": "blocked",
+      "guideRejected": true,
+      "normalRejected": true
+    }
+  },
+  "candidateVerdict": "HOLD_NOT_PRODUCTION_READY",
+  "knownBadMoveRejected": true,
+  "scope": "terminal guided face translations only; not all contact operations",
+  "fitCertified": false,
+  "continuousCollisionCertified": false,
+  "productionChanged": false,
+  "physicalDeviceTested": false,
+  "userVisualAcceptance": false,
+  "fiveSecondABBAExecuted": false,
+  "next": "Preserve the guarded candidate as evidence, not production. Study a small coupled local contact solve that resolves the remaining centroid/face intersections without sacrificing safe corners; track all affected samples and avoid relying on per-pair rejection alone. Preserve the original limits and all upper/pair failures; separately remove the first-use BVH spike after correctness is established.",
+  "verifiedAt": "2026-10-21T08:15:13.747644+00:00"
+}
