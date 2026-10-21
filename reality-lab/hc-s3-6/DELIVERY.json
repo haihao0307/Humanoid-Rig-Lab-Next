@@ -1,0 +1,211 @@
+{
+  "version": "REALITY-HC-S3.6",
+  "status": "PROGRESSIVE_FITTING_AND_ROLLBACK_VERIFIED_DYNAMIC_FIT_NOT_CERTIFIED",
+  "fixedURL": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/9b718ff418aa4761d8fedf5964ade6395f6ec119/reality-lab/hc-s3-6/preview.html",
+  "sourceCommit": "fc39fce9a0bd5425f392f0c030d2213736856669",
+  "publicCommit": "9b718ff418aa4761d8fedf5964ade6395f6ec119",
+  "workflowRun": "39535511165",
+  "nativeRun": "39534171339",
+  "nativeCodeCommit": "73adc31d6ad37be2cb588c52c76de05463273099",
+  "html": {
+    "bytes": 60649,
+    "sha256": "f06080757233b57498bbcf17b5e49eb8d1cdd0086a09217c288c57c0052b746e"
+  },
+  "source": {
+    "repository": "haihao0307/guilin-dem-pipeline",
+    "commit": "c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49",
+    "path": "kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef/live-cloth-worker.mjs",
+    "sha256": "7cd945c060e4206bdef1b2b1eba302d8bd4a0cd9c44d0858b6031db3cf21d3c7"
+  },
+  "moduleSHA256": "db7e42558409bd93e782e96d60d2c39fb20f3dfa215879289589f99b19763a96",
+  "syntheticUnitChecks": 21,
+  "reviewProtocolChecks": 23,
+  "fileBrowserChecks": 34,
+  "publicBrowserChecks": 33,
+  "outcomes": [
+    {
+      "case": "baseline",
+      "status": "NATIVE_FAILED",
+      "acceptedTrialSteps": 10,
+      "committedSteps": 0,
+      "committedRuntimeRevision": null,
+      "failure": {
+        "message": "物理应变超出工程安全范围，已完整回滚本步状态"
+      },
+      "rollback": null,
+      "independentRollback": null,
+      "finalAcceptedStep": {
+        "step": 10,
+        "maxActiveRatios": [
+          1.4071388282431083,
+          1.1686382598754705
+        ]
+      },
+      "snapshot": null,
+      "durationMS": null,
+      "nativeElapsedSeconds": 179.159984592,
+      "sourceStatusAtCapture": "载入 D03 失败：物理应变超出工程安全范围，已完整回滚本步状态。保留此前搭配。",
+      "nativeChecks": 8
+    },
+    {
+      "case": "progressive",
+      "status": "COMMITTED",
+      "acceptedTrialSteps": 48,
+      "committedSteps": 48,
+      "committedRuntimeRevision": 1,
+      "failure": null,
+      "rollback": null,
+      "independentRollback": null,
+      "finalAcceptedStep": {
+        "step": 48,
+        "fraction": 1,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.287066047325567,
+          1.1999544796301014
+        ],
+        "elapsedSimulation": 0.7999999999999984
+      },
+      "snapshot": {
+        "bytes": 11514124,
+        "arrayCount": 18702,
+        "scalarCount": 15618,
+        "excluded": [
+          "WASM internal instrumentation counters",
+          "safetyTrips and metrics.rollbacks (monotonic failure diagnostics)",
+          "GPU state",
+          "source binding/recipe structures (never written)"
+        ]
+      },
+      "durationMS": 15656.5,
+      "nativeElapsedSeconds": 196.58362345199998,
+      "sourceStatusAtCapture": "生成裤装实体材料 · 83% · wb_front",
+      "nativeChecks": 14
+    },
+    {
+      "case": "cancel",
+      "status": "CANCELLED",
+      "acceptedTrialSteps": 4,
+      "committedSteps": 0,
+      "committedRuntimeRevision": 0,
+      "failure": {
+        "code": "FITTING_CANCELLED",
+        "message": "FITTING_CANCELLED_BY_MESSAGE",
+        "nativeSafetyTrips": 0
+      },
+      "rollback": {
+        "exact": true,
+        "changedPaths": [],
+        "restoredTo": "transaction entry, not merely the last successful step",
+        "stateRevisionRestored": true
+      },
+      "independentRollback": {
+        "equal": true,
+        "beforeSHA256": "eb7a846db8665a7baf77582ea1a39685c9d07cc5008bf8cb9c9210da638b2213",
+        "afterSHA256": "eb7a846db8665a7baf77582ea1a39685c9d07cc5008bf8cb9c9210da638b2213",
+        "scope": "independent SHA256 arrays, edge rest values, frame/time/revisions"
+      },
+      "finalAcceptedStep": {
+        "step": 4,
+        "fraction": 0.125,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1608404493294184,
+          1.1486457727827022
+        ],
+        "elapsedSimulation": 0.06666666666666667
+      },
+      "snapshot": {
+        "bytes": 11514124,
+        "arrayCount": 18702,
+        "scalarCount": 15618,
+        "excluded": [
+          "WASM internal instrumentation counters",
+          "safetyTrips and metrics.rollbacks (monotonic failure diagnostics)",
+          "GPU state",
+          "source binding/recipe structures (never written)"
+        ]
+      },
+      "durationMS": 2788.8000000000466,
+      "nativeElapsedSeconds": 248.42282448599997,
+      "sourceStatusAtCapture": "载入 D03 失败：FITTING_CANCELLED_BY_MESSAGE。保留此前搭配。",
+      "nativeChecks": 17
+    },
+    {
+      "case": "fault",
+      "status": "FAILED_ROLLED_BACK",
+      "acceptedTrialSteps": 3,
+      "committedSteps": 0,
+      "committedRuntimeRevision": 0,
+      "failure": {
+        "code": "INJECTED_TEST_FAILURE",
+        "message": "RF36_INJECTED_AFTER_NATIVE_STEP_3",
+        "nativeSafetyTrips": 0
+      },
+      "rollback": {
+        "exact": true,
+        "changedPaths": [],
+        "restoredTo": "transaction entry, not merely the last successful step",
+        "stateRevisionRestored": true
+      },
+      "independentRollback": {
+        "equal": true,
+        "beforeSHA256": "eb7a846db8665a7baf77582ea1a39685c9d07cc5008bf8cb9c9210da638b2213",
+        "afterSHA256": "eb7a846db8665a7baf77582ea1a39685c9d07cc5008bf8cb9c9210da638b2213",
+        "scope": "independent SHA256 arrays, edge rest values, frame/time/revisions"
+      },
+      "finalAcceptedStep": {
+        "step": 3,
+        "fraction": 0.09375,
+        "bodyPreviousErrorM": 0,
+        "jsWasmMetricErrorM": 0,
+        "maxActiveRatios": [
+          1.1521960623347458,
+          1.141637349486821
+        ],
+        "elapsedSimulation": 0.049999999999999996
+      },
+      "snapshot": {
+        "bytes": 11514124,
+        "arrayCount": 18702,
+        "scalarCount": 15618,
+        "excluded": [
+          "WASM internal instrumentation counters",
+          "safetyTrips and metrics.rollbacks (monotonic failure diagnostics)",
+          "GPU state",
+          "source binding/recipe structures (never written)"
+        ]
+      },
+      "durationMS": 1765.3000000000466,
+      "nativeElapsedSeconds": 248.93753000099997,
+      "sourceStatusAtCapture": "载入 D03 失败：RF36_INJECTED_AFTER_NATIVE_STEP_3。保留此前搭配。",
+      "nativeChecks": 15
+    }
+  ],
+  "nativeCoreCodeUnchangedSinceExperiment": true,
+  "originalGate": 1.45,
+  "progressiveSchedule": "min(step/32,1); 48 original fitting steps",
+  "wholeSessionRollbackForDeclaredState": true,
+  "oldGenerationCancelRejected": true,
+  "newRuntimeRevisionIsNotHumanProportionRevision": true,
+  "previousContact": {
+    "stage": "S3.5",
+    "sourceCommit": "8a869688d1f8490d75d7883b5e1f82f545210407",
+    "bodyMinimumSampleMM": -37.074691305825176,
+    "pairMinimumSampleMM": -8.905275057161742,
+    "retestedInS36": false,
+    "status": "retained failed historical sample, not full surface penetration proof"
+  },
+  "sourceMaterialVisualReadinessCertified": false,
+  "productionChanged": false,
+  "productionInstalled": false,
+  "dynamicFitCertified": false,
+  "physicalCertification": false,
+  "manufacturingCertification": false,
+  "physicalDeviceTested": false,
+  "userVisualAcceptance": false,
+  "next": "Establish a deterministic post-fit static state and bounded native motion contact test; retain the proven transaction and diagnose first body/garment-pair penetration. Source UI installation, full material visual readiness and production promotion remain separate.",
+  "verifiedAt": "2026-10-21T02:54:39.042632+00:00"
+}
