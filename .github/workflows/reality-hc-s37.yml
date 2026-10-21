@@ -1,0 +1,49 @@
+name: Reality HC S3.7 contact origin
+on:
+  push:
+    branches: [feature/reality-hc-s37-contact-origin-20261021]
+    paths: [.github/workflows/reality-hc-s37.yml, reality-lab/hc-s3-7/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [static, walk, walk-repeat]
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: platform
+          sparse-checkout: |
+            reality-lab/hc-s3-7
+            reality-lab/hc-s3-6
+      - uses: actions/checkout@v4
+        with:
+          repository: haihao0307/guilin-dem-pipeline
+          ref: c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49
+          path: host
+          sparse-checkout: kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+      - name: Check code and install fixed browser
+        run: |
+          node --check reality-lab/hc-s3-7/contact-probe.mjs
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Measure actual native surfaces with fixed initial state and steps
+        env:
+          CONTACT_CASE: ${{ matrix.case }}
+          GARMENT_HOST: ${{ github.workspace }}/host/kaopu-tailor-workbench/material-products/mp05-studio-r10-3fc034fa91ef
+        run: python reality-lab/hc-s3-7/run_native.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf37-native-${{ matrix.case }}
+          path: platform/reality-lab/hc-s3-7/qa/${{ matrix.case }}/
+          retention-days: 30
