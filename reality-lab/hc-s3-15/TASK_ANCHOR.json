@@ -1,0 +1,13 @@
+{
+ "taskId":"RF01-S3.15-SURFACE-20261022",
+ "baseCommit":"79bb242cdf460ccf8fcd17b742041737a114e872",
+ "allowedPaths":["reality-lab/hc-s3-15/",".github/workflows/reality-hc-s315.yml"],
+ "question":"Do the exact contact rows from S3.14 refer to consistent body surfaces, nearest points and outward sides?",
+ "source":{"repository":"haihao0307/guilin-dem-pipeline","commit":"c5c0bedbc35f24cbb35426ab9c14b74ca7fc5f49","fixtureRun":"39570430770","certificateSHA256":"cd5b506b7cd34b8662f8af463531284dd41d57d4f5262a11f699d328ab3668d9","meshContactSHA256":"0fe9b8e0840c7b35c4ee3fce9b7d648c220043783ad6166314812472ddde8ff3"},
+ "implementation":"Read-only exact-source query replay; independent full triangle nearest search; connected-component/orientation audit; main-component winding probes; nonadjacent body-body intersection witnesses with exact rational recheck; explicit contact-model gate and interactive original geometry.",
+ "protected":["original normals","all contact rows","body and garment positions/topology","material thickness","24-node and20mm budgets","existing source branches","all original acceptance failures"],
+ "forbidden":["flip normals to obtain a pass","delete conflicting rows","relax limits","rewrite body geometry","claim winding alone is a repaired collision field","reuse old motion results as new validation","merge","force push"],
+ "acceptance":["source and fixture digests verified","14 contact-only certificate rows replay exactly","independent nearest distances agree","every displayed strict intersection independently verified with exact binary64 rational coordinates","surface points not assigned arbitrary winding signs","positive local distances never upgraded to whole-body safety","source arrays unchanged","file and fixed HTTPS actual 3D controls"],
+ "scope":"human/garment only; original frozen step30 and step102 states; no production install or new dynamics",
+ "productionChanged":false,"solverExecuted":false,"newMotionExecuted":false,"fitCertified":false,"mergeAuthorized":false
+}
