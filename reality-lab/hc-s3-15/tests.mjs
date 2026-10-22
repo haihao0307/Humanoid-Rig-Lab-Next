@@ -1,0 +1,41 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+import {closestIndependent,winding,topology,modelGate} from './audit.mjs';
+import {closestTriangle} from './_runtime/mesh-contact.mjs';
+const R=new URL('.',import.meta.url),report=JSON.parse(fs.readFileSync(new URL('AUDIT.json',R))),checks=[];
+function test(name,fn){fn();checks.push({name,passed:true});console.log('PASS',name);}
+const near=(a,b,e=1e-12)=>assert(Math.abs(a-b)<=e,`${a} != ${b}`);
+const T=[[0,0,0],[1,0,0],[0,1,0]];
+test('independent face-interior nearest',()=>{const q=closestIndependent([.2,.3,2],...T);[.2,.3,0].forEach((v,k)=>near(q[k],v));});
+test('independent vertex region',()=>assert.deepEqual(closestIndependent([-2,-3,1],...T),[0,0,0]));
+test('independent hypotenuse region',()=>{const q=closestIndependent([1,1,1],...T);near(q[0],.5);near(q[1],.5);near(q[2],0);});
+test('independent degenerate segment',()=>assert.deepEqual(closestIndependent([.5,1,0],[0,0,0],[1,0,0],[2,0,0]),[.5,0,0]));
+test('independent method matches source on deterministic off-plane points',()=>{const p=Float64Array.from(T.flat()),f=Int32Array.from([0,1,2]);for(let i=0;i<100;i++){const x=[Math.sin(i)*2,Math.cos(i*1.7)*2,Math.sin(i*.7)],a=closestIndependent(x,...T),b=closestTriangle(p,f,0,...x);near(Math.hypot(...a.map((v,k)=>v-x[k])),Math.sqrt(b[0]));}});
+const p=Float64Array.from([0,0,0,1,0,0,0,1,0,0,0,1]),f=Int32Array.from([0,2,1,0,1,3,0,3,2,1,2,3]);
+test('closed tetra interior winding',()=>near(winding([.1,.1,.1],p,f),1));
+test('closed tetra exterior winding',()=>near(winding([2,2,2],p,f),0));
+test('winding keeps orientation not absolute-value repair',()=>{const g=f.slice();for(let i=0;i<g.length;i+=3)[g[i+1],g[i+2]]=[g[i+2],g[i+1]];near(winding([.1,.1,.1],p,g),-1);});
+test('exact surface vertex winding left unclassified',()=>assert.equal(winding([0,0,0],p,f),null));
+test('topology recognizes closed consistent component',()=>{const t=topology(p,f).summaries[0];assert(t.indexClosed&&t.consistentlyOriented&&t.triangles===4);});
+test('missing face creates explicit boundary',()=>assert.equal(topology(p,f.subarray(3)).summaries[0].boundaryEdges,3));
+test('reversed face creates inconsistent edges',()=>{const g=f.slice();[g[1],g[2]]=[g[2],g[1]];assert.equal(topology(p,g).summaries[0].inconsistentEdges,3);});
+test('disconnected open appendage does not invalidate main closure classification',()=>{const P=Float64Array.from([...p,4,0,0,5,0,0,4,1,0]),F=Int32Array.from([...f,4,5,6]);const t=topology(P,F);assert.equal(t.summaries.length,2);assert(t.summaries[0].indexClosed);assert.equal(t.summaries[1].boundaryEdges,3);});
+test('unknown nearest never permits solve',()=>assert.equal(modelGate({nearestVerified:false,exactCrossings:0,positiveLocalInsideCount:0}).status,'QUERY_UNVERIFIED'));
+test('proved self intersection blocks assumed clean-body solve',()=>{const g=modelGate({nearestVerified:true,exactCrossings:1,positiveLocalInsideCount:0});assert.equal(g.status,'BODY_SURFACE_SELF_INTERSECTION');assert(!g.solveAllowed&&!g.contactCertified);});
+test('no failure found is not certification',()=>assert(!modelGate({nearestVerified:true,exactCrossings:0,positiveLocalInsideCount:0}).solveAllowed));
+test('positive local sign inconsistency remains unresolved',()=>assert.equal(modelGate({nearestVerified:true,exactCrossings:0,positiveLocalInsideCount:1}).status,'LOCAL_SIGN_UNRESOLVED'));
+test('three original fixtures and14 certificate rows, not14 separate trajectories',()=>{assert.equal(report.cases.length,3);assert.equal(report.cases.reduce((n,c)=>n+c.rows.length,0),14);});
+for(const c of report.cases){
+ test(c.fixture+' all stored constraints and independent nearest reproduce',()=>{for(const r of c.rows){assert(r.nativeMatchesStoredRow);assert(r.independent.distanceErrorM<1e-10);assert(r.originErrorM<1e-10);}});
+ test(c.fixture+' selected faces belong to closed consistently oriented main body',()=>{assert(c.rows.every(r=>r.component===0));const t=c.topology[0];assert.equal(t.triangles,40120);assert(t.indexClosed&&t.consistentlyOriented);});
+ test(c.fixture+' strict pairs do not share vertices and exact proof retained',()=>{assert(c.selfIntersections.length>0);for(const x of c.selfIntersections){assert(!x.aIds.some(i=>x.bIds.includes(i)));assert(x.sameComponent&&x.component===0&&x.exactVerified&&x.exactProof.strict);}});
+ test(c.fixture+' probes leave surface undefined and do not flip source normals',()=>{for(const r of c.rows){assert(r.faceSmoothDot>0);for(const p of r.probes)if(p.side==='ON_SURFACE_UNCLASSIFIED')assert.equal(p.mainWinding,null);}});
+ test(c.fixture+' geometry held with no physical installation',()=>{assert(c.inputUnchanged&&!c.solverExecuted&&!c.sourceWritten);assert(!c.modelGate.solveAllowed);});
+}
+const last=report.cases.find(c=>c.step===102),r=last.rows.find(r=>r.id==='x324:55038:0');
+test('step102 contact witness native face may be adjacent on shared edge, not fabricated mismatch',()=>{assert.equal(r.nativeFace,45768);assert.equal(r.witnessFace,55038);assert(Math.min(...r.barycentric)<1e-10);});
+test('step102 positive100-micron local query stays one-layer in main winding',()=>{const q=r.probes.find(p=>p.offsetM===.0001);near(q.distanceM,.0001,1e-12);near(q.mainWinding,1,1e-10);assert(q.positiveLocalInside);});
+test('step102 opposite probe is two-layer, not outside',()=>{const q=r.probes.find(p=>p.offsetM===-.0001);near(q.mainWinding,2,1e-10);});
+test('frozen baseline and guarded step30 geometry audit agrees',()=>{const [a,b]=report.cases;assert.deepEqual(a.rows,b.rows);assert.deepEqual(a.selfIntersections,b.selfIntersections);});
+test('local self intersection counts are not whole-body totals',()=>{assert.deepEqual(report.cases.map(c=>c.selfIntersections.length),[11,11,6]);assert(report.cases.every(c=>c.intersectionCoverage.includes('not exhaustive')));});
+test('no solver, motion, source, global impossibility or fit claims',()=>{for(const key of ['solverExecuted','newMotionExecuted','sourceWritten','globalNonlinearInfeasibilityProved','fitCertified','live'])assert.equal(report[key],false);});
+fs.mkdirSync(new URL('qa/',R),{recursive:true});fs.writeFileSync(new URL('qa/TESTS.json',R),JSON.stringify({passed:true,count:checks.length,checks,syntheticGeometrySeparate:true,actualCertificateRows:14,newMotionExecuted:false,fitCertified:false},null,2));
