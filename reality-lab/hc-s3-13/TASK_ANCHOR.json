@@ -1,0 +1,16 @@
+{
+  "taskId":"RF01-S3.13-ADAPTIVE-PREFLIGHT-20261022",
+  "baseCommit":"2d26e832b0f0dbf0590b7444efdad3ba869b6947",
+  "auditEvidenceCommit":"e969e194dfd6279ad1c94f71adb5a6c547e2e700",
+  "sourceSolverBlob":"1257910124975158d7f93d0191553c49ad48e80d",
+  "sourceSolverSHA256":"b9b7873d279eacc631b7c358dad71db312ffa42d4f18c12fc2b26e8ef88d53d2",
+  "allowedPaths":["reality-lab/hc-s3-13/",".github/workflows/reality-hc-s313.yml"],
+  "change":"Insert fixed-edge obstruction preflight and bounded adaptive mobile-node selection before the original S3.12 local search. Keep its seeds, objective, iteration cap, displacement/shape bounds and source geometry unchanged.",
+  "primaryGate":"Run actual full-body frozen states baseline-step30, guarded-step30 and guarded-step102; compare original vs preflighted solver. Search failure stays failure. No completed motion or production claim unless separately executed.",
+  "preservedPolicy":{"outerIterations":12,"dualSweeps":160,"maxNodes":24,"maxFaces":128,"maxMoveM":0.02,"edgeRatioMin":0.75,"edgeRatioMax":1.25,"linearToleranceM":1e-7},
+  "acceptance":["native input digests fixed","preflight omits provably blocked scopes","remaining scopes re-use original nonlinear search","rejected trials do not change any source array","accepted local candidate independently checked on full original body and shape","report actual residuals and query/time costs","a necessary-condition pass cannot become a solver pass","public webpage with actual geometry and verified interactions"],
+  "conditionalMotionGate":"Do not pay for a full180-step candidate run when no local fixture passes. If any fixture passes, explicitly separate local endpoint acceptance from later motion regression.",
+  "productionChanged":false,
+  "mergeAuthorized":false,
+  "status":"IMPLEMENTING_BOUNDED_COMPARISON"
+}
