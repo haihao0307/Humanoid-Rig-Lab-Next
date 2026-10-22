@@ -1,0 +1,167 @@
+{
+  "version": "REALITY-HC-S3.13",
+  "sourceCommit": "ba69d6c0be0c6cd58ece1e4a7dc0192ed741dd9c",
+  "rawReportSHA256": "36307a6cd0b600f8ae1b775ca629936a250865842678677d8f00d5960d552ba7",
+  "sourceSolverSHA256": "b9b7873d279eacc631b7c358dad71db312ffa42d4f18c12fc2b26e8ef88d53d2",
+  "sourceFiles": {
+    "adaptive-preflight.mjs": "0c10284f16e8100a8b9b62669a552208278e75aef57a9d4491b0e4a3577db576",
+    "prepare.py": "c5c0a0b03f7d72e8c99c6b5ba4f2fea286fce0d59aa50504594ed745c8e6994a",
+    "evaluate.mjs": "ba48f05ec3248c669c2db1004f993a3f2f425a3c0d2590c7979a928024619a52",
+    "tests.mjs": "4ad379953eb46c94c7e0234d1625993f4d6e2ac83a14688b162882fd4903c560",
+    "build.py": "32d00409c7335e0d656a6d10f0e77e922a1fa35e91540b2ae2dc3f540aeb4b1e",
+    "index.html": "ade6d9693e27c53e8239de12c625cb2fc24ebfaed73263e90faa4766848c3f51",
+    "app.js": "45ee39d736b7dff04cd2281057e6aa87f3db9fbb18518db3f8f5a50566410761",
+    "browser.py": "9e3c9e08672c1b4c0538ea1ae3588e31fcad6c35cf1947489652c00dbc179147",
+    "README.md": "4abdbd8de3c765dabdb859fd183b5cff6f0ed32a32b0bd8f8d511de65b9923c9"
+  },
+  "fixtureRun": "39570430770",
+  "fixtureDigests": {
+    "baseline-step30.json": "bf574d265e7a53b7de69accd5722f35d622b7f6e170f14797f888e451f7b9a7b",
+    "guarded-step30.json": "602056e688b040b58d99d103422031bf3bc44907e37e1dbf636e08a3939622a3",
+    "guarded-step102.json": "8c5a9a04693d2e864cdd1913bd45bd37bec5d485dc6d9a9bfb7d48a1af24de7f"
+  },
+  "policy": {
+    "outerIterations": 12,
+    "dualSweeps": 160,
+    "maxNodes": 24,
+    "maxFaces": 128,
+    "maxMoveM": 0.02,
+    "edgeRatioMin": 0.75,
+    "edgeRatioMax": 1.25,
+    "linearToleranceM": 1e-07
+  },
+  "status": "HOLD_NO_ACCEPTABLE_LOCAL_MOVE",
+  "motionGate": "DO_NOT_RUN_NO_LOCAL_CANDIDATE",
+  "fullMotionExecuted": false,
+  "sourceWritten": false,
+  "fitCertified": false,
+  "live": false,
+  "checks": 26,
+  "summary": [
+    {
+      "fixture": "baseline-step30.json",
+      "step": 30,
+      "originalSearches": 6,
+      "adaptiveSearches": 3,
+      "adaptiveNodes": [
+        13
+      ],
+      "accepted": false,
+      "sourceWritten": false,
+      "adaptiveTrials": [
+        {
+          "seed": "zero",
+          "nodes": 13,
+          "beforeCrossings": 32,
+          "terminalCrossings": 28,
+          "terminalMinM": 0.0003588234112965898,
+          "status": "NO_DESCENT_WITHIN_BUDGET",
+          "shapeRejectedTrials": 9
+        },
+        {
+          "seed": "guide",
+          "nodes": 13,
+          "beforeCrossings": 32,
+          "terminalCrossings": 32,
+          "terminalMinM": -0.0010967082342714192,
+          "status": "NO_DESCENT_WITHIN_BUDGET",
+          "shapeRejectedTrials": 4
+        },
+        {
+          "seed": "normal",
+          "nodes": 13,
+          "beforeCrossings": 32,
+          "terminalCrossings": 30,
+          "terminalMinM": 8.952154110362884e-05,
+          "status": "NO_DESCENT_WITHIN_BUDGET",
+          "shapeRejectedTrials": 10
+        }
+      ]
+    },
+    {
+      "fixture": "guarded-step30.json",
+      "step": 30,
+      "originalSearches": 6,
+      "adaptiveSearches": 3,
+      "adaptiveNodes": [
+        13
+      ],
+      "accepted": false,
+      "sourceWritten": false,
+      "adaptiveTrials": [
+        {
+          "seed": "zero",
+          "nodes": 13,
+          "beforeCrossings": 32,
+          "terminalCrossings": 28,
+          "terminalMinM": 0.0003588234112965898,
+          "status": "NO_DESCENT_WITHIN_BUDGET",
+          "shapeRejectedTrials": 9
+        },
+        {
+          "seed": "guide",
+          "nodes": 13,
+          "beforeCrossings": 32,
+          "terminalCrossings": 32,
+          "terminalMinM": -0.0010967082342714192,
+          "status": "NO_DESCENT_WITHIN_BUDGET",
+          "shapeRejectedTrials": 4
+        },
+        {
+          "seed": "normal",
+          "nodes": 13,
+          "beforeCrossings": 32,
+          "terminalCrossings": 30,
+          "terminalMinM": 8.952154110362884e-05,
+          "status": "NO_DESCENT_WITHIN_BUDGET",
+          "shapeRejectedTrials": 10
+        }
+      ]
+    },
+    {
+      "fixture": "guarded-step102.json",
+      "step": 102,
+      "originalSearches": 6,
+      "adaptiveSearches": 3,
+      "adaptiveNodes": [
+        21
+      ],
+      "accepted": false,
+      "sourceWritten": false,
+      "adaptiveTrials": [
+        {
+          "seed": "zero",
+          "nodes": 21,
+          "beforeCrossings": 92,
+          "terminalCrossings": 88,
+          "terminalMinM": -9.530752296770651e-05,
+          "status": "NO_DESCENT_WITHIN_BUDGET",
+          "shapeRejectedTrials": 7
+        },
+        {
+          "seed": "guide",
+          "nodes": 21,
+          "beforeCrossings": 92,
+          "terminalCrossings": 171,
+          "terminalMinM": -0.019088363159047925,
+          "status": "NO_DESCENT_WITHIN_BUDGET",
+          "shapeRejectedTrials": 4
+        },
+        {
+          "seed": "normal",
+          "nodes": 21,
+          "beforeCrossings": 92,
+          "terminalCrossings": 94,
+          "terminalMinM": -0.00024575034040263537,
+          "status": "NO_DESCENT_WITHIN_BUDGET",
+          "shapeRejectedTrials": 4
+        }
+      ]
+    }
+  ],
+  "html": {
+    "bytes": 77004,
+    "sha256": "f168c3f12a207ed1c240865f9d4007648a3eea342493b84c4e5f5f0b974d85c7"
+  },
+  "payloadSHA256": "b82d4049dce7b1cbb4adf435be2fc2cbf77e1998360a2670f8955c59faeff542"
+}
