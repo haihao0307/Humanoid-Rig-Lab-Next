@@ -1,0 +1,162 @@
+name: Reality S3.15 contact surface provenance
+on:
+  push:
+    branches: [feature/reality-hc-s315-contact-surface-20261022]
+    paths: [.github/workflows/reality-hc-s315.yml, reality-lab/hc-s3-15/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            reality-lab/hc-s3-15
+            reality-lab/hc-s3-14
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - name: Verify bounded source and clear stale evidence
+        run: |
+          git fetch --filter=blob:none --depth=1 origin 79bb242cdf460ccf8fcd17b742041737a114e872
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json,shutil,ast
+          r=Path('reality-lab/hc-s3-15');changed=subprocess.check_output(['git','diff','--name-only','79bb242cdf460ccf8fcd17b742041737a114e872','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith('reality-lab/hc-s3-15/') or p=='.github/workflows/reality-hc-s315.yml' for p in changed),changed
+          for p in r.glob('*.py'):ast.parse(p.read_text(),filename=str(p))
+          shutil.rmtree(r/'qa',ignore_errors=True);(r/'qa').mkdir();(r/'qa/SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':changed,'originalProductionChanged':False,'existingSourceModified':False},indent=2))
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf312-fixtures-and-native-toolkit
+          run-id: 39570430770
+          github-token: ${{ github.token }}
+          path: _fixtures
+      - name: Repeat true-source audit, exact rational witnesses and geometry tests
+        run: |
+          mkdir -p reality-lab/hc-s3-15/_runtime
+          cp _fixtures/hc-s3-12/_toolkit/mesh-contact.mjs reality-lab/hc-s3-15/_runtime/mesh-contact.mjs
+          cp _fixtures/hc-s3-12/_toolkit/hc-s3-7/contact-probe.mjs reality-lab/hc-s3-15/_runtime/contact-probe.mjs
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          r=Path('reality-lab/hc-s3-15/_runtime')
+          assert hashlib.sha256((r/'mesh-contact.mjs').read_bytes()).hexdigest()=='0fe9b8e0840c7b35c4ee3fce9b7d648c220043783ad6166314812472ddde8ff3'
+          assert hashlib.sha256((r/'contact-probe.mjs').read_bytes()).hexdigest()=='55349ab8a0d09cad19ae6e9155794e83223ce72077326c7102392a49b24de2ec'
+          PY
+          node reality-lab/hc-s3-15/audit.mjs _fixtures/hc-s3-12/qa/fixtures reality-lab/hc-s3-14/CERTIFICATES.json reality-lab/hc-s3-15/AUDIT_RAW.json
+          node reality-lab/hc-s3-15/audit.mjs _fixtures/hc-s3-12/qa/fixtures reality-lab/hc-s3-14/CERTIFICATES.json reality-lab/hc-s3-15/AUDIT_RAW_REPEAT.json
+          python reality-lab/hc-s3-15/exact.py reality-lab/hc-s3-15/AUDIT_RAW.json reality-lab/hc-s3-15/AUDIT.json
+          node reality-lab/hc-s3-15/tests.mjs
+          python reality-lab/hc-s3-15/build.py
+      - name: Install pinned browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Actual standalone source geometry and browser rational recheck
+        run: python reality-lab/hc-s3-15/browser.py
+      - name: Freeze verified audit viewer, not repaired clothing
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-15')
+          for n in ['qa/SCOPE.json','qa/TESTS.json','qa/EXACT_TESTS.json','qa/file/BROWSER.json']:assert json.loads((r/n).read_text())['passed'],n
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s315-contact-surface-20261022
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-15/AUDIT.json reality-lab/hc-s3-15/BUILD_MANIFEST.json reality-lab/hc-s3-15/preview.html reality-lab/hc-s3-15/qa/SCOPE.json reality-lab/hc-s3-15/qa/TESTS.json reality-lab/hc-s3-15/qa/EXACT_TESTS.json reality-lab/hc-s3-15/qa/file
+          git commit -m 'build(reality): freeze exact body-surface findings and tested source-geometry viewer'
+          git push origin HEAD:refs/heads/feature/reality-hc-s315-contact-surface-20261022
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-15/preview.html" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf315-build-evidence
+          path: |
+            reality-lab/hc-s3-15/AUDIT*.json
+            reality-lab/hc-s3-15/BUILD_MANIFEST.json
+            reality-lab/hc-s3-15/preview.html
+            reality-lab/hc-s3-15/qa/
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-15
+      - name: Verify exact immutable public bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF315_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,json,hashlib,os,time
+          r=Path('reality-lab/hc-s3-15');m=json.loads((r/'BUILD_MANIFEST.json').read_text());url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-15/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(url,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'url':os.environ['RF315_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install independent fixed browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Actual fixed HTTPS geometry, probes and exact proof
+        env:
+          RF315_URL: ${{ needs.build.outputs.url }}
+          RF315_QA: ${{ github.workspace }}/reality-lab/hc-s3-15/qa/public
+        run: python reality-lab/hc-s3-15/browser.py
+      - name: Persist audit result and unresolved source repair
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF315_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,datetime
+          r=Path('reality-lab/hc-s3-15');m=json.loads((r/'BUILD_MANIFEST.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());p=json.loads((r/'qa/public/BROWSER.json').read_text());t=json.loads((r/'qa/TESTS.json').read_text());e=json.loads((r/'qa/EXACT_TESTS.json').read_text())
+          assert f['passed'] and f['fileVerified'] and p['passed'] and p['publicVerified'] and t['passed'] and e['passed']
+          d={'version':'REALITY-HC-S3.15','status':'SURFACE_AUDIT_VERIFIED_BODY_SELF_INTERSECTION_REPAIR_HOLD','fixedURL':os.environ['RF315_URL'],'sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'workflowRun':os.environ['GITHUB_RUN_ID'],'html':m['html'],'dataSHA256':m['dataSHA256'],'fixtureRun':m['fixtureRun'],'actualContactRows':m['actualRows'],'rulesChecks':t['count'],'exactChecks':e['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(p['checks']),'summary':m['summary'],'sourceWritten':False,'normalOrTopologyChanged':False,'solverExecuted':False,'newMotionExecuted':False,'sourceRuntimeInstalled':False,'fitCertified':False,'continuousCollisionCertified':False,'globalNonlinearInfeasibilityProved':False,'physicalDeviceTested':False,'userVisualAccepted':False,'next':'Trace the exact self-intersecting main-body faces back to the original collision-body generation and compare fit-start/rest/motion states. Establish valid body volume semantics before changing normals or attempting the same cloth constraints again.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.15-SURFACE-20261022','status':d['status'],'fixedURL':d['fixedURL'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'lastActuallyCompletedStep':'Original contact-row replay, independent full-body nearest search, exact local body intersections and fixed public interactive evidence','nextAction':d['next'],'sourceWritten':False,'userAccepted':False},ensure_ascii=False,indent=2));print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s315-contact-surface-20261022
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-15/DELIVERY.json reality-lab/hc-s3-15/TASK_STATE.json reality-lab/hc-s3-15/qa/public
+          git commit -m 'docs(reality): persist public source-surface audit without certifying contact repair'
+          git push origin HEAD:refs/heads/feature/reality-hc-s315-contact-surface-20261022
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf315-public-evidence
+          path: reality-lab/hc-s3-15/qa/public/
+          retention-days: 30
