@@ -1,0 +1,165 @@
+name: Reality S3.14 contact and shape direction
+on:
+  push:
+    branches: [feature/reality-hc-s314-contact-shape-20261022]
+    paths: [.github/workflows/reality-hc-s314.yml, reality-lab/hc-s3-14/RUN_REQUEST.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+      url: ${{ steps.freeze.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            reality-lab/hc-s3-7
+            reality-lab/hc-s3-11
+            reality-lab/hc-s3-12
+            reality-lab/hc-s3-13
+            reality-lab/hc-s3-14
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - name: Verify isolated scope and clean old evidence
+        run: |
+          git fetch --filter=blob:none --depth=1 origin fbe17f54671b247f78295d430bc6a46eea56aa26
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,shutil,ast,json
+          r=Path('reality-lab/hc-s3-14');paths=subprocess.check_output(['git','diff','--name-only','fbe17f54671b247f78295d430bc6a46eea56aa26','HEAD'],text=True).splitlines()
+          assert paths and all(p.startswith('reality-lab/hc-s3-14/') or p=='.github/workflows/reality-hc-s314.yml' for p in paths),paths
+          for f in r.rglob('*.py'):ast.parse(f.read_text(),filename=str(f))
+          shutil.rmtree(r/'qa',ignore_errors=True);shutil.rmtree(r/'_runtime',ignore_errors=True);(r/'qa').mkdir()
+          (r/'qa/SCOPE.json').write_text(json.dumps({'passed':True,'changedPaths':paths,'originalProductionChanged':False,'otherBranchesChanged':False},indent=2))
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: rf312-fixtures-and-native-toolkit
+          run-id: 39570430770
+          github-token: ${{ github.token }}
+          path: _fixtures
+      - name: Install offline linear-model evidence dependency
+        run: python -m pip install scipy==1.17.0
+      - name: Actual symmetric frozen solves and independent exact certificates
+        env:
+          RF314_TOOLKIT: ${{ github.workspace }}/_fixtures/hc-s3-12/_toolkit
+          RF314_MESH_CONTACT: ${{ github.workspace }}/_fixtures/hc-s3-12/_toolkit/mesh-contact.mjs
+        run: |
+          python reality-lab/hc-s3-14/prepare.py
+          node reality-lab/hc-s3-14/evaluate.mjs _fixtures/hc-s3-12/qa/fixtures reality-lab/hc-s3-14/RESULT.json
+          python reality-lab/hc-s3-14/linear-certificate.py
+          node reality-lab/hc-s3-14/tests.mjs
+          python reality-lab/hc-s3-14/build.py
+      - name: Install pinned browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Actual standalone geometry and proof interactions
+        run: python reality-lab/hc-s3-14/browser.py
+      - name: Freeze verified experiment viewer, not repaired clothing
+        id: freeze
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('reality-lab/hc-s3-14')
+          for n in ['qa/SCOPE.json','qa/ASSEMBLY.json','qa/TESTS.json','qa/CERTIFICATE_TESTS.json','qa/file/BROWSER.json']:assert json.loads((r/n).read_text())['passed'],n
+          x=json.loads((r/'RESULT.json').read_text());assert not x['sourceWritten'] and not x['fullMotionExecuted'] and not x['fitCertified']
+          PY
+          EXPECTED=$(git rev-parse HEAD)
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s314-contact-shape-20261022
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-14/BUILD_MANIFEST.json reality-lab/hc-s3-14/SUMMARY.json reality-lab/hc-s3-14/CERTIFICATES.json reality-lab/hc-s3-14/preview.html reality-lab/hc-s3-14/qa/SCOPE.json reality-lab/hc-s3-14/qa/ASSEMBLY.json reality-lab/hc-s3-14/qa/TESTS.json reality-lab/hc-s3-14/qa/CERTIFICATE_TESTS.json reality-lab/hc-s3-14/qa/file/BROWSER.json reality-lab/hc-s3-14/qa/file/*.png
+          git commit -m 'build(reality): freeze actual joint-direction experiment and linear conflict evidence'
+          git push origin HEAD:refs/heads/feature/reality-hc-s314-contact-shape-20261022
+          SHA=$(git rev-parse HEAD)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "url=https://htmlpreview.github.io/?https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/$SHA/reality-lab/hc-s3-14/preview.html" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf314-build-and-experiment
+          path: |
+            reality-lab/hc-s3-14/RESULT.json
+            reality-lab/hc-s3-14/LINEAR_SYSTEMS.json
+            reality-lab/hc-s3-14/CERTIFICATES.json
+            reality-lab/hc-s3-14/BUILD_MANIFEST.json
+            reality-lab/hc-s3-14/SUMMARY.json
+            reality-lab/hc-s3-14/preview.html
+            reality-lab/hc-s3-14/qa/
+          retention-days: 30
+  public:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          sparse-checkout: reality-lab/hc-s3-14
+      - name: Verify exact public immutable bytes
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF314_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,json,hashlib,os,time
+          r=Path('reality-lab/hc-s3-14');m=json.loads((r/'BUILD_MANIFEST.json').read_text());url='https://raw.githubusercontent.com/haihao0307/Humanoid-Rig-Lab-Next/'+os.environ['BUILD_SHA']+'/reality-lab/hc-s3-14/preview.html'
+          for i in range(12):
+            try:b=urllib.request.urlopen(url,timeout=90).read();break
+            except Exception:
+              if i==11:raise
+              time.sleep(3)
+          assert len(b)==m['html']['bytes'] and hashlib.sha256(b).hexdigest()==m['html']['sha256']
+          q=r/'qa/public';q.mkdir(parents=True,exist_ok=True);(q/'PUBLIC_BYTES.json').write_text(json.dumps({'passed':True,'publicCommit':os.environ['BUILD_SHA'],'sourceCommit':m['sourceCommit'],'fixedURL':os.environ['RF314_URL'],'html':m['html']},indent=2))
+          PY
+      - name: Install independent fixed browser
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Fixed HTTPS actual geometry and exact arithmetic checks
+        env:
+          RF314_URL: ${{ needs.build.outputs.url }}
+          RF314_QA: ${{ github.workspace }}/reality-lab/hc-s3-14/qa/public
+        run: python reality-lab/hc-s3-14/browser.py
+      - name: Record delivery without upgrading contact failure
+        env:
+          BUILD_SHA: ${{ needs.build.outputs.sha }}
+          RF314_URL: ${{ needs.build.outputs.url }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,datetime
+          r=Path('reality-lab/hc-s3-14');m=json.loads((r/'BUILD_MANIFEST.json').read_text());s=json.loads((r/'SUMMARY.json').read_text());t=json.loads((r/'qa/TESTS.json').read_text());ct=json.loads((r/'qa/CERTIFICATE_TESTS.json').read_text());f=json.loads((r/'qa/file/BROWSER.json').read_text());p=json.loads((r/'qa/public/BROWSER.json').read_text())
+          assert t['passed'] and ct['passed'] and f['passed'] and f['fileVerified'] and p['passed'] and p['publicVerified']
+          d={'version':'REALITY-HC-S3.14','status':'JOINT_DIRECTION_IMPLEMENTED_VIEWER_VERIFIED_CONTACT_REPAIR_HOLD','sourceCommit':m['sourceCommit'],'publicCommit':os.environ['BUILD_SHA'],'fixedURL':os.environ['RF314_URL'],'workflowRun':os.environ['GITHUB_RUN_ID'],'html':m['html'],'rawReportSHA256':m['rawReportSHA256'],'linearModelSHA256':m['linearModelSHA256'],'certificateSHA256':m['certificateSHA256'],'fixtureRun':m['fixtureRun'],'actualFrozenCases':m['actualFrozenCases'],'rulesChecks':t['count'],'certificateChecks':ct['count'],'fileBrowserChecks':len(f['checks']),'publicBrowserChecks':len(p['checks']),'summary':s['summary'],'certificateLowerBounds':s['certificateLowerBounds'],'sourceWritten':False,'newMotionSequenceExecuted':False,'sourceRuntimeInstalled':False,'originalProductionChanged':False,'fitCertified':False,'continuousCollisionCertified':False,'globalNonlinearInfeasibilityProved':False,'userVisualAccepted':False,'physicalDeviceTested':False,'next':'Re-examine the jointly conflicting initial contact rows against the original closest-surface and normal choices. Build a consistent nonlinear local contact model before more iteration or budget changes. Revalidate identical frozen states, then run new motion only after an independently acceptable endpoint move.','verifiedAt':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (r/'DELIVERY.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));(r/'TASK_STATE.json').write_text(json.dumps({'taskId':'RF01-S3.14-CONTACT-SHAPE-20261022','status':d['status'],'sourceCommit':d['sourceCommit'],'publicCommit':d['publicCommit'],'fixedURL':d['fixedURL'],'lastActuallyCompletedStep':'Real repeated endpoint experiments with shape-aware directions and bounded reachability, exact linear-only conflict proof, interactive file/public review','nextAction':d['next'],'sourceWritten':False,'userAccepted':False},ensure_ascii=False,indent=2));print(json.dumps(d,ensure_ascii=False,indent=2))
+          PY
+          git fetch --filter=blob:none --depth=1 origin feature/reality-hc-s314-contact-shape-20261022
+          test "$(git rev-parse FETCH_HEAD)" = "$BUILD_SHA"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f reality-lab/hc-s3-14/DELIVERY.json reality-lab/hc-s3-14/TASK_STATE.json reality-lab/hc-s3-14/qa/public/BROWSER.json reality-lab/hc-s3-14/qa/public/PUBLIC_BYTES.json reality-lab/hc-s3-14/qa/public/*.png
+          git commit -m 'docs(reality): preserve verified S3.14 delivery and exact unresolved contact boundary'
+          git push origin HEAD:refs/heads/feature/reality-hc-s314-contact-shape-20261022
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rf314-public-evidence
+          path: reality-lab/hc-s3-14/qa/public/
+          retention-days: 30

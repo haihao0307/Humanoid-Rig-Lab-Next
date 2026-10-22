@@ -1,0 +1,18 @@
+{
+  "taskId":"RF01-S3.14-CONTACT-SHAPE-20261022",
+  "frameworkId":"RF01",
+  "baseCommit":"fbe17f54671b247f78295d430bc6a46eea56aa26",
+  "sourcePR":114,
+  "fixtureRun":39570430770,
+  "allowedPaths":["reality-lab/hc-s3-14/",".github/workflows/reality-hc-s314.yml"],
+  "problem":"S3.13 removes fixed-edge obstructions but its contact directions can violate local edge-length bounds; some contact rows are individually unreachable under the existing mobile set and displacement box.",
+  "implementation":"Add contact-row reachability to deterministic bounded variable selection, and include edge-length constraints in the direction computation rather than only rejecting deformation afterwards. Exact original nonlinear contact/shape checks remain final authority.",
+  "fixedLimits":{"maxNodes":24,"maxFaces":128,"maxMoveM":0.02,"edgeRatioMin":0.75,"edgeRatioMax":1.25,"outerIterations":12,"dualSweeps":160,"contactMarginFromFixture":true,"originalContactPasses":32,"originalFitGate":1.45},
+  "experiment":"Use original full-body frozen step30 and step102 states. Compare original S3.13 direction, shape-aware direction and reachability-aware scope as explicit conditions. Only scratch arrays may move; require source-byte invariance and repeatability. Synthetic feasible controls test that the new gate does not reject everything.",
+  "acceptance":["all source hashes pinned","no hidden budget increase or source repair","all affected nonlinear contact checks and original edge limits hold before any candidate acceptance","old safe samples retained","no affected strict endpoint intersections","source remains unchanged for both rejected and preview-only accepted solutions","bounded selection stop reasons and linear/nonlinear residuals retained","file and immutable public browser verification for actual geometry review"],
+  "limitsOfClaim":["frozen endpoint experiment is not a motion sequence","strict endpoint intersections are not CCD or self-collision certification","finite local failure is not global infeasibility","physical material calibration and original production integration are separate"],
+  "productionChanged":false,
+  "mergeAuthorized":false,
+  "userAccepted":false,
+  "nextGate":"Only after a genuine endpoint candidate passes all independent checks may a new full-motion integration be started. Otherwise preserve failure evidence and original state."
+}
