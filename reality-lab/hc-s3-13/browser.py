@@ -1,0 +1,65 @@
+from pathlib import Path
+import os,json,hashlib,traceback
+from playwright.sync_api import sync_playwright
+R=Path(__file__).resolve().parent;Q=Path(os.environ.get("RF313_QA",str(R/"qa/file")));Q.mkdir(parents=True,exist_ok=True)
+M=json.loads((R/"BUILD_MANIFEST.json").read_text());URL=os.environ.get("RF313_URL",(R/"preview.html").as_uri())
+report={"passed":False,"sourceCommit":M["sourceCommit"],"url":URL,"checks":[],"pageErrors":[],"consoleErrors":[],"requestFailures":[],"physicalDeviceTested":False,"fullMotionExecuted":False};requests=[]
+def save():(Q/"BROWSER.json").write_text(json.dumps(report,ensure_ascii=False,indent=2))
+def check(name,ok,detail=None):
+ if not ok:raise AssertionError(name+": "+str(detail))
+ report["checks"].append({"name":name,"passed":True,"detail":detail});print("PASS",name,flush=True);save()
+def shot(page,name):
+ p=Q/(name+".png");page.screenshot(path=str(p),timeout=60000);report.setdefault("screenshots",[]).append({"file":p.name,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()})
+with sync_playwright() as pw:
+ browser=pw.chromium.launch(executable_path=os.environ.get("RF313_CHROMIUM"),headless=True,args=["--no-sandbox","--disable-dev-shm-usage","--use-angle=swiftshader","--enable-unsafe-swiftshader"])
+ ctx=browser.new_context(viewport={"width":1440,"height":1100},device_scale_factor=1,accept_downloads=True)
+ page=ctx.new_page();page.set_default_timeout(60000)
+ page.on("pageerror",lambda e:report["pageErrors"].append(str(e)));page.on("console",lambda e:report["consoleErrors"].append(e.text) if e.type=="error" else None)
+ page.on("request",lambda r:requests.append(r.url) if r.url.startswith(("http:","https:")) else None);page.on("requestfailed",lambda r:report["requestFailures"].append({"url":r.url,"reason":r.failure}))
+ state=lambda:page.evaluate("__RF313__.report()")
+ try:
+  page.goto(URL,wait_until="domcontentloaded",timeout=90000);page.wait_for_function("!!window.__RF313__")
+  check("source commit identity",state()["sourceCommit"]==M["sourceCommit"])
+  check("payload exact digest",state()["payloadSHA256"]==M["payloadSHA256"])
+  check("real initial102 adaptive21-node scope",state()["fixture"]=="guarded-step102.json" and len(state()["selected"]["nodes"])==21)
+  check("failed solve remains visible","没有局部位移通过" in page.locator("#overall").inner_text() and "HOLD" in page.locator("#result").inner_text())
+  check("not live or motion acceptance",not state()["fullMotionExecuted"] and not state()["sourceWritten"] and not state()["fitCertified"] and not state()["variantAccepted"])
+  check("same-scope92-to88 crossings visible","92" in page.locator("#measurements").inner_text() and "88" in page.locator("#measurements").inner_text())
+  check("new midpoint constraint source displayed","e46:447" in page.locator("#certificates").inner_text())
+  check("certificate required versus supported gain visible","13.030" in page.locator("#certificates").inner_text() and "7.509" in page.locator("#certificates").inner_text())
+  check("shape-limit failure is not hidden","3.087" in page.locator("#proposals").inner_text() and "形变限制未通过" in page.locator("#proposals").inner_text())
+  canvas=page.locator("#canvas");initial=canvas.screenshot();camera=state()["camera"]
+  page.locator("#trial").click();check("rejected preview explicitly labelled","未写回" in page.locator("#view-label").inner_text() and state()["phase"]=="trial")
+  check("real geometry preview changes pixels but not camera",hashlib.sha256(initial).hexdigest()!=hashlib.sha256(canvas.screenshot()).hexdigest() and state()["camera"]==camera)
+  shot(page,"01-adaptive102-rejected-preview")
+  page.locator("#before").click();check("original state visually restored",hashlib.sha256(initial).hexdigest()==hashlib.sha256(canvas.screenshot()).hexdigest())
+  for case in ["0","1"]:
+   page.locator("#case").select_option(case);check("step30 actual13-node candidate "+case,len(state()["selected"]["nodes"])==13)
+   check("three original seed modes retained "+case,page.locator("#scope option").count()==3)
+   for index in ["1","2"]:
+    page.locator("#scope").select_option(index);check("actual seed selected "+case+":"+index,state()["scope"]==int(index))
+  page.locator("#variant").select_option("original");check("original three-and-one-ring six searches preserved",page.locator("#scope option").count()==6 and len(state()["selected"]["nodes"])==3)
+  page.locator("#scope").select_option("3");check("original13-node zero seed available",len(state()["selected"]["nodes"])==13 and state()["selected"]["seed"]=="zero")
+  page.locator("#restore").click();check("default recovery exact",state()["fixture"]=="guarded-step102.json" and state()["mode"]=="adaptive" and state()["phase"]=="before")
+  canvas.scroll_into_view_if_needed();box=canvas.bounding_box();before=canvas.screenshot()
+  page.mouse.move(box["x"]+box["width"]*.5,box["y"]+box["height"]*.5);page.mouse.down();page.mouse.move(box["x"]+box["width"]*.65,box["y"]+box["height"]*.6,steps=8);page.mouse.up()
+  check("actual orbit changes camera and rendered output",state()["camera"]!=camera and hashlib.sha256(before).hexdigest()!=hashlib.sha256(canvas.screenshot()).hexdigest())
+  z=state()["camera"]["zoom"];page.mouse.wheel(0,-140);page.wait_for_timeout(100);check("wheel zoom works",state()["camera"]["zoom"]!=z)
+  before=canvas.screenshot();page.locator("#surface").uncheck();check("body visibility changes actual rendering",hashlib.sha256(before).hexdigest()!=hashlib.sha256(canvas.screenshot()).hexdigest());page.locator("#surface").check()
+  page.locator("#reset-view").click();check("camera reset works",state()["camera"]==camera)
+  with page.expect_download() as event:page.locator("#download").click()
+  p=Q/"EXPORTED.json";event.value.save_as(p);d=json.loads(p.read_text());check("export retains all3 native states and fail status",d["schema"]=="kaopu/adaptive-contact-review@1" and len(d["data"]["cases"])==3 and d["data"]["status"]=="HOLD_NO_ACCEPTABLE_LOCAL_MOVE")
+  check("export never upgrades to motion or source writes",not d["sourceWritten"] and not d["fullMotionExecuted"])
+  check("no heavy native scene running secretly",page.locator("iframe").count()==0)
+  page.evaluate("scrollTo(0,0)");shot(page,"02-default102")
+  page.set_viewport_size({"width":390,"height":844});page.evaluate("scrollTo(0,0)");page.wait_for_timeout(100)
+  check("390px page has no horizontal overflow",page.evaluate("document.documentElement.scrollWidth<=innerWidth+2"));shot(page,"03-mobile")
+  if URL.startswith("file:"):check("standalone core no network",not requests,requests)
+  check("zero unhandled errors",not report["pageErrors"],report["pageErrors"]);check("zero console errors",not report["consoleErrors"],report["consoleErrors"]);check("zero failed requests",not report["requestFailures"],report["requestFailures"])
+  report["passed"]=True;report["fileVerified"]=URL.startswith("file:");report["publicVerified"]=URL.startswith("https:")
+ except Exception as e:
+  report["failure"]=str(e);report["trace"]=traceback.format_exc();print(report["trace"],flush=True)
+  try:report["lastState"]=state();shot(page,"FAILURE")
+  except Exception as extra:report["captureFailure"]=str(extra)
+ finally:save();ctx.close();browser.close()
+if not report["passed"]:raise SystemExit(1)
