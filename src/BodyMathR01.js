@@ -1,0 +1,28 @@
+/* Project-authored numerical primitives. Row-major matrices, column vectors.
+ * These functions contain no character positions, shape or skinning data. */
+(()=>{'use strict';
+const I=()=>[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],add=(a,b)=>a.map((x,i)=>x+b[i]),sub=(a,b)=>a.map((x,i)=>x-b[i]),scale=(a,s)=>a.map(x=>x*s),dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>Math.hypot(...a),unit=a=>{const l=norm(a);if(!(l>1e-14))throw Error('Degenerate body direction');return scale(a,1/l)};
+function mul(a,b){const c=new Float64Array(16);for(let r=0;r<4;r++)for(let k=0;k<4;k++)for(let j=0;j<4;j++)c[r*4+k]+=a[r*4+j]*b[j*4+k];return c;}
+const point=(m,p)=>[0,1,2].map(i=>m[4*i]*p[0]+m[4*i+1]*p[1]+m[4*i+2]*p[2]+m[4*i+3]),vector=(m,p)=>[0,1,2].map(i=>m[4*i]*p[0]+m[4*i+1]*p[1]+m[4*i+2]*p[2]),position=m=>[m[3],m[7],m[11]];
+function rigidInverse(m){const r=I();for(let i=0;i<3;i++){for(let j=0;j<3;j++)r[i*4+j]=m[j*4+i];r[i*4+3]=-(m[i]*m[3]+m[4+i]*m[7]+m[8+i]*m[11]);}return r;}
+// Preserve the existing animation interface's uniform-scale convention.
+// This deliberately differs from an arbitrary-affine inverse for slightly
+// non-orthogonal legacy bind frames; silently changing it alters attachments.
+function uniformInverse(m){const r=I(),s=m[0]*m[0]+m[4]*m[4]+m[8]*m[8];if(!(s>0))throw Error('Degenerate uniform body frame');for(let i=0;i<3;i++)for(let j=0;j<3;j++)r[i*4+j]=m[j*4+i]/s;for(let i=0;i<3;i++)r[i*4+3]=-(r[i*4]*m[3]+r[i*4+1]*m[7]+r[i*4+2]*m[11]);return r;}
+function inverse(m){const a=Array.from({length:4},(_,r)=>[...Array.from(m.slice(r*4,r*4+4)),...I().slice(r*4,r*4+4)]);for(let k=0;k<4;k++){let pivot=k;for(let r=k+1;r<4;r++)if(Math.abs(a[r][k])>Math.abs(a[pivot][k]))pivot=r;if(Math.abs(a[pivot][k])<1e-18)throw Error('Singular body transform');[a[k],a[pivot]]=[a[pivot],a[k]];const d=a[k][k];for(let j=0;j<8;j++)a[k][j]/=d;for(let r=0;r<4;r++)if(r!==k){const q=a[r][k];for(let j=0;j<8;j++)a[r][j]-=q*a[k][j];}}return Float64Array.from(a.flatMap(r=>r.slice(4)));}
+function affine(r,t=[0,0,0]){const m=I();for(let i=0;i<3;i++){for(let j=0;j<3;j++)m[i*4+j]=r[i*3+j];m[i*4+3]=t[i];}return Float64Array.from(m);}
+function qmul(a,b){return[a[3]*b[0]+a[0]*b[3]+a[1]*b[2]-a[2]*b[1],a[3]*b[1]-a[0]*b[2]+a[1]*b[3]+a[2]*b[0],a[3]*b[2]+a[0]*b[1]-a[1]*b[0]+a[2]*b[3],a[3]*b[3]-a[0]*b[0]-a[1]*b[1]-a[2]*b[2]];}
+function quaternionMatrix(q,t=[0,0,0],s=1){const[x,y,z,w]=scale(q,1/(norm(q)||1));return affine([(1-2*y*y-2*z*z)*s,(2*x*y-2*z*w)*s,(2*x*z+2*y*w)*s,(2*x*y+2*z*w)*s,(1-2*x*x-2*z*z)*s,(2*y*z-2*x*w)*s,(2*x*z-2*y*w)*s,(2*y*z+2*x*w)*s,(1-2*x*x-2*y*y)*s],t);}
+function rotateQuaternion(q,p){const u=cross(q.slice(0,3),p),v=cross(q.slice(0,3),u);return p.map((x,i)=>x+2*(q[3]*u[i]+v[i]));}
+function composeSRT(a,b){const qa=scale(a.slice(3,7),1/(norm(a.slice(3,7))||1)),qb=scale(b.slice(3,7),1/(norm(b.slice(3,7))||1));return[...add(a.slice(0,3),scale(rotateQuaternion(qa,b.slice(0,3)),a[7])),...qmul(qa,qb),a[7]*b[7]];}
+function srtMatrix(a){return quaternionMatrix(a.slice(3,7),a.slice(0,3),a[7]);}
+function eulerQuaternion(x,y,z){const sx=Math.sin(x/2),sy=Math.sin(y/2),sz=Math.sin(z/2),cx=Math.cos(x/2),cy=Math.cos(y/2),cz=Math.cos(z/2);return[sx*cy*cz-cx*sy*sz,cx*sy*cz+sx*cy*sz,cx*cy*sz-sx*sy*cz,cx*cy*cz+sx*sy*sz];}
+function rotvecDegrees(v,t){const[x,y,z]=v.map(x=>x*Math.PI/180),a=Math.hypot(x,y,z),q=a*a,s=a<1e-6?1-q/6+q*q/120:Math.sin(a)/a,c=a<1e-6?.5-q/24+q*q/720:(1-Math.cos(a))/q;return affine([1-c*(y*y+z*z),c*x*y-s*z,c*x*z+s*y,c*x*y+s*z,1-c*(x*x+z*z),c*y*z-s*x,c*x*z-s*y,c*y*z+s*x,1-c*(x*x+y*y)],t);}
+// Closest proper rotation of a 3x3 covariance through its quaternion form.
+// A bounded Jacobi eigensolve handles anisotropic and nearly singular frames.
+function properRotation(input){let s=0;for(const x of input){if(!Number.isFinite(x))throw Error('Invalid body orientation');s=Math.max(s,Math.abs(x));}if(s===0)return[1,0,0,0,1,0,0,0,1];const[a,b,c,d,e,f,g,h,i]=Array.from(input,x=>x/s),k=[a-e-i,b+d,c+g,h-f,b+d,e-a-i,f+h,c-g,c+g,f+h,i-a-e,d-b,h-f,c-g,d-b,a+e+i],v=I();for(let step=0;step<80;step++){let p=0,q=1,largest=0;for(let r=0;r<4;r++)for(let j=r+1;j<4;j++)if(Math.abs(k[r*4+j])>largest){largest=Math.abs(k[r*4+j]);p=r;q=j;}if(largest<2e-15)break;const off=k[p*4+q],tau=(k[q*4+q]-k[p*4+p])/(2*off),t=(tau>=0?1:-1)/(Math.abs(tau)+Math.hypot(1,tau)),co=1/Math.hypot(1,t),si=t*co;k[p*4+p]-=t*off;k[q*4+q]+=t*off;k[p*4+q]=k[q*4+p]=0;for(let r=0;r<4;r++){if(r!==p&&r!==q){const ap=k[r*4+p],aq=k[r*4+q];k[r*4+p]=k[p*4+r]=co*ap-si*aq;k[r*4+q]=k[q*4+r]=si*ap+co*aq;}const vp=v[r*4+p],vq=v[r*4+q];v[r*4+p]=co*vp-si*vq;v[r*4+q]=si*vp+co*vq;}}let best=3;for(let r=0;r<3;r++)if(k[r*4+r]>k[best*4+best])best=r;const m=quaternionMatrix([v[best],v[4+best],v[8+best],v[12+best]]);return[m[0],m[1],m[2],m[4],m[5],m[6],m[8],m[9],m[10]];}
+function align(a,b){const x=unit(a),y=unit(b),c=dot(x,y);if(c>.99999999)return I();if(c< -.99999999){const axis=unit(cross(x,Math.abs(x[0])<.8?[1,0,0]:[0,1,0]));return quaternionMatrix([...axis,0]);}return quaternionMatrix([...cross(x,y),1+c]);}
+function palm(a,b){const x=unit(a),z=unit(cross(x,b)),y=cross(z,x);return affine([x[0],y[0],z[0],x[1],y[1],z[1],x[2],y[2],z[2]]);}
+const matrices=(a,n,stride=16)=>Array.from({length:n},(_,i)=>Array.from(a.slice(i*stride,(i+1)*stride))),finite=(a,n,label)=>{const v=a==null?Array(n).fill(0):Array.from(a);if(v.length!==n||!v.every(Number.isFinite))throw Error('Invalid '+label);return v;};
+globalThis.BodyMathR01={I,add,sub,scale,dot,cross,norm,unit,mul,point,vector,position,rigidInverse,uniformInverse,inverse,affine,qmul,quaternionMatrix,rotateQuaternion,composeSRT,srtMatrix,eulerQuaternion,rotvecDegrees,properRotation,align,palm,matrices,finite};
+})();

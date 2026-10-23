@@ -1,0 +1,12 @@
+'use strict';
+// Lossless representation change. Provenance and the complete catalog stay intact.
+const fs=require('fs'),zlib=require('zlib'),crypto=require('crypto'),H=b=>crypto.createHash('sha256').update(b).digest('hex');
+const input='data/body-function-program.json',output='data/body-function-program-r17.json',before=fs.readFileSync(input),source=JSON.parse(before),raw=zlib.gunzipSync(Buffer.from(source.gzipBase64,'base64')),size=raw.readUInt32LE(0),header=JSON.parse(raw.subarray(4,4+size)),start=4+size;
+const unique=new Map(),chunks=[],entries=[];let offset=0,duplicateArrays=0;
+for(const a of header.arrays){const length=a.length*globalThis[a.type].BYTES_PER_ELEMENT,b=raw.subarray(start+a.offset,start+a.offset+length),key=a.type+':'+a.length+':'+H(b);let at=unique.get(key);if(at===undefined){at=offset;unique.set(key,at);chunks.push(b);offset+=b.length;}else duplicateArrays++;entries.push({...a,offset:at});}
+const nextHeader={...header,arrays:entries},json=Buffer.from(JSON.stringify(nextHeader)),prefix=Buffer.alloc(4);prefix.writeUInt32LE(json.length);const compact=Buffer.concat([prefix,json,...chunks]),base=4+json.length;
+// Check every logical array byte for byte, not just a numerical tolerance.
+for(let i=0;i<header.arrays.length;i++){const a=header.arrays[i],b=entries[i],bytes=a.length*globalThis[a.type].BYTES_PER_ELEMENT;if(!raw.subarray(start+a.offset,start+a.offset+bytes).equals(compact.subarray(base+b.offset,base+b.offset+bytes)))throw Error('Array mismatch '+i);}
+if(JSON.stringify(header.tree)!==JSON.stringify(nextHeader.tree))throw Error('Tree changed');
+const compressed=zlib.gzipSync(compact,{level:9}),pack={...source,gzipBase64:compressed.toString('base64'),compressedBytes:compressed.length,rawBytes:compact.length,storage:{schema:'body-array-sharing/1',logicalArrays:entries.length,uniqueArrays:unique.size,readOnlyCoefficients:true,bitExact:true,originalPackageSHA256:H(before)}};
+fs.writeFileSync(output,JSON.stringify(pack));const report={checkedUTC:new Date().toISOString(),input,output,inputSHA256:H(before),outputSHA256:H(fs.readFileSync(output)),originalFileBytes:before.length,compactFileBytes:fs.statSync(output).size,originalRawBytes:raw.length,compactRawBytes:compact.length,logicalArrays:entries.length,uniqueArrays:unique.size,duplicateArrays,allArrayBytesIdentical:true,completeMetadataTreeIdentical:true,sourceDerivedCalibration:true,wholeBodySourceIndependent:false};fs.writeFileSync('qa/compact-program-r17.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));

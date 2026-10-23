@@ -1,0 +1,3 @@
+'use strict';
+Object.assign(process.env,{BODY_PROGRAM_PACKAGE:'data/body-function-program-r17.json',BODY_NUMERIC_SOURCES:'BodyMathR01,BodyShapeR18,BodyMHRFieldsR01,BodyTargetBindingR01,BodyMHRAdapterR01,BodyDriverR01,BodyCalibrationR18,BodyTorsoR18',BODY_IMPLICIT_WORKER:'src/BodyImplicitWorkerR18.js',BODY_RAY_SOURCE:'src/BodyRayR18.js',BODY_APP_SOURCE:'src/BodyImplicitAppR18.js',BODY_HTML_POSTPROCESS:'tools/body-ui-r18.cjs',BODY_EXTRA_SOURCES:'src/BodyControlR17.js',BODY_OUTPUT_FILE:'delivery/人物身体_R18_躯干结构与体量校准.html',BODY_BUILD_MANIFEST:'BUILD-R18.json',BODY_VISIBLE_VERSION:'R18'});
+require('./build-implicit.cjs');

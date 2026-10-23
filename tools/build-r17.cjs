@@ -1,0 +1,11 @@
+'use strict';
+process.env.BODY_PROGRAM_PACKAGE='data/body-function-program-r17.json';
+process.env.BODY_IMPLICIT_WORKER='src/BodyImplicitWorkerR17.js';
+process.env.BODY_RAY_SOURCE='src/BodyRayR15.js';
+process.env.BODY_APP_SOURCE='src/BodyImplicitAppR17.js';
+process.env.BODY_HTML_POSTPROCESS='tools/body-ui-r17.cjs';
+process.env.BODY_EXTRA_SOURCES='src/BodyControlR17.js';
+process.env.BODY_OUTPUT_FILE='delivery/人物身体_R17_精简参数与无损加载.html';
+process.env.BODY_BUILD_MANIFEST='BUILD-R17.json';
+process.env.BODY_VISIBLE_VERSION='R17';
+require('./build-implicit.cjs');
