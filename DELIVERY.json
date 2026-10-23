@@ -1,16 +1,16 @@
 {
-  "schema": "body-function-delivery/3",
-  "reviewedUTC": "2026-10-23T08:26:35.035Z",
-  "selectedVersion": "R18",
-  "artifact": "G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\delivery\\人物身体_R18_躯干结构与体量校准.html",
-  "sha256": "be2e48abeefa870d3f3222db3a2d01e354eaa22d0a7b81a1bd1fbc697421e9c7",
-  "bytes": 60038825,
+  "schema": "body-function-delivery/4",
+  "reviewedUTC": "2026-10-23T08:56:34.233Z",
+  "selectedVersion": "R19",
+  "artifact": "G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\delivery\\人物身体_R19_躯干大形与肩带过渡.html",
+  "sha256": "0442474d248e357541d8738ecfceaaff7748cbc6e6910c4c17612a44a9256d7f",
+  "bytes": 60050831,
   "prior": {
-    "version": "R17",
-    "file": "G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\delivery\\人物身体_R17_精简参数与无损加载.html",
-    "sha256": "0d5d45d1ff2c8d6f1b9183b881360a2fd891009e14d297be5f9679081ffd26cd"
+    "version": "R18",
+    "file": "G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\delivery\\人物身体_R18_躯干结构与体量校准.html",
+    "sha256": "be2e48abeefa870d3f3222db3a2d01e354eaa22d0a7b81a1bd1fbc697421e9c7"
   },
-  "scope": "BODY ONLY - torso structure and support-composition calibration",
+  "scope": "BODY ONLY - torso wide form and shoulder transition",
   "characterTriangleFaces": 0,
   "rasterPrimitive": "POINTS",
   "headGenerated": false,
@@ -19,7 +19,12 @@
   "bodyReconstructionComplete": false,
   "visualAccepted": false,
   "stageImplementationVerified": true,
-  "firstPriorityFinalVisualAcceptance": false,
+  "regionalVisualReview": {
+    "performed": true,
+    "formAndNormalSeparation": true,
+    "limitedActionValuesOnly": true,
+    "remaining": "simplified overall anatomy; wider shoulder/axilla motion, hip connection, wrist and hand/foot defects remain"
+  },
   "mainPlatformMigrated": false,
   "publicWebDeployment": false,
   "githubSyncRequested": true,
@@ -32,23 +37,24 @@
     "independentDegreesDeleted": 0
   },
   "verified": {
-    "numericChecks": 21,
-    "browserChecks": 13,
-    "screenshots": 38,
-    "legacyOriginalPixels": 4,
-    "saveRepeatedLoadAndHeadState": true,
-    "restSupportUnchangedForSoftControls": true,
-    "explicitStatureAndProportionsRetained": true
+    "numericChecks": 27,
+    "browserChecks": 17,
+    "finalScreenshots": 71,
+    "archivedR18CanvasViews": 4,
+    "fullInfluenceTransport": true,
+    "derivativeNormalTangentComparison": true,
+    "oldAndNewArchivesAndRepeatedLoad": true,
+    "actualPointDrawsOnly": true,
+    "originalLightingAndRaySourceRetained": true
   },
-  "qa": "qa/calibration-r18/browser.json",
-  "numeric": "qa/calibration-r18/numeric.json",
-  "knowledge": "docs/TORSO-CALIBRATION-R18.md",
-  "remaining": [
-    "final torso visual acceptance",
-    "shoulder and hip transitions",
-    "wrist and hand foot quality",
-    "complete pose and parameter combinations",
-    "source-independent mother data",
-    "local surface calculation and head integration"
-  ]
+  "warpProbe": {
+    "minimumJacobianDeterminant": 0.8647266831117565,
+    "maximumDisplacementMM": 9.494045778533337,
+    "maxSymmetryErrorMetres": 0,
+    "globalProof": false
+  },
+  "qa": "qa/structure-r19/browser.json",
+  "numeric": "qa/structure-r19/numeric.json",
+  "knowledge": "docs/TORSO-STRUCTURE-R19.md",
+  "nextPriority": "shoulder-axilla and hip transitions under motion, retaining whole-torso and multi-shape review"
 }

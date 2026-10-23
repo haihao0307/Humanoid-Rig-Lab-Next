@@ -1,0 +1,411 @@
+{
+  "startedUTC": "2026-10-23T08:45:24.071Z",
+  "checks": [
+    {
+      "name": "anny archived original exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "anny archived adult exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "anny archived lean exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "anny archived fuller exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "anny archived muscular exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "anny adult finite and support fixed",
+      "passed": true
+    },
+    {
+      "name": "anny lean finite and support fixed",
+      "passed": true
+    },
+    {
+      "name": "anny fuller finite and support fixed",
+      "passed": true
+    },
+    {
+      "name": "anny muscular finite and support fixed",
+      "passed": true
+    },
+    {
+      "name": "anny trunk full influence packet",
+      "passed": true
+    },
+    {
+      "name": "anny shoulder full influence packet",
+      "passed": true
+    },
+    {
+      "name": "anny source samples outside finite support preserved",
+      "passed": true
+    },
+    {
+      "name": "mhr archived original exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "mhr archived adult exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "mhr archived lean exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "mhr archived fuller exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "mhr archived muscular exact R18 evaluation",
+      "passed": true
+    },
+    {
+      "name": "mhr adult finite and support fixed",
+      "passed": true
+    },
+    {
+      "name": "mhr lean finite and support fixed",
+      "passed": true
+    },
+    {
+      "name": "mhr fuller finite and support fixed",
+      "passed": true
+    },
+    {
+      "name": "mhr muscular finite and support fixed",
+      "passed": true
+    },
+    {
+      "name": "mhr trunk full influence packet",
+      "passed": true
+    },
+    {
+      "name": "mhr shoulder full influence packet",
+      "passed": true
+    },
+    {
+      "name": "mhr source samples outside finite support preserved",
+      "passed": true
+    },
+    {
+      "name": "sampled regional warp is symmetric, bounded, and orientation preserving",
+      "passed": true
+    },
+    {
+      "name": "fat cover attenuates chest structural correction",
+      "passed": true
+    },
+    {
+      "name": "normal transport matches independent warped tangent cross product",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "rig": "anny",
+      "name": "adult",
+      "calibration": {
+        "schema": "body-support-calibration/1",
+        "supportFixedAgainst": [
+          "weight",
+          "muscle",
+          "cupsize",
+          "firmness",
+          "soft local controls"
+        ],
+        "torsoFrame": {
+          "origin": [
+            0,
+            0.006311665004451784,
+            -0.00116892771679924
+          ],
+          "height": 0.5168803900715953,
+          "halfWidth": 0.1771896491753394
+        },
+        "torsoGain": 1,
+        "maxRestCorrectionMM": 8.39145941172601,
+        "correctedSamples": 2049,
+        "independentWholeBody": false,
+        "structure": {
+          "version": 19,
+          "gain": 1,
+          "normalMode": "warp-derivative",
+          "fieldNormalBlend": 0,
+          "maxAdditionalCorrectionMM": 9.543251431014015,
+          "correctedSamples": 2305,
+          "method": "regional broad fields and shoulder cap; rest-space complete-influence transport"
+        }
+      }
+    },
+    {
+      "rig": "anny",
+      "name": "lean",
+      "calibration": {
+        "schema": "body-support-calibration/1",
+        "supportFixedAgainst": [
+          "weight",
+          "muscle",
+          "cupsize",
+          "firmness",
+          "soft local controls"
+        ],
+        "torsoFrame": {
+          "origin": [
+            0,
+            0.006311665004451784,
+            -0.00116892771679924
+          ],
+          "height": 0.5168803900715953,
+          "halfWidth": 0.1771896491753394
+        },
+        "torsoGain": 1,
+        "maxRestCorrectionMM": 8.392521182846826,
+        "correctedSamples": 2049,
+        "independentWholeBody": false,
+        "structure": {
+          "version": 19,
+          "gain": 1,
+          "normalMode": "warp-derivative",
+          "fieldNormalBlend": 0,
+          "maxAdditionalCorrectionMM": 10.087871514503481,
+          "correctedSamples": 2303,
+          "method": "regional broad fields and shoulder cap; rest-space complete-influence transport"
+        }
+      }
+    },
+    {
+      "rig": "anny",
+      "name": "fuller",
+      "calibration": {
+        "schema": "body-support-calibration/1",
+        "supportFixedAgainst": [
+          "weight",
+          "muscle",
+          "cupsize",
+          "firmness",
+          "soft local controls"
+        ],
+        "torsoFrame": {
+          "origin": [
+            0,
+            0.006311665004451784,
+            -0.00116892771679924
+          ],
+          "height": 0.5168803900715953,
+          "halfWidth": 0.1771896491753394
+        },
+        "torsoGain": 1,
+        "maxRestCorrectionMM": 8.48152867210507,
+        "correctedSamples": 1960,
+        "independentWholeBody": false,
+        "structure": {
+          "version": 19,
+          "gain": 1,
+          "normalMode": "warp-derivative",
+          "fieldNormalBlend": 0,
+          "maxAdditionalCorrectionMM": 6.210010506253245,
+          "correctedSamples": 2254,
+          "method": "regional broad fields and shoulder cap; rest-space complete-influence transport"
+        }
+      }
+    },
+    {
+      "rig": "anny",
+      "name": "muscular",
+      "calibration": {
+        "schema": "body-support-calibration/1",
+        "supportFixedAgainst": [
+          "weight",
+          "muscle",
+          "cupsize",
+          "firmness",
+          "soft local controls"
+        ],
+        "torsoFrame": {
+          "origin": [
+            0,
+            0.006311665004451784,
+            -0.00116892771679924
+          ],
+          "height": 0.5168803900715953,
+          "halfWidth": 0.1771896491753394
+        },
+        "torsoGain": 1,
+        "maxRestCorrectionMM": 14.164370158381542,
+        "correctedSamples": 2049,
+        "independentWholeBody": false,
+        "structure": {
+          "version": 19,
+          "gain": 1,
+          "normalMode": "warp-derivative",
+          "fieldNormalBlend": 0,
+          "maxAdditionalCorrectionMM": 10.004077019486013,
+          "correctedSamples": 2299,
+          "method": "regional broad fields and shoulder cap; rest-space complete-influence transport"
+        }
+      }
+    },
+    {
+      "rig": "mhr",
+      "name": "adult",
+      "calibration": {
+        "schema": "body-support-calibration/1",
+        "supportFixedAgainst": [
+          "weight",
+          "muscle",
+          "cupsize",
+          "firmness",
+          "soft local controls"
+        ],
+        "torsoFrame": {
+          "origin": [
+            0,
+            0.006311665004451784,
+            -0.00116892771679924
+          ],
+          "height": 0.5168803900715953,
+          "halfWidth": 0.1771896491753394
+        },
+        "torsoGain": 1,
+        "maxRestCorrectionMM": 8.39145941172601,
+        "correctedSamples": 2049,
+        "independentWholeBody": false,
+        "structure": {
+          "version": 19,
+          "gain": 1,
+          "normalMode": "warp-derivative",
+          "fieldNormalBlend": 0,
+          "maxAdditionalCorrectionMM": 9.543251431014015,
+          "correctedSamples": 2305,
+          "method": "regional broad fields and shoulder cap; rest-space complete-influence transport"
+        }
+      }
+    },
+    {
+      "rig": "mhr",
+      "name": "lean",
+      "calibration": {
+        "schema": "body-support-calibration/1",
+        "supportFixedAgainst": [
+          "weight",
+          "muscle",
+          "cupsize",
+          "firmness",
+          "soft local controls"
+        ],
+        "torsoFrame": {
+          "origin": [
+            0,
+            0.006311665004451784,
+            -0.00116892771679924
+          ],
+          "height": 0.5168803900715953,
+          "halfWidth": 0.1771896491753394
+        },
+        "torsoGain": 1,
+        "maxRestCorrectionMM": 8.392521182846826,
+        "correctedSamples": 2049,
+        "independentWholeBody": false,
+        "structure": {
+          "version": 19,
+          "gain": 1,
+          "normalMode": "warp-derivative",
+          "fieldNormalBlend": 0,
+          "maxAdditionalCorrectionMM": 10.087871514503481,
+          "correctedSamples": 2303,
+          "method": "regional broad fields and shoulder cap; rest-space complete-influence transport"
+        }
+      }
+    },
+    {
+      "rig": "mhr",
+      "name": "fuller",
+      "calibration": {
+        "schema": "body-support-calibration/1",
+        "supportFixedAgainst": [
+          "weight",
+          "muscle",
+          "cupsize",
+          "firmness",
+          "soft local controls"
+        ],
+        "torsoFrame": {
+          "origin": [
+            0,
+            0.006311665004451784,
+            -0.00116892771679924
+          ],
+          "height": 0.5168803900715953,
+          "halfWidth": 0.1771896491753394
+        },
+        "torsoGain": 1,
+        "maxRestCorrectionMM": 8.48152867210507,
+        "correctedSamples": 1960,
+        "independentWholeBody": false,
+        "structure": {
+          "version": 19,
+          "gain": 1,
+          "normalMode": "warp-derivative",
+          "fieldNormalBlend": 0,
+          "maxAdditionalCorrectionMM": 6.210010506253245,
+          "correctedSamples": 2254,
+          "method": "regional broad fields and shoulder cap; rest-space complete-influence transport"
+        }
+      }
+    },
+    {
+      "rig": "mhr",
+      "name": "muscular",
+      "calibration": {
+        "schema": "body-support-calibration/1",
+        "supportFixedAgainst": [
+          "weight",
+          "muscle",
+          "cupsize",
+          "firmness",
+          "soft local controls"
+        ],
+        "torsoFrame": {
+          "origin": [
+            0,
+            0.006311665004451784,
+            -0.00116892771679924
+          ],
+          "height": 0.5168803900715953,
+          "halfWidth": 0.1771896491753394
+        },
+        "torsoGain": 1,
+        "maxRestCorrectionMM": 14.164370158381542,
+        "correctedSamples": 2049,
+        "independentWholeBody": false,
+        "structure": {
+          "version": 19,
+          "gain": 1,
+          "normalMode": "warp-derivative",
+          "fieldNormalBlend": 0,
+          "maxAdditionalCorrectionMM": 10.004077019486013,
+          "correctedSamples": 2299,
+          "method": "regional broad fields and shoulder cap; rest-space complete-influence transport"
+        }
+      }
+    }
+  ],
+  "passed": true,
+  "warpProbe": {
+    "minimumJacobianDeterminant": 0.8647266831117565,
+    "maximumDisplacementMM": 9.494045778533337,
+    "maxSymmetryErrorMetres": 0,
+    "globalProof": false
+  },
+  "finishedUTC": "2026-10-23T08:45:26.578Z"
+}

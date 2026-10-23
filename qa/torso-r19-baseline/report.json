@@ -1,0 +1,440 @@
+{
+  "startedUTC": "2026-10-23T08:35:26.498Z",
+  "artifactSHA256": "be2e48abeefa870d3f3222db3a2d01e354eaa22d0a7b81a1bd1fbc697421e9c7",
+  "shots": [
+    {
+      "file": "qa/torso-r19-baseline/front-skin.png",
+      "sha256": "b416ba28b65db25439d25ccbbc63a1460f608eb84c7b2628085e0ed0b6a9a27e"
+    },
+    {
+      "file": "qa/torso-r19-baseline/front-geometry.png",
+      "sha256": "130d8ad3b023235285e5f3340ab3e2c9054f3caaba642db237efdc9d8ae7f060"
+    },
+    {
+      "file": "qa/torso-r19-baseline/front-normals.png",
+      "sha256": "b75d326d5323e25d6028c688882ea2baf28f7c4a99f961a522453b9c4fb51559"
+    },
+    {
+      "file": "qa/torso-r19-baseline/side-skin.png",
+      "sha256": "f05beedfa2cab9547b2d3ef88e60cf41fdc46c7ea3f23b2fb337bb041df7118c"
+    },
+    {
+      "file": "qa/torso-r19-baseline/side-geometry.png",
+      "sha256": "a231013ddd5c5f041bc46e6e29d83b53b9b17975b8b1384d0dba1e586e804714"
+    },
+    {
+      "file": "qa/torso-r19-baseline/side-normals.png",
+      "sha256": "b1a6dc9378acfac07d7e6e58ce0f79380ad9911497a899a561539ea1594123f1"
+    },
+    {
+      "file": "qa/torso-r19-baseline/back-skin.png",
+      "sha256": "562a97d97c5ebd27dcc06db7f4af42e43d5949424ac837ca1b5a09ce5a327d05"
+    },
+    {
+      "file": "qa/torso-r19-baseline/back-geometry.png",
+      "sha256": "bfe9a0932cf7b3a89499ba252e12a62f40566d4b79db52369865d0728f9ee940"
+    },
+    {
+      "file": "qa/torso-r19-baseline/back-normals.png",
+      "sha256": "57744c9c01371889972c521d76d392ff600e61578dd1f9ed27605ba049ff7b05"
+    },
+    {
+      "file": "qa/torso-r19-baseline/oblique-skin.png",
+      "sha256": "10dce82c3af39f04910a95cf04d58cd9e5d0c8c2bac94d4aac15d35ba08937ec"
+    },
+    {
+      "file": "qa/torso-r19-baseline/oblique-geometry.png",
+      "sha256": "a0d5da3b514eb0ab2e843f75ca471deb153a2566cd72ff082a96dda41306bf7f"
+    },
+    {
+      "file": "qa/torso-r19-baseline/oblique-normals.png",
+      "sha256": "6752c84f06fbe8f77a4270333ce2072da0b2998320e47df66c521ac33a544c19"
+    },
+    {
+      "file": "qa/torso-r19-baseline/back-oblique-skin.png",
+      "sha256": "b87457202fd5916a7057cf9578405d6c31feda1e180fcba726a36bf36cfeda6b"
+    },
+    {
+      "file": "qa/torso-r19-baseline/back-oblique-geometry.png",
+      "sha256": "951ecfbcff2c39636ea3f3c3add1ada9bdbf6948ce604db6896ce843d0b392fd"
+    },
+    {
+      "file": "qa/torso-r19-baseline/back-oblique-normals.png",
+      "sha256": "a9bd190cf92a2f97319fc23e770b86cd8aa1f8c6a93e077bb420a5e3a84b615d"
+    }
+  ],
+  "errors": [],
+  "productChanged": false,
+  "report": {
+    "schema": "body-implicit-r18/1",
+    "ready": true,
+    "busy": false,
+    "lastError": null,
+    "catalogCount": 1916,
+    "bodyParameters": 965,
+    "checks": {
+      "messages": 2,
+      "characterFaces": 0
+    },
+    "field": {
+      "stats": {
+        "calibration": {
+          "schema": "body-support-calibration/1",
+          "supportFixedAgainst": [
+            "weight",
+            "muscle",
+            "cupsize",
+            "firmness",
+            "soft local controls"
+          ],
+          "torsoFrame": {
+            "origin": [
+              0,
+              0.006311665004451784,
+              -0.00116892771679924
+            ],
+            "height": 0.5168803900715953,
+            "halfWidth": 0.1771896491753394
+          },
+          "torsoGain": 1,
+          "maxRestCorrectionMM": 8.39145941172601,
+          "correctedSamples": 2049,
+          "independentWholeBody": false
+        },
+        "version": "BODY-IMPLICIT-R18",
+        "build": 1,
+        "pointConstraints": {
+          "global": {
+            "constraints": 9253,
+            "weights": 1217137,
+            "beforeRmsMM": 2.165856911913532,
+            "afterRmsMM": 0.7179066616883341,
+            "iterations": 74,
+            "regularization": 0.04,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 7.913987418503652e-8,
+            "maxAbsCoefficientMM": 17.558615663335047,
+            "coefficientRmsMM": 3.193390385563193,
+            "objective": 0.008543291763980509,
+            "solutionL2ErrorBoundMM": 0.00039714820701195375,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          },
+          "local": {
+            "constraints": 9253,
+            "weights": 186922,
+            "beforeRmsMM": 1.1133655194831515,
+            "afterRmsMM": 0.1316732223052669,
+            "iterations": 216,
+            "regularization": 0.002,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.657482175631751e-8,
+            "maxAbsCoefficientMM": 21.317605258282192,
+            "coefficientRmsMM": 2.4816170057287796,
+            "objective": 0.00027439478548629077,
+            "solutionL2ErrorBoundMM": 0.004689734873970857,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          }
+        },
+        "fieldMS": 17227.600000023842,
+        "dimensions": [
+          163,
+          208,
+          72
+        ],
+        "channels": 4,
+        "scalarCoefficients": 2441088,
+        "materialCoordinateCoefficients": 7323264,
+        "localScalarCoefficients": 11760360,
+        "materialCoordinatesFollowBody": true,
+        "authoredNormalField": true,
+        "normalFieldCoefficients": 9764352,
+        "localRegions": [
+          {
+            "region": "left hand",
+            "dimensions": [
+              129,
+              146,
+              158
+            ]
+          },
+          {
+            "region": "right hand",
+            "dimensions": [
+              129,
+              146,
+              158
+            ]
+          },
+          {
+            "region": "left foot",
+            "dimensions": [
+              116,
+              117,
+              214
+            ]
+          },
+          {
+            "region": "right foot",
+            "dimensions": [
+              116,
+              117,
+              214
+            ]
+          }
+        ],
+        "orientedSamples": 9253,
+        "fieldVoxelsNearSamples": 493901,
+        "characterVertices": 0,
+        "characterFaces": 0,
+        "characterTriangleIndices": 0,
+        "usesPolygonConnectivity": false,
+        "headGenerated": false,
+        "sourceDerivedCalibration": true,
+        "exactShapeEquivalenceCertified": false
+      },
+      "bounds": [
+        [
+          -0.5692760181427002,
+          0.5692760181427002
+        ],
+        [
+          -0.8752007913589478,
+          0.5750162434577942
+        ],
+        [
+          -0.15826055228710173,
+          0.3455644381046295
+        ]
+      ],
+      "dimensions": [
+        163,
+        208,
+        72
+      ],
+      "cap": 0.5282056975093755
+    },
+    "renderer": {
+      "version": "BODY-RAY-R18",
+      "characterMeshes": 0,
+      "characterVertexBuffers": 0,
+      "characterElementBuffers": 0,
+      "characterTriangleFaces": 0,
+      "rasterPrimitive": "POINTS",
+      "screenTileSize": 64,
+      "draws": 2,
+      "webglError": 0,
+      "camera": {
+        "yaw": 0.28,
+        "pitch": 0.04,
+        "distance": 1.9577929970026018,
+        "target": [
+          0,
+          -0.15009227395057678,
+          0
+        ]
+      },
+      "appearance": {
+        "roughness": 0.52,
+        "noise": 1,
+        "oil": 0.45,
+        "bodyVariation": 0.64,
+        "bodyPores": 0.78,
+        "jointTone": 0.42,
+        "neckCreases": 0.34,
+        "enabled": true,
+        "regionalColor": 0.72,
+        "lidWarmth": 0.46,
+        "noseWarmth": 0.38,
+        "earBlood": 0.44,
+        "earTransmission": 0.58,
+        "beardShadow": 0.04,
+        "audit": 0
+      },
+      "lighting": {
+        "key": 1.6,
+        "rim": 3.5,
+        "environment": 0.9,
+        "exposure": 0.7,
+        "keyAzimuth": -154,
+        "keyElevation": 8,
+        "rimAzimuth": 71,
+        "rimElevation": 11.309932,
+        "keyColor": "#ffffff",
+        "rimColor": "#efa37e",
+        "schema": "kaopu.eb1/1",
+        "preset": "custom",
+        "environmentRotation": -69,
+        "background": 0.85,
+        "shadowSize": 2048
+      },
+      "implicitStats": {
+        "calibration": {
+          "schema": "body-support-calibration/1",
+          "supportFixedAgainst": [
+            "weight",
+            "muscle",
+            "cupsize",
+            "firmness",
+            "soft local controls"
+          ],
+          "torsoFrame": {
+            "origin": [
+              0,
+              0.006311665004451784,
+              -0.00116892771679924
+            ],
+            "height": 0.5168803900715953,
+            "halfWidth": 0.1771896491753394
+          },
+          "torsoGain": 1,
+          "maxRestCorrectionMM": 8.39145941172601,
+          "correctedSamples": 2049,
+          "independentWholeBody": false
+        },
+        "version": "BODY-IMPLICIT-R18",
+        "build": 1,
+        "pointConstraints": {
+          "global": {
+            "constraints": 9253,
+            "weights": 1217137,
+            "beforeRmsMM": 2.165856911913532,
+            "afterRmsMM": 0.7179066616883341,
+            "iterations": 74,
+            "regularization": 0.04,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 7.913987418503652e-8,
+            "maxAbsCoefficientMM": 17.558615663335047,
+            "coefficientRmsMM": 3.193390385563193,
+            "objective": 0.008543291763980509,
+            "solutionL2ErrorBoundMM": 0.00039714820701195375,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          },
+          "local": {
+            "constraints": 9253,
+            "weights": 186922,
+            "beforeRmsMM": 1.1133655194831515,
+            "afterRmsMM": 0.1316732223052669,
+            "iterations": 216,
+            "regularization": 0.002,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.657482175631751e-8,
+            "maxAbsCoefficientMM": 21.317605258282192,
+            "coefficientRmsMM": 2.4816170057287796,
+            "objective": 0.00027439478548629077,
+            "solutionL2ErrorBoundMM": 0.004689734873970857,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          }
+        },
+        "fieldMS": 17227.600000023842,
+        "dimensions": [
+          163,
+          208,
+          72
+        ],
+        "channels": 4,
+        "scalarCoefficients": 2441088,
+        "materialCoordinateCoefficients": 7323264,
+        "localScalarCoefficients": 11760360,
+        "materialCoordinatesFollowBody": true,
+        "authoredNormalField": true,
+        "normalFieldCoefficients": 9764352,
+        "localRegions": [
+          {
+            "region": "left hand",
+            "dimensions": [
+              129,
+              146,
+              158
+            ]
+          },
+          {
+            "region": "right hand",
+            "dimensions": [
+              129,
+              146,
+              158
+            ]
+          },
+          {
+            "region": "left foot",
+            "dimensions": [
+              116,
+              117,
+              214
+            ]
+          },
+          {
+            "region": "right foot",
+            "dimensions": [
+              116,
+              117,
+              214
+            ]
+          }
+        ],
+        "orientedSamples": 9253,
+        "fieldVoxelsNearSamples": 493901,
+        "characterVertices": 0,
+        "characterFaces": 0,
+        "characterTriangleIndices": 0,
+        "usesPolygonConnectivity": false,
+        "headGenerated": false,
+        "sourceDerivedCalibration": true,
+        "exactShapeEquivalenceCertified": false
+      }
+    },
+    "headGenerated": false,
+    "sourceDerivedData": true,
+    "wholeBodySourceIndependent": false,
+    "allOriginalControlCombinationsCertified": false
+  },
+  "lighting": {
+    "key": 1.6,
+    "rim": 3.5,
+    "environment": 0.9,
+    "exposure": 0.7,
+    "keyAzimuth": -154,
+    "keyElevation": 8,
+    "rimAzimuth": 71,
+    "rimElevation": 11.309932,
+    "keyColor": "#ffffff",
+    "rimColor": "#efa37e",
+    "schema": "kaopu.eb1/1",
+    "preset": "custom",
+    "environmentRotation": -69,
+    "background": 0.85,
+    "shadowSize": 2048
+  },
+  "normalAudit": {
+    "chest": {
+      "points": 317,
+      "medianDegrees": 2.2866280918289195,
+      "p95Degrees": 6.714212925288084
+    },
+    "waist": {
+      "points": 157,
+      "medianDegrees": 2.789056286303151,
+      "p95Degrees": 12.380594992289923
+    },
+    "back": {
+      "points": 369,
+      "medianDegrees": 2.531604467049601,
+      "p95Degrees": 6.647751309149906
+    }
+  },
+  "finishedUTC": "2026-10-23T08:35:51.619Z",
+  "passed": true,
+  "browserClosed": true
+}

@@ -1,2 +1,2 @@
-require('./build-r18.cjs');
-require('fs').copyFileSync('BUILD-R18.json','BUILD.json');
+require('./build-r19.cjs');
+require('fs').copyFileSync('BUILD-R19.json','BUILD.json');
