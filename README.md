@@ -14,6 +14,7 @@ R21 优先纠正来源复刻：恢复原人物默认值，隔离 R18–R20 的�
 - `node tools/preview-body.cjs`：在本机 8914 端口打开当前三维入口。
 - `node tools/check-release-r21.cjs`：核对构建、全部压缩函数数组、来源标记和交付文件。
 - `node tools/qa-fidelity-workbench-r21.cjs`：实际无窗口浏览器检查批量参数、两套驱动、真实人物保存/重复载入、旧字段及失败回退。
+- `node tools/qa-field-cache-r21.cjs`：将完整函数场与缓存前版本逐数组比较，再验证传输后无损恢复、元数据和缓存容量。
 - `node tools/qa-source-atlas-viewer-r21.cjs`、`qa-source-profiles-r21.cjs`、`qa-source-precision-r21.cjs`、`qa-source-albedo-r21.cjs`、`qa-source-skin-r21.cjs`：实际三维显示与来源对照。
 - `node tools/qa-source-coverage-r21.cjs`：独立重建每个来源分区的覆盖域，检查面积、边界及源平面。
 

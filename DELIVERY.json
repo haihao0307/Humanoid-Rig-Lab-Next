@@ -1,6 +1,6 @@
 {
   "schema": "body-function-delivery/6",
-  "reviewedUTC": "2026-10-24T04:55:57.946Z",
+  "reviewedUTC": "2026-10-24T05:14:32.281Z",
   "selectedVersion": "R21",
   "status": "verified working checkpoint; source-fidelity comparison candidate, not completed reconstruction",
   "artifact": "delivery/身体_R21_原母体函数对照.html",
@@ -8,8 +8,8 @@
   "bytes": 61833887,
   "companionWorkbench": {
     "file": "delivery/人物身体_R21_原数据复刻检查.html",
-    "sha256": "d0d902e9119fdaed214f906712d4432890c350bc326784f9dcb816c622639a8d",
-    "bytes": 60049668
+    "sha256": "0a51b52d150ad3977fd8a95724ae7b05c633be05ffc9cb3d3cd21c565a829684",
+    "bytes": 60054816
   },
   "prior": {
     "version": "R20",
@@ -54,6 +54,7 @@
     "same-surface quad helper rays prevent material differences from crossing body layers; no shape smoothing",
     "complete original profile archives, compatible exact-profile imports/repeated loads, preservation of unknown old metadata; unsupported source/appearance states rejected without substitution",
     "full control workbench retains atomic batch operations, both drivers, head/neck-preserving body reset and complete rollback",
+    "session-only bounded lossless field snapshots reuse exact complete states; obsolete pending snapshots are cancelled; unused nearest-point scratch arrays are no longer allocated or transmitted",
     "all compressed function coefficient arrays bit-checked; byte shuffle selected only when losslessly smaller"
   ],
   "notRestored": [
@@ -88,7 +89,26 @@
   "verified": {
     "releaseIntegrityChecks": 222,
     "actualGPUPointDrawsOnly": true,
-    "completeWorkbenchLifecycleChecks": 11,
+    "completeWorkbenchLifecycleChecks": 12,
+    "losslessFieldCacheChecks": 10,
+    "fieldCacheRestore": {
+      "ms": 795.8185999999987,
+      "compressedBytes": 85834943,
+      "rawBytes": 353159084,
+      "report": {
+        "entries": 1,
+        "bytes": 85834943,
+        "maximumBytes": 201326592,
+        "maximumEntries": 2,
+        "pending": 0,
+        "pendingRawBytes": 0,
+        "hits": 1,
+        "misses": 0,
+        "failures": 0,
+        "lossless": true,
+        "encoding": "gzip-byte-exact"
+      }
+    },
     "sourceProfiles": 9,
     "precisionViews": 12,
     "matchedInspectionPixelViews": 12,
@@ -107,7 +127,7 @@
   "reports": {
     "releaseIntegrity": {
       "file": "qa/fidelity-r21/release-integrity.json",
-      "sha256": "6b09a00a8466cd7d217ee723a9f667a09cd3f46b53574a85fdcc0a1c72d16fcf",
+      "sha256": "72d39cfa85da16664ca25e046563bc88a3b6b52026a9e2910be43d9df4a8c0d8",
       "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
     },
     "gpuViews": {
@@ -142,13 +162,13 @@
     },
     "actualHTTP": {
       "file": "qa/fidelity-r21/http-viewer.json",
-      "sha256": "50022e60deb436c7a7990786834bd9275b833197a3856e062bb9cd53e896efd7",
+      "sha256": "19b990037a92d3c985b28972a90c01eeabd032a236dff96e04125af5a308883a",
       "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
     },
     "completeWorkbenchLifecycle": {
       "file": "qa/fidelity-r21/workbench-lifecycle.json",
-      "sha256": "dab164797dd8dfb4563130e20d5857d9da99db9ed1b89f5f793a57606a9f55e0",
-      "artifactSHA256": "d0d902e9119fdaed214f906712d4432890c350bc326784f9dcb816c622639a8d"
+      "sha256": "748754b8972112ff8fc83d08930e90bce98f1507b1b6b66986c0e927cad1ca16",
+      "artifactSHA256": "0a51b52d150ad3977fd8a95724ae7b05c633be05ffc9cb3d3cd21c565a829684"
     },
     "surface-baseline": {
       "file": "qa/fidelity-r21/atlas-full-fidelity.json",
@@ -198,6 +218,11 @@
     "coverage": {
       "file": "qa/fidelity-r21/source-coverage.json",
       "sha256": "ad39cdd95469ac115615dabf13fc55316d51ab9b6b0d9650928500500e95c5f9"
+    },
+    "fieldCache": {
+      "file": "qa/fidelity-r21/field-cache.json",
+      "sha256": "7a368368eba33e4e95db066f0aaa67901a8fda4e0645b782e8d2252db30a8074",
+      "workbenchSHA256": "0a51b52d150ad3977fd8a95724ae7b05c633be05ffc9cb3d3cd21c565a829684"
     }
   },
   "remaining": [
@@ -224,7 +249,7 @@
     {
       "priority": 4,
       "status": "partial",
-      "task": "已完成本对照包逐数组无损压缩/按需解码和参数批量提交；整个连续系统的局部更新、缓存及完整表层肌理/光学效率仍未完成。"
+      "task": "已完成本对照包逐数组无损压缩/按需解码、参数批量提交和有界的完整状态无损缓存；整个连续系统的局部更新、缓存及完整表层肌理/光学效率仍未完成。"
     },
     {
       "priority": 5,

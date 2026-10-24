@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const output='delivery/人物身体_R21_原数据复刻检查.html',pending='BUILD-R21.pending.json';
-Object.assign(process.env,{BODY_PROGRAM_PACKAGE:'data/body-function-program-r17.json',BODY_NUMERIC_SOURCES:'BodyMathR01,BodyShapeR01,BodyMHRFieldsR01,BodyTargetBindingR01,BodyMHRAdapterR01,BodyDriverR01,BodyFieldIntervalsR21',BODY_IMPLICIT_WORKER:'src/BodyImplicitWorkerR21.js',BODY_RAY_SOURCE:'src/BodyRayR21.js',BODY_APP_SOURCE:'src/BodyImplicitAppR21.js',BODY_HTML_POSTPROCESS:'tools/body-ui-r21.cjs',BODY_EXTRA_SOURCES:'src/BodyControlR17.js',BODY_OUTPUT_FILE:output+'.building',BODY_BUILD_MANIFEST:pending,BODY_VISIBLE_VERSION:'R21'});
+Object.assign(process.env,{BODY_PROGRAM_PACKAGE:'data/body-function-program-r17.json',BODY_NUMERIC_SOURCES:'BodyMathR01,BodyShapeR01,BodyMHRFieldsR01,BodyTargetBindingR01,BodyMHRAdapterR01,BodyDriverR01,BodyFieldIntervalsR21,BodyFieldCacheR21',BODY_IMPLICIT_WORKER:'src/BodyImplicitWorkerR21.js',BODY_RAY_SOURCE:'src/BodyRayR21.js',BODY_APP_SOURCE:'src/BodyImplicitAppR21.js',BODY_HTML_POSTPROCESS:'tools/body-ui-r21.cjs',BODY_EXTRA_SOURCES:'src/BodyControlR17.js',BODY_OUTPUT_FILE:output+'.building',BODY_BUILD_MANIFEST:pending,BODY_VISIBLE_VERSION:'R21'});
 require('./build-implicit.cjs');const build=JSON.parse(fs.readFileSync(pending));
 fs.renameSync(output+'.building',output);build.file=output;
 build.stage='source-response restoration and fidelity diagnostics; NOT faithful surface acceptance';

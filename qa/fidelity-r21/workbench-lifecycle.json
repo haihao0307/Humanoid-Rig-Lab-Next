@@ -1,6 +1,6 @@
 {
-  "startedUTC": "2026-10-24T04:31:17.538Z",
-  "artifactSHA256": "d0d902e9119fdaed214f906712d4432890c350bc326784f9dcb816c622639a8d",
+  "startedUTC": "2026-10-24T05:11:28.644Z",
+  "artifactSHA256": "0a51b52d150ad3977fd8a95724ae7b05c633be05ffc9cb3d3cd21c565a829684",
   "checks": [
     {
       "name": "source default state restored",
@@ -45,6 +45,10 @@
     },
     {
       "name": "actual saved person reloads twice without losing state or unknown fields",
+      "passed": true
+    },
+    {
+      "name": "repeated actual archive uses a lossless cached field",
       "passed": true
     },
     {
@@ -128,7 +132,7 @@
             "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
           }
         },
-        "fieldMS": 13303.5,
+        "fieldMS": 899.8999999761581,
         "dimensions": [
           186,
           238,
@@ -183,7 +187,25 @@
         "usesPolygonConnectivity": false,
         "headGenerated": false,
         "sourceDerivedCalibration": true,
-        "exactShapeEquivalenceCertified": false
+        "exactShapeEquivalenceCertified": false,
+        "computeFieldMS": 10847.199999928474,
+        "cache": {
+          "entries": 1,
+          "bytes": 119758878,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 0,
+          "pendingRawBytes": 0,
+          "hits": 2,
+          "misses": 7,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": true,
+          "restoreMS": 899.7999999523163,
+          "compressedBytes": 119758878,
+          "rawBytes": 429074137
+        }
       },
       "bounds": [
         [
@@ -332,7 +354,7 @@
             "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
           }
         },
-        "fieldMS": 13303.5,
+        "fieldMS": 899.8999999761581,
         "dimensions": [
           186,
           238,
@@ -387,7 +409,25 @@
         "usesPolygonConnectivity": false,
         "headGenerated": false,
         "sourceDerivedCalibration": true,
-        "exactShapeEquivalenceCertified": false
+        "exactShapeEquivalenceCertified": false,
+        "computeFieldMS": 10847.199999928474,
+        "cache": {
+          "entries": 1,
+          "bytes": 119758878,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 0,
+          "pendingRawBytes": 0,
+          "hits": 2,
+          "misses": 7,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": true,
+          "restoreMS": 899.7999999523163,
+          "compressedBytes": 119758878,
+          "rawBytes": 429074137
+        }
       }
     },
     "sourceFidelityAccepted": false,
@@ -400,5 +440,5 @@
   "artifactStable": true,
   "passed": true,
   "browserClosed": true,
-  "finishedUTC": "2026-10-24T04:33:41.141Z"
+  "finishedUTC": "2026-10-24T05:13:35.802Z"
 }

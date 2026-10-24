@@ -1,0 +1,79 @@
+{
+  "startedUTC": "2026-10-24T05:06:39.246Z",
+  "workbenchSHA256": "448255d6f7829dff3e32204e534f049114186381ff2d9837ae91f7401bfac59e",
+  "sourceFidelityAccepted": false,
+  "checks": [
+    {
+      "name": "all scalar/material/normal/interval/sample arrays identical to pre-cache R21",
+      "passed": true,
+      "details": {
+        "arrays": 9,
+        "bytes": 353153004
+      }
+    },
+    {
+      "name": "snapshot queued",
+      "passed": true
+    },
+    {
+      "name": "cache snapshot survives the real transfer/detachment contract",
+      "passed": true
+    },
+    {
+      "name": "restored real complete field is byte exact",
+      "passed": false
+    }
+  ],
+  "previousBuildMS": 35877.5377,
+  "currentBuildMS": 35627.465800000005,
+  "fieldHashes": {
+    "intervalCache.active": {
+      "type": "Uint8Array",
+      "bytes": 59220,
+      "sha256": "4b461900ec4184bd65a00cee5e004faf725fd3ff29f8fa85f0707fab08d5a7a0"
+    },
+    "field": {
+      "type": "Float32Array",
+      "bytes": 57371328,
+      "sha256": "c436d1b1d174f2e7368928e44801cfe81683c92a56224606562899f2860304a1"
+    },
+    "normalField": {
+      "type": "Float32Array",
+      "bytes": 57371328,
+      "sha256": "c67f073dfea407a312a1dae9f018e65da5ae5e4cb56ee40516014733f8d634ce"
+    },
+    "locals.0.field": {
+      "type": "Float32Array",
+      "bytes": 61228944,
+      "sha256": "fa339cd24e34e19ffe766d0bc240f4bf229d4671d7f75ae2174da2edc5fd2926"
+    },
+    "locals.1.field": {
+      "type": "Float32Array",
+      "bytes": 61228944,
+      "sha256": "a9b7388bbce2f08d13dead0fa0b6f3b98b97d975837217ccdf2b18a401fb48b0"
+    },
+    "locals.2.field": {
+      "type": "Float32Array",
+      "bytes": 57835584,
+      "sha256": "ad025249724dd0edabcc3529752f3f41d71bac765c5e2b04a05a096474700838"
+    },
+    "locals.3.field": {
+      "type": "Float32Array",
+      "bytes": 57835584,
+      "sha256": "daf5bc7dff8c89af26add2aefbe87f430e917e36778fade7641db4eb3dbd9265"
+    },
+    "samples": {
+      "type": "Float32Array",
+      "bytes": 111036,
+      "sha256": "92d8f6bcb3bfdce89b7038301b94d12d524d0286c587d9d3bf74b85a836543ce"
+    },
+    "normals": {
+      "type": "Float32Array",
+      "bytes": 111036,
+      "sha256": "1e79cd1000d12725b4a91faf56addec0c2ae827de280c94d19dae6e5b33c4f01"
+    }
+  },
+  "failure": "Error: restored real complete field is byte exact\n    at check (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-field-cache-r21.cjs:3:121)\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-field-cache-r21.cjs:5:672\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "passed": false,
+  "finishedUTC": "2026-10-24T05:07:57.122Z"
+}
