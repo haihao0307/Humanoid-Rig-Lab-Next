@@ -1,0 +1,11 @@
+'use strict';
+const fs=require('fs'),path=require('path'),crypto=require('crypto');
+const output='delivery/人物身体_R21_原数据复刻检查.html',pending='BUILD-R21.pending.json';
+Object.assign(process.env,{BODY_PROGRAM_PACKAGE:'data/body-function-program-r17.json',BODY_NUMERIC_SOURCES:'BodyMathR01,BodyShapeR01,BodyMHRFieldsR01,BodyTargetBindingR01,BodyMHRAdapterR01,BodyDriverR01,BodyFieldIntervalsR21',BODY_IMPLICIT_WORKER:'src/BodyImplicitWorkerR21.js',BODY_RAY_SOURCE:'src/BodyRayR21.js',BODY_APP_SOURCE:'src/BodyImplicitAppR21.js',BODY_HTML_POSTPROCESS:'tools/body-ui-r21.cjs',BODY_EXTRA_SOURCES:'src/BodyControlR17.js',BODY_OUTPUT_FILE:output+'.building',BODY_BUILD_MANIFEST:pending,BODY_VISIBLE_VERSION:'R21'});
+require('./build-implicit.cjs');const build=JSON.parse(fs.readFileSync(pending));
+fs.renameSync(output+'.building',output);build.file=output;
+build.stage='source-response restoration and fidelity diagnostics; NOT faithful surface acceptance';
+build.sourceDefaultPreserved=true;build.intentionalShapeChanges=false;build.sourceFidelityAccepted=false;
+build.buildDependencies=['tools/build-r21.cjs','tools/build-implicit.cjs','tools/body-ui-r17.cjs','tools/body-ui-r21.cjs'].map(file=>({file,sha256:crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')}));
+fs.writeFileSync(pending,JSON.stringify(build,null,2));fs.renameSync(pending,'BUILD-R21.json');
+console.log(JSON.stringify({sha256:build.sha256,bytes:build.bytes}));

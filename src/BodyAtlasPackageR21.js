@@ -1,0 +1,8 @@
+/* Byte-exact source function coefficients; no source mesh connectivity. */
+(()=>{'use strict';
+async function decode(pack,id){if(!['body-source-affine-atlas-pack/1','body-source-affine-atlas-pack/2'].includes(pack.schema))throw Error('原貌对照包格式不匹配');const profile=pack.profiles.find(p=>p.id===id);if(!profile)throw Error('没有这个来源状态');if(profile.report.unresolved.length||profile.report.maxDepth>=30||profile.report.maxProjectedLayers>32)throw Error('这个候选仍有未解决的分区');
+ const entries=await Promise.all(Object.entries(profile.arrays).map(async([name,index])=>{const blob=pack.blobs[index],Type=globalThis[blob.type],compressed=Uint8Array.from(atob(blob.gzipBase64),c=>c.charCodeAt(0)),inflated=await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();let raw=inflated;if(blob.encoding==='gzip-byte-shuffle'){const bytes=new Uint8Array(inflated),out=new Uint8Array(bytes.length),width=Type.BYTES_PER_ELEMENT,count=bytes.length/width;for(let byte=0;byte<width;byte++)for(let i=0;i<count;i++)out[i*width+byte]=bytes[byte*count+i];raw=out.buffer;}else if(blob.encoding&&blob.encoding!=='gzip')throw Error('函数包压缩格式不匹配');const sha=[...new Uint8Array(await crypto.subtle.digest('SHA-256',raw))].map(b=>b.toString(16).padStart(2,'0')).join('');if(sha!==blob.sha256||raw.byteLength!==blob.bytes)throw Error('原函数系数校验失败');const values=new Type(raw);if(values.length!==blob.length)throw Error('函数系数长度不符');return[name,values];}));
+ return{...profile,...Object.fromEntries(entries),material:pack.material,storage:pack.storage,sourceFidelityAccepted:false};
+}
+globalThis.BodyAtlasPackageR21={decode};
+})();

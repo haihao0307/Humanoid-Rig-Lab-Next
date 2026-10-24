@@ -1,0 +1,1124 @@
+{
+  "startedUTC": "2026-10-24T02:34:26.681Z",
+  "artifactSHA256": "f38adec4a48414fa5ac191387afd393e29d66e63df01451e1a9ba587cc3a99f0",
+  "referenceSourceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+  "offlineReferenceSHA256": "1e8b89fc509467ae1eeb8689b5afc853265d0da119ff4259a17b2e84f550d4c5",
+  "acceptanceTolerance": null,
+  "acceptanceStatus": "NOT ACCEPTED; no source-surface tolerance authorized",
+  "technicalChecks": [
+    {
+      "name": "original driver inputs and samples preserved",
+      "passed": false
+    },
+    {
+      "name": "forbidden estimated modifiers absent",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Newton projection is a local diagnostic, not a certified closest point or a complete Hausdorff bound.",
+    "Sparse samples do not certify layers or first-hit equivalence.",
+    "Numerical convergence constants are solver diagnostics, not source acceptance tolerances."
+  ],
+  "sourceFidelityAccepted": false,
+  "sourceEvaluation": {
+    "stateExact": true,
+    "driverCoordinateErrorMM": {
+      "count": 9253,
+      "finite": 9253,
+      "rms": 5.909616896057064e-18,
+      "median": 0,
+      "p95": 0,
+      "max": 2.7985505356139054e-16
+    },
+    "unrepresentedOriginalDisplayPostprocessMM": {
+      "count": 9253,
+      "finite": 9253,
+      "rms": 0.5800331175628912,
+      "median": 0,
+      "p95": 0,
+      "max": 7.7740368999424225
+    },
+    "worstPostprocess": [
+      {
+        "i": 9222,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 7.7740368999424225
+      },
+      {
+        "i": 9182,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 7.653366521438006
+      },
+      {
+        "i": 9181,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 7.401453229506151
+      },
+      {
+        "i": 9177,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 7.380485736506042
+      },
+      {
+        "i": 9227,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 7.337497270499579
+      },
+      {
+        "i": 9180,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 7.122769362793419
+      },
+      {
+        "i": 9183,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 6.968799925577711
+      },
+      {
+        "i": 9184,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 6.891126228053705
+      },
+      {
+        "i": 9229,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 6.81053481159427
+      },
+      {
+        "i": 9225,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 6.721356947154865
+      },
+      {
+        "i": 9226,
+        "bone": "neck01",
+        "driverMM": 0,
+        "displayMM": 6.672916370748779
+      },
+      {
+        "i": 9171,
+        "bone": "head",
+        "driverMM": 0,
+        "displayMM": 6.604312217024283
+      }
+    ]
+  },
+  "originalTopology": {
+    "openEdges": 88,
+    "nonManifoldEdges": 0,
+    "duplicateTriangles": 0,
+    "components": [
+      {
+        "vertices": 88,
+        "closedLoop": true
+      }
+    ]
+  },
+  "surface": {
+    "count": 18416,
+    "unconverged": 0,
+    "sourceToLocalZeroMM": {
+      "count": 18416,
+      "finite": 18416,
+      "rms": 0.7928535334743907,
+      "median": 0.3286910926955968,
+      "p95": 1.652907840696519,
+      "max": 6.766157497034035
+    },
+    "localZeroToOriginalMM": {
+      "count": 18416,
+      "finite": 18416,
+      "rms": 0.7790927663644837,
+      "median": 0.31986860743973994,
+      "p95": 1.6273825079480355,
+      "max": 6.752869656388974
+    },
+    "normalAngleDegrees": {
+      "count": 18416,
+      "finite": 18416,
+      "rms": 12.557281450063842,
+      "median": 4.742783478128618,
+      "p95": 19.92542408197088,
+      "max": 170.50439624415574
+    },
+    "worst": [
+      {
+        "triangle": 74,
+        "region": "neck",
+        "sourcePosition": [
+          -0.062683733801047,
+          0.6031041542689006,
+          -0.03730001486837864
+        ],
+        "projectedPosition": [
+          -0.06790571081619988,
+          0.6072540083763008,
+          -0.038436040490967535
+        ],
+        "projectionMM": 6.766157497034035,
+        "projectedToSourceMM": 6.752869656388974,
+        "normalAngleDegrees": 5.259802250392844,
+        "residualMM": 0.000014352585521980321,
+        "converged": true
+      },
+      {
+        "triangle": 9145,
+        "region": "neck",
+        "sourcePosition": [
+          0.06321674212813377,
+          0.6035149097442627,
+          -0.036139016350110374
+        ],
+        "projectedPosition": [
+          0.06829685990017616,
+          0.6075091312253517,
+          -0.037198278795644024
+        ],
+        "projectionMM": 6.548544780814386,
+        "projectedToSourceMM": 6.535839311113217,
+        "normalAngleDegrees": 8.577977286165362,
+        "residualMM": 4.6339203077483924e-8,
+        "converged": true
+      },
+      {
+        "triangle": 72,
+        "region": "neck",
+        "sourcePosition": [
+          -0.060762057701746613,
+          0.6035793622334799,
+          -0.041344245274861656
+        ],
+        "projectedPosition": [
+          -0.06531816969563671,
+          0.6075220551040281,
+          -0.04382047459470378
+        ],
+        "projectionMM": 6.5141918314390415,
+        "projectedToSourceMM": 6.467811657263395,
+        "normalAngleDegrees": 3.428915345078095,
+        "residualMM": 0.000013431249644462384,
+        "converged": true
+      },
+      {
+        "triangle": 73,
+        "region": "neck",
+        "sourcePosition": [
+          -0.06546551237503687,
+          0.6004260381062826,
+          -0.03625767988463243
+        ],
+        "projectedPosition": [
+          -0.07054197043824952,
+          0.6044241114583756,
+          -0.037031084114524986
+        ],
+        "projectionMM": 6.507931399384038,
+        "projectedToSourceMM": 6.4289739241832695,
+        "normalAngleDegrees": 10.217104680059139,
+        "residualMM": 9.314445585949281e-8,
+        "converged": true
+      },
+      {
+        "triangle": 9150,
+        "region": "neck",
+        "sourcePosition": [
+          0.056156259030103683,
+          0.6046810746192932,
+          -0.04646275689204534
+        ],
+        "projectedPosition": [
+          0.059757485531322756,
+          0.6084967322304513,
+          -0.05022179522252743
+        ],
+        "projectionMM": 6.454335325090013,
+        "projectedToSourceMM": 6.398419061353438,
+        "normalAngleDegrees": 3.02365210566589,
+        "residualMM": 0.00006580385142324242,
+        "converged": true
+      }
+    ]
+  },
+  "regions": {
+    "neck": {
+      "count": 341,
+      "unconverged": 0,
+      "sourceToLocalZeroMM": {
+        "count": 341,
+        "finite": 341,
+        "rms": 2.7307055374492633,
+        "median": 1.749774108748019,
+        "p95": 5.3973792521052815,
+        "max": 6.766157497034035
+      },
+      "localZeroToOriginalMM": {
+        "count": 341,
+        "finite": 341,
+        "rms": 2.7049929603643923,
+        "median": 1.7211297016213671,
+        "p95": 5.3435982571851595,
+        "max": 6.752869656388974
+      },
+      "normalAngleDegrees": {
+        "count": 341,
+        "finite": 341,
+        "rms": 6.691880673565974,
+        "median": 5.947331417601239,
+        "p95": 10.478530378033106,
+        "max": 15.850912782889228
+      },
+      "worst": [
+        {
+          "triangle": 74,
+          "region": "neck",
+          "sourcePosition": [
+            -0.062683733801047,
+            0.6031041542689006,
+            -0.03730001486837864
+          ],
+          "projectedPosition": [
+            -0.06790571081619988,
+            0.6072540083763008,
+            -0.038436040490967535
+          ],
+          "projectionMM": 6.766157497034035,
+          "projectedToSourceMM": 6.752869656388974,
+          "normalAngleDegrees": 5.259802250392844,
+          "residualMM": 0.000014352585521980321,
+          "converged": true
+        },
+        {
+          "triangle": 9145,
+          "region": "neck",
+          "sourcePosition": [
+            0.06321674212813377,
+            0.6035149097442627,
+            -0.036139016350110374
+          ],
+          "projectedPosition": [
+            0.06829685990017616,
+            0.6075091312253517,
+            -0.037198278795644024
+          ],
+          "projectionMM": 6.548544780814386,
+          "projectedToSourceMM": 6.535839311113217,
+          "normalAngleDegrees": 8.577977286165362,
+          "residualMM": 4.6339203077483924e-8,
+          "converged": true
+        },
+        {
+          "triangle": 72,
+          "region": "neck",
+          "sourcePosition": [
+            -0.060762057701746613,
+            0.6035793622334799,
+            -0.041344245274861656
+          ],
+          "projectedPosition": [
+            -0.06531816969563671,
+            0.6075220551040281,
+            -0.04382047459470378
+          ],
+          "projectionMM": 6.5141918314390415,
+          "projectedToSourceMM": 6.467811657263395,
+          "normalAngleDegrees": 3.428915345078095,
+          "residualMM": 0.000013431249644462384,
+          "converged": true
+        },
+        {
+          "triangle": 73,
+          "region": "neck",
+          "sourcePosition": [
+            -0.06546551237503687,
+            0.6004260381062826,
+            -0.03625767988463243
+          ],
+          "projectedPosition": [
+            -0.07054197043824952,
+            0.6044241114583756,
+            -0.037031084114524986
+          ],
+          "projectionMM": 6.507931399384038,
+          "projectedToSourceMM": 6.4289739241832695,
+          "normalAngleDegrees": 10.217104680059139,
+          "residualMM": 9.314445585949281e-8,
+          "converged": true
+        },
+        {
+          "triangle": 9150,
+          "region": "neck",
+          "sourcePosition": [
+            0.056156259030103683,
+            0.6046810746192932,
+            -0.04646275689204534
+          ],
+          "projectedPosition": [
+            0.059757485531322756,
+            0.6084967322304513,
+            -0.05022179522252743
+          ],
+          "projectionMM": 6.454335325090013,
+          "projectedToSourceMM": 6.398419061353438,
+          "normalAngleDegrees": 3.02365210566589,
+          "residualMM": 0.00006580385142324242,
+          "converged": true
+        }
+      ]
+    },
+    "trunk-pelvis": {
+      "count": 2874,
+      "unconverged": 0,
+      "sourceToLocalZeroMM": {
+        "count": 2874,
+        "finite": 2874,
+        "rms": 0.7489721300272645,
+        "median": 0.4895321811891573,
+        "p95": 1.476959837142017,
+        "max": 2.611213795188801
+      },
+      "localZeroToOriginalMM": {
+        "count": 2874,
+        "finite": 2874,
+        "rms": 0.742527808982033,
+        "median": 0.48669773929015536,
+        "p95": 1.460948830005439,
+        "max": 2.572472243808947
+      },
+      "normalAngleDegrees": {
+        "count": 2874,
+        "finite": 2874,
+        "rms": 4.938077559581126,
+        "median": 2.969095469945382,
+        "p95": 10.146199575869892,
+        "max": 20.2919074961992
+      },
+      "worst": [
+        {
+          "triangle": 13671,
+          "region": "trunk-pelvis",
+          "sourcePosition": [
+            0.009255011954261741,
+            0.4424772262573242,
+            -0.10693025340636572
+          ],
+          "projectedPosition": [
+            0.009763229384900653,
+            0.4422059864781141,
+            -0.10438337659160747
+          ],
+          "projectionMM": 2.611213795188801,
+          "projectedToSourceMM": 2.572472243808947,
+          "normalAngleDegrees": 2.8769400497063184,
+          "residualMM": 1.2738915076884044e-7,
+          "converged": true
+        },
+        {
+          "triangle": 4602,
+          "region": "trunk-pelvis",
+          "sourcePosition": [
+            -0.009258049772824961,
+            0.44247695803642273,
+            -0.106929841140906
+          ],
+          "projectedPosition": [
+            -0.00976635207201564,
+            0.4422057352703784,
+            -0.10438327032647389
+          ],
+          "projectionMM": 2.6109300888956675,
+          "projectedToSourceMM": 2.572236160375456,
+          "normalAngleDegrees": 2.8824846233393755,
+          "residualMM": 1.2755086283984768e-7,
+          "converged": true
+        },
+        {
+          "triangle": 5186,
+          "region": "trunk-pelvis",
+          "sourcePosition": [
+            -0.007816990030329169,
+            0.2580247720082601,
+            -0.08838125814994176
+          ],
+          "projectedPosition": [
+            -0.008535020332810329,
+            0.2585205854601313,
+            -0.08593967819989025
+          ],
+          "projectionMM": 2.592819150428962,
+          "projectedToSourceMM": 2.555418140378757,
+          "normalAngleDegrees": 8.430680389190863,
+          "residualMM": 8.562381392015345e-8,
+          "converged": true
+        },
+        {
+          "triangle": 14255,
+          "region": "trunk-pelvis",
+          "sourcePosition": [
+            0.007816958116967736,
+            0.25802477697531384,
+            -0.08838127305110295
+          ],
+          "projectedPosition": [
+            0.008534541108716355,
+            0.2585204336418399,
+            -0.08593962302078248
+          ],
+          "projectionMM": 2.5927313304086472,
+          "projectedToSourceMM": 2.5552515505991718,
+          "normalAngleDegrees": 8.420780259294181,
+          "residualMM": 8.526565163560068e-8,
+          "converged": true
+        },
+        {
+          "triangle": 13926,
+          "region": "trunk-pelvis",
+          "sourcePosition": [
+            0.0092551276316802,
+            0.43167798717816674,
+            -0.10784300168355307
+          ],
+          "projectedPosition": [
+            0.009794259891025616,
+            0.43146005717340113,
+            -0.10534494899596823
+          ],
+          "projectionMM": 2.564843915327765,
+          "projectedToSourceMM": 2.5178473477927845,
+          "normalAngleDegrees": 3.486523211338663,
+          "residualMM": 8.604783156623483e-7,
+          "converged": true
+        }
+      ]
+    },
+    "arm-shoulder": {
+      "count": 2208,
+      "unconverged": 0,
+      "sourceToLocalZeroMM": {
+        "count": 2208,
+        "finite": 2208,
+        "rms": 0.7595420600214058,
+        "median": 0.47474952824466593,
+        "p95": 1.532506908807973,
+        "max": 2.6045153210044956
+      },
+      "localZeroToOriginalMM": {
+        "count": 2208,
+        "finite": 2208,
+        "rms": 0.7538455551595109,
+        "median": 0.4712302347119344,
+        "p95": 1.5255289002618146,
+        "max": 2.5222274606226174
+      },
+      "normalAngleDegrees": {
+        "count": 2208,
+        "finite": 2208,
+        "rms": 5.057290809324445,
+        "median": 2.959420914675929,
+        "p95": 7.786990049558889,
+        "max": 53.549183707584774
+      },
+      "worst": [
+        {
+          "triangle": 9689,
+          "region": "arm-shoulder",
+          "sourcePosition": [
+            0.204582209388415,
+            0.3890745143095652,
+            -0.05699075261751811
+          ],
+          "projectedPosition": [
+            0.20406094551421236,
+            0.38656317112778354,
+            -0.057443455007745114
+          ],
+          "projectionMM": 2.6045153210044956,
+          "projectedToSourceMM": 2.5222274606226174,
+          "normalAngleDegrees": 22.443935678316137,
+          "residualMM": 6.706228534189389e-7,
+          "converged": true
+        },
+        {
+          "triangle": 621,
+          "region": "arm-shoulder",
+          "sourcePosition": [
+            -0.20458856721719104,
+            0.3890781799952189,
+            -0.05697868143518767
+          ],
+          "projectedPosition": [
+            -0.20407333866255412,
+            0.38657335611433413,
+            -0.057431648795272024
+          ],
+          "projectionMM": 2.5970719218122458,
+          "projectedToSourceMM": 2.515800079164291,
+          "normalAngleDegrees": 22.44055441164253,
+          "residualMM": 6.462980047514978e-7,
+          "converged": true
+        },
+        {
+          "triangle": 13943,
+          "region": "arm-shoulder",
+          "sourcePosition": [
+            0.25537020464738214,
+            0.34065758188565576,
+            -0.06439864759643874
+          ],
+          "projectedPosition": [
+            0.2544006779996224,
+            0.33932750104126425,
+            -0.06603630341838429
+          ],
+          "projectionMM": 2.321855629552715,
+          "projectedToSourceMM": 2.2950423144689545,
+          "normalAngleDegrees": 2.1949763874725026,
+          "residualMM": 0.0000015904984772896816,
+          "converged": true
+        },
+        {
+          "triangle": 4874,
+          "region": "arm-shoulder",
+          "sourcePosition": [
+            -0.25544141729672754,
+            0.3405646284421285,
+            -0.06434718643625577
+          ],
+          "projectedPosition": [
+            -0.25448070609635814,
+            0.3392483397420432,
+            -0.06598206092590686
+          ],
+          "projectionMM": 2.3083319842256818,
+          "projectedToSourceMM": 2.282860705229113,
+          "normalAngleDegrees": 3.5660644710907783,
+          "residualMM": 5.179870900696298e-7,
+          "converged": true
+        },
+        {
+          "triangle": 9662,
+          "region": "arm-shoulder",
+          "sourcePosition": [
+            0.26877551277478534,
+            0.5117445389429729,
+            -0.03506912291049957
+          ],
+          "projectedPosition": [
+            0.2703775723161345,
+            0.5133362199311516,
+            -0.03549775690734952
+          ],
+          "projectionMM": 2.29864530656932,
+          "projectedToSourceMM": 2.282122006405705,
+          "normalAngleDegrees": 5.4059332425884525,
+          "residualMM": 8.567464798313242e-7,
+          "converged": true
+        }
+      ]
+    },
+    "hand": {
+      "count": 6405,
+      "unconverged": 0,
+      "sourceToLocalZeroMM": {
+        "count": 6405,
+        "finite": 6405,
+        "rms": 0.36906431548901814,
+        "median": 0.1990762702627672,
+        "p95": 0.7648506718229686,
+        "max": 2.6639166250466615
+      },
+      "localZeroToOriginalMM": {
+        "count": 6405,
+        "finite": 6405,
+        "rms": 0.35752833975924875,
+        "median": 0.1969305253687266,
+        "p95": 0.7374020157856345,
+        "max": 2.6394469843372415
+      },
+      "normalAngleDegrees": {
+        "count": 6405,
+        "finite": 6405,
+        "rms": 9.544250020317879,
+        "median": 5.592613886042763,
+        "p95": 17.385438170987747,
+        "max": 71.82571680498101
+      },
+      "worst": [
+        {
+          "triangle": 13948,
+          "region": "hand",
+          "sourcePosition": [
+            0.5547349254290262,
+            0.07763034850358963,
+            0.1787855178117752
+          ],
+          "projectedPosition": [
+            0.5562330713301771,
+            0.07654755280062832,
+            0.1768672988175742
+          ],
+          "projectionMM": 2.6639166250466615,
+          "projectedToSourceMM": 2.6394469843372415,
+          "normalAngleDegrees": 8.541686238574526,
+          "residualMM": 0.0000072975260986980835,
+          "converged": true
+        },
+        {
+          "triangle": 4881,
+          "region": "hand",
+          "sourcePosition": [
+            -0.5547413229942322,
+            0.07763351003328958,
+            0.17878849804401398
+          ],
+          "projectedPosition": [
+            -0.5562393969644095,
+            0.07655049939548438,
+            0.17687035421852132
+          ],
+          "projectionMM": 2.663909419818488,
+          "projectedToSourceMM": 2.6394413434926367,
+          "normalAngleDegrees": 8.540201038741914,
+          "residualMM": 0.00000739866767819012,
+          "converged": true
+        },
+        {
+          "triangle": 4448,
+          "region": "hand",
+          "sourcePosition": [
+            -0.5491355856259663,
+            0.073451596001784,
+            0.17836512625217438
+          ],
+          "projectedPosition": [
+            -0.5493363722042302,
+            0.07194008772032194,
+            0.1763186605369329
+          ],
+          "projectionMM": 2.552056907398046,
+          "projectedToSourceMM": 2.4676562873466064,
+          "normalAngleDegrees": 6.286381853708755,
+          "residualMM": 0.0000022367408442796984,
+          "converged": true
+        },
+        {
+          "triangle": 13517,
+          "region": "hand",
+          "sourcePosition": [
+            0.5491291681925455,
+            0.07344843695561092,
+            0.1783621460199356
+          ],
+          "projectedPosition": [
+            0.5493299643284375,
+            0.07193692204262415,
+            0.17631569216356738
+          ],
+          "projectionMM": 2.5520520775671725,
+          "projectedToSourceMM": 2.467654409060834,
+          "normalAngleDegrees": 6.286348394486525,
+          "residualMM": 0.0000022406545694399636,
+          "converged": true
+        },
+        {
+          "triangle": 4350,
+          "region": "hand",
+          "sourcePosition": [
+            -0.5485200881958008,
+            0.05874904245138168,
+            0.19577138125896454
+          ],
+          "projectedPosition": [
+            -0.5472195071656406,
+            0.057184699384305586,
+            0.19541350480586522
+          ],
+          "projectionMM": 2.0656126943850097,
+          "projectedToSourceMM": 2.034858488935665,
+          "normalAngleDegrees": 3.713140174618504,
+          "residualMM": 0.000035830835120024445,
+          "converged": true
+        }
+      ]
+    },
+    "leg": {
+      "count": 2322,
+      "unconverged": 0,
+      "sourceToLocalZeroMM": {
+        "count": 2322,
+        "finite": 2322,
+        "rms": 1.3027500058869796,
+        "median": 0.8925130007906995,
+        "p95": 2.3966796042346448,
+        "max": 4.103084468642547
+      },
+      "localZeroToOriginalMM": {
+        "count": 2322,
+        "finite": 2322,
+        "rms": 1.2920393537785309,
+        "median": 0.8898499415756134,
+        "p95": 2.377752023369299,
+        "max": 4.001928667426249
+      },
+      "normalAngleDegrees": {
+        "count": 2322,
+        "finite": 2322,
+        "rms": 4.656132590574164,
+        "median": 3.3637556642184365,
+        "p95": 8.405814851627168,
+        "max": 21.344959048429466
+      },
+      "worst": [
+        {
+          "triangle": 18336,
+          "region": "leg",
+          "sourcePosition": [
+            0.11497566600640616,
+            -0.2490066985289256,
+            0.1209326907992363
+          ],
+          "projectedPosition": [
+            0.11423055262122273,
+            -0.24912817553805558,
+            0.12496572334761587
+          ],
+          "projectionMM": 4.103084468642547,
+          "projectedToSourceMM": 4.000055572559209,
+          "normalAngleDegrees": 6.112759126943754,
+          "residualMM": 0.000005806426562758767,
+          "converged": true
+        },
+        {
+          "triangle": 9031,
+          "region": "leg",
+          "sourcePosition": [
+            -0.11497566600640616,
+            -0.2490066985289256,
+            0.1209326907992363
+          ],
+          "projectedPosition": [
+            -0.11421623347727139,
+            -0.24912814960424282,
+            0.12496247684073289
+          ],
+          "projectionMM": 4.102519185847217,
+          "projectedToSourceMM": 4.001928667426249,
+          "normalAngleDegrees": 6.110723195617516,
+          "residualMM": 0.00000531137289696632,
+          "converged": true
+        },
+        {
+          "triangle": 6056,
+          "region": "leg",
+          "sourcePosition": [
+            -0.12580976883570352,
+            -0.28260626395543414,
+            0.11764777948458988
+          ],
+          "projectedPosition": [
+            -0.12557300842258323,
+            -0.28330236495849886,
+            0.1215682903921904
+          ],
+          "projectionMM": 3.988861726896947,
+          "projectedToSourceMM": 3.89035457105286,
+          "normalAngleDegrees": 7.564150343582141,
+          "residualMM": 9.178104452084391e-8,
+          "converged": true
+        },
+        {
+          "triangle": 15286,
+          "region": "leg",
+          "sourcePosition": [
+            0.12580976883570352,
+            -0.28260626395543414,
+            0.11764777948458989
+          ],
+          "projectedPosition": [
+            0.1255725489301528,
+            -0.283302327009782,
+            0.12156823384191874
+          ],
+          "projectionMM": 3.9888268234051347,
+          "projectedToSourceMM": 3.8903927473551403,
+          "normalAngleDegrees": 7.559257607555618,
+          "residualMM": 9.200527063032548e-8,
+          "converged": true
+        },
+        {
+          "triangle": 6433,
+          "region": "leg",
+          "sourcePosition": [
+            -0.2620583971341451,
+            -0.6242947777112324,
+            -0.04067874824007352
+          ],
+          "projectedPosition": [
+            -0.2656925562675986,
+            -0.6240220733483028,
+            -0.04228645213748811
+          ],
+          "projectionMM": 3.98323889549527,
+          "projectedToSourceMM": 3.9469624066939226,
+          "normalAngleDegrees": 4.753355689447391,
+          "residualMM": 0.0000022136977963606655,
+          "converged": true
+        }
+      ]
+    },
+    "foot": {
+      "count": 4266,
+      "unconverged": 0,
+      "sourceToLocalZeroMM": {
+        "count": 4266,
+        "finite": 4266,
+        "rms": 0.5593338253973799,
+        "median": 0.28715921155423807,
+        "p95": 1.196384706481757,
+        "max": 3.404981767387772
+      },
+      "localZeroToOriginalMM": {
+        "count": 4266,
+        "finite": 4266,
+        "rms": 0.518937029425904,
+        "median": 0.26332702751905107,
+        "p95": 1.0954338816557359,
+        "max": 2.7880556705782773
+      },
+      "normalAngleDegrees": {
+        "count": 4266,
+        "finite": 4266,
+        "rms": 22.336135786600828,
+        "median": 8.786363198899199,
+        "p95": 38.28684027083152,
+        "max": 170.50439624415574
+      },
+      "worst": [
+        {
+          "triangle": 7612,
+          "region": "foot",
+          "sourcePosition": [
+            -0.2028626451889674,
+            -0.9457733829816182,
+            0.1832951953013738
+          ],
+          "projectedPosition": [
+            -0.20347444224901096,
+            -0.9487126997608317,
+            0.18168895059243345
+          ],
+          "projectionMM": 3.404981767387772,
+          "projectedToSourceMM": 0.03273306272730029,
+          "normalAngleDegrees": 23.9723147893406,
+          "residualMM": 0.000009220184798853083,
+          "converged": true
+        },
+        {
+          "triangle": 16911,
+          "region": "foot",
+          "sourcePosition": [
+            0.2028626451889674,
+            -0.9457733829816182,
+            0.1832951953013738
+          ],
+          "projectedPosition": [
+            0.203474442246811,
+            -0.9487126997099449,
+            0.1816889506388452
+          ],
+          "projectionMM": 3.4049817011709393,
+          "projectedToSourceMM": 0.03273307128569543,
+          "normalAngleDegrees": 23.972314887158305,
+          "residualMM": 0.000009220182012819418,
+          "converged": true
+        },
+        {
+          "triangle": 16372,
+          "region": "foot",
+          "sourcePosition": [
+            0.19578814009825385,
+            -0.9386663039525349,
+            -0.06961982821424802
+          ],
+          "projectedPosition": [
+            0.19342361522579257,
+            -0.9389730431867287,
+            -0.07111507498885003
+          ],
+          "projectionMM": 2.814396870954685,
+          "projectedToSourceMM": 2.7880556705782773,
+          "normalAngleDegrees": 16.850590313244318,
+          "residualMM": 8.009545668894263e-8,
+          "converged": true
+        },
+        {
+          "triangle": 7076,
+          "region": "foot",
+          "sourcePosition": [
+            -0.19578814009825388,
+            -0.9386663039525349,
+            -0.06961982821424802
+          ],
+          "projectedPosition": [
+            -0.19342353218957883,
+            -0.9389731458081051,
+            -0.07111481995496381
+          ],
+          "projectionMM": 2.8143423371911864,
+          "projectedToSourceMM": 2.78801153318684,
+          "normalAngleDegrees": 16.857548030760217,
+          "residualMM": 8.068386919442684e-8,
+          "converged": true
+        },
+        {
+          "triangle": 16005,
+          "region": "foot",
+          "sourcePosition": [
+            0.21158006290594739,
+            -0.9241100152333577,
+            -0.07918675243854523
+          ],
+          "projectedPosition": [
+            0.21061419434011386,
+            -0.9239298293651496,
+            -0.0817847324505076
+          ],
+          "projectionMM": 2.7775653324671326,
+          "projectedToSourceMM": 2.689015581294764,
+          "normalAngleDegrees": 9.338199544819332,
+          "residualMM": 0.000005587045594397655,
+          "converged": true
+        }
+      ]
+    }
+  },
+  "field": {
+    "dimensions": [
+      186,
+      238,
+      81
+    ],
+    "stats": {
+      "sourceFidelity": {
+        "accepted": false,
+        "sourceDefaultPreserved": true,
+        "intentionalShapeChanges": false,
+        "estimatedAnatomy": false,
+        "estimatedHandsFeet": false,
+        "fieldSmoothing": false,
+        "interiorFilling": false,
+        "sourceSurfaceEquivalenceCertified": false
+      },
+      "version": "BODY-IMPLICIT-R21",
+      "build": 1,
+      "pointConstraints": {
+        "global": {
+          "constraints": 9253,
+          "weights": 1017705,
+          "beforeRmsMM": 2.0798304078256376,
+          "afterRmsMM": 0.6852909335137914,
+          "iterations": 76,
+          "regularization": 0.04,
+          "positiveDefinite": true,
+          "relativeSolverResidual": 8.545434653501991e-8,
+          "maxAbsCoefficientMM": 19.017324010951665,
+          "coefficientRmsMM": 3.075365536136248,
+          "objective": 0.007845975780583454,
+          "solutionL2ErrorBoundMM": 0.0004177880679134838,
+          "coefficientClippingUsed": false,
+          "kernelUnchangedFromR05": true,
+          "converged": true,
+          "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+        },
+        "local": {
+          "constraints": 9253,
+          "weights": 175992,
+          "beforeRmsMM": 1.171748814052831,
+          "afterRmsMM": 0.11371757250979475,
+          "iterations": 206,
+          "regularization": 0.002,
+          "positiveDefinite": true,
+          "relativeSolverResidual": 9.382319340867338e-8,
+          "maxAbsCoefficientMM": 16.107304333016344,
+          "coefficientRmsMM": 2.3916737961877454,
+          "objective": 0.00022551312955860613,
+          "solutionL2ErrorBoundMM": 0.004761657666341402,
+          "coefficientClippingUsed": false,
+          "kernelUnchangedFromR05": true,
+          "converged": true,
+          "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+        }
+      },
+      "fieldMS": 31479.8571,
+      "dimensions": [
+        186,
+        238,
+        81
+      ],
+      "channels": 4,
+      "scalarCoefficients": 3585708,
+      "materialCoordinateCoefficients": 10757124,
+      "localScalarCoefficients": 14883066,
+      "materialCoordinatesFollowBody": true,
+      "authoredNormalField": true,
+      "normalFieldCoefficients": 14342832,
+      "localRegions": [
+        {
+          "region": "left hand",
+          "dimensions": [
+            139,
+            161,
+            171
+          ]
+        },
+        {
+          "region": "right hand",
+          "dimensions": [
+            139,
+            161,
+            171
+          ]
+        },
+        {
+          "region": "left foot",
+          "dimensions": [
+            124,
+            123,
+            237
+          ]
+        },
+        {
+          "region": "right foot",
+          "dimensions": [
+            124,
+            123,
+            237
+          ]
+        }
+      ],
+      "orientedSamples": 9253,
+      "fieldVoxelsNearSamples": 662313,
+      "characterVertices": 0,
+      "characterFaces": 0,
+      "characterTriangleIndices": 0,
+      "usesPolygonConnectivity": false,
+      "headGenerated": false,
+      "sourceDerivedCalibration": true,
+      "exactShapeEquivalenceCertified": false
+    },
+    "scalarBytes": 57371328,
+    "normalBytes": 57371328
+  },
+  "diagnosticCompleted": true,
+  "finishedUTC": "2026-10-24T02:34:59.305Z"
+}

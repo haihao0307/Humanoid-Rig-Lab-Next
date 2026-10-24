@@ -1,143 +1,188 @@
 {
-  "schema": "body-implicit-build/1",
-  "builtUTC": "2026-10-23T10:53:59.704Z",
-  "file": "G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\delivery\\人物身体_R20_结构细节与动作调整.html",
-  "sha256": "eca0132b1866a818725feaffbbd262511319a337522a369234be26c6d3d1ea9a",
-  "bytes": 60127794,
-  "sources": [
+  "schema": "body-source-atlas-viewer/2",
+  "builtUTC": "2026-10-24T04:53:05.137Z",
+  "file": "delivery/身体_R21_原母体函数对照.html",
+  "sha256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c",
+  "bytes": 61833887,
+  "data": {
+    "file": "data/body-source-atlas-r21.json",
+    "sha256": "11e652353756be59942a0cc7375727fa4d346af0dbbbfb995f035557453edf94",
+    "bytes": 61768594,
+    "storage": {
+      "logicalArrays": 54,
+      "uniqueArrays": 51,
+      "logicalBytes": 108975040,
+      "uniqueBytes": 104192036,
+      "compressedBytes": 46253973,
+      "bitExactCoefficients": true,
+      "noLossyQuantization": true
+    }
+  },
+  "profiles": [
     {
-      "file": "src/BodyMathR01.js",
-      "sha256": "b218c289acc7042a5951901736c1518080155772c3b43810d3fe05082fa2add3"
+      "id": "baseline",
+      "label": "原人物",
+      "sourceProgramSHA256": "3f6cdcbd03c630535a7fc1a47304ec8d52d7e3f38540159283ed93550a76bd2d",
+      "sourceStateSHA256": "81a30e810ba92d4d491a0861b2e06aa27333e9d30b00d473a871a6fb1a61b4db",
+      "functions": 18416,
+      "decisionNodes": 172480,
+      "layers": 11
     },
     {
-      "file": "src/BodyShapeR18.js",
-      "sha256": "fd8ac877c13dd93596101b8bccbf42e0c9991d8cb88653d634571167879a13fc"
+      "id": "lean",
+      "label": "原参数 · 偏瘦",
+      "sourceProgramSHA256": "3d870b20286329943ed2b53cb46776c7fdf2f5d45295e2bbd6a86708206b6513",
+      "sourceStateSHA256": "4ec469e3c7afa531e783893a6bc506140b1022b666bc8b5f915e6aeb57873d96",
+      "functions": 18416,
+      "decisionNodes": 169564,
+      "layers": 11
     },
     {
-      "file": "src/BodyMHRFieldsR01.js",
-      "sha256": "74777c26d58a2a3709e4d53dd021da8b76979930238980899d208cae75d7579d"
+      "id": "fuller",
+      "label": "原参数 · 丰满",
+      "sourceProgramSHA256": "447d6333590f4c9c3930b2f5a2ae1af4a742554c912b74791cbf05afdb3fd63b",
+      "sourceStateSHA256": "e72dede689832591520ea4c3aed43585a2900fbca1b163d89c3b467c0c14af4c",
+      "functions": 18416,
+      "decisionNodes": 174206,
+      "layers": 11
     },
     {
-      "file": "src/BodyTargetBindingR01.js",
-      "sha256": "f174f14b9b49d7cc6bac742db17a5d6e493f98881e692ad4ed6b3b38369b3392"
+      "id": "muscular",
+      "label": "原参数 · 高肌肉",
+      "sourceProgramSHA256": "fcefaa2a5769d5a42e6d97576a44533628bef508fbb30930a0c6d71ba9120575",
+      "sourceStateSHA256": "917b366c12ee3426f9d2c1bd5889f42dd423be2eadc499389b1e65ca9ce60e20",
+      "functions": 18416,
+      "decisionNodes": 169794,
+      "layers": 11
     },
     {
-      "file": "src/BodyMHRAdapterR01.js",
-      "sha256": "ad301cf77a97d3ede48d4d2fab49d209c5a64f0ccf2f607221797071c4b589d0"
+      "id": "female",
+      "label": "原参数 · 女性形态",
+      "sourceProgramSHA256": "0d81edfdb96a188dd6523325b55834ec60917a21a71f6eaa1aa222dd814eba21",
+      "sourceStateSHA256": "2e712711086cc449e0c099913e66e3cf4274be8eb09cb446ee53895dc04f5348",
+      "functions": 18416,
+      "decisionNodes": 167206,
+      "layers": 10
     },
     {
-      "file": "src/BodyDriverR01.js",
-      "sha256": "f4d9db6a83faddeb4fde4bf57f0ea1243d51cedc22e289aa610568eeadd05660"
+      "id": "A-reach",
+      "label": "动作 A · 抬臂",
+      "sourceProgramSHA256": "b0301f9fe0910a6f30f85a49a15b0a3defd3068c2a67e512cdb40383bda4a958",
+      "sourceStateSHA256": "f9b080b3a3273e555f0fcca99625ce25c170addc0169e3b39e8ab4c5292aec6b",
+      "functions": 18416,
+      "decisionNodes": 156590,
+      "layers": 11
     },
     {
-      "file": "src/BodyCalibrationR18.js",
-      "sha256": "4494461414c3d226c86c261c3f13f76cdd6fe4e6458459b87c6057e0cf82e60a"
+      "id": "A-joints",
+      "label": "动作 A · 屈肘膝",
+      "sourceProgramSHA256": "f10daf1a5157689851835a6e4e5ff0196a7ae03f9e8fec230c81f73b5feea0ca",
+      "sourceStateSHA256": "63fc64ff12fa950d78e73af94f5dfe057d97cd9fdae3c158ddaefe90152a45d4",
+      "functions": 18416,
+      "decisionNodes": 137322,
+      "layers": 6
     },
     {
-      "file": "src/BodyTorsoR18.js",
-      "sha256": "3572d6984611a5850a7f47023bfbbbeafa8d59a0cc41201349ab3c36c3f0163c"
+      "id": "B-neutral",
+      "label": "动作 B · 自然",
+      "sourceProgramSHA256": "af86fb64609e1c5f3f431483a1439d6684af4729f608f76e54276500b924e8dd",
+      "sourceStateSHA256": "a38b23d210541f8e86df7f0b3163aac7edfac68c45f3c163f6ad9a67d68f0506",
+      "functions": 18416,
+      "decisionNodes": 172480,
+      "layers": 11
     },
     {
-      "file": "src/BodyStructureR19.js",
-      "sha256": "3a65cf8c47e972e184e02936c1797dcf7dba73001f431b482481d6c1b6244409"
-    },
-    {
-      "file": "src/BodyAnatomyR20.js",
-      "sha256": "1cd961b8c6b858119768479a328008156397a2eb0dc9f7b6a34f3cb0028b55f0"
-    },
-    {
-      "file": "src/BodyArticulationR20.js",
-      "sha256": "63a25374c5883e3a01637901f10171065596367ce1879fc81ddcb2915ff057a0"
-    },
-    {
-      "file": "src/BodyLocalFieldR20.js",
-      "sha256": "64b29bfd20489e2fbfade6bc5ed65a37075f673a75d0897ecc0f0d12b7813584"
-    },
-    {
-      "file": "src/BodyLocalCompositionR20.js",
-      "sha256": "4ed1a82304e1543e908e7eb329720a12cec8737275e7d4f7e3318d78ecd680e0"
-    },
-    {
-      "file": "src/BodyInteriorR20.js",
-      "sha256": "a3ab25e14025d1b41341d410abc0e50d5e7775654f9e75b16e80a396f8fd5f21"
-    },
-    {
-      "file": "src/BodyContactFieldR20.js",
-      "sha256": "daae402b6a1833288d1fbbfc0b8993f305dd292f6ad35d97b18af5afe0537f84"
-    },
-    {
-      "file": "src/BodyNeckClosureR20.js",
-      "sha256": "eaa666cf961e8948555e49a316fff345230e783bc760dcbe3af19d0338c6afa8"
-    },
-    {
-      "file": "src/BodyDigitsR20.js",
-      "sha256": "71310bb7671385729f7e6257459a534bd90d0cb4669ad4a48918ccf43138274a"
-    },
-    {
-      "file": "src/BodyFeetR20.js",
-      "sha256": "1fb332a53b07e1a6b000f05304fcaa94460287671504c6c283d4c8c1a53bc948"
-    },
-    {
-      "file": "src/BodyImplicitWorkerR20.js",
-      "sha256": "48a35d351a4901187f49b66186e8f10020c2ccffc4b9d469c50f97f33563f0d5"
-    },
-    {
-      "file": "src/BodyRayR20.js",
-      "sha256": "0f7e7a1036fd157fb1a8487757cfb5dd5dac01b3e27c43d6b17a7f10cab53dc1"
-    },
-    {
-      "file": "src/BodyImplicitAppR20.js",
-      "sha256": "65998b0fd799115fc42f2f53c62628dec6801db9dc9432f882c75ab846174aa1"
-    },
-    {
-      "file": "src/BodyControlR17.js",
-      "sha256": "6cbb0caa7a280d8af96b8c467c139557ba5502875ada96c0b3adf76f6ce9c5ad"
+      "id": "B-bend",
+      "label": "动作 B · 屈髋膝",
+      "sourceProgramSHA256": "9a406f7846b95781fb1b37a1fe45c5e0c612d791b749e3ee4eb584e8223160e0",
+      "sourceStateSHA256": "67e2e1cadc0fda70054fc31f2acd9f05ca8055d28fd38ba2dbf629a0a5dfef2f",
+      "functions": 18416,
+      "decisionNodes": 175284,
+      "layers": 11
     }
   ],
-  "data": {
-    "file": "data/body-function-program-r17.json",
-    "sha256": "21977efd7038eced66aacb2719f307620892d23486f35a3cb6c475e4841f5af7",
-    "bytes": 59934938
-  },
-  "scope": "BODY ONLY",
-  "representation": "implicit scalar function, coefficient variables, procedural noise",
-  "characterMeshes": 0,
-  "characterTriangleFaces": 0,
-  "characterIndexBuffers": 0,
-  "rasterPrimitive": "POINTS",
-  "externalRuntimeImports": 0,
-  "originalParameterCatalogRetained": true,
-  "headGenerated": false,
-  "sourceDerivedCalibration": true,
-  "wholeBodySourceIndependent": false,
-  "allParameterEquivalenceCertified": false,
-  "visualAccepted": false,
-  "mainPlatformMigrated": false,
-  "publicRelease": false,
-  "buildDependencies": [
+  "sources": [
     {
-      "file": "tools/build-r20.cjs",
-      "sha256": "974d726e29cbe4830d9ec3a78c9020cf9fc92fbb50ea4e576b966fdb2bec3e1b"
+      "file": "src/BodyAtlasPackageR21.js",
+      "sha256": "78636f420387430fd54fb83e6f5c1a75ed0ea5af49ed65eb8b890c48e2164fe7"
     },
     {
-      "file": "tools/build-implicit.cjs",
-      "sha256": "ff24f062ded4777fc005aa1ec9a26061528114be348d9208fe154370e066bfb6"
+      "file": "src/BodyAtlasMaterialR21.js",
+      "sha256": "8bc4f5042ea64eaf7c13b5be73d5316be22264a3909e7d8e4901154c07bf16dc"
     },
     {
-      "file": "tools/body-ui-r17.cjs",
-      "sha256": "edeb689555448d4112720538efcc8980416d62e95f3e7345b97b96d587001cc6"
+      "file": "src/BodySourceDifferentialsR21.glsl",
+      "sha256": "7cd1d24ebc662cc78cf468aa98a89c89c90704782ab3a8eee1350bb17f2e827c"
     },
     {
-      "file": "tools/body-ui-r18.cjs",
-      "sha256": "4e45521f48de47a19a7ac543fa513eb78eca389245a9fc1cec26400f836facdd"
+      "file": "src/BodySourceSkinR21.glsl",
+      "sha256": "9f25bd6a543cd341e30944d9269324e2a007fe01b367476e47cf2897ce5302a1"
     },
     {
-      "file": "tools/body-ui-r19.cjs",
-      "sha256": "d9e1de754161084ef3e13a9950a90818d31e747cf1c4eff9c3f30fa104468733"
+      "file": "src/BodyAtlasCpuR21.js",
+      "sha256": "894bb7ce159c4716d593d3603a16c48e749f8864ae3c6c9ec7155d90650aca9c"
     },
     {
-      "file": "tools/body-ui-r20.cjs",
-      "sha256": "ab955ced402e46eacd38b8f179fb71845f14561deb2ee417d4a9d9aaaffa0c56"
+      "file": "src/BodyAtlasPrecisionR21.js",
+      "sha256": "da63d9da704e911f4afdc5ab7b382c9bd81f4a18a10a032efdc11fa2b03ab5a2"
+    },
+    {
+      "file": "src/BodyAtlasRayR21.js",
+      "sha256": "d68f1e8d1c172447b7960cabadfb9f86b297b3495824482d08718a620eff24af"
+    },
+    {
+      "file": "src/BodySourceAlbedoR21.glsl",
+      "sha256": "4bce431810a25e357d542e0042421fb345ab40c0088484790a5fb4de237a0549"
+    },
+    {
+      "file": "src/BodyAtlasAppR21.js",
+      "sha256": "a1ad264213b743baeccab70c5422b199753a21eeeec992005538ecaa8c46179c"
+    },
+    {
+      "file": "src/BodyAtlasTemplateR21.html",
+      "sha256": "98642b552da318062b35748f1719fb78f213c8b42e855020217d028e6c362d14"
+    },
+    {
+      "file": "src/BodySourceAtlasR21.js",
+      "sha256": "3e5868ee3a6e02bb23078d96441ad9ea7f1c53694b4d5f0f7ab34934ab8ccaeb"
+    },
+    {
+      "file": "tools/build-source-atlas-r21.cjs",
+      "sha256": "2efb42948b268fb2dd80f88c83309afdc86db78cd6bb0fd9fef562eb92f9e765"
+    },
+    {
+      "file": "tools/pack-source-atlas-r21.cjs",
+      "sha256": "1ec52a4534c2199d9228149b99443bafe9a265b954153c279198650e63ade066"
+    },
+    {
+      "file": "tools/compile-source-atlas-r21.py",
+      "sha256": "8794d0fe8a98ed292c09f16585e57fbdde5aa836a66599fd662bd6190515c1d9"
+    },
+    {
+      "file": "tools/compile-source-profiles-r21.py",
+      "sha256": "17ea2cc5f6c5e0c51a22f9fc27fc90939f97c5726a4ba6cb686afcf06469478a"
+    },
+    {
+      "file": "tools/compile-source-material-r21.py",
+      "sha256": "25d04e1238892b4c90f639f8ea8edd6a8de0301ffaef94448ef34629f37fdcd1"
+    },
+    {
+      "file": "tools/compile-source-skin-r21.py",
+      "sha256": "e84b33a14aad067c50b01c69dde1411f7e2654876f3ae8220b19ba3d8afbd80f"
     }
-  ]
+  ],
+  "characterTriangleFaces": 0,
+  "characterVertexBuffers": 0,
+  "sourceFacetPartitionInformationRetained": true,
+  "completedMotherConversion": false,
+  "sourceFidelityAccepted": false,
+  "parameterVariationImplemented": false,
+  "fixedSourceStates": true,
+  "originalArchiveRetained": true,
+  "headGenerated": false,
+  "sourceBodyReliefAndRoughnessFieldsRestored": true,
+  "originalSkinLayersRestored": false,
+  "visualAccepted": false,
+  "companionWorkbench": "BUILD-R21.json",
+  "selection": "source-partition comparison candidate; not completed mother conversion"
 }

@@ -1,0 +1,15 @@
+'use strict';const fs=require('fs');let s=fs.readFileSync('src/BodyAtlasRayR21.js','utf8');
+function replace(a,b){if(!s.includes(a))throw Error('Source colour marker missing: '+a.slice(0,90));s=s.replace(a,b);}
+replace('return upload(0,data)+upload(1,next.functionCoefficients)+upload(2,next.leafFunctionIds);',`const palms=new Float32Array(next.sourcePalmCoefficients.length/3*4);for(let i=0;i<palms.length/4;i++)palms.set(next.sourcePalmCoefficients.subarray(i*3,i*3+3),i*4);return upload(0,data)+upload(1,next.functionCoefficients)+upload(2,next.leafFunctionIds)+upload(3,palms);`);
+replace('let gpuBytes=uploadAtlas(atlas);',`function uploadPigments(material){if(!material?.constantBodyMasksVerified)throw Error('原肤色输入尚未核对');const t=material.pigmentTable,values=new Float32Array(t.width*t.height*4);for(let i=0;i<t.data.length/3;i++)values.set([...t.data.slice(i*3,i*3+3),1],i*4);const texture=textures[4]||gl.createTexture();textures[4]=texture;gl.activeTexture(gl.TEXTURE4);gl.bindTexture(gl.TEXTURE_2D,texture);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,t.width,t.height,0,gl.RGBA,gl.FLOAT,values);return values.byteLength;}let gpuBytes=uploadAtlas(atlas)+uploadPigments(atlas.material);`);
+replace("'rectangles[0]','diagnostic'","'rectangles[0]','diagnostic','probeChannel','sourcePalms','pigmentTable','sourceDna','sourceFlush'");
+replace('diagnostic=0,draws=0','diagnostic=1,diagnosticChannel=0,draws=0');
+replace('for(let i=0;i<3;i++){gl.activeTexture','for(let i=0;i<5;i++){gl.activeTexture');
+replace('gl.uniform1i(locations.leafIds,2);','gl.uniform1i(locations.leafIds,2);gl.uniform1i(locations.sourcePalms,3);gl.uniform1i(locations.pigmentTable,4);const dna=atlas.material.recipe;gl.uniform4f(locations.sourceDna,dna.profile.melanin,dna.profile.blood,dna.profile.variation,dna.profile.sun);gl.uniform1f(locations.sourceFlush,dna.state.flush);gl.uniform1i(locations.probeChannel,diagnosticChannel);');
+replace('const bytes=uploadAtlas(next);','const bytes=uploadAtlas(next)+uploadPigments(next.material);');
+replace('uploadAtlas(previous);atlas=previous;','uploadAtlas(previous);uploadPigments(previous.material);atlas=previous;');
+replace("diagnostic=a.diagnostic==='normals'?2:0;","diagnostic=({skin:1,normals:2,albedo:5,geometry:0})[a.diagnostic]??0;");
+replace("probeFrame(mode){const previous=diagnostic;diagnostic=mode==='normals'?4:3;","probeFrame(mode,channel=0){const previous=diagnostic,previousChannel=diagnosticChannel;diagnosticChannel=channel;diagnostic=mode==='normals'?4:mode==='albedo'?6:3;");
+replace('diagnostic=previous;gl.enable','diagnostic=previous;diagnosticChannel=previousChannel;gl.enable');
+replace('sourceFacetPartitionInformationRetained:true,completedMotherConversion:false','sourceBodyAlbedoRestored:true,originalSkinOpticsRestored:false,sourceFacetPartitionInformationRetained:true,completedMotherConversion:false');
+fs.writeFileSync('src/BodyAtlasRayR21.js',s);

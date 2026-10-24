@@ -1,0 +1,100 @@
+{
+  "schema": "body-function-delivery/5",
+  "reviewedUTC": "2026-10-23T11:01:41.786Z",
+  "selectedVersion": "R20",
+  "status": "working checkpoint; broader body reconstruction remains in progress",
+  "artifact": "G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\delivery\\人物身体_R20_结构细节与动作调整.html",
+  "sha256": "eca0132b1866a818725feaffbbd262511319a337522a369234be26c6d3d1ea9a",
+  "bytes": 60127794,
+  "prior": {
+    "version": "R19",
+    "file": "G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\delivery\\人物身体_R19_躯干大形与肩带过渡.html",
+    "sha256": "0442474d248e357541d8738ecfceaaff7748cbc6e6910c4c17612a44a9256d7f"
+  },
+  "scope": "BODY ONLY - anatomy, contact continuity, regional hand/foot functions and interactive operation",
+  "characterTriangleFaces": 0,
+  "rasterPrimitive": "POINTS",
+  "headGenerated": false,
+  "sourceDerivedCalibration": true,
+  "wholeBodySourceIndependent": false,
+  "bodyReconstructionComplete": false,
+  "visualAccepted": false,
+  "stageImplementationVerified": true,
+  "mainPlatformMigrated": false,
+  "publicWebDeployment": false,
+  "githubSyncRequested": true,
+  "githubRepository": "haihao0307/Humanoid-Rig-Lab-Next",
+  "githubBranch": "body/reconstruction-r18-20261023",
+  "controls": {
+    "originalCatalog": 1916,
+    "bodyControls": 965,
+    "symmetricPairs": 34,
+    "independentDegreesDeleted": 0
+  },
+  "implemented": [
+    "trunk and limb external structure with geometric fat cover",
+    "pose-dependent soft-tissue response and dual-quaternion rigid correction",
+    "continuous palms, digits, heels, arches, forefeet, nails and wrist/ankle transition",
+    "rest-neighbourhood union at contact and closed body-side neck boundary",
+    "size-aware fitting, grids and ray stepping",
+    "motion/light/pan controls and current-head-preserving person archives",
+    "exact hot-loop optimization and reduced GPU/CPU field retention",
+    "responsive drawing buffer and full-view width fit without changing the person or rebuilding its field"
+  ],
+  "verified": {
+    "numericChecks": 39,
+    "finalBrowserChecks": 12,
+    "actualPointDrawsOnly": true,
+    "currentHeadAndCompletePersonRoundTrip": true,
+    "oldArchiveLifecycleReport": "qa/anatomy-r20/browser-lifecycle.json",
+    "oldArchiveLifecycleSHA256": "01719c52255640823ddd68c2b5d20fca4957da439ed90084e03695ccba37765e",
+    "lifecycleApplicationUnchangedExceptTrailingWhitespace": true,
+    "limitedPoseMatrix": "qa/anatomy-r20/browser-attempt2.json",
+    "limitedPoseMatrixNote": "successful individual cases retained; harness waited for a correctly skipped no-op, not a runtime failure",
+    "finalRuntime": "qa/anatomy-r20/final-viewer.json",
+    "fieldOptimization": "qa/anatomy-r20/field-optimization.json",
+    "hotLoopBitExactFields": 6,
+    "optimizedFieldMS": 20878.506400000002,
+    "referenceFieldMS": 41533.7675,
+    "adultGPUFieldBytesEstimate": 216350368,
+    "normalCPUCopyReleased": true,
+    "sourcePackageMainThreadReferenceReleased": true,
+    "newScreenshotsDelivered": 0,
+    "precisionModes": "qa/anatomy-r20/precision-mode.json",
+    "precisionModeStatePreserved": true,
+    "preciseModeFieldMS": 67532.29999995232,
+    "actualHTTPViewer": "qa/anatomy-r20/http-viewer.json",
+    "actualHTTPArtifactMatches": true,
+    "viewerLayout": "qa/anatomy-r20/viewer-layout.json",
+    "viewportChecks": 4,
+    "fieldAndShadersUnchangedSinceFullLifecycle": true,
+    "fullLifecycleArtifactSHA256": "eda170d2052350a5fbcfdd3710bed5473e11b1c5fe05548f9f6d4ff6569f5aab"
+  },
+  "visualReview": {
+    "internalRuntimeReview": true,
+    "reviewedGeometrySHA256": "3156d8175e8f11c624b12e3f11f642f196de5a7ee25a9c5f614f0168ea5ff9ac",
+    "publicationFormattingNote": "R20 source trailing whitespace was normalized after this geometry observation; final artifact also ran through final-viewer checks",
+    "testedEdgeCases": [
+      "small-age",
+      "tall-lean",
+      "hand-near-torso",
+      "MHR-hands-and-feet"
+    ],
+    "allFormAndMotionCombinationsCertified": false,
+    "remaining": [
+      "overall anatomical naturalness and finer contour continuity",
+      "hands/feet remain simplified despite continuous regional functions",
+      "extreme and combined motions need wider visual acceptance",
+      "source-derived whole-body shape/binding package still retained",
+      "compact independent mother data and complete platform integration remain"
+    ]
+  },
+  "data": {
+    "file": "data/body-function-program-r17.json",
+    "sha256": "21977efd7038eced66aacb2719f307620892d23486f35a3cb6c475e4841f5af7",
+    "bytes": 59934938
+  },
+  "knowledge": "docs/ANATOMY-AND-REGIONAL-FUNCTIONS-R20.md",
+  "workingViewer": "http://127.0.0.1:8914/",
+  "nextPriority": "continue normal-distance anatomical refinement and wider combined-motion review; progressively replace source-derived regional calibration"
+}

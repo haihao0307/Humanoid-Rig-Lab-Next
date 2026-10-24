@@ -1,0 +1,607 @@
+{
+  "startedUTC": "2026-10-24T04:30:14.019Z",
+  "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+  "acceptanceTolerance": null,
+  "sourceFidelityAccepted": false,
+  "completedMotherConversion": false,
+  "sourceFacetPartitionInformationRetained": true,
+  "method": "Independently reconstruct every BSP leaf domain; sum projected coverage per original surface piece, check every covered-domain corner against original oriented boundaries and source planes. Area arithmetic is diagnostic, not a formal interval proof.",
+  "profiles": [
+    {
+      "id": "baseline",
+      "programSHA256": "3f6cdcbd03c630535a7fc1a47304ec8d52d7e3f38540159283ed93550a76bd2d",
+      "surfacePieces": 18416,
+      "leaves": 86243,
+      "emptyDomains": 7032,
+      "coveredDomainCorners": 875053,
+      "unvisitedSurfacePieces": 0,
+      "invalidDomains": 0,
+      "maximumOutsideOriginalBoundaryMM": 8.901213099932193e-11,
+      "maximumSourcePlaneDistanceMM": 2.877472565776529e-13,
+      "absoluteProjectedCoverageAreaErrorM2": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 2.2223531865083904e-17,
+        "median": 8.673617379884035e-19,
+        "p95": 2.7755575615628914e-17,
+        "max": 4.85722573273506e-16
+      },
+      "relativeProjectedCoverageAreaError": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 3.549047188816961e-12,
+        "median": 1.6682094176105968e-14,
+        "p95": 4.289162106566082e-12,
+        "max": 8.751260293498395e-11
+      },
+      "worst": [
+        {
+          "function": 17216,
+          "sourceAreaM2": 0.00007066620250384403,
+          "coverageAreaM2": 0.00007066620250432976,
+          "differenceM2": 4.85722573273506e-16,
+          "relativeError": 6.873477788014491e-12
+        },
+        {
+          "function": 7919,
+          "sourceAreaM2": 0.00006638824056182102,
+          "coverageAreaM2": 0.00006638824056218184,
+          "differenceM2": 3.608224830031759e-16,
+          "relativeError": 5.435036083945867e-12
+        },
+        {
+          "function": 17229,
+          "sourceAreaM2": 0.000030412440398919216,
+          "coverageAreaM2": 0.00003041244039858615,
+          "differenceM2": -3.3306690738754696e-16,
+          "relativeError": 1.095166658836702e-11
+        },
+        {
+          "function": 7845,
+          "sourceAreaM2": 0.0000285000398592139,
+          "coverageAreaM2": 0.000028500039859505333,
+          "differenceM2": 2.914335439641036e-16,
+          "relativeError": 1.0225724083325617e-11
+        },
+        {
+          "function": 17215,
+          "sourceAreaM2": 0.00003163736508104975,
+          "coverageAreaM2": 0.000031637365081341184,
+          "differenceM2": 2.914335439641036e-16,
+          "relativeError": 9.211688243237025e-12
+        }
+      ],
+      "elapsedMS": 169
+    },
+    {
+      "id": "lean",
+      "programSHA256": "3d870b20286329943ed2b53cb46776c7fdf2f5d45295e2bbd6a86708206b6513",
+      "surfacePieces": 18416,
+      "leaves": 84785,
+      "emptyDomains": 6934,
+      "coveredDomainCorners": 856295,
+      "unvisitedSurfacePieces": 0,
+      "invalidDomains": 0,
+      "maximumOutsideOriginalBoundaryMM": 3.802513859341161e-11,
+      "maximumSourcePlaneDistanceMM": 2.1890041862482335e-13,
+      "absoluteProjectedCoverageAreaErrorM2": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 2.3246681564899547e-17,
+        "median": 8.673617379884035e-19,
+        "p95": 2.7755575615628914e-17,
+        "max": 3.885780586188048e-16
+      },
+      "relativeProjectedCoverageAreaError": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 3.70281645625423e-12,
+        "median": 1.5883428761424827e-14,
+        "p95": 4.3982621594437295e-12,
+        "max": 9.740574756013393e-11
+      },
+      "worst": [
+        {
+          "function": 16940,
+          "sourceAreaM2": 0.00001914036767480809,
+          "coverageAreaM2": 0.000019140367675196668,
+          "differenceM2": 3.885780586188048e-16,
+          "relativeError": 2.0301493953548144e-11
+        },
+        {
+          "function": 17225,
+          "sourceAreaM2": 0.000033065127171383324,
+          "coverageAreaM2": 0.000033065127171758024,
+          "differenceM2": 3.7470027081099033e-16,
+          "relativeError": 1.1332189011971499e-11
+        },
+        {
+          "function": 7686,
+          "sourceAreaM2": 0.00003909237159360757,
+          "coverageAreaM2": 0.00003909237159396839,
+          "differenceM2": 3.608224830031759e-16,
+          "relativeError": 9.22999726786026e-12
+        },
+        {
+          "function": 17213,
+          "sourceAreaM2": 0.00002759094749471558,
+          "coverageAreaM2": 0.000027590947494368634,
+          "differenceM2": -3.469446951953614e-16,
+          "relativeError": 1.2574584300224224e-11
+        },
+        {
+          "function": 17249,
+          "sourceAreaM2": 0.000024849238099200477,
+          "coverageAreaM2": 0.000024849238099533544,
+          "differenceM2": 3.3306690738754696e-16,
+          "relativeError": 1.3403505816070206e-11
+        }
+      ],
+      "elapsedMS": 146
+    },
+    {
+      "id": "fuller",
+      "programSHA256": "447d6333590f4c9c3930b2f5a2ae1af4a742554c912b74791cbf05afdb3fd63b",
+      "surfacePieces": 18416,
+      "leaves": 87106,
+      "emptyDomains": 7148,
+      "coveredDomainCorners": 882978,
+      "unvisitedSurfacePieces": 0,
+      "invalidDomains": 0,
+      "maximumOutsideOriginalBoundaryMM": 1.7974510768681284e-9,
+      "maximumSourcePlaneDistanceMM": 2.229119666630197e-13,
+      "absoluteProjectedCoverageAreaErrorM2": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 2.234237204026797e-17,
+        "median": 8.673617379884035e-19,
+        "p95": 2.7755575615628914e-17,
+        "max": 3.608224830031759e-16
+      },
+      "relativeProjectedCoverageAreaError": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 3.6221489810437084e-12,
+        "median": 1.6545234304242957e-14,
+        "p95": 4.21606351829717e-12,
+        "max": 1.2057301466740822e-10
+      },
+      "worst": [
+        {
+          "function": 16899,
+          "sourceAreaM2": 0.0000426078512623107,
+          "coverageAreaM2": 0.00004260785126194988,
+          "differenceM2": -3.608224830031759e-16,
+          "relativeError": 8.468450586297128e-12
+        },
+        {
+          "function": 7686,
+          "sourceAreaM2": 0.00003951263764445656,
+          "coverageAreaM2": 0.000039512637644109616,
+          "differenceM2": -3.469446951953614e-16,
+          "relativeError": 8.780600736332674e-12
+        },
+        {
+          "function": 16898,
+          "sourceAreaM2": 0.00004631109503527853,
+          "coverageAreaM2": 0.000046311095035611594,
+          "differenceM2": 3.3306690738754696e-16,
+          "relativeError": 7.191946274080233e-12
+        },
+        {
+          "function": 16076,
+          "sourceAreaM2": 0.00001428453375718064,
+          "coverageAreaM2": 0.000014284533757499829,
+          "differenceM2": 3.191891195797325e-16,
+          "relativeError": 2.2345084901303167e-11
+        },
+        {
+          "function": 16729,
+          "sourceAreaM2": 0.000010025676281166795,
+          "coverageAreaM2": 0.000010025676280847606,
+          "differenceM2": -3.191891195797325e-16,
+          "relativeError": 3.183716595551049e-11
+        }
+      ],
+      "elapsedMS": 148
+    },
+    {
+      "id": "muscular",
+      "programSHA256": "fcefaa2a5769d5a42e6d97576a44533628bef508fbb30930a0c6d71ba9120575",
+      "surfacePieces": 18416,
+      "leaves": 84900,
+      "emptyDomains": 6968,
+      "coveredDomainCorners": 864121,
+      "unvisitedSurfacePieces": 0,
+      "invalidDomains": 0,
+      "maximumOutsideOriginalBoundaryMM": 6.406541963599466e-10,
+      "maximumSourcePlaneDistanceMM": 2.313958486627188e-13,
+      "absoluteProjectedCoverageAreaErrorM2": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 2.2996298529617878e-17,
+        "median": 8.673617379884035e-19,
+        "p95": 2.7755575615628914e-17,
+        "max": 4.579669976578771e-16
+      },
+      "relativeProjectedCoverageAreaError": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 3.5743268382220394e-12,
+        "median": 1.6299624030051166e-14,
+        "p95": 4.31153789494348e-12,
+        "max": 8.812095819037785e-11
+      },
+      "worst": [
+        {
+          "function": 16959,
+          "sourceAreaM2": 0.00003949569297212463,
+          "coverageAreaM2": 0.00003949569297166666,
+          "differenceM2": -4.579669976578771e-16,
+          "relativeError": 1.1595365549886722e-11
+        },
+        {
+          "function": 7920,
+          "sourceAreaM2": 0.00004931089330417748,
+          "coverageAreaM2": 0.00004931089330374727,
+          "differenceM2": -4.3021142204224816e-16,
+          "relativeError": 8.72447025829487e-12
+        },
+        {
+          "function": 7963,
+          "sourceAreaM2": 0.000025744056958210138,
+          "coverageAreaM2": 0.000025744056957793804,
+          "differenceM2": -4.163336342344337e-16,
+          "relativeError": 1.6172028942845354e-11
+        },
+        {
+          "function": 16984,
+          "sourceAreaM2": 0.00003909247523070647,
+          "coverageAreaM2": 0.000039092475230359525,
+          "differenceM2": -3.469446951953614e-16,
+          "relativeError": 8.874973844655463e-12
+        },
+        {
+          "function": 6684,
+          "sourceAreaM2": 0.000018667774187797193,
+          "coverageAreaM2": 0.000018667774187464126,
+          "differenceM2": -3.3306690738754696e-16,
+          "relativeError": 1.784181145737595e-11
+        }
+      ],
+      "elapsedMS": 159
+    },
+    {
+      "id": "female",
+      "programSHA256": "0d81edfdb96a188dd6523325b55834ec60917a21a71f6eaa1aa222dd814eba21",
+      "surfacePieces": 18416,
+      "leaves": 83606,
+      "emptyDomains": 6838,
+      "coveredDomainCorners": 788303,
+      "unvisitedSurfacePieces": 0,
+      "invalidDomains": 0,
+      "maximumOutsideOriginalBoundaryMM": 1.1302070390684094e-10,
+      "maximumSourcePlaneDistanceMM": 2.2039797287556895e-13,
+      "absoluteProjectedCoverageAreaErrorM2": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 2.0898040483456e-17,
+        "median": 8.673617379884035e-19,
+        "p95": 2.7755575615628914e-17,
+        "max": 2.914335439641036e-16
+      },
+      "relativeProjectedCoverageAreaError": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 3.834577700707622e-12,
+        "median": 2.0126491894222347e-14,
+        "p95": 4.884991389346826e-12,
+        "max": 8.656481208034141e-11
+      },
+      "worst": [
+        {
+          "function": 6704,
+          "sourceAreaM2": 0.000017590672240164196,
+          "coverageAreaM2": 0.000017590672239872762,
+          "differenceM2": -2.914335439641036e-16,
+          "relativeError": 1.6567504640253776e-11
+        },
+        {
+          "function": 16958,
+          "sourceAreaM2": 0.00003409568258128104,
+          "coverageAreaM2": 0.000034095682581003484,
+          "differenceM2": -2.7755575615628914e-16,
+          "relativeError": 8.140495662306253e-12
+        },
+        {
+          "function": 6907,
+          "sourceAreaM2": 0.00001026211334975713,
+          "coverageAreaM2": 0.000010262113349493451,
+          "differenceM2": -2.636779683484747e-16,
+          "relativeError": 2.569431454922636e-11
+        },
+        {
+          "function": 7803,
+          "sourceAreaM2": 0.000026721172231791712,
+          "coverageAreaM2": 0.000026721172231528034,
+          "differenceM2": -2.636779683484747e-16,
+          "relativeError": 9.867754530422953e-12
+        },
+        {
+          "function": 17209,
+          "sourceAreaM2": 0.000011888853139740974,
+          "coverageAreaM2": 0.000011888853140004652,
+          "differenceM2": 2.636779683484747e-16,
+          "relativeError": 2.217858739183816e-11
+        }
+      ],
+      "elapsedMS": 148
+    },
+    {
+      "id": "A-reach",
+      "programSHA256": "b0301f9fe0910a6f30f85a49a15b0a3defd3068c2a67e512cdb40383bda4a958",
+      "surfacePieces": 18416,
+      "leaves": 78298,
+      "emptyDomains": 7061,
+      "coveredDomainCorners": 784396,
+      "unvisitedSurfacePieces": 0,
+      "invalidDomains": 0,
+      "maximumOutsideOriginalBoundaryMM": 1.62233143585766e-8,
+      "maximumSourcePlaneDistanceMM": 2.877472565776529e-13,
+      "absoluteProjectedCoverageAreaErrorM2": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 2.987677518787818e-17,
+        "median": 1.734723475976807e-18,
+        "p95": 5.551115123125783e-17,
+        "max": 4.3021142204224816e-16
+      },
+      "relativeProjectedCoverageAreaError": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 6.7554161891031796e-12,
+        "median": 1.1723125061850018e-14,
+        "p95": 1.1497050965038085e-11,
+        "max": 1.5527347708017976e-10
+      },
+      "worst": [
+        {
+          "function": 17359,
+          "sourceAreaM2": 0.00004085076731463744,
+          "coverageAreaM2": 0.00004085076731506765,
+          "differenceM2": 4.3021142204224816e-16,
+          "relativeError": 1.0531293542877885e-11
+        },
+        {
+          "function": 7600,
+          "sourceAreaM2": 0.00004235830567145271,
+          "coverageAreaM2": 0.000042358305671050256,
+          "differenceM2": -4.0245584642661925e-16,
+          "relativeError": 9.501226265947023e-12
+        },
+        {
+          "function": 17174,
+          "sourceAreaM2": 0.000028881807657477054,
+          "coverageAreaM2": 0.000028881807657088476,
+          "differenceM2": -3.885780586188048e-16,
+          "relativeError": 1.3454076809427402e-11
+        },
+        {
+          "function": 16899,
+          "sourceAreaM2": 0.00004235830567145271,
+          "coverageAreaM2": 0.00004235830567107801,
+          "differenceM2": -3.7470027081099033e-16,
+          "relativeError": 8.845969282088608e-12
+        },
+        {
+          "function": 16985,
+          "sourceAreaM2": 0.00002167470771041735,
+          "coverageAreaM2": 0.00002167470771004265,
+          "differenceM2": -3.7470027081099033e-16,
+          "relativeError": 1.728744284892483e-11
+        }
+      ],
+      "elapsedMS": 152
+    },
+    {
+      "id": "A-joints",
+      "programSHA256": "f10daf1a5157689851835a6e4e5ff0196a7ae03f9e8fec230c81f73b5feea0ca",
+      "surfacePieces": 18416,
+      "leaves": 68664,
+      "emptyDomains": 7874,
+      "coveredDomainCorners": 415915,
+      "unvisitedSurfacePieces": 0,
+      "invalidDomains": 0,
+      "maximumOutsideOriginalBoundaryMM": 1.514899317101026e-10,
+      "maximumSourcePlaneDistanceMM": 2.2876665839444144e-13,
+      "absoluteProjectedCoverageAreaErrorM2": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 1.6276531695373828e-17,
+        "median": 8.673617379884035e-19,
+        "p95": 2.7755575615628914e-17,
+        "max": 2.220446049250313e-16
+      },
+      "relativeProjectedCoverageAreaError": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 3.444381595459253e-12,
+        "median": 1.14682338680428e-14,
+        "p95": 5.856158402514647e-12,
+        "max": 7.013719607622764e-11
+      },
+      "worst": [
+        {
+          "function": 6786,
+          "sourceAreaM2": 0.000037850214494206114,
+          "coverageAreaM2": 0.00003785021449398407,
+          "differenceM2": -2.220446049250313e-16,
+          "relativeError": 5.866402816793035e-12
+        },
+        {
+          "function": 7601,
+          "sourceAreaM2": 0.00004605328643192408,
+          "coverageAreaM2": 0.00004605328643210449,
+          "differenceM2": 1.8041124150158794e-16,
+          "relativeError": 3.917445539272678e-12
+        },
+        {
+          "function": 7660,
+          "sourceAreaM2": 0.00006602669704136588,
+          "coverageAreaM2": 0.00006602669704118547,
+          "differenceM2": -1.8041124150158794e-16,
+          "relativeError": 2.732398402248713e-12
+        },
+        {
+          "function": 8510,
+          "sourceAreaM2": 0.000007637395379234135,
+          "coverageAreaM2": 0.000007637395379053724,
+          "differenceM2": -1.8041124150158794e-16,
+          "relativeError": 2.3622090063861438e-11
+        },
+        {
+          "function": 10660,
+          "sourceAreaM2": 0.000024453378106414903,
+          "coverageAreaM2": 0.000024453378106595314,
+          "differenceM2": 1.8041124150158794e-16,
+          "relativeError": 7.377763543199796e-12
+        }
+      ],
+      "elapsedMS": 130
+    },
+    {
+      "id": "B-neutral",
+      "programSHA256": "af86fb64609e1c5f3f431483a1439d6684af4729f608f76e54276500b924e8dd",
+      "surfacePieces": 18416,
+      "leaves": 86243,
+      "emptyDomains": 7032,
+      "coveredDomainCorners": 875091,
+      "unvisitedSurfacePieces": 0,
+      "invalidDomains": 0,
+      "maximumOutsideOriginalBoundaryMM": 5.040967643310523e-10,
+      "maximumSourcePlaneDistanceMM": 2.877472565776529e-13,
+      "absoluteProjectedCoverageAreaErrorM2": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 2.222870076042534e-17,
+        "median": 8.673617379884035e-19,
+        "p95": 2.7755575615628914e-17,
+        "max": 4.85722573273506e-16
+      },
+      "relativeProjectedCoverageAreaError": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 3.5515610601773532e-12,
+        "median": 1.633794516345072e-14,
+        "p95": 4.279806033734312e-12,
+        "max": 8.751260293498395e-11
+      },
+      "worst": [
+        {
+          "function": 17216,
+          "sourceAreaM2": 0.00007066620250384403,
+          "coverageAreaM2": 0.00007066620250432976,
+          "differenceM2": 4.85722573273506e-16,
+          "relativeError": 6.873477788014491e-12
+        },
+        {
+          "function": 7919,
+          "sourceAreaM2": 0.00006638824056182102,
+          "coverageAreaM2": 0.00006638824056218184,
+          "differenceM2": 3.608224830031759e-16,
+          "relativeError": 5.435036083945867e-12
+        },
+        {
+          "function": 17229,
+          "sourceAreaM2": 0.000030412440398919216,
+          "coverageAreaM2": 0.00003041244039858615,
+          "differenceM2": -3.3306690738754696e-16,
+          "relativeError": 1.095166658836702e-11
+        },
+        {
+          "function": 7845,
+          "sourceAreaM2": 0.0000285000398592139,
+          "coverageAreaM2": 0.000028500039859505333,
+          "differenceM2": 2.914335439641036e-16,
+          "relativeError": 1.0225724083325617e-11
+        },
+        {
+          "function": 17215,
+          "sourceAreaM2": 0.00003163736508104975,
+          "coverageAreaM2": 0.000031637365081341184,
+          "differenceM2": 2.914335439641036e-16,
+          "relativeError": 9.211688243237025e-12
+        }
+      ],
+      "elapsedMS": 140
+    },
+    {
+      "id": "B-bend",
+      "programSHA256": "9a406f7846b95781fb1b37a1fe45c5e0c612d791b749e3ee4eb584e8223160e0",
+      "surfacePieces": 18416,
+      "leaves": 87645,
+      "emptyDomains": 7716,
+      "coveredDomainCorners": 913218,
+      "unvisitedSurfacePieces": 0,
+      "invalidDomains": 0,
+      "maximumOutsideOriginalBoundaryMM": 3.7247982476174e-10,
+      "maximumSourcePlaneDistanceMM": 2.1895462873344762e-13,
+      "absoluteProjectedCoverageAreaErrorM2": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 2.6677975053550942e-17,
+        "median": 3.469446951953614e-18,
+        "p95": 4.163336342344337e-17,
+        "max": 6.106226635438361e-16
+      },
+      "relativeProjectedCoverageAreaError": {
+        "count": 18416,
+        "finite": 18416,
+        "rms": 4.734162915330889e-12,
+        "median": 2.6310581904069455e-14,
+        "p95": 7.808478497576082e-12,
+        "max": 1.2472957990954752e-10
+      },
+      "worst": [
+        {
+          "function": 7919,
+          "sourceAreaM2": 0.00006599887657365855,
+          "coverageAreaM2": 0.00006599887657426917,
+          "differenceM2": 6.106226635438361e-16,
+          "relativeError": 9.252016022762842e-12
+        },
+        {
+          "function": 16898,
+          "sourceAreaM2": 0.00004955403742012976,
+          "coverageAreaM2": 0.00004955403742054609,
+          "differenceM2": 4.163336342344337e-16,
+          "relativeError": 8.40160874692546e-12
+        },
+        {
+          "function": 16080,
+          "sourceAreaM2": 0.000026544695673536012,
+          "coverageAreaM2": 0.000026544695673938468,
+          "differenceM2": 4.0245584642661925e-16,
+          "relativeError": 1.516144134317017e-11
+        },
+        {
+          "function": 6878,
+          "sourceAreaM2": 0.00001367552375519665,
+          "coverageAreaM2": 0.000013675523754849706,
+          "differenceM2": -3.469446951953614e-16,
+          "relativeError": 2.5369755587132352e-11
+        },
+        {
+          "function": 7844,
+          "sourceAreaM2": 0.000020990813992316504,
+          "coverageAreaM2": 0.00002099081399264957,
+          "differenceM2": 3.3306690738754696e-16,
+          "relativeError": 1.5867269726150834e-11
+        }
+      ],
+      "elapsedMS": 171
+    }
+  ],
+  "diagnosticCompleted": true,
+  "finishedUTC": "2026-10-24T04:30:16.008Z"
+}

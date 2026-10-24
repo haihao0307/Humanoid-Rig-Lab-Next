@@ -1,0 +1,404 @@
+{
+  "startedUTC": "2026-10-24T04:31:17.538Z",
+  "artifactSHA256": "d0d902e9119fdaed214f906712d4432890c350bc326784f9dcb816c622639a8d",
+  "checks": [
+    {
+      "name": "source default state restored",
+      "passed": true
+    },
+    {
+      "name": "complete catalog and paired controls retained",
+      "passed": true,
+      "details": {
+        "catalog": 1916,
+        "body": 965,
+        "symmetric": 34
+      }
+    },
+    {
+      "name": "atomic multi-variable edit builds once and preserves head",
+      "passed": true
+    },
+    {
+      "name": "same values do not recompute",
+      "passed": true
+    },
+    {
+      "name": "source body reset preserves loaded head and neck state",
+      "passed": true
+    },
+    {
+      "name": "initial body preset preserves loaded head",
+      "passed": true
+    },
+    {
+      "name": "invalid real archive restores complete previous person",
+      "passed": true
+    },
+    {
+      "name": "failed quality update restores quality and whole archive",
+      "passed": true
+    },
+    {
+      "name": "other original body driver remains operational",
+      "passed": true
+    },
+    {
+      "name": "actual saved person reloads twice without losing state or unknown fields",
+      "passed": true
+    },
+    {
+      "name": "unaccepted research modifiers remain inactive",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "network": [],
+  "sourceFidelityAccepted": false,
+  "final": {
+    "schema": "body-implicit-r21/1",
+    "ready": true,
+    "busy": false,
+    "lastError": null,
+    "catalogCount": 1916,
+    "bodyParameters": 965,
+    "checks": {
+      "messages": 12,
+      "characterFaces": 0
+    },
+    "field": {
+      "stats": {
+        "intervalCache": {
+          "dimensions": [
+            47,
+            60,
+            31
+          ],
+          "activeCells": 5972,
+          "cells": 87420,
+          "bytes": 87420
+        },
+        "sourceFidelity": {
+          "accepted": false,
+          "sourceDefaultPreserved": true,
+          "intentionalShapeChanges": false,
+          "estimatedAnatomy": false,
+          "estimatedHandsFeet": false,
+          "fieldSmoothing": false,
+          "interiorFilling": false,
+          "sourceSurfaceEquivalenceCertified": false
+        },
+        "version": "BODY-IMPLICIT-R21",
+        "build": 9,
+        "pointConstraints": {
+          "global": {
+            "constraints": 9253,
+            "weights": 1021883,
+            "beforeRmsMM": 2.0937797294797207,
+            "afterRmsMM": 0.6930673431637236,
+            "iterations": 77,
+            "regularization": 0.04,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.353483748815474e-8,
+            "maxAbsCoefficientMM": 19.351941762813887,
+            "coefficientRmsMM": 3.0939446937185133,
+            "objective": 0.007987579085340736,
+            "solutionL2ErrorBoundMM": 0.00044375566659761006,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          },
+          "local": {
+            "constraints": 9253,
+            "weights": 176382,
+            "beforeRmsMM": 1.1779483462498082,
+            "afterRmsMM": 0.11587020590281376,
+            "iterations": 210,
+            "regularization": 0.002,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.32421287359155e-8,
+            "maxAbsCoefficientMM": 16.37503434626673,
+            "coefficientRmsMM": 2.43543178297471,
+            "objective": 0.0002339950508154817,
+            "solutionL2ErrorBoundMM": 0.004797019214793105,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          }
+        },
+        "fieldMS": 13303.5,
+        "dimensions": [
+          186,
+          238,
+          123
+        ],
+        "channels": 4,
+        "scalarCoefficients": 5444964,
+        "materialCoordinateCoefficients": 16334892,
+        "localScalarCoefficients": 15907482,
+        "materialCoordinatesFollowBody": true,
+        "authoredNormalField": true,
+        "normalFieldCoefficients": 21779856,
+        "localRegions": [
+          {
+            "region": "left hand",
+            "dimensions": [
+              139,
+              161,
+              171
+            ]
+          },
+          {
+            "region": "right hand",
+            "dimensions": [
+              139,
+              161,
+              171
+            ]
+          },
+          {
+            "region": "left foot",
+            "dimensions": [
+              124,
+              123,
+              237
+            ]
+          },
+          {
+            "region": "right foot",
+            "dimensions": [
+              121,
+              213,
+              180
+            ]
+          }
+        ],
+        "orientedSamples": 9253,
+        "fieldVoxelsNearSamples": 661173,
+        "characterVertices": 0,
+        "characterFaces": 0,
+        "characterTriangleIndices": 0,
+        "usesPolygonConnectivity": false,
+        "headGenerated": false,
+        "sourceDerivedCalibration": true,
+        "exactShapeEquivalenceCertified": false
+      },
+      "bounds": [
+        [
+          -0.6480791401863099,
+          0.6480727624893189
+        ],
+        [
+          -1.0085570049285888,
+          0.6536520552635193
+        ],
+        [
+          -0.46714977741241454,
+          0.3896561098098755
+        ]
+      ],
+      "dimensions": [
+        186,
+        238,
+        123
+      ],
+      "cap": 0.5963848165490411
+    },
+    "renderer": {
+      "version": "BODY-RAY-R21",
+      "canvasSize": {
+        "width": 791,
+        "height": 866
+      },
+      "responsiveAspect": true,
+      "characterMeshes": 0,
+      "characterVertexBuffers": 0,
+      "characterElementBuffers": 0,
+      "characterTriangleFaces": 0,
+      "rasterPrimitive": "POINTS",
+      "continuousRestSpaceSurfaceDetails": false,
+      "sourceFidelityAccepted": false,
+      "normalFieldCPUReleased": false,
+      "gpuFieldBytesEstimate": 428758560,
+      "localGpuPrecision": "float32",
+      "rayIterationBudget": 320,
+      "screenTileSize": 64,
+      "draws": 26,
+      "webglError": 0,
+      "camera": {
+        "yaw": 0.28,
+        "pitch": 0.04,
+        "distance": 2.2439873811006548,
+        "target": [
+          0,
+          -0.17745056748390192,
+          0
+        ]
+      },
+      "appearance": {
+        "roughness": 0.52,
+        "noise": 1,
+        "oil": 0.45,
+        "bodyVariation": 0.64,
+        "bodyPores": 0.78,
+        "jointTone": 0.42,
+        "neckCreases": 0.34,
+        "enabled": true,
+        "regionalColor": 0.72,
+        "lidWarmth": 0.46,
+        "noseWarmth": 0.38,
+        "earBlood": 0.44,
+        "earTransmission": 0.58,
+        "beardShadow": 0.04,
+        "audit": 0
+      },
+      "lighting": {
+        "key": 1.6,
+        "rim": 3.5,
+        "environment": 0.9,
+        "exposure": 0.7,
+        "keyAzimuth": -154,
+        "keyElevation": 8,
+        "rimAzimuth": 71,
+        "rimElevation": 11.309932,
+        "keyColor": "#ffffff",
+        "rimColor": "#efa37e",
+        "schema": "kaopu.eb1/1",
+        "preset": "custom",
+        "environmentRotation": -69,
+        "background": 0.85,
+        "shadowSize": 2048
+      },
+      "implicitStats": {
+        "intervalCache": {
+          "dimensions": [
+            47,
+            60,
+            31
+          ],
+          "activeCells": 5972,
+          "cells": 87420,
+          "bytes": 87420
+        },
+        "sourceFidelity": {
+          "accepted": false,
+          "sourceDefaultPreserved": true,
+          "intentionalShapeChanges": false,
+          "estimatedAnatomy": false,
+          "estimatedHandsFeet": false,
+          "fieldSmoothing": false,
+          "interiorFilling": false,
+          "sourceSurfaceEquivalenceCertified": false
+        },
+        "version": "BODY-IMPLICIT-R21",
+        "build": 9,
+        "pointConstraints": {
+          "global": {
+            "constraints": 9253,
+            "weights": 1021883,
+            "beforeRmsMM": 2.0937797294797207,
+            "afterRmsMM": 0.6930673431637236,
+            "iterations": 77,
+            "regularization": 0.04,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.353483748815474e-8,
+            "maxAbsCoefficientMM": 19.351941762813887,
+            "coefficientRmsMM": 3.0939446937185133,
+            "objective": 0.007987579085340736,
+            "solutionL2ErrorBoundMM": 0.00044375566659761006,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          },
+          "local": {
+            "constraints": 9253,
+            "weights": 176382,
+            "beforeRmsMM": 1.1779483462498082,
+            "afterRmsMM": 0.11587020590281376,
+            "iterations": 210,
+            "regularization": 0.002,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.32421287359155e-8,
+            "maxAbsCoefficientMM": 16.37503434626673,
+            "coefficientRmsMM": 2.43543178297471,
+            "objective": 0.0002339950508154817,
+            "solutionL2ErrorBoundMM": 0.004797019214793105,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          }
+        },
+        "fieldMS": 13303.5,
+        "dimensions": [
+          186,
+          238,
+          123
+        ],
+        "channels": 4,
+        "scalarCoefficients": 5444964,
+        "materialCoordinateCoefficients": 16334892,
+        "localScalarCoefficients": 15907482,
+        "materialCoordinatesFollowBody": true,
+        "authoredNormalField": true,
+        "normalFieldCoefficients": 21779856,
+        "localRegions": [
+          {
+            "region": "left hand",
+            "dimensions": [
+              139,
+              161,
+              171
+            ]
+          },
+          {
+            "region": "right hand",
+            "dimensions": [
+              139,
+              161,
+              171
+            ]
+          },
+          {
+            "region": "left foot",
+            "dimensions": [
+              124,
+              123,
+              237
+            ]
+          },
+          {
+            "region": "right foot",
+            "dimensions": [
+              121,
+              213,
+              180
+            ]
+          }
+        ],
+        "orientedSamples": 9253,
+        "fieldVoxelsNearSamples": 661173,
+        "characterVertices": 0,
+        "characterFaces": 0,
+        "characterTriangleIndices": 0,
+        "usesPolygonConnectivity": false,
+        "headGenerated": false,
+        "sourceDerivedCalibration": true,
+        "exactShapeEquivalenceCertified": false
+      }
+    },
+    "sourceFidelityAccepted": false,
+    "intentionalShapeChanges": false,
+    "headGenerated": false,
+    "sourceDerivedData": true,
+    "wholeBodySourceIndependent": false,
+    "allOriginalControlCombinationsCertified": false
+  },
+  "artifactStable": true,
+  "passed": true,
+  "browserClosed": true,
+  "finishedUTC": "2026-10-24T04:33:41.141Z"
+}
