@@ -1,0 +1,96 @@
+{
+  "startedUTC": "2026-10-24T10:35:55.660Z",
+  "artifactSHA256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
+  "sourceFidelityAccepted": false,
+  "acceptanceTolerance": null,
+  "bodySkinOnly": true,
+  "attachmentsExcludedAfterOriginalSceneHooks": true,
+  "matchedCameraBasis": true,
+  "shadowHistory": "original m.compute -> v.update -> v.render per state, no forced shadow refresh; full source casters retained during refresh",
+  "scope": "Actual frozen original body and compose render; head/attachment meshes hidden offline only; source body faces retained only in the original reference page",
+  "newImageFiles": 0,
+  "cases": [],
+  "errors": [],
+  "sourceAttributes": {
+    "baseline": {
+      "shadowFields": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "sha256": "8563c54e95a2f04cd87fa3002ba9045c297eba1986819ccaf973e67475434720",
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "sha256": "7f852f83c39bb3a2bc74dabc6aef857ee8d11d9eb8c7e3fd64b9142f8359a26c",
+          "error": 0
+        }
+      ],
+      "shadowMatrices": [
+        [
+          -0.32099787367827387,
+          0.021789097096448537,
+          0.05494999353453757,
+          0,
+          0,
+          0.35366716740770365,
+          -0.017616848222793087,
+          0,
+          0.15656112385324183,
+          0.04467426948139275,
+          0.11266418283861993,
+          0,
+          0.49528858139701026,
+          0.24523482110767508,
+          0.4396315921278908,
+          1
+        ],
+        [
+          0.11627434087755596,
+          -0.06622551467047466,
+          -0.11736167661691244,
+          0,
+          -1.2390881971262908e-17,
+          0.35020738475479674,
+          -0.02482482620577604,
+          0,
+          -0.3376852055711846,
+          -0.022803273405364262,
+          -0.04041086600117497,
+          0,
+          0.5101247046385602,
+          0.24972995794325747,
+          0.44937165595472706,
+          1
+        ]
+      ],
+      "bodyColourAllOne": false,
+      "colourChannels": 3,
+      "bodyCount": 9253
+    }
+  },
+  "referenceShadowVisibilityPreserved": true,
+  "forcedFreshShadowRebuild": false,
+  "originalShadowUpdatePolicyReplayAccepted": true,
+  "shadowParity": {
+    "baseline": [
+      {
+        "name": "RESTORED_EB1_KEY",
+        "expected": "8563c54e95a2f04cd87fa3002ba9045c297eba1986819ccaf973e67475434720",
+        "actual": "8563c54e95a2f04cd87fa3002ba9045c297eba1986819ccaf973e67475434720",
+        "matched": true,
+        "error": 0,
+        "matrixMatched": true
+      },
+      {
+        "name": "RESTORED_EB1_RIM",
+        "expected": "7f852f83c39bb3a2bc74dabc6aef857ee8d11d9eb8c7e3fd64b9142f8359a26c",
+        "actual": "7f852f83c39bb3a2bc74dabc6aef857ee8d11d9eb8c7e3fd64b9142f8359a26c",
+        "matched": true,
+        "error": 0,
+        "matrixMatched": true
+      }
+    ]
+  },
+  "failure": "page.evaluate: Error: Original hooks re-enabled non-body meshes\n    at eval (eval at evaluate (:311:30), <anonymous>:1:738)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-active-profiles-pixels-r23.cjs:4:3992",
+  "finishedUTC": "2026-10-24T10:38:25.539Z"
+}

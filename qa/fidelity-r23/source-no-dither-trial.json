@@ -1,0 +1,717 @@
+{
+  "startedUTC": "2026-10-24T09:36:28.373Z",
+  "artifactSHA256": "ba298c1aea44f88281ffdf25dcd99073140136f928fd067417ba2de0042daaa0",
+  "referenceArtifactSHA256": "59314d7715e5c4ab887739b7b321f83ebadce364ed92c6d7e60a7349d5a62e4b",
+  "referenceSubmissionBarrier": true,
+  "sourceFidelityAccepted": false,
+  "acceptanceTolerance": null,
+  "newImageFiles": 0,
+  "checks": [
+    {
+      "name": "initially loads only six current-state coefficient arrays",
+      "passed": true,
+      "details": {
+        "decodedStates": 1,
+        "pending": 0,
+        "hits": 0,
+        "requests": 6,
+        "loadedCompressedBytes": 5278913,
+        "evictions": 0,
+        "decodedStateLimit": 2,
+        "sourceCoefficientsByteExact": true
+      }
+    },
+    {
+      "name": "original skin initially uses a single WebGL context",
+      "passed": true
+    },
+    {
+      "name": "worker payload excludes skin, environment, archives and unused metadata",
+      "passed": true
+    },
+    {
+      "name": "baseline front full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline side full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline back full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "lean front full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "lean side full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "lean back full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "fuller front full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "fuller side full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "fuller back full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "muscular front full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "muscular side full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "muscular back full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "female front full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "female side full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "female back full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-reach front full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-reach side full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-reach back full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints front full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints side full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints back full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-neutral front full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-neutral side full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-neutral back full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend front full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend side full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend back full-frame output unchanged",
+      "passed": true
+    },
+    {
+      "name": "decoded source cache stays within two states",
+      "passed": true,
+      "details": {
+        "decodedStates": 2,
+        "pending": 0,
+        "hits": 0,
+        "requests": 54,
+        "loadedCompressedBytes": 46963012,
+        "evictions": 7,
+        "decodedStateLimit": 2,
+        "sourceCoefficientsByteExact": true
+      }
+    },
+    {
+      "name": "corrupt lazy coefficient is rejected without changing the person",
+      "passed": true,
+      "details": "原函数压缩字段校验失败"
+    },
+    {
+      "name": "failed coefficient load can retry",
+      "passed": true
+    },
+    {
+      "name": "active obsolete computation is cancelled",
+      "passed": false
+    }
+  ],
+  "frames": [
+    {
+      "id": "baseline",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "dc40e6ad128053c16c4a7a916bfc8c4404bb03112104b213d927f1b11857e4bf",
+      "maskSHA256": "3315d2af31aca32d646aa46773c9b41c06f7aecfe68f5739abe1bbfc3aae9c09",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 504,
+      "referencePrecisionMS": 542.8999999761581
+    },
+    {
+      "id": "baseline",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "87a72db799ea52be58441d73e7337d400cf804ef3914656e73755267dc9b261e",
+      "maskSHA256": "9d3b25b829c11d7d465a51c691edb7ca2fe957123905b20f8b54325e61564d99",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 306.2999999523163,
+      "referencePrecisionMS": 291.89999997615814
+    },
+    {
+      "id": "baseline",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "5b95dc97e9d24068c360d34a9bcf13c06330cb1dd679970896349135154baed7",
+      "maskSHA256": "9dfae0c21c85b3d96d89800c11026c2300ace559da4876ed5cf77d785ee3f6ac",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 398.10000002384186,
+      "referencePrecisionMS": 381.2000000476837
+    },
+    {
+      "id": "lean",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "973b07bbaf367f6c030f795648d00d74e2ccfef25130d2a305443f14ba1b36c1",
+      "maskSHA256": "b3bf758fd08c9106627c8150b79d813715dd6a8ea7bf8bd6a4213e1d230e6b4b",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 668.6000000238419,
+      "referencePrecisionMS": 678.0999999046326
+    },
+    {
+      "id": "lean",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "f44b6d0bd8671b766e55aef76b505bee3ed9d5e4f3053f57d87907f14194cd26",
+      "maskSHA256": "ffb446ac9e69e581458ccad68b41a0b5375f1740004a142f3418e77e1aae3ea9",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 409.3000000715256,
+      "referencePrecisionMS": 415.6999999284744
+    },
+    {
+      "id": "lean",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "21a40b0f46586fb2a216356fa91faad9d81f465f4915305d25ed427ff19ef8fb",
+      "maskSHA256": "dfbb673097c487f12e2f2d9939186cb78afb608dedb633ff3198d27744166ed3",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 520.5,
+      "referencePrecisionMS": 533.8000000715256
+    },
+    {
+      "id": "fuller",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "a3b04aeceabce85c24868619e586d1c6c1e47292e7b5532ea674bddee039a191",
+      "maskSHA256": "12f42eff86bd54e6ae89e6a0aa628db3478f821ebff4da792b049b75806a603e",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 671.7000000476837,
+      "referencePrecisionMS": 664.7999999523163
+    },
+    {
+      "id": "fuller",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "08a16d8f367ad5a41dd2fb0be23bae81cd3c378acfd0609cbe0cded35c889662",
+      "maskSHA256": "1622bc52bef152eac26911194e0ae0c07c0cee2ab671f80473bb9cbba7b74fd5",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 369.2999999523163,
+      "referencePrecisionMS": 353.5
+    },
+    {
+      "id": "fuller",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "b2e1f25f9c7571a113b756c0ca5c5ec48d01e4cf088351fa7be7977e5b40ea63",
+      "maskSHA256": "6b00c601b43dbe4489b95ffc9779c3e057692f9010cffe9e9f23dea7f84513d0",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 541.3999999761581,
+      "referencePrecisionMS": 527.2000000476837
+    },
+    {
+      "id": "muscular",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "953d1a238b77bd5feed8f412c7258f7dd3ebebeca40924f53f245147b9dc4e42",
+      "maskSHA256": "c63d4ffdbeeaa402cb1755851deb24d777c4a824425b0507589b79fb804ec468",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 659.2999999523163,
+      "referencePrecisionMS": 705.8000000715256
+    },
+    {
+      "id": "muscular",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "6671dd10295e43eaf75aeb8c0ddff6fccc8b85c27ae19caf70e2ae7981e75e1d",
+      "maskSHA256": "5b01914660c3929edadb485d3f524bc28e49f45e830382c11b517cb0ede239c5",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 405.3000000715256,
+      "referencePrecisionMS": 394.89999997615814
+    },
+    {
+      "id": "muscular",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "6cdd0757ce1356f1370227fe61d13d8159c3cd6cddcec6f73ff63f051e79786f",
+      "maskSHA256": "2a8b85e8e4429cb57d0b8641e737f1d4081ef587e7336f993daec1cd7e6d990f",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 565.7000000476837,
+      "referencePrecisionMS": 560.1000000238419
+    },
+    {
+      "id": "female",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "9a2a94986d15d8eef2eabd0251a7944ccd706cda80dca48d2ff4fb05e772c437",
+      "maskSHA256": "53168ca8ae2854ca286745736a9d9c7f5adfb3b5172fde2329e223631fcc1029",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 634.3999999761581,
+      "referencePrecisionMS": 611.6000000238419
+    },
+    {
+      "id": "female",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "0880a4de8a2add767868e90dc47ea67d93398990518ee89edeef65ab5bde7bac",
+      "maskSHA256": "b753260dbf6d5118ead5970d7a3f280577bb33caf2abe10e290e842c9197615b",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 414,
+      "referencePrecisionMS": 405
+    },
+    {
+      "id": "female",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "0c0146c4a74cb5deb10367afd04101b7217542fcb9f5688316493cfe1c5aaee3",
+      "maskSHA256": "96c06076acd7284a407d354fc6b20a3bf3a6fdbd7023f8e44e2409634c60643a",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 511.7000000476837,
+      "referencePrecisionMS": 514.7999999523163
+    },
+    {
+      "id": "A-reach",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "3637de12b70b345d34c7deb6e5e89c6ee70a43a556ad98b8efdc79d651857fcd",
+      "maskSHA256": "f6e112450d93cc40831af71f069a8005f81fa8a6b0a048de353012c6b61df907",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 705.3999999761581,
+      "referencePrecisionMS": 748.3999999761581
+    },
+    {
+      "id": "A-reach",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "c3072038aff289c9cbe259d64dd80012c5d0fcebb045c899025d27f2a25320ac",
+      "maskSHA256": "52b6d15e723d3cdf4b7b91f1f8dd0ad2e796ce21ff61a22267cd069d10dbbac5",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 619,
+      "referencePrecisionMS": 664.6000000238419
+    },
+    {
+      "id": "A-reach",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "9b0e66c2d14c9b10703095f3dcfbafdb2e43e6a2acfbc98f0b1d04051c752fc6",
+      "maskSHA256": "52af8a30b263ea13b042b38f32ec210043cfc5e552fbb53cf9a5f58ecad08e86",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 762.6000000238419,
+      "referencePrecisionMS": 734.8000000715256
+    },
+    {
+      "id": "A-joints",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "bbede740ac80f23adee46d7c5cabe6ce3dc421f993e6cace06726d3a8f15d205",
+      "maskSHA256": "010f7c55c9da72a65e731ef47f58efcc2599c6a661f761530a281e4923258282",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 976.9000000953674,
+      "referencePrecisionMS": 941.5
+    },
+    {
+      "id": "A-joints",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "7d642ff0808d376a8c7e4ebe6d64483e6e1dc0712242314fed4dce3ca496b6ff",
+      "maskSHA256": "85b66f9826815db91fd98a3364e2bb3ea71faf2032e64def9bd9503241c12b5d",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 604.3999999761581,
+      "referencePrecisionMS": 615.1000000238419
+    },
+    {
+      "id": "A-joints",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "42bf9f133a0a83c1aae85114f8afb6f4f6f365eea356c5a98c80e1531664c010",
+      "maskSHA256": "500ff537f57d871accc8cba8e169bebc7c147f6b3b926cdd73b3f837ae9d057e",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 804.5,
+      "referencePrecisionMS": 817.7000000476837
+    },
+    {
+      "id": "B-neutral",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "dc40e6ad128053c16c4a7a916bfc8c4404bb03112104b213d927f1b11857e4bf",
+      "maskSHA256": "3315d2af31aca32d646aa46773c9b41c06f7aecfe68f5739abe1bbfc3aae9c09",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 831.2999999523163,
+      "referencePrecisionMS": 839
+    },
+    {
+      "id": "B-neutral",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "87a72db799ea52be58441d73e7337d400cf804ef3914656e73755267dc9b261e",
+      "maskSHA256": "9d3b25b829c11d7d465a51c691edb7ca2fe957123905b20f8b54325e61564d99",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 495.39999997615814,
+      "referencePrecisionMS": 662.6000000238419
+    },
+    {
+      "id": "B-neutral",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "5b95dc97e9d24068c360d34a9bcf13c06330cb1dd679970896349135154baed7",
+      "maskSHA256": "9dfae0c21c85b3d96d89800c11026c2300ace559da4876ed5cf77d785ee3f6ac",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 759.1000000238419,
+      "referencePrecisionMS": 632.3999999761581
+    },
+    {
+      "id": "B-bend",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "ffffa46190cae84a96e5fd9b172484f93a2c8d113d1f1382cea0e160b7688d4c",
+      "maskSHA256": "e4c5d859f117ac9859eb8f661cb49c730aa6d6beed9defc5f52c5cec3b3699f7",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 1137.6000000238419,
+      "referencePrecisionMS": 1000.8999999761581
+    },
+    {
+      "id": "B-bend",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "7bc8c52fbd82982310912e337ef6b6200129b36b64551fd493a247b32d4c2cf5",
+      "maskSHA256": "8eb8e90319d858b5e636a3b740da9a05b9dc1784f6d7714bc2ea4fedf7af417f",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 625,
+      "referencePrecisionMS": 564.8000000715256
+    },
+    {
+      "id": "B-bend",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differingBytes": 0,
+      "maximumCodeDifference": 0,
+      "colourSHA256": "4513d2014d5feefb15c2609ef066364b14caf8ab0e49d95f9c0a86d7e9e4ab71",
+      "maskSHA256": "d3e657e0d5345d321340ff8ba4cf945859aa13d2e2decdcaee30ebd9fd8ad1d9",
+      "maskExact": true,
+      "cameraExact": true,
+      "precisionMS": 707,
+      "referencePrecisionMS": 695.8999999761581
+    }
+  ],
+  "errors": [],
+  "currentInitial": {
+    "ms": 7518,
+    "requests": [
+      "http://127.0.0.1:8914/%E8%BA%AB%E4%BD%93_R23_%E5%8E%9F%E8%B2%8C%E4%B8%8E%E6%8C%89%E9%9C%80%E7%BB%86%E8%8A%82.html",
+      "http://127.0.0.1:8914/assets/body-atlas-r23/d34306fdbb1e4b012e420c13db2d91e67ccbed94741a72e401101ba455b9e05f.gz",
+      "http://127.0.0.1:8914/assets/body-atlas-r23/c9f4549289e3c23b9544d8041ade85cf3c5904315f81be4a430d0332af9eb503.gz",
+      "http://127.0.0.1:8914/assets/body-atlas-r23/e06cbc7544213d3c644372eb9385e1efe2533c52a07fb355ef9957aa8b084285.gz",
+      "http://127.0.0.1:8914/assets/body-atlas-r23/9d7ec6e1df2bf8207ddf762a143b004ae6da82ac0edf3a5d05dc552923757c95.gz",
+      "http://127.0.0.1:8914/assets/body-atlas-r23/c1884f0f8f79a3baf436713b93475a3be0c3c36746aa319305e1f492c1dc1639.gz",
+      "http://127.0.0.1:8914/assets/body-atlas-r23/7d2f8a070943b6089dc671a3faeb7022ddca8219ba75e8a592623ebb7e1b9c35.gz",
+      "http://127.0.0.1:8914/assets/body-skin-r22/gmMesoMap-mips-15eb39465abca38cfa66de2abe1bdb5e761ba73730b58614a6028129cd567bf6.gz",
+      "http://127.0.0.1:8914/assets/body-skin-r22/gmPoreMap-mips-145741339125824c92303771045c41a62acff5044f986053667a7324eadf7ec7.gz",
+      "http://127.0.0.1:8914/assets/body-skin-r22/gmWrinkleMap-mips-18672477a20b75db33da756b0e3412a1d1bf2e3b07321db04667c9c879a2ce96.gz",
+      "http://127.0.0.1:8914/assets/body-skin-r22/gmCavityMap-mips-eb2cf12f72c005b468804e9251a4465f9a34681e5375dd88057d6d954b792e86.gz",
+      "http://127.0.0.1:8914/assets/body-skin-r22/shadow-8563c54e95a2f04cd87fa3002ba9045c297eba1986819ccaf973e67475434720.gz",
+      "http://127.0.0.1:8914/assets/body-skin-r22/shadow-7f852f83c39bb3a2bc74dabc6aef857ee8d11d9eb8c7e3fd64b9142f8359a26c.gz"
+    ],
+    "report": {
+      "schema": "body-source-atlas-ray/1",
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "workers": 6,
+        "lastError": null,
+        "profile": "baseline",
+        "frame": 4,
+        "lastMS": 537.3999999761581,
+        "diagnosticContextAllocated": false,
+        "cancelledTasks": 0,
+        "completedFrames": 1,
+        "startedTasks": 6,
+        "coalescedWorkerJobs": true,
+        "workerPayload": "intersection coefficients only",
+        "precision": "Float64 direct function intersection",
+        "material": "shared source GLSL after Float64 intersections",
+        "characterTriangleFaces": 0,
+        "sourceFacetPartitionInformationRetained": true
+      },
+      "characterVertexBuffers": 0,
+      "characterTriangleFaces": 0,
+      "characterElementBuffers": 0,
+      "rasterPrimitive": "POINTS",
+      "gpuBytes": 8495888,
+      "draws": 4,
+      "lastMS": 321.7000000476837,
+      "webglError": 0,
+      "sourceBodyReliefAndRoughnessFieldsRestored": true,
+      "sourceBodyAlbedoRestored": true,
+      "originalEB1LightsAndEnvironmentRestored": true,
+      "originalSceneShadowsRestored": true,
+      "originalSkinOpticsRestored": false,
+      "originalActiveSkin": {
+        "sourceActiveBodyMaterial": true,
+        "explicitPointSubmission": true,
+        "sourceHostMaterialDifferent": true,
+        "sourceShaderSHA256": "27c846dc419b218d93db3057cf8bd452f088a337dfa057ff1abccda0e1d6f9c7",
+        "sourceGraphFieldsByteExact": true,
+        "sharedGraphGPUBytes": 178956960,
+        "currentSourceShadowGPUBytes": 33554432,
+        "materialTargetsGPUBytes": 23296504,
+        "sourceShadows": true,
+        "sourceDiffusion": true,
+        "fullVolumeScattering": false,
+        "sourceFidelityAccepted": false,
+        "bodySurfaceControls": {},
+        "draws": 39,
+        "lastMS": 2.5
+      },
+      "sourceFacetPartitionInformationRetained": true,
+      "completedMotherConversion": false,
+      "parameterVariationImplemented": false,
+      "sourceFidelityAccepted": false,
+      "camera": {
+        "yaw": 0.28,
+        "pitch": 0.04,
+        "distance": 2.120683890581131,
+        "target": [
+          0,
+          -0.1781185269355774,
+          0
+        ]
+      },
+      "canvasSize": {
+        "width": 641,
+        "height": 826
+      },
+      "program": {
+        "schema": "source-affine-atlas-research/1",
+        "mode": "full",
+        "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+        "offlineReferenceSHA256": "1e8b89fc509467ae1eeb8689b5afc853265d0da119ff4259a17b2e84f550d4c5",
+        "sourceDerivedCalibration": true,
+        "sourceFacetPartitionInformationRetained": true,
+        "completedMotherConversion": false,
+        "autonomousMother": false,
+        "parameterVariationImplemented": false,
+        "sourceFidelityAccepted": false,
+        "acceptanceTolerance": null,
+        "sourceTrianglesInOfflineReference": 18416,
+        "functions": 18416,
+        "decisionNodes": 172480,
+        "maxDepth": 22,
+        "maxProjectedLayers": 11,
+        "unresolved": [],
+        "seconds": 11.454000000027008,
+        "runtimeVertices": 0,
+        "runtimeTriangleIndices": 0,
+        "runtimePolygonBuffers": 0,
+        "sourceBodyPaletteAttributePreserved": true,
+        "sourceRestAndDrynessPreserved": true,
+        "profile": "baseline",
+        "sourceMaterialSide": 0
+      },
+      "ready": true,
+      "busy": false,
+      "lastError": null,
+      "profile": "baseline",
+      "updates": 0,
+      "storage": {
+        "logicalArrays": 54,
+        "uniqueArrays": 51,
+        "logicalBytes": 108975040,
+        "uniqueBytes": 104192036,
+        "compressedBytes": 46253973,
+        "bitExactCoefficients": true,
+        "noLossyQuantization": true,
+        "externalCoefficients": true,
+        "loadCurrentStateOnly": true
+      },
+      "fixedSourceStates": true,
+      "continuousParametersImplemented": false,
+      "coefficientCache": {
+        "decodedStates": 1,
+        "pending": 0,
+        "hits": 0,
+        "requests": 6,
+        "loadedCompressedBytes": 5278913,
+        "evictions": 0,
+        "decodedStateLimit": 2,
+        "sourceCoefficientsByteExact": true
+      },
+      "originalBodySurfaceControlsImplemented": true,
+      "bodySurface": {
+        "bodyVariation": 0.64,
+        "bodyPores": 0.78,
+        "jointTone": 0.42,
+        "neckCreases": 0.34
+      },
+      "archiveStatePreserved": true
+    },
+    "contexts": 1
+  },
+  "referenceInitial": {
+    "ms": 2852,
+    "contexts": 2
+  },
+  "cacheAfterAllStates": {
+    "decodedStates": 2,
+    "pending": 0,
+    "hits": 0,
+    "requests": 54,
+    "loadedCompressedBytes": 46963012,
+    "evictions": 7,
+    "decodedStateLimit": 2,
+    "sourceCoefficientsByteExact": true
+  },
+  "failure": "Error: active obsolete computation is cancelled\n    at check (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-source-no-dither-r23.cjs:4:154)\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-source-no-dither-r23.cjs:28:193",
+  "finishedUTC": "2026-10-24T09:37:46.354Z"
+}

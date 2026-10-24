@@ -1,0 +1,637 @@
+{
+  "startedUTC": "2026-10-24T10:01:31.671Z",
+  "artifactSHA256": "5b797b6ff88403aca2d1627bab045c3c7dfd0190fe1a80e41eb7b9271790a6fa",
+  "workbenchSHA256": "266980ae8d8a1ad9223229708de8c551df296a7311c296a31bed047e0fd913c8",
+  "referenceWorkbenchSHA256": "13c65007f677549baa54708f904c425469fc8a020c0e445ef520348047454733",
+  "sourceFidelityAccepted": false,
+  "newImageFiles": 0,
+  "checks": [
+    {
+      "name": "A-reach one initial field, no temporary default-body field",
+      "passed": true,
+      "details": {
+        "build": 1,
+        "updates": 1
+      }
+    },
+    {
+      "name": "A-reach exact state and whole-person fields transferred",
+      "passed": true
+    },
+    {
+      "name": "A-reach all four body surface settings retained",
+      "passed": true
+    },
+    {
+      "name": "A-reach camera retained",
+      "passed": true
+    },
+    {
+      "name": "A-reach original current neck replay applied",
+      "passed": true,
+      "details": {
+        "schema": "body-neck-source-replay/1",
+        "applied": true,
+        "inputPhase": "after original head rig bridge, before contour",
+        "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+        "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+        "sourceDerived": true,
+        "headSupportSamples": 1398,
+        "bodyChangedSamples": 192,
+        "maxBodyDisplacementMM": 7.537714784455806,
+        "sourceArithmeticPreserved": true,
+        "headSurfaceGenerated": false,
+        "sourceFidelityAccepted": false,
+        "profile": "A-reach"
+      }
+    },
+    {
+      "name": "A-reach directly initialized fields match R22 restore bit for bit",
+      "passed": true,
+      "details": {
+        "buffers": 30
+      }
+    },
+    {
+      "name": "A-reach actual saved complete person includes transferred fields",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "A-reach",
+      "elapsedMS": 36530,
+      "current": {
+        "hashes": [
+          {
+            "bytes": 460,
+            "sha256": "0a77533a3193859fda1e84b34a1c793f1ba7a4ed2dd40d8a14aca26fc7e78187"
+          },
+          {
+            "bytes": 948,
+            "sha256": "1c14ad3e9ce514c7378ab1b6b8156d4a3535c7c5b110d1ea64b7a218cc6c0ad4"
+          },
+          {
+            "bytes": 948,
+            "sha256": "1c14ad3e9ce514c7378ab1b6b8156d4a3535c7c5b110d1ea64b7a218cc6c0ad4"
+          },
+          {
+            "bytes": 684,
+            "sha256": "1fc73db5feb0db934c3aaa3164e5b5707c9e52381a8145e5386d9b6958bcbb78"
+          },
+          {
+            "bytes": 29040,
+            "sha256": "2399501c6535f47a9d949638ae20a2c3c2260d2cb8f2698267aed8fce0c2bf46"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "2ced81d1b6e81d15f028dd8434318a1dbae948e875f94563e1b44dc5a8c00c4b"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "3ce77f9f554b221143edf84d8b83497d6892f7335db26faa22eb1bc1c66218f9"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "41a358e43b84b77af2f4cfb21dfebd216f93656a601dfae942a9119f3fecb786"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "4639c81c0d237d45a36502820578de24c2cb044006fbf534b3620953154d0266"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "499bf27bbb0daa4cc8bfa4e8394cc0d7a6a179f9d383971ec95223c13d82f0a8"
+          },
+          {
+            "bytes": 496,
+            "sha256": "4dd4d06065b99f80ee8a8ffce031064dde91a54623d6494c50440d4103ce2ca7"
+          },
+          {
+            "bytes": 42240,
+            "sha256": "501bca6606e11edfda479914e261ff5f50f855bc861eea1d86b1d9580800186a"
+          },
+          {
+            "bytes": 79380,
+            "sha256": "56769190c8c586a098dc9ceaa7bde34144710d63eb889dae3da55e2ffa0e7f49"
+          },
+          {
+            "bytes": 29040,
+            "sha256": "56efcbf402233ca38799c0c1a9d886298ab950d989fbee07b21560aa369a2139"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "5c659466b53b1f79a04b83428ee4e468c3ff1761d66a1dfc5ea95f089469b878"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "5e1f3f0662c023456510fd1299907917e106baa7f51088463978d68636aadee3"
+          },
+          {
+            "bytes": 696,
+            "sha256": "65c3d6883a8a99cb342fc0afc8739fb57b580040fb9d974c993ead9789ef2c42"
+          },
+          {
+            "bytes": 496,
+            "sha256": "72904d88034d99ccc6d910cdbdd3af22804543d1041df48cc1c558c167509cd6"
+          },
+          {
+            "bytes": 1004,
+            "sha256": "76aa12b510f2d6ea8717d1fcbc5a299045f258bf51960c34431ef1a7feeeaa91"
+          },
+          {
+            "bytes": 492,
+            "sha256": "8c68f991a72d77921805c5f59b2af49b9d66f24dad5fa62ea5923294928bd5e6"
+          },
+          {
+            "bytes": 492,
+            "sha256": "8c68f991a72d77921805c5f59b2af49b9d66f24dad5fa62ea5923294928bd5e6"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "a931e0448495874cbb5dd68bcb757447fc7034b76784cda164e3b7269b692f62"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "b145e7f496b62b68496cd3c75161914b00b094f0789eef80af1b9d7fb4c8bae2"
+          },
+          {
+            "bytes": 684,
+            "sha256": "b1bc652c6a469b4826bbae4a9e448df9f2f8c5127d79c861db161af6dfc92e69"
+          },
+          {
+            "bytes": 324,
+            "sha256": "b6d1828cb3df23bcb08eb44c1d3bffc5e2a38487d292ebbc40b527aec36eca1f"
+          },
+          {
+            "bytes": 460,
+            "sha256": "c831b66f672e71355890c6e6a59e2338832a112a877016f4f8f11bdaed701bc9"
+          },
+          {
+            "bytes": 696,
+            "sha256": "d4cabb4b52635630be644e420236e1ff907040af99132804dde2e633b53ad3cb"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "d4cd8257f256fdb88b280dc7f1e29b373a8c7bffd4abe35c70d135a2ac4efaf4"
+          },
+          {
+            "bytes": 65536,
+            "sha256": "d55492957c3a630b43933ae68292573ae75dfcad17099061d6a0834479971053"
+          },
+          {
+            "bytes": 952,
+            "sha256": "f07d97e488c7cfaec2feaaa7b551ea10e05af299097d148a37e0562302dbd72b"
+          }
+        ],
+        "structure": {
+          "bounds": [
+            [
+              -0.8768270444869996,
+              0.8768228721618653
+            ],
+            [
+              -1.0085570049285888,
+              0.6529066991806031
+            ],
+            [
+              -0.1731761825084686,
+              0.3896625769138336
+            ]
+          ],
+          "dimensions": [
+            251,
+            238,
+            81
+          ],
+          "refinement": {
+            "origins": [
+              [
+                0.6669761420602343,
+                0.573031868298072,
+                0.17401482983024208
+              ],
+              [
+                -0.6669803054961586,
+                0.5730374429422032,
+                0.17401780753504068
+              ],
+              [
+                0.2140082765947465,
+                -0.8837328087498717,
+                -0.012147641661545992
+              ],
+              [
+                -0.21400827659474647,
+                -0.8837328087498717,
+                -0.012147641661545971
+              ]
+            ],
+            "axes": [
+              [
+                0.6939437953497514,
+                -0.05955632511855327,
+                0.717561880978885
+              ],
+              [
+                -0.6939437785817858,
+                -0.05955629122985099,
+                0.7175619000076431
+              ],
+              [
+                0.09208278388317333,
+                -0.3556406941951171,
+                0.9300755117433961
+              ],
+              [
+                -0.09208278388317351,
+                -0.3556406941951171,
+                0.9300755117433959
+              ]
+            ],
+            "ranges": [
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ]
+            ],
+            "blend": "anatomical axial quintic partition; box only as exterior support"
+          },
+          "joints": [
+            [
+              0.4823033371255673,
+              0.5191220944660169,
+              -0.008340931618299286
+            ],
+            [
+              -0.48230610962952847,
+              0.5191298420837048,
+              -0.008336596922684777
+            ],
+            [
+              0.1704903688048578,
+              -0.42190304335414025,
+              0.02004059799901629
+            ],
+            [
+              -0.17049036880485777,
+              -0.42190304335414025,
+              0.020040597999016297
+            ],
+            [
+              0.2140082765947465,
+              -0.8837328087498717,
+              -0.012147641661545992
+            ],
+            [
+              -0.21400827659474647,
+              -0.8837328087498717,
+              -0.012147641661545971
+            ],
+            [
+              0.6669761420602343,
+              0.573031868298072,
+              0.17401482983024208
+            ],
+            [
+              -0.6669803054961586,
+              0.5730374429422032,
+              0.17401780753504068
+            ]
+          ],
+          "cap": 0.5979432680390098
+        },
+        "neck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.537714784455806,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "A-reach"
+        },
+        "build": 1,
+        "fieldMS": 16276,
+        "cache": {
+          "entries": 0,
+          "bytes": 0,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 1,
+          "pendingRawBytes": 182073300,
+          "hits": 0,
+          "misses": 1,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": false
+        }
+      },
+      "reference": {
+        "hashes": [
+          {
+            "bytes": 460,
+            "sha256": "0a77533a3193859fda1e84b34a1c793f1ba7a4ed2dd40d8a14aca26fc7e78187"
+          },
+          {
+            "bytes": 948,
+            "sha256": "1c14ad3e9ce514c7378ab1b6b8156d4a3535c7c5b110d1ea64b7a218cc6c0ad4"
+          },
+          {
+            "bytes": 948,
+            "sha256": "1c14ad3e9ce514c7378ab1b6b8156d4a3535c7c5b110d1ea64b7a218cc6c0ad4"
+          },
+          {
+            "bytes": 684,
+            "sha256": "1fc73db5feb0db934c3aaa3164e5b5707c9e52381a8145e5386d9b6958bcbb78"
+          },
+          {
+            "bytes": 29040,
+            "sha256": "2399501c6535f47a9d949638ae20a2c3c2260d2cb8f2698267aed8fce0c2bf46"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "2ced81d1b6e81d15f028dd8434318a1dbae948e875f94563e1b44dc5a8c00c4b"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "3ce77f9f554b221143edf84d8b83497d6892f7335db26faa22eb1bc1c66218f9"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "41a358e43b84b77af2f4cfb21dfebd216f93656a601dfae942a9119f3fecb786"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "4639c81c0d237d45a36502820578de24c2cb044006fbf534b3620953154d0266"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "499bf27bbb0daa4cc8bfa4e8394cc0d7a6a179f9d383971ec95223c13d82f0a8"
+          },
+          {
+            "bytes": 496,
+            "sha256": "4dd4d06065b99f80ee8a8ffce031064dde91a54623d6494c50440d4103ce2ca7"
+          },
+          {
+            "bytes": 42240,
+            "sha256": "501bca6606e11edfda479914e261ff5f50f855bc861eea1d86b1d9580800186a"
+          },
+          {
+            "bytes": 79380,
+            "sha256": "56769190c8c586a098dc9ceaa7bde34144710d63eb889dae3da55e2ffa0e7f49"
+          },
+          {
+            "bytes": 29040,
+            "sha256": "56efcbf402233ca38799c0c1a9d886298ab950d989fbee07b21560aa369a2139"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "5c659466b53b1f79a04b83428ee4e468c3ff1761d66a1dfc5ea95f089469b878"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "5e1f3f0662c023456510fd1299907917e106baa7f51088463978d68636aadee3"
+          },
+          {
+            "bytes": 696,
+            "sha256": "65c3d6883a8a99cb342fc0afc8739fb57b580040fb9d974c993ead9789ef2c42"
+          },
+          {
+            "bytes": 496,
+            "sha256": "72904d88034d99ccc6d910cdbdd3af22804543d1041df48cc1c558c167509cd6"
+          },
+          {
+            "bytes": 1004,
+            "sha256": "76aa12b510f2d6ea8717d1fcbc5a299045f258bf51960c34431ef1a7feeeaa91"
+          },
+          {
+            "bytes": 492,
+            "sha256": "8c68f991a72d77921805c5f59b2af49b9d66f24dad5fa62ea5923294928bd5e6"
+          },
+          {
+            "bytes": 492,
+            "sha256": "8c68f991a72d77921805c5f59b2af49b9d66f24dad5fa62ea5923294928bd5e6"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "a931e0448495874cbb5dd68bcb757447fc7034b76784cda164e3b7269b692f62"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "b145e7f496b62b68496cd3c75161914b00b094f0789eef80af1b9d7fb4c8bae2"
+          },
+          {
+            "bytes": 684,
+            "sha256": "b1bc652c6a469b4826bbae4a9e448df9f2f8c5127d79c861db161af6dfc92e69"
+          },
+          {
+            "bytes": 324,
+            "sha256": "b6d1828cb3df23bcb08eb44c1d3bffc5e2a38487d292ebbc40b527aec36eca1f"
+          },
+          {
+            "bytes": 460,
+            "sha256": "c831b66f672e71355890c6e6a59e2338832a112a877016f4f8f11bdaed701bc9"
+          },
+          {
+            "bytes": 696,
+            "sha256": "d4cabb4b52635630be644e420236e1ff907040af99132804dde2e633b53ad3cb"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "d4cd8257f256fdb88b280dc7f1e29b373a8c7bffd4abe35c70d135a2ac4efaf4"
+          },
+          {
+            "bytes": 65536,
+            "sha256": "d55492957c3a630b43933ae68292573ae75dfcad17099061d6a0834479971053"
+          },
+          {
+            "bytes": 952,
+            "sha256": "f07d97e488c7cfaec2feaaa7b551ea10e05af299097d148a37e0562302dbd72b"
+          }
+        ],
+        "structure": {
+          "bounds": [
+            [
+              -0.8768270444869996,
+              0.8768228721618653
+            ],
+            [
+              -1.0085570049285888,
+              0.6529066991806031
+            ],
+            [
+              -0.1731761825084686,
+              0.3896625769138336
+            ]
+          ],
+          "dimensions": [
+            251,
+            238,
+            81
+          ],
+          "refinement": {
+            "origins": [
+              [
+                0.6669761420602343,
+                0.573031868298072,
+                0.17401482983024208
+              ],
+              [
+                -0.6669803054961586,
+                0.5730374429422032,
+                0.17401780753504068
+              ],
+              [
+                0.2140082765947465,
+                -0.8837328087498717,
+                -0.012147641661545992
+              ],
+              [
+                -0.21400827659474647,
+                -0.8837328087498717,
+                -0.012147641661545971
+              ]
+            ],
+            "axes": [
+              [
+                0.6939437953497514,
+                -0.05955632511855327,
+                0.717561880978885
+              ],
+              [
+                -0.6939437785817858,
+                -0.05955629122985099,
+                0.7175619000076431
+              ],
+              [
+                0.09208278388317333,
+                -0.3556406941951171,
+                0.9300755117433961
+              ],
+              [
+                -0.09208278388317351,
+                -0.3556406941951171,
+                0.9300755117433959
+              ]
+            ],
+            "ranges": [
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ]
+            ],
+            "blend": "anatomical axial quintic partition; box only as exterior support"
+          },
+          "joints": [
+            [
+              0.4823033371255673,
+              0.5191220944660169,
+              -0.008340931618299286
+            ],
+            [
+              -0.48230610962952847,
+              0.5191298420837048,
+              -0.008336596922684777
+            ],
+            [
+              0.1704903688048578,
+              -0.42190304335414025,
+              0.02004059799901629
+            ],
+            [
+              -0.17049036880485777,
+              -0.42190304335414025,
+              0.020040597999016297
+            ],
+            [
+              0.2140082765947465,
+              -0.8837328087498717,
+              -0.012147641661545992
+            ],
+            [
+              -0.21400827659474647,
+              -0.8837328087498717,
+              -0.012147641661545971
+            ],
+            [
+              0.6669761420602343,
+              0.573031868298072,
+              0.17401482983024208
+            ],
+            [
+              -0.6669803054961586,
+              0.5730374429422032,
+              0.17401780753504068
+            ]
+          ],
+          "cap": 0.5979432680390098
+        },
+        "neck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.537714784455806,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "A-reach"
+        },
+        "build": 2,
+        "fieldMS": 16332.700000047684,
+        "cache": {
+          "entries": 1,
+          "bytes": 62601990,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 1,
+          "pendingRawBytes": 182073300,
+          "hits": 0,
+          "misses": 2,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": false
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "failure": "page.waitForURL: Timeout 180000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"http://127.0.0.1:8914/%E8%BA%AB%E4%BD%93_R23_%E5%8E%9F%E8%B2%8C%E4%B8%8E%E6%8C%89%E9%9C%80%E7%BB%86%E8%8A%82.html\" until \"load\"\n============================================================\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-handoff-r23.cjs:21:62",
+  "finishedUTC": "2026-10-24T10:06:23.540Z"
+}

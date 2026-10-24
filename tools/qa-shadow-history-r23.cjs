@@ -1,0 +1,22 @@
+'use strict';
+// Isolated original-reference inspection. No original triangles enter the product.
+const fs=require('fs'),path=require('path'),{pathToFileURL}=require('url'),{chromium}=require('C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+let browser;const out='qa/fidelity-r23/shadow-history.json',q={startedUTC:new Date().toISOString(),cases:[],sourceFidelityAccepted:false};
+(async()=>{try{
+ browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--enable-unsafe-swiftshader']});
+ const p=await browser.newPage({viewport:{width:1000,height:950}});p.setDefaultTimeout(300000);await p.route(/^https?:/,r=>r.abort());
+ await p.addInitScript(()=>{window.__PAUSE_REFERENCE_TRIANGLES__=true;const draw=WebGL2RenderingContext.prototype.drawElements;WebGL2RenderingContext.prototype.drawElements=function(...args){if(!window.__PAUSE_REFERENCE_TRIANGLES__)return draw.apply(this,args);};});
+ await p.goto(pathToFileURL(path.resolve('qa/legacy-comparison/人物身体_R01_参数保留与函数重构.html')).href,{waitUntil:'domcontentloaded',timeout:300000});await p.waitForFunction(()=>window.__BODY_RECONSTRUCTION_R01_READY__);
+ await p.evaluate(()=>{window.__PAUSE_REFERENCE_TRIANGLES__=false;restoredLighting.setReverse(true);restoredLighting.setReverse(false);const v=__IDENTITY_QA__.viewer();v.scene.traverse(o=>{if(o.isDirectionalLight&&o.visible)o.shadow.needsUpdate=true;});v.renderer.shadowMap.needsUpdate=true;v.render();});console.log('Original ready');
+ const expected=JSON.parse(fs.readFileSync('data/body-active-skin-r22.json')).profiles;
+ for(const id of ['baseline','lean','fuller','muscular','female','A-reach','A-joints','B-neutral','B-bend']){
+ const state=JSON.parse(fs.readFileSync('qa/fidelity-r21/offline/case-'+id+'.json')).sourceState;
+ const result=await p.evaluate(async state=>{
+  const v=__IDENTITY_QA__.viewer(),m=__IDENTITY_QA__.model();m.bodyDriver=bodyWorkbenchR01.original();m.compute(state);v.update();v.render();
+  async function snapshot(label){const gl=v.renderer.getContext(),fields=[];for(const light of v.scene.children.filter(l=>l.isDirectionalLight&&l.visible&&l.intensity>0)){const t=light.shadow.map.texture,old=gl.getParameter(gl.FRAMEBUFFER_BINDING),fbo=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,v.renderer.properties.get(t).__webglTexture,0);const data=new Uint8Array(t.image.width*t.image.height*4);gl.readPixels(0,0,t.image.width,t.image.height,gl.RGBA,gl.UNSIGNED_BYTE,data);gl.bindFramebuffer(gl.FRAMEBUFFER,old);gl.deleteFramebuffer(fbo);fields.push({name:light.name,sha256:Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',data)),v=>v.toString(16).padStart(2,'0')).join(''),error:gl.getError(),matrix:light.shadow.matrix.toArray(),position:light.position.toArray(),target:light.target.position.toArray(),needsUpdate:light.shadow.needsUpdate,autoUpdate:light.shadow.autoUpdate});}const casters=[];v.scene.traverse(o=>{if(o.isMesh&&o.castShadow)casters.push({name:o.name,visible:o.visible,parentVisible:o.parent?.visible,count:o.geometry?.index?.count,groups:o.geometry?.groups.map(g=>({...g})),drawRange:o.geometry?.drawRange});});return{label,fields,positionVersion:v.geometry.attributes.position.version,rendererAutoUpdate:v.renderer.shadowMap.autoUpdate,rendererNeedsUpdate:v.renderer.shadowMap.needsUpdate,casters};}
+  const a=await snapshot('native-update');for(const l of v.scene.children.filter(l=>l.isDirectionalLight&&l.visible&&l.intensity>0))l.shadow.needsUpdate=true;v.renderer.shadowMap.needsUpdate=true;v.render();const b=await snapshot('forced-fresh');v.render();const c=await snapshot('second-native-render');return[a,b,c];
+ },state);
+ q.cases.push({id,snapshots:result,expected:expected[id].shadows.map(t=>({sha256:t.sha256,matrix:t.matrix})),nativeMatches:result[0].fields.map((t,i)=>t.sha256===expected[id].shadows[i].sha256),forceChanges:result[1].fields.map((t,i)=>t.sha256!==result[0].fields[i].sha256)});fs.writeFileSync(out,JSON.stringify(q,null,2));console.log(JSON.stringify({id,nativeMatches:q.cases.at(-1).nativeMatches,forceChanges:q.cases.at(-1).forceChanges}));
+ }
+ q.completed=true;
+ }catch(e){q.failure=e.stack;console.error(e);process.exitCode=1;}finally{await browser?.close();q.finishedUTC=new Date().toISOString();fs.writeFileSync(out,JSON.stringify(q,null,2));}})();

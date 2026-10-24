@@ -1,0 +1,14 @@
+'use strict';
+// Recreate original authored noise from equations and person variables.
+// The existing fields are comparison oracles, never generation inputs.
+const fs=require('fs'),zlib=require('zlib'),crypto=require('crypto'),K=require('../src/source-r23/BodySkinGraphKernel.js'),H=b=>crypto.createHash('sha256').update(b).digest('hex');
+const archive=JSON.parse(fs.readFileSync('qa/original-person-archive.json')),pack=JSON.parse(fs.readFileSync('data/body-active-skin-r22.json')),settings=archive.person.graphSkin.settings,options={seed:settings.seed,resolution:2048,period:12,density:settings.density,width:settings.width,poreWidth:settings.poreWidth},kernel='src/source-r23/BodySkinGraphKernel.js',q={startedUTC:new Date().toISOString(),sourceDerived:true,sourceReferenceSHA256:pack.sourceReferenceSHA256,kernel:{file:kernel,sha256:H(fs.readFileSync(kernel))},options,generationReadsOriginalFieldArrays:false,originalHeadModified:false,generatedCharacterGeometry:false,sourceFidelityAccepted:false,fields:[]};
+try{const start=performance.now(),field=K.build(options);q.generationMS=performance.now()-start;q.kernelVersion=field.version;q.summary=field.summary;
+ for(const [name,key]of [['gmMesoMap','mesoMap'],['gmPoreMap','poreMap'],['gmWrinkleMap','wrinkleMap'],['gmCavityMap','cavityMap']]){
+  const expected=pack.textures[name],compressed=fs.readFileSync(expected.file),lanes=zlib.gunzipSync(compressed),n=lanes.length/8,reference=Buffer.alloc(lanes.length);for(let c=0;c<4;c++)for(let b=0;b<2;b++)for(let i=0;i<n;i++)reference[i*8+c*2+b]=lanes[(c*2+b)*n+i];if(H(reference)!==expected.rawSHA256)throw Error('Source cache changed '+name);
+  const generated=Buffer.concat(field[key].mips.map(m=>Buffer.from(m.data.buffer,m.data.byteOffset,m.data.byteLength))),cavity=key==='cavityMap';let oracle=reference;if(cavity){oracle=Buffer.alloc(reference.length/4);for(let i=0;i<reference.length/8;i++)reference.copy(oracle,i*2,i*8,i*8+2);}
+  let differentWords=0,firstWord=null;if(generated.length===oracle.length)for(let i=0;i<generated.length;i+=2)if(generated.readUInt16LE(i)!==oracle.readUInt16LE(i)){differentWords++;if(firstWord===null)firstWord=i/2;}
+  const record={name,channels:cavity?'R only; original head-contents GBA channels are retained separately and not claimed regenerated':'RGBA',levels:field[key].mips.length,generatedBytes:generated.length,referenceBytes:oracle.length,generatedSHA256:H(generated),referenceSHA256:H(oracle),differentWords,firstWord,exact:generated.equals(oracle)};q.fields.push(record);fs.writeFileSync('qa/fidelity-r23/offline/generated-'+name+'.bin',generated);console.log(JSON.stringify(record));
+ }
+ q.passed=q.fields.every(f=>f.exact);if(!q.passed)process.exitCode=1;
+}catch(e){q.failure=e.stack;console.error(e);process.exitCode=1;}finally{q.finishedUTC=new Date().toISOString();fs.writeFileSync('qa/fidelity-r23/procedural-field-regeneration.json',JSON.stringify(q,null,2));}

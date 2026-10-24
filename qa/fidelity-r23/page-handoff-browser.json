@@ -1,0 +1,1293 @@
+{
+  "startedUTC": "2026-10-24T10:56:17.747Z",
+  "artifactSHA256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
+  "workbenchSHA256": "2efbad66b178b54687d7763d5961cd29cc7c50fa175f32e58e6dfaeb31bffcb5",
+  "referenceWorkbenchSHA256": "13c65007f677549baa54708f904c425469fc8a020c0e445ef520348047454733",
+  "sourceFidelityAccepted": false,
+  "newImageFiles": 0,
+  "checks": [
+    {
+      "name": "A-reach one initial field, no temporary default-body field",
+      "passed": true,
+      "details": {
+        "build": 1,
+        "updates": 1
+      }
+    },
+    {
+      "name": "A-reach exact state and whole-person fields transferred",
+      "passed": true
+    },
+    {
+      "name": "A-reach all four body surface settings retained",
+      "passed": true
+    },
+    {
+      "name": "A-reach camera retained",
+      "passed": true
+    },
+    {
+      "name": "A-reach original current neck replay applied",
+      "passed": true,
+      "details": {
+        "schema": "body-neck-source-replay/1",
+        "applied": true,
+        "inputPhase": "after original head rig bridge, before contour",
+        "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+        "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+        "sourceDerived": true,
+        "headSupportSamples": 1398,
+        "bodyChangedSamples": 192,
+        "maxBodyDisplacementMM": 7.537714784455806,
+        "sourceArithmeticPreserved": true,
+        "headSurfaceGenerated": false,
+        "sourceFidelityAccepted": false,
+        "profile": "A-reach"
+      }
+    },
+    {
+      "name": "A-reach directly initialized fields match R22 restore bit for bit",
+      "passed": true,
+      "details": {
+        "buffers": 30
+      }
+    },
+    {
+      "name": "A-reach actual saved complete person includes transferred fields",
+      "passed": true
+    },
+    {
+      "name": "A-reach source restores matching current person before decoding",
+      "passed": true
+    },
+    {
+      "name": "A-reach roundtrip preserves body, head and unknown metadata",
+      "passed": true
+    },
+    {
+      "name": "A-reach reverse camera preserved",
+      "passed": true
+    },
+    {
+      "name": "B-bend one initial field, no temporary default-body field",
+      "passed": true,
+      "details": {
+        "build": 1,
+        "updates": 1
+      }
+    },
+    {
+      "name": "B-bend exact state and whole-person fields transferred",
+      "passed": true
+    },
+    {
+      "name": "B-bend all four body surface settings retained",
+      "passed": true
+    },
+    {
+      "name": "B-bend camera retained",
+      "passed": true
+    },
+    {
+      "name": "B-bend original current neck replay applied",
+      "passed": true,
+      "details": {
+        "schema": "body-neck-source-replay/1",
+        "applied": true,
+        "inputPhase": "after original head rig bridge, before contour",
+        "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+        "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+        "sourceDerived": true,
+        "headSupportSamples": 1398,
+        "bodyChangedSamples": 192,
+        "maxBodyDisplacementMM": 7.918962463513892,
+        "sourceArithmeticPreserved": true,
+        "headSurfaceGenerated": false,
+        "sourceFidelityAccepted": false,
+        "profile": "B-bend"
+      }
+    },
+    {
+      "name": "B-bend directly initialized fields match R22 restore bit for bit",
+      "passed": true,
+      "details": {
+        "buffers": 30
+      }
+    },
+    {
+      "name": "B-bend actual saved complete person includes transferred fields",
+      "passed": true
+    },
+    {
+      "name": "B-bend source restores matching current person before decoding",
+      "passed": true
+    },
+    {
+      "name": "B-bend roundtrip preserves body, head and unknown metadata",
+      "passed": true
+    },
+    {
+      "name": "B-bend reverse camera preserved",
+      "passed": true
+    },
+    {
+      "name": "unsupported continuous state stays in parameter page with complete person unchanged",
+      "passed": true
+    },
+    {
+      "name": "unsupported continuous state is explicitly explained",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "A-reach",
+      "elapsedMS": 30358,
+      "current": {
+        "hashes": [
+          {
+            "bytes": 460,
+            "sha256": "0a77533a3193859fda1e84b34a1c793f1ba7a4ed2dd40d8a14aca26fc7e78187"
+          },
+          {
+            "bytes": 948,
+            "sha256": "1c14ad3e9ce514c7378ab1b6b8156d4a3535c7c5b110d1ea64b7a218cc6c0ad4"
+          },
+          {
+            "bytes": 948,
+            "sha256": "1c14ad3e9ce514c7378ab1b6b8156d4a3535c7c5b110d1ea64b7a218cc6c0ad4"
+          },
+          {
+            "bytes": 684,
+            "sha256": "1fc73db5feb0db934c3aaa3164e5b5707c9e52381a8145e5386d9b6958bcbb78"
+          },
+          {
+            "bytes": 29040,
+            "sha256": "2399501c6535f47a9d949638ae20a2c3c2260d2cb8f2698267aed8fce0c2bf46"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "2ced81d1b6e81d15f028dd8434318a1dbae948e875f94563e1b44dc5a8c00c4b"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "3ce77f9f554b221143edf84d8b83497d6892f7335db26faa22eb1bc1c66218f9"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "41a358e43b84b77af2f4cfb21dfebd216f93656a601dfae942a9119f3fecb786"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "4639c81c0d237d45a36502820578de24c2cb044006fbf534b3620953154d0266"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "499bf27bbb0daa4cc8bfa4e8394cc0d7a6a179f9d383971ec95223c13d82f0a8"
+          },
+          {
+            "bytes": 496,
+            "sha256": "4dd4d06065b99f80ee8a8ffce031064dde91a54623d6494c50440d4103ce2ca7"
+          },
+          {
+            "bytes": 42240,
+            "sha256": "501bca6606e11edfda479914e261ff5f50f855bc861eea1d86b1d9580800186a"
+          },
+          {
+            "bytes": 79380,
+            "sha256": "56769190c8c586a098dc9ceaa7bde34144710d63eb889dae3da55e2ffa0e7f49"
+          },
+          {
+            "bytes": 29040,
+            "sha256": "56efcbf402233ca38799c0c1a9d886298ab950d989fbee07b21560aa369a2139"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "5c659466b53b1f79a04b83428ee4e468c3ff1761d66a1dfc5ea95f089469b878"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "5e1f3f0662c023456510fd1299907917e106baa7f51088463978d68636aadee3"
+          },
+          {
+            "bytes": 696,
+            "sha256": "65c3d6883a8a99cb342fc0afc8739fb57b580040fb9d974c993ead9789ef2c42"
+          },
+          {
+            "bytes": 496,
+            "sha256": "72904d88034d99ccc6d910cdbdd3af22804543d1041df48cc1c558c167509cd6"
+          },
+          {
+            "bytes": 1004,
+            "sha256": "76aa12b510f2d6ea8717d1fcbc5a299045f258bf51960c34431ef1a7feeeaa91"
+          },
+          {
+            "bytes": 492,
+            "sha256": "8c68f991a72d77921805c5f59b2af49b9d66f24dad5fa62ea5923294928bd5e6"
+          },
+          {
+            "bytes": 492,
+            "sha256": "8c68f991a72d77921805c5f59b2af49b9d66f24dad5fa62ea5923294928bd5e6"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "a931e0448495874cbb5dd68bcb757447fc7034b76784cda164e3b7269b692f62"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "b145e7f496b62b68496cd3c75161914b00b094f0789eef80af1b9d7fb4c8bae2"
+          },
+          {
+            "bytes": 684,
+            "sha256": "b1bc652c6a469b4826bbae4a9e448df9f2f8c5127d79c861db161af6dfc92e69"
+          },
+          {
+            "bytes": 324,
+            "sha256": "b6d1828cb3df23bcb08eb44c1d3bffc5e2a38487d292ebbc40b527aec36eca1f"
+          },
+          {
+            "bytes": 460,
+            "sha256": "c831b66f672e71355890c6e6a59e2338832a112a877016f4f8f11bdaed701bc9"
+          },
+          {
+            "bytes": 696,
+            "sha256": "d4cabb4b52635630be644e420236e1ff907040af99132804dde2e633b53ad3cb"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "d4cd8257f256fdb88b280dc7f1e29b373a8c7bffd4abe35c70d135a2ac4efaf4"
+          },
+          {
+            "bytes": 65536,
+            "sha256": "d55492957c3a630b43933ae68292573ae75dfcad17099061d6a0834479971053"
+          },
+          {
+            "bytes": 952,
+            "sha256": "f07d97e488c7cfaec2feaaa7b551ea10e05af299097d148a37e0562302dbd72b"
+          }
+        ],
+        "structure": {
+          "bounds": [
+            [
+              -0.8768270444869996,
+              0.8768228721618653
+            ],
+            [
+              -1.0085570049285888,
+              0.6529066991806031
+            ],
+            [
+              -0.1731761825084686,
+              0.3896625769138336
+            ]
+          ],
+          "dimensions": [
+            251,
+            238,
+            81
+          ],
+          "refinement": {
+            "origins": [
+              [
+                0.6669761420602343,
+                0.573031868298072,
+                0.17401482983024208
+              ],
+              [
+                -0.6669803054961586,
+                0.5730374429422032,
+                0.17401780753504068
+              ],
+              [
+                0.2140082765947465,
+                -0.8837328087498717,
+                -0.012147641661545992
+              ],
+              [
+                -0.21400827659474647,
+                -0.8837328087498717,
+                -0.012147641661545971
+              ]
+            ],
+            "axes": [
+              [
+                0.6939437953497514,
+                -0.05955632511855327,
+                0.717561880978885
+              ],
+              [
+                -0.6939437785817858,
+                -0.05955629122985099,
+                0.7175619000076431
+              ],
+              [
+                0.09208278388317333,
+                -0.3556406941951171,
+                0.9300755117433961
+              ],
+              [
+                -0.09208278388317351,
+                -0.3556406941951171,
+                0.9300755117433959
+              ]
+            ],
+            "ranges": [
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ]
+            ],
+            "blend": "anatomical axial quintic partition; box only as exterior support"
+          },
+          "joints": [
+            [
+              0.4823033371255673,
+              0.5191220944660169,
+              -0.008340931618299286
+            ],
+            [
+              -0.48230610962952847,
+              0.5191298420837048,
+              -0.008336596922684777
+            ],
+            [
+              0.1704903688048578,
+              -0.42190304335414025,
+              0.02004059799901629
+            ],
+            [
+              -0.17049036880485777,
+              -0.42190304335414025,
+              0.020040597999016297
+            ],
+            [
+              0.2140082765947465,
+              -0.8837328087498717,
+              -0.012147641661545992
+            ],
+            [
+              -0.21400827659474647,
+              -0.8837328087498717,
+              -0.012147641661545971
+            ],
+            [
+              0.6669761420602343,
+              0.573031868298072,
+              0.17401482983024208
+            ],
+            [
+              -0.6669803054961586,
+              0.5730374429422032,
+              0.17401780753504068
+            ]
+          ],
+          "cap": 0.5979432680390098
+        },
+        "neck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.537714784455806,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "A-reach"
+        },
+        "build": 1,
+        "fieldMS": 11560.699999928474,
+        "cache": {
+          "entries": 0,
+          "bytes": 0,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 1,
+          "pendingRawBytes": 182073300,
+          "hits": 0,
+          "misses": 1,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": false
+        }
+      },
+      "reference": {
+        "hashes": [
+          {
+            "bytes": 460,
+            "sha256": "0a77533a3193859fda1e84b34a1c793f1ba7a4ed2dd40d8a14aca26fc7e78187"
+          },
+          {
+            "bytes": 948,
+            "sha256": "1c14ad3e9ce514c7378ab1b6b8156d4a3535c7c5b110d1ea64b7a218cc6c0ad4"
+          },
+          {
+            "bytes": 948,
+            "sha256": "1c14ad3e9ce514c7378ab1b6b8156d4a3535c7c5b110d1ea64b7a218cc6c0ad4"
+          },
+          {
+            "bytes": 684,
+            "sha256": "1fc73db5feb0db934c3aaa3164e5b5707c9e52381a8145e5386d9b6958bcbb78"
+          },
+          {
+            "bytes": 29040,
+            "sha256": "2399501c6535f47a9d949638ae20a2c3c2260d2cb8f2698267aed8fce0c2bf46"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "2ced81d1b6e81d15f028dd8434318a1dbae948e875f94563e1b44dc5a8c00c4b"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "3ce77f9f554b221143edf84d8b83497d6892f7335db26faa22eb1bc1c66218f9"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "41a358e43b84b77af2f4cfb21dfebd216f93656a601dfae942a9119f3fecb786"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "4639c81c0d237d45a36502820578de24c2cb044006fbf534b3620953154d0266"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "499bf27bbb0daa4cc8bfa4e8394cc0d7a6a179f9d383971ec95223c13d82f0a8"
+          },
+          {
+            "bytes": 496,
+            "sha256": "4dd4d06065b99f80ee8a8ffce031064dde91a54623d6494c50440d4103ce2ca7"
+          },
+          {
+            "bytes": 42240,
+            "sha256": "501bca6606e11edfda479914e261ff5f50f855bc861eea1d86b1d9580800186a"
+          },
+          {
+            "bytes": 79380,
+            "sha256": "56769190c8c586a098dc9ceaa7bde34144710d63eb889dae3da55e2ffa0e7f49"
+          },
+          {
+            "bytes": 29040,
+            "sha256": "56efcbf402233ca38799c0c1a9d886298ab950d989fbee07b21560aa369a2139"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "5c659466b53b1f79a04b83428ee4e468c3ff1761d66a1dfc5ea95f089469b878"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "5e1f3f0662c023456510fd1299907917e106baa7f51088463978d68636aadee3"
+          },
+          {
+            "bytes": 696,
+            "sha256": "65c3d6883a8a99cb342fc0afc8739fb57b580040fb9d974c993ead9789ef2c42"
+          },
+          {
+            "bytes": 496,
+            "sha256": "72904d88034d99ccc6d910cdbdd3af22804543d1041df48cc1c558c167509cd6"
+          },
+          {
+            "bytes": 1004,
+            "sha256": "76aa12b510f2d6ea8717d1fcbc5a299045f258bf51960c34431ef1a7feeeaa91"
+          },
+          {
+            "bytes": 492,
+            "sha256": "8c68f991a72d77921805c5f59b2af49b9d66f24dad5fa62ea5923294928bd5e6"
+          },
+          {
+            "bytes": 492,
+            "sha256": "8c68f991a72d77921805c5f59b2af49b9d66f24dad5fa62ea5923294928bd5e6"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "a931e0448495874cbb5dd68bcb757447fc7034b76784cda164e3b7269b692f62"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "b145e7f496b62b68496cd3c75161914b00b094f0789eef80af1b9d7fb4c8bae2"
+          },
+          {
+            "bytes": 684,
+            "sha256": "b1bc652c6a469b4826bbae4a9e448df9f2f8c5127d79c861db161af6dfc92e69"
+          },
+          {
+            "bytes": 324,
+            "sha256": "b6d1828cb3df23bcb08eb44c1d3bffc5e2a38487d292ebbc40b527aec36eca1f"
+          },
+          {
+            "bytes": 460,
+            "sha256": "c831b66f672e71355890c6e6a59e2338832a112a877016f4f8f11bdaed701bc9"
+          },
+          {
+            "bytes": 696,
+            "sha256": "d4cabb4b52635630be644e420236e1ff907040af99132804dde2e633b53ad3cb"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "d4cd8257f256fdb88b280dc7f1e29b373a8c7bffd4abe35c70d135a2ac4efaf4"
+          },
+          {
+            "bytes": 65536,
+            "sha256": "d55492957c3a630b43933ae68292573ae75dfcad17099061d6a0834479971053"
+          },
+          {
+            "bytes": 952,
+            "sha256": "f07d97e488c7cfaec2feaaa7b551ea10e05af299097d148a37e0562302dbd72b"
+          }
+        ],
+        "structure": {
+          "bounds": [
+            [
+              -0.8768270444869996,
+              0.8768228721618653
+            ],
+            [
+              -1.0085570049285888,
+              0.6529066991806031
+            ],
+            [
+              -0.1731761825084686,
+              0.3896625769138336
+            ]
+          ],
+          "dimensions": [
+            251,
+            238,
+            81
+          ],
+          "refinement": {
+            "origins": [
+              [
+                0.6669761420602343,
+                0.573031868298072,
+                0.17401482983024208
+              ],
+              [
+                -0.6669803054961586,
+                0.5730374429422032,
+                0.17401780753504068
+              ],
+              [
+                0.2140082765947465,
+                -0.8837328087498717,
+                -0.012147641661545992
+              ],
+              [
+                -0.21400827659474647,
+                -0.8837328087498717,
+                -0.012147641661545971
+              ]
+            ],
+            "axes": [
+              [
+                0.6939437953497514,
+                -0.05955632511855327,
+                0.717561880978885
+              ],
+              [
+                -0.6939437785817858,
+                -0.05955629122985099,
+                0.7175619000076431
+              ],
+              [
+                0.09208278388317333,
+                -0.3556406941951171,
+                0.9300755117433961
+              ],
+              [
+                -0.09208278388317351,
+                -0.3556406941951171,
+                0.9300755117433959
+              ]
+            ],
+            "ranges": [
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ]
+            ],
+            "blend": "anatomical axial quintic partition; box only as exterior support"
+          },
+          "joints": [
+            [
+              0.4823033371255673,
+              0.5191220944660169,
+              -0.008340931618299286
+            ],
+            [
+              -0.48230610962952847,
+              0.5191298420837048,
+              -0.008336596922684777
+            ],
+            [
+              0.1704903688048578,
+              -0.42190304335414025,
+              0.02004059799901629
+            ],
+            [
+              -0.17049036880485777,
+              -0.42190304335414025,
+              0.020040597999016297
+            ],
+            [
+              0.2140082765947465,
+              -0.8837328087498717,
+              -0.012147641661545992
+            ],
+            [
+              -0.21400827659474647,
+              -0.8837328087498717,
+              -0.012147641661545971
+            ],
+            [
+              0.6669761420602343,
+              0.573031868298072,
+              0.17401482983024208
+            ],
+            [
+              -0.6669803054961586,
+              0.5730374429422032,
+              0.17401780753504068
+            ]
+          ],
+          "cap": 0.5979432680390098
+        },
+        "neck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.537714784455806,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "A-reach"
+        },
+        "build": 2,
+        "fieldMS": 12478.100000023842,
+        "cache": {
+          "entries": 1,
+          "bytes": 62601910,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 1,
+          "pendingRawBytes": 182073300,
+          "hits": 0,
+          "misses": 2,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": false
+        }
+      }
+    },
+    {
+      "id": "B-bend",
+      "elapsedMS": 29904,
+      "current": {
+        "hashes": [
+          {
+            "bytes": 548,
+            "sha256": "046d36a13b9e47caaa3112a350cf03dd6000a6096a6318c889183a021d557218"
+          },
+          {
+            "bytes": 488,
+            "sha256": "0c6f3608ee31a2e3d4f199ea0189eaa8ad2967e171a13da3744b4d97d877a00b"
+          },
+          {
+            "bytes": 712,
+            "sha256": "12cfd16534b8bd068c662a2b5f426955648515674fc5a42225a2759164032bf4"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "1737d4f25d393683b9c8fe227ae13c1e6e2a36ac6b6fdae72d602bb8c7cd3bc0"
+          },
+          {
+            "bytes": 712,
+            "sha256": "2c10904cd4ed0d0b0d05e64d4784b70cd5ec18845c8990511d4f03773345ee02"
+          },
+          {
+            "bytes": 680,
+            "sha256": "37ac1f854e3e4e3e18e54c1e2caea68ab0d020ea5bc6018b1e123327347d438d"
+          },
+          {
+            "bytes": 600,
+            "sha256": "38f05aefab2a1b28a361772e159f7af272e1ce030161a6d8f27bc59718abea5c"
+          },
+          {
+            "bytes": 876,
+            "sha256": "3b4076b1ce764c3341cb04c403df674d3ac34bd22d9e660b7dea9bed9e7b6a93"
+          },
+          {
+            "bytes": 488,
+            "sha256": "3bbf91d55f763eb0fcfd80228cf60d5469ca45b662de7e6a23130fd6c0e0d523"
+          },
+          {
+            "bytes": 39424,
+            "sha256": "3cda47d75b93223d69314ace4d6edb3ff730e1dc79b9f744f833ff68bbea49e3"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "58754e1ce058fb797667497a326a35b22ada6a284d190d7962da95b31b4ff3e8"
+          },
+          {
+            "bytes": 876,
+            "sha256": "5d632c9533bbdff04b0bf53c9d5c0457e557a99ddfcfc9120e14ec9c2b296c57"
+          },
+          {
+            "bytes": 31464,
+            "sha256": "6dd213ef85e65ece75f9871982bb24df4c0716caba8eb6b873463d69d78e235e"
+          },
+          {
+            "bytes": 31464,
+            "sha256": "6f0f43d8d94f8b53ed7894a0d7bfdd487a7999d478b256e4ebb07ee609cdab87"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "754c6fc5ee519574a3f88176dd0488fecd43505456196e09fa7c1409283683c1"
+          },
+          {
+            "bytes": 36064,
+            "sha256": "7a90ce14d25898bc0c8300925bf281c1d9ce35678cf669a9539db2318d56c996"
+          },
+          {
+            "bytes": 600,
+            "sha256": "8aee69c568491c31d6f72b95022c82b33f7c1e04fbbff447f20aa7be2ca96655"
+          },
+          {
+            "bytes": 892,
+            "sha256": "8b8bd9fef377eb71ab30ed0449148f42d4af3bd0e57260a7bd8e8b757d5a3227"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "9bb73f1e60de4cfd5e67f5c5b35c7d41c5719fc306433e70ee6edb81746e55aa"
+          },
+          {
+            "bytes": 70560,
+            "sha256": "9f630a9293f4d6512f6e767176d20d3c87ab7da3be290c1beef962daa5f73df2"
+          },
+          {
+            "bytes": 680,
+            "sha256": "b6a0d11285f898b5cc146266b4da66626bcefb0f36d4348868f77068dd9d1a48"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "c07e62ef7950344e39c226632fc24a4d7155d6a6a10f73c2fd5149d3b601a184"
+          },
+          {
+            "bytes": 548,
+            "sha256": "c1f9930277bafc285a7d165c94616460ba1cb935e912cf91d49f09afba21d07a"
+          },
+          {
+            "bytes": 65536,
+            "sha256": "c228f7fb86bad1229481e6023f4a0a217afc7fbfd5e4bb8ed7338f663fd4ef8b"
+          },
+          {
+            "bytes": 712,
+            "sha256": "d3a27a38e632ab5a14d6f6dc67fbdb6b54f2ee26d9c5c7377b5e74f79e6cb10d"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "e23422970ff7db8b6a410f401032cd0e85dc5bdeb122b94a29c00fd7fc113a45"
+          },
+          {
+            "bytes": 47775744,
+            "sha256": "e2ae9ba885223e190d2fea6fea23fe1a1d4ffe9f5363b784c3d266e7ecbc42d5"
+          },
+          {
+            "bytes": 39424,
+            "sha256": "e52e7c13c52c098e4357ba6cf8f513d9591e62c00d9a9a7388061a3df4cd213d"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "efabf31a0479fa85be9d6f3f36a2b1f7d44e2a7113975a52bdffea26bf707031"
+          },
+          {
+            "bytes": 436,
+            "sha256": "f434343624b99b9ea46d10f2b5a6b882a32b092ea3b3e48859f4977d707c6871"
+          }
+        ],
+        "structure": {
+          "bounds": [
+            [
+              -0.6196829509735108,
+              0.6196777057647705
+            ],
+            [
+              -0.9114619326591492,
+              0.6485228371620179
+            ],
+            [
+              -0.14041659802198408,
+              0.6207501125335694
+            ]
+          ],
+          "dimensions": [
+            178,
+            223,
+            109
+          ],
+          "refinement": {
+            "origins": [
+              [
+                0.503778103093137,
+                0.2294850974220315,
+                0.3864102548345336
+              ],
+              [
+                -0.5037843047370494,
+                0.2294823496754696,
+                0.38641537986364694
+              ],
+              [
+                0.20108426096064055,
+                -0.7170118997971914,
+                0.07191081601210791
+              ],
+              [
+                -0.20108426844458402,
+                -0.717011898482021,
+                0.07191081571864422
+              ]
+            ],
+            "axes": [
+              [
+                0.15992606377700533,
+                -0.43106456956955386,
+                0.888035467189576
+              ],
+              [
+                -0.1599175566371603,
+                -0.431073808150263,
+                0.8880325146108282
+              ],
+              [
+                0.11105817793154636,
+                -0.6899694943327767,
+                0.7152679064551251
+              ],
+              [
+                -0.11078394665028678,
+                -0.6899531284833426,
+                0.7153262176522223
+              ]
+            ],
+            "ranges": [
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ]
+            ],
+            "blend": "anatomical axial quintic partition; box only as exterior support"
+          },
+          "joints": [
+            [
+              0.407773193627308,
+              0.298559223129654,
+              0.14918516030877568
+            ],
+            [
+              -0.4077821075657635,
+              0.298561519069221,
+              0.14919111045974326
+            ],
+            [
+              0.16170143766750505,
+              -0.3042044405888024,
+              0.28228100907117015
+            ],
+            [
+              -0.1617014754211061,
+              -0.304204436169373,
+              0.28228100835294523
+            ],
+            [
+              0.20108426096064055,
+              -0.7170118997971914,
+              0.07191081601210791
+            ],
+            [
+              -0.20108426844458402,
+              -0.717011898482021,
+              0.07191081571864422
+            ],
+            [
+              0.503778103093137,
+              0.2294850974220315,
+              0.3864102548345336
+            ],
+            [
+              -0.5037843047370494,
+              0.2294823496754696,
+              0.38641537986364694
+            ]
+          ],
+          "cap": 0.5857893093065782
+        },
+        "neck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.918962463513892,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "B-bend"
+        },
+        "build": 1,
+        "fieldMS": 11353.100000023842,
+        "cache": {
+          "entries": 0,
+          "bytes": 0,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 1,
+          "pendingRawBytes": 184734784,
+          "hits": 0,
+          "misses": 1,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": false
+        }
+      },
+      "reference": {
+        "hashes": [
+          {
+            "bytes": 548,
+            "sha256": "046d36a13b9e47caaa3112a350cf03dd6000a6096a6318c889183a021d557218"
+          },
+          {
+            "bytes": 488,
+            "sha256": "0c6f3608ee31a2e3d4f199ea0189eaa8ad2967e171a13da3744b4d97d877a00b"
+          },
+          {
+            "bytes": 712,
+            "sha256": "12cfd16534b8bd068c662a2b5f426955648515674fc5a42225a2759164032bf4"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "1737d4f25d393683b9c8fe227ae13c1e6e2a36ac6b6fdae72d602bb8c7cd3bc0"
+          },
+          {
+            "bytes": 712,
+            "sha256": "2c10904cd4ed0d0b0d05e64d4784b70cd5ec18845c8990511d4f03773345ee02"
+          },
+          {
+            "bytes": 680,
+            "sha256": "37ac1f854e3e4e3e18e54c1e2caea68ab0d020ea5bc6018b1e123327347d438d"
+          },
+          {
+            "bytes": 600,
+            "sha256": "38f05aefab2a1b28a361772e159f7af272e1ce030161a6d8f27bc59718abea5c"
+          },
+          {
+            "bytes": 876,
+            "sha256": "3b4076b1ce764c3341cb04c403df674d3ac34bd22d9e660b7dea9bed9e7b6a93"
+          },
+          {
+            "bytes": 488,
+            "sha256": "3bbf91d55f763eb0fcfd80228cf60d5469ca45b662de7e6a23130fd6c0e0d523"
+          },
+          {
+            "bytes": 39424,
+            "sha256": "3cda47d75b93223d69314ace4d6edb3ff730e1dc79b9f744f833ff68bbea49e3"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "58754e1ce058fb797667497a326a35b22ada6a284d190d7962da95b31b4ff3e8"
+          },
+          {
+            "bytes": 876,
+            "sha256": "5d632c9533bbdff04b0bf53c9d5c0457e557a99ddfcfc9120e14ec9c2b296c57"
+          },
+          {
+            "bytes": 31464,
+            "sha256": "6dd213ef85e65ece75f9871982bb24df4c0716caba8eb6b873463d69d78e235e"
+          },
+          {
+            "bytes": 31464,
+            "sha256": "6f0f43d8d94f8b53ed7894a0d7bfdd487a7999d478b256e4ebb07ee609cdab87"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "754c6fc5ee519574a3f88176dd0488fecd43505456196e09fa7c1409283683c1"
+          },
+          {
+            "bytes": 36064,
+            "sha256": "7a90ce14d25898bc0c8300925bf281c1d9ce35678cf669a9539db2318d56c996"
+          },
+          {
+            "bytes": 600,
+            "sha256": "8aee69c568491c31d6f72b95022c82b33f7c1e04fbbff447f20aa7be2ca96655"
+          },
+          {
+            "bytes": 892,
+            "sha256": "8b8bd9fef377eb71ab30ed0449148f42d4af3bd0e57260a7bd8e8b757d5a3227"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "9bb73f1e60de4cfd5e67f5c5b35c7d41c5719fc306433e70ee6edb81746e55aa"
+          },
+          {
+            "bytes": 70560,
+            "sha256": "9f630a9293f4d6512f6e767176d20d3c87ab7da3be290c1beef962daa5f73df2"
+          },
+          {
+            "bytes": 680,
+            "sha256": "b6a0d11285f898b5cc146266b4da66626bcefb0f36d4348868f77068dd9d1a48"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "c07e62ef7950344e39c226632fc24a4d7155d6a6a10f73c2fd5149d3b601a184"
+          },
+          {
+            "bytes": 548,
+            "sha256": "c1f9930277bafc285a7d165c94616460ba1cb935e912cf91d49f09afba21d07a"
+          },
+          {
+            "bytes": 65536,
+            "sha256": "c228f7fb86bad1229481e6023f4a0a217afc7fbfd5e4bb8ed7338f663fd4ef8b"
+          },
+          {
+            "bytes": 712,
+            "sha256": "d3a27a38e632ab5a14d6f6dc67fbdb6b54f2ee26d9c5c7377b5e74f79e6cb10d"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "e23422970ff7db8b6a410f401032cd0e85dc5bdeb122b94a29c00fd7fc113a45"
+          },
+          {
+            "bytes": 47775744,
+            "sha256": "e2ae9ba885223e190d2fea6fea23fe1a1d4ffe9f5363b784c3d266e7ecbc42d5"
+          },
+          {
+            "bytes": 39424,
+            "sha256": "e52e7c13c52c098e4357ba6cf8f513d9591e62c00d9a9a7388061a3df4cd213d"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "efabf31a0479fa85be9d6f3f36a2b1f7d44e2a7113975a52bdffea26bf707031"
+          },
+          {
+            "bytes": 436,
+            "sha256": "f434343624b99b9ea46d10f2b5a6b882a32b092ea3b3e48859f4977d707c6871"
+          }
+        ],
+        "structure": {
+          "bounds": [
+            [
+              -0.6196829509735108,
+              0.6196777057647705
+            ],
+            [
+              -0.9114619326591492,
+              0.6485228371620179
+            ],
+            [
+              -0.14041659802198408,
+              0.6207501125335694
+            ]
+          ],
+          "dimensions": [
+            178,
+            223,
+            109
+          ],
+          "refinement": {
+            "origins": [
+              [
+                0.503778103093137,
+                0.2294850974220315,
+                0.3864102548345336
+              ],
+              [
+                -0.5037843047370494,
+                0.2294823496754696,
+                0.38641537986364694
+              ],
+              [
+                0.20108426096064055,
+                -0.7170118997971914,
+                0.07191081601210791
+              ],
+              [
+                -0.20108426844458402,
+                -0.717011898482021,
+                0.07191081571864422
+              ]
+            ],
+            "axes": [
+              [
+                0.15992606377700533,
+                -0.43106456956955386,
+                0.888035467189576
+              ],
+              [
+                -0.1599175566371603,
+                -0.431073808150263,
+                0.8880325146108282
+              ],
+              [
+                0.11105817793154636,
+                -0.6899694943327767,
+                0.7152679064551251
+              ],
+              [
+                -0.11078394665028678,
+                -0.6899531284833426,
+                0.7153262176522223
+              ]
+            ],
+            "ranges": [
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ]
+            ],
+            "blend": "anatomical axial quintic partition; box only as exterior support"
+          },
+          "joints": [
+            [
+              0.407773193627308,
+              0.298559223129654,
+              0.14918516030877568
+            ],
+            [
+              -0.4077821075657635,
+              0.298561519069221,
+              0.14919111045974326
+            ],
+            [
+              0.16170143766750505,
+              -0.3042044405888024,
+              0.28228100907117015
+            ],
+            [
+              -0.1617014754211061,
+              -0.304204436169373,
+              0.28228100835294523
+            ],
+            [
+              0.20108426096064055,
+              -0.7170118997971914,
+              0.07191081601210791
+            ],
+            [
+              -0.20108426844458402,
+              -0.717011898482021,
+              0.07191081571864422
+            ],
+            [
+              0.503778103093137,
+              0.2294850974220315,
+              0.3864102548345336
+            ],
+            [
+              -0.5037843047370494,
+              0.2294823496754696,
+              0.38641537986364694
+            ]
+          ],
+          "cap": 0.5857893093065782
+        },
+        "neck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.918962463513892,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "B-bend"
+        },
+        "build": 3,
+        "fieldMS": 15006.700000047684,
+        "cache": {
+          "entries": 2,
+          "bytes": 140538635,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 1,
+          "pendingRawBytes": 184734784,
+          "hits": 0,
+          "misses": 3,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": false
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "unsupportedMessage": "这个连续状态尚未接入原貌页。当前人物仍保留在参数页，可以另开原版对照。",
+  "artifactStable": true,
+  "passed": true,
+  "finishedUTC": "2026-10-24T10:59:10.589Z"
+}

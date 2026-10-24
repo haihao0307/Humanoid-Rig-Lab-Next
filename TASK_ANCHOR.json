@@ -1,61 +1,62 @@
 {
-  "updatedUTC": "2026-10-24T08:47:36.001Z",
+  "updatedUTC": "2026-10-24T11:01:35.187Z",
   "scope": "BODY ONLY",
   "currentBuild": "BUILD.json",
   "delivery": "DELIVERY.json",
   "route": "EXECUTION-ROUTE.md",
-  "status": "R22 checked candidate; reconstruction and source acceptance remain incomplete",
-  "hardStopUTC": "2026-10-24T08:56:19Z",
+  "status": "R23 checked working candidate; source fidelity and whole body reconstruction remain incomplete",
+  "hardStopUTC": "2026-10-24T12:00:50Z",
   "headBoardUntouched": true,
   "noCharacterTriangles": true,
-  "latestCheckpointUTC": "2026-10-24T08:47:36.001Z",
-  "stage": "original neck, actual active body skin, source parity and lossless CPU pages",
-  "stageStatus": "checked candidate with explicit remaining work",
+  "latestCheckpointUTC": "2026-10-24T11:01:35.187Z",
+  "stage": "original body surface controls, byte-exact lazy data, complete-person page transfer, render recovery and reproducible procedural skin fields",
+  "stageStatus": "local release checks complete; synchronization receipt stored separately",
   "projectComplete": false,
-  "latestAuditUTC": "2026-10-24T08:37:19.947Z",
-  "latestAudit": "qa/fidelity-r22/http-viewer.json",
-  "nextPriority": "原数据完整复刻验收：非默认状态的阴影快照与强制重建/更新历史尚未核对一致；解决剩余覆盖/首交、局部材质和边缘差异；保留局部最大误差，明确正式验收范围。任意连续状态的真实头侧边界提供方和连续新表面上的原颈部整合仍未完成。",
+  "latestAuditUTC": "2026-10-24T11:01:35.187Z",
+  "latestAudit": "DELIVERY.json",
+  "nextPriority": "完成原表面、首交、边界、分层、法线与外观正式复刻验收；仍有边缘和局部像素差异，正式容差未设定。记录顺序下的18幅阴影已复现，任意历史及连续状态的动态阴影尚未完成。",
   "latestAuditChangedProduct": true,
   "previousPhaseHardStopUTC": "2026-10-23T08:21:00Z",
-  "stageStartedUTC": "2026-10-24T05:56:19Z",
-  "workingBuild": "BUILD-SOURCE-R22.json",
+  "stageStartedUTC": "2026-10-24T09:00:50Z",
+  "workingBuild": "BUILD-SOURCE-R23.json",
   "workingViewer": "http://127.0.0.1:8914/",
   "previousTask": {
-    "hardStopUTC": "2026-10-24T05:26:17Z",
-    "status": "R21 checked checkpoint; reconstruction and source acceptance remain incomplete",
-    "stageStartedUTC": "2026-10-24T02:26:17Z"
+    "stageStartedUTC": "2026-10-24T05:56:19Z",
+    "hardStopUTC": "2026-10-24T08:56:19Z",
+    "status": "R22 checked candidate; reconstruction and source acceptance remain incomplete"
   },
-  "companionBuild": "BUILD-R22.json",
+  "companionBuild": "BUILD-R23.json",
   "remaining": [
     {
       "priority": 0,
       "status": "incomplete",
-      "task": "原数据完整复刻验收：非默认状态的阴影快照与强制重建/更新历史尚未核对一致；解决剩余覆盖/首交、局部材质和边缘差异；保留局部最大误差，明确正式验收范围。任意连续状态的真实头侧边界提供方和连续新表面上的原颈部整合仍未完成。"
+      "task": "完成原表面、首交、边界、分层、法线与外观正式复刻验收；仍有边缘和局部像素差异，正式容差未设定。记录顺序下的18幅阴影已复现，任意历史及连续状态的动态阴影尚未完成。"
     },
     {
       "priority": 1,
       "status": "incomplete",
-      "task": "通过原数据基准后完成中性整体校准、胸肩带/腰腹/骨盆大体积，并分离支撑骨架与软组织响应；R18–R20估算改形不当作已验收母体。"
+      "task": "原数据基准通过后，完成中性整体校准、胸肩带、腰腹与骨盆体量，并分离支撑骨架与软组织响应；不将R18–R20估算改形当作已验收母体。"
     },
     {
       "priority": 2,
       "status": "incomplete",
-      "task": "完成肩髋连接、肘膝腕踝、手足细轮廓和全部连续动作组合的来源保真及后续变形；九个固定状态不是连续完成。"
+      "task": "完成肩髋连接、肘膝腕踝、手足细轮廓与连续动作组合；原貌页目前只有9个记录状态，完整控制仍在另一个未验收的连续函数工作页。"
     },
     {
       "priority": 3,
       "status": "incomplete",
-      "task": "建立自主结构函数母体，逐区替换来源分区、形态变化和绑定数据；现有来源分段信息仍保留。"
+      "task": "建立自主结构函数母体，逐区替换来源分面分区、形态和绑定数据；当前仍保留来源分区信息，不能声称自主母体完成。"
     },
     {
       "priority": 4,
       "status": "partial",
-      "task": "已完成工作页CPU常驻/传输/缓存字段无损分页；全系统局部更新、动态光学、肌理和缓存效率仍需继续。当前原皮肤/阴影为固定状态来源对照。"
+      "task": "已完成按需原貌字段、字节包传输、CPU无损分页与部分皮纹函数重建；全系统局部更新、GPU内存、动态光学、其余肌理仍需继续。"
     },
     {
       "priority": 5,
       "status": "incomplete",
-      "task": "头部、附件、坐标跟随、完整人物和总平台联调尚未完成。身体边界接收侧已实现，头部板块未修改。"
+      "task": "完成真实连续头侧边界提供方、身体颈部在连续新表面的整合，以及头部、附件、坐标跟随与总平台联调；头部项目未修改。"
     }
-  ]
+  ],
+  "previousSelectedBuild": "BUILD-SOURCE-R22.json"
 }

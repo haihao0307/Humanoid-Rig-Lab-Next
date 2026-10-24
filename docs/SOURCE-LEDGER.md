@@ -67,3 +67,12 @@ BodyOriginalSkinR22 使用原版实际启用的身体材质片段，四个原程
 BodyFieldPagesR22 仅省去缺省值完全同位的砖块，保留所有非缺省 Float32 字节。上传恢复原 GPU 数据与原 R21 GLSL。压缩、缓存及技术检查均不改变旧隐式表面未验收和母体未自主的结论。
 
 固定外观下的原顶点 color 并非全 1。实际启用的身体片段随后以 psBase 完整覆盖 diffuseColor，原 color 不影响该固定外观的最终结果。该常量消除只适用于本候选固定原外观，不能据此声称任意外观变化已迁移；不匹配外观的档案在来源对照页被拒绝并保留上一人物。
+
+
+## R23：无损载体和原皮纹函数
+
+来源几何和身体数值系数未改。原貌函数包从内嵌 base64 改为当前状态字段；完整参数包改为原 gzip 字节，压缩及解压后均校验。源码、字段和 shader 等价检查见 qa/fidelity-r23/release-integrity.json。
+
+原项目 SkinGraphKernel.js 的冻结副本保存在 src/source-r23/BodySkinGraphKernel.js，哈希与原 R07 一致；seed=731 等变量见 data/body-skin-recipe-r23.json。三个完整 RGBA 场及凹陷 R 通道的 12 级字段逐字节重建通过。凹陷缓存其余 GBA 原附加内容未声称独立再生。缓存可重建不代表身体来源分区、形态与绑定数据已经自主。
+
+原数据整体复刻、连续来源表面和真正自主母体均未宣告完成。共享原版与独立头部项目本轮只读。

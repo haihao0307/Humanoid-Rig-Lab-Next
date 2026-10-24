@@ -1,0 +1,144 @@
+{
+  "startedUTC": "2026-10-24T10:21:33.911Z",
+  "artifactSHA256": "2efbad66b178b54687d7763d5961cd29cc7c50fa175f32e58e6dfaeb31bffcb5",
+  "sourceFidelityAccepted": false,
+  "checks": [
+    {
+      "name": "tiny descriptor replaces the 60 MB base64 initialization string",
+      "passed": true,
+      "details": {
+        "schema": "body-program-byte-packet/1",
+        "url": "http://127.0.0.1:8914/assets/body-program-r23/ce2955ea74feb9e5e9c1c0328d0a77eb851c1d2376e2f2e245051868bddf1036.gz",
+        "compressedBytes": 44950878,
+        "compressedSHA256": "ce2955ea74feb9e5e9c1c0328d0a77eb851c1d2376e2f2e245051868bddf1036",
+        "rawBytes": 90490457,
+        "rawSHA256": "2e2419f37d1fbcfce7c40b221e907ae14b9e746baa81cf4e90fa81f59bc82f0e",
+        "sourceDerived": true,
+        "characterFaces": 0,
+        "characterIndices": 0,
+        "bitExact": true
+      }
+    },
+    {
+      "name": "loaded compressed and raw body bytes are verified",
+      "passed": true
+    },
+    {
+      "name": "all controls, sharing and initial state retained",
+      "passed": true
+    },
+    {
+      "name": "successful first field acknowledges complete-person handoff",
+      "passed": true
+    },
+    {
+      "name": "valid packet never requests another origin",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "compressed invalid packet rejected before any field update",
+      "passed": true,
+      "details": "Error: 身体计算数据校验失败，已保留待载入人物\n    at bodyPacketBytes (blob:http://127.0.0.1:8914/6c58a62d-414d-4817-9801-b46290c5e4a9:228:919)\n    at async decode (blob:http://127.0.0.1:8914/6c58a62d-414d-4817-9801-b46290c5e4a9:230:75)\n    at async self.onmessage (blob:http://127.0.0.1:8914/6c58a62d-414d-4817-9801-b46290c5e4a9:278:123)"
+    },
+    {
+      "name": "compressed complete pending person is retained",
+      "passed": true
+    },
+    {
+      "name": "compressed pending person remains downloadable",
+      "passed": true
+    },
+    {
+      "name": "compressed actual pending-person download is complete",
+      "passed": true
+    },
+    {
+      "name": "compressed packet never requests another origin",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "raw invalid packet rejected before any field update",
+      "passed": true,
+      "details": "Error: 身体函数系数校验失败\n    at bodyPacketRaw (blob:http://127.0.0.1:8914/e1370a5e-210a-4a3c-9df5-8e4d78bdc166:229:282)\n    at async decode (blob:http://127.0.0.1:8914/e1370a5e-210a-4a3c-9df5-8e4d78bdc166:230:110)\n    at async self.onmessage (blob:http://127.0.0.1:8914/e1370a5e-210a-4a3c-9df5-8e4d78bdc166:278:123)"
+    },
+    {
+      "name": "raw complete pending person is retained",
+      "passed": true
+    },
+    {
+      "name": "raw pending person remains downloadable",
+      "passed": true
+    },
+    {
+      "name": "raw actual pending-person download is complete",
+      "passed": true
+    },
+    {
+      "name": "raw packet never requests another origin",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "origin invalid packet rejected before any field update",
+      "passed": true,
+      "details": "Error: 身体计算数据来源不匹配\n    at bodyPacketBytes (blob:http://127.0.0.1:8914/d58503fc-5b72-4e9b-8faf-9121d1ae412c:228:582)\n    at decode (blob:http://127.0.0.1:8914/d58503fc-5b72-4e9b-8faf-9121d1ae412c:230:81)\n    at self.onmessage (blob:http://127.0.0.1:8914/d58503fc-5b72-4e9b-8faf-9121d1ae412c:278:129)"
+    },
+    {
+      "name": "origin complete pending person is retained",
+      "passed": true
+    },
+    {
+      "name": "origin pending person remains downloadable",
+      "passed": true
+    },
+    {
+      "name": "origin actual pending-person download is complete",
+      "passed": true
+    },
+    {
+      "name": "origin packet never requests another origin",
+      "passed": true,
+      "details": []
+    }
+  ],
+  "cases": [
+    {
+      "mode": "valid",
+      "error": null,
+      "updates": 1,
+      "bytePacketVerified": true,
+      "descriptorBytes": 450,
+      "network": []
+    },
+    {
+      "mode": "compressed",
+      "error": "Error: 身体计算数据校验失败，已保留待载入人物\n    at bodyPacketBytes (blob:http://127.0.0.1:8914/6c58a62d-414d-4817-9801-b46290c5e4a9:228:919)\n    at async decode (blob:http://127.0.0.1:8914/6c58a62d-414d-4817-9801-b46290c5e4a9:230:75)\n    at async self.onmessage (blob:http://127.0.0.1:8914/6c58a62d-414d-4817-9801-b46290c5e4a9:278:123)",
+      "updates": 0,
+      "bytePacketVerified": false,
+      "descriptorBytes": 450,
+      "network": []
+    },
+    {
+      "mode": "raw",
+      "error": "Error: 身体函数系数校验失败\n    at bodyPacketRaw (blob:http://127.0.0.1:8914/e1370a5e-210a-4a3c-9df5-8e4d78bdc166:229:282)\n    at async decode (blob:http://127.0.0.1:8914/e1370a5e-210a-4a3c-9df5-8e4d78bdc166:230:110)\n    at async self.onmessage (blob:http://127.0.0.1:8914/e1370a5e-210a-4a3c-9df5-8e4d78bdc166:278:123)",
+      "updates": 0,
+      "bytePacketVerified": false,
+      "descriptorBytes": 450,
+      "network": []
+    },
+    {
+      "mode": "origin",
+      "error": "Error: 身体计算数据来源不匹配\n    at bodyPacketBytes (blob:http://127.0.0.1:8914/d58503fc-5b72-4e9b-8faf-9121d1ae412c:228:582)\n    at decode (blob:http://127.0.0.1:8914/d58503fc-5b72-4e9b-8faf-9121d1ae412c:230:81)\n    at self.onmessage (blob:http://127.0.0.1:8914/d58503fc-5b72-4e9b-8faf-9121d1ae412c:278:129)",
+      "updates": 0,
+      "bytePacketVerified": false,
+      "descriptorBytes": 450,
+      "network": []
+    }
+  ],
+  "errors": [],
+  "artifactStable": true,
+  "passed": true,
+  "finishedUTC": "2026-10-24T10:22:20.567Z"
+}

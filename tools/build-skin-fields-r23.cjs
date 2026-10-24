@@ -1,0 +1,13 @@
+'use strict';
+// Optional deterministic cache rebuild. It reads functions, variables and hash
+// metadata only. Original cached arrays are not read to create these fields.
+const fs=require('fs'),path=require('path'),crypto=require('crypto'),zlib=require('zlib'),H=b=>crypto.createHash('sha256').update(b).digest('hex'),root=path.resolve(__dirname,'..');process.chdir(root);
+const recipe=JSON.parse(fs.readFileSync('data/body-skin-recipe-r23.json')),kernel=path.resolve(root,recipe.kernel.file),directory=path.resolve(root,process.argv[2]||'delivery/assets/body-skin-r22'),q={startedUTC:new Date().toISOString(),recipeSHA256:H(fs.readFileSync('data/body-skin-recipe-r23.json')),sourceDerived:true,readsCachedArrays:false,fields:[]};
+if(!directory.startsWith(root+path.sep))throw Error('Cache output must stay in this body project');if(H(fs.readFileSync(kernel))!==recipe.kernel.sha256)throw Error('Authored kernel changed');fs.mkdirSync(directory,{recursive:true});
+try{const K=require(kernel),start=performance.now(),field=K.build(recipe.options);q.generationMS=performance.now()-start;
+ for(const entry of recipe.fields){const key={gmMesoMap:'mesoMap',gmPoreMap:'poreMap',gmWrinkleMap:'wrinkleMap',gmCavityMap:'cavityMap'}[entry.name],raw=Buffer.concat(field[key].mips.map(m=>Buffer.from(m.data.buffer,m.data.byteOffset,m.data.byteLength)));if(raw.length!==entry.rawBytes||H(raw)!==entry.rawSHA256)throw Error('Generated field differs from original '+entry.name);
+  if(!entry.fullRGBA){q.fields.push({name:entry.name,exact:true,rawSHA256:entry.rawSHA256,scope:'R only; retained original head-contents GBA not replaced'});continue;}
+  const n=raw.length/8,lanes=Buffer.alloc(raw.length);for(let c=0;c<4;c++)for(let b=0;b<2;b++)for(let i=0;i<n;i++)lanes[(c*2+b)*n+i]=raw[i*8+c*2+b];const compressed=zlib.gzipSync(lanes,{level:6});if(H(compressed)!==entry.compressedSHA256||compressed.length!==entry.compressedBytes)throw Error('Deterministic compressed field differs '+entry.name);const file=path.join(directory,path.basename(entry.file));fs.writeFileSync(file+'.building',compressed);fs.renameSync(file+'.building',file);q.fields.push({name:entry.name,exact:true,rawBytes:raw.length,rawSHA256:entry.rawSHA256,compressedBytes:compressed.length,compressedSHA256:entry.compressedSHA256,file:path.relative(root,file).replaceAll('\\','/')});console.log(entry.name+' regenerated exactly');
+ }
+ q.passed=true;
+}catch(e){q.failure=e.stack;console.error(e);process.exitCode=1;}finally{q.finishedUTC=new Date().toISOString();fs.writeFileSync('qa/fidelity-r23/clean-field-rebuild.json',JSON.stringify(q,null,2));}
