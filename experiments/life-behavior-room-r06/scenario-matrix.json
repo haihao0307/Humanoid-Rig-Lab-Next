@@ -1,0 +1,69 @@
+{
+  "schema": "kaopu/life-behavior-scenario-matrix@1",
+  "revision": "R06",
+  "branch": "experiment/life-behavior-room-r06-20261024",
+  "rule": "Every sequence runs on one persistent character/world state unless a scenario explicitly states reset=true.",
+  "scenarios": [
+    {
+      "id": "carry-crate-table-to-shelf",
+      "role": "baseline",
+      "reset": true,
+      "steps": ["approach", "settle", "reach", "establish-contact", "lift", "carry", "align", "lower", "verify-support", "release", "withdraw", "recover-stance"],
+      "requiredEvidence": ["stableSupport", "jointLimitsValid", "bodyClearanceValid", "contactValid", "objectStateValid", "objectSettled", "objectSupported", "gripReleased", "handsClear"],
+      "status": "pending-live-runtime-integration"
+    },
+    {
+      "id": "carry-crate-shelf-back-to-table",
+      "role": "continuous-return",
+      "reset": false,
+      "steps": ["approach", "settle", "reach", "establish-contact", "lift", "carry", "align", "lower", "verify-support", "release", "withdraw", "recover-stance"],
+      "requiredEvidence": ["objectSupported", "objectSettled", "handsClear", "no-foot-anchor-drift"],
+      "status": "pending-live-runtime-integration"
+    },
+    {
+      "id": "book-grasp-and-place",
+      "role": "different-grasp-envelope",
+      "reset": false,
+      "requiredEvidence": ["finger-clearance", "palm-contact", "object-supported", "release-clearance"],
+      "status": "pending-live-runtime-integration"
+    },
+    {
+      "id": "canister-grasp-and-place",
+      "role": "different-object-geometry",
+      "reset": false,
+      "requiredEvidence": ["grasp-stable", "wrist-limits", "object-supported", "release-clearance"],
+      "status": "pending-live-runtime-integration"
+    },
+    {
+      "id": "door-with-one-hand-occupied",
+      "role": "multi-skill-planning",
+      "reset": false,
+      "requiredEvidence": ["free-hand-reachability", "door-sweep-clear", "held-object-retained", "body-clearance"],
+      "status": "pending-live-runtime-integration"
+    },
+    {
+      "id": "stairs-with-and-without-load",
+      "role": "support-transition",
+      "reset": false,
+      "requiredEvidence": ["foot-on-tread", "support-transfer", "load-clearance", "no-slip", "no-rig-scale-change"],
+      "status": "pending-live-runtime-integration"
+    },
+    {
+      "id": "window-height-variation",
+      "role": "held-out-reach",
+      "reset": false,
+      "variation": {"windowHandleHeightM": [0.95, 1.1, 1.25]},
+      "requiredEvidence": ["reach-within-joint-limits", "stable-support", "no-body-penetration"],
+      "status": "pending-live-runtime-integration"
+    },
+    {
+      "id": "held-out-table-and-shelf-dimensions",
+      "role": "generalization",
+      "reset": true,
+      "variation": {"tableHeightM": [0.68, 0.76, 0.84], "shelfHeightM": [0.72, 0.9, 1.05], "approachYawDegrees": [-45, 0, 45, 90]},
+      "requiredEvidence": ["all-phase-gates", "continuous-motion", "collision-free", "task-completed"],
+      "status": "pending-live-runtime-integration"
+    }
+  ],
+  "promotionRule": "No scenario is marked passed until the actual browser runtime exports phase evidence and a normal-speed visual review is completed. Parameter exploration failures remain in the report and cannot overwrite last-known-good parameters."
+}
