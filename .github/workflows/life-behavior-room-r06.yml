@@ -1,0 +1,29 @@
+name: Life Behavior Room R06 isolated checks
+
+on:
+  push:
+    branches:
+      - experiment/life-behavior-room-r06-20261024
+    paths:
+      - 'experiments/life-behavior-room-r06/**'
+      - '.github/workflows/life-behavior-room-r06.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'experiments/life-behavior-room-r06/**'
+      - '.github/workflows/life-behavior-room-r06.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  trajectory-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run isolated trajectory regression checks
+        run: node experiments/life-behavior-room-r06/trajectory.test.mjs
