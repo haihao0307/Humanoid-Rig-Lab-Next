@@ -25,5 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run isolated trajectory regression checks
-        run: node experiments/life-behavior-room-r06/trajectory.test.mjs
+      - name: Run isolated trajectory and carry-sequence regressions
+        run: |
+          node experiments/life-behavior-room-r06/trajectory.test.mjs
+          node experiments/life-behavior-room-r06/carry-sequence.test.mjs
