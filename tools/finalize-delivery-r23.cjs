@@ -17,7 +17,8 @@ for(const [key,file,kind] of [
  ['originalProfiles','active-profiles-pixels-browser.json','diagnosticCompleted'],
  ['originalBodyControls','body-surface-source-browser.json','diagnosticCompleted'],
  ['proceduralFields','procedural-field-regeneration.json','passed'],
- ['cleanFieldRebuild','clean-field-rebuild.json','passed']
+ ['cleanFieldRebuild','clean-field-rebuild.json','passed'],
+ ['gitTreeRebuild','git-tree-rebuild.json','passed']
 ]){
  const path='qa/fidelity-r23/'+file,q=read(path);
  if(q[kind]!==true||q.failure||q.artifactStable===false||q.errors?.length)throw Error('Incomplete evidence '+path);
@@ -69,6 +70,6 @@ const delivery={
  remaining,localViewer:'http://127.0.0.1:8914/?v=R23-'+source.sha256.slice(0,8),localWorkbench:'http://127.0.0.1:8914/?view=workbench'
 };
 write('DELIVERY.json',delivery);
-Object.assign(anchor,{updatedUTC:now,latestCheckpointUTC:now,latestAuditUTC:now,status:'R23 checked working candidate; GitHub synchronization pending',stageStatus:'local checks complete; reconstruction and source acceptance remain incomplete',latestAudit:'DELIVERY.json',nextPriority:remaining[0].task,remaining,projectComplete:false});write('TASK_ANCHOR.json',anchor);
+Object.assign(anchor,{updatedUTC:now,latestCheckpointUTC:now,latestAuditUTC:now,status:'R23 checked working candidate; source fidelity and whole body reconstruction remain incomplete',stageStatus:'local release checks complete; synchronization receipt stored separately',latestAudit:'DELIVERY.json',nextPriority:remaining[0].task,remaining,projectComplete:false});write('TASK_ANCHOR.json',anchor);
 const html='<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url='+source.file.split('/').pop()+'"><title>身体三维工作页 R23</title><p><a href="'+source.file.split('/').pop()+'">打开身体原貌与表面控制</a></p><p><a href="'+workbench.file.split('/').pop()+'">打开完整参数与人物工作页</a></p></html>\n';fs.writeFileSync('delivery/index.html',html);
 console.log(JSON.stringify({version:delivery.selectedVersion,source:source.sha256,workbench:workbench.sha256,evidence:Object.keys(evidence).length,remaining:remaining.length}));
