@@ -1,0 +1,625 @@
+{
+  "startedUTC": "2026-10-24T07:31:18.563Z",
+  "artifactSHA256": "13c65007f677549baa54708f904c425469fc8a020c0e445ef520348047454733",
+  "checks": [
+    {
+      "name": "source default state restored",
+      "passed": true
+    },
+    {
+      "name": "original neck stages applied to matching default source state",
+      "passed": true
+    },
+    {
+      "name": "complete catalog and paired controls retained",
+      "passed": true,
+      "details": {
+        "catalog": 1916,
+        "body": 965,
+        "symmetric": 34
+      }
+    },
+    {
+      "name": "atomic multi-variable edit builds once and preserves head",
+      "passed": true
+    },
+    {
+      "name": "arbitrary body changes do not reuse stale head boundary",
+      "passed": true
+    },
+    {
+      "name": "same values do not recompute",
+      "passed": true
+    },
+    {
+      "name": "source body reset preserves loaded head and neck state",
+      "passed": true
+    },
+    {
+      "name": "initial body preset preserves loaded head",
+      "passed": true
+    },
+    {
+      "name": "invalid real archive restores complete previous person",
+      "passed": true
+    },
+    {
+      "name": "failed quality update restores quality and whole archive",
+      "passed": true
+    },
+    {
+      "name": "other original body driver remains operational",
+      "passed": true
+    },
+    {
+      "name": "actual saved person reloads twice without losing state or unknown fields",
+      "passed": true
+    },
+    {
+      "name": "repeated actual archive uses a lossless cached field",
+      "passed": true
+    },
+    {
+      "name": "unaccepted research modifiers remain inactive",
+      "passed": true
+    },
+    {
+      "name": "nonpreset continuous state uses its own supplied head boundary",
+      "passed": true
+    },
+    {
+      "name": "actual worker evaluated source neck with current boundary",
+      "passed": true
+    },
+    {
+      "name": "failed async head boundary leaves current whole person and visual field",
+      "passed": true
+    },
+    {
+      "name": "stale asynchronously supplied head boundary rejected atomically",
+      "passed": true
+    },
+    {
+      "name": "valid async provider reconnects without changing saved head state",
+      "passed": true
+    },
+    {
+      "name": "real repeated saved archive retains current head boundary",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "network": [],
+  "sourceFidelityAccepted": false,
+  "currentSourceComparison": {
+    "maximumCoordinateDifferenceMM": 6.381947899965063e-15,
+    "formalAcceptanceTolerance": null,
+    "sourceFidelityAccepted": false
+  },
+  "final": {
+    "schema": "body-implicit-r22/1",
+    "ready": true,
+    "busy": false,
+    "lastError": null,
+    "catalogCount": 1916,
+    "bodyParameters": 965,
+    "checks": {
+      "messages": 18,
+      "characterFaces": 0
+    },
+    "field": {
+      "stats": {
+        "intervalCache": {
+          "dimensions": [
+            50,
+            66,
+            22
+          ],
+          "activeCells": 6537,
+          "cells": 72600,
+          "bytes": 72600
+        },
+        "sourceFidelity": {
+          "accepted": false,
+          "sourceDefaultPreserved": true,
+          "intentionalShapeChanges": false,
+          "estimatedAnatomy": false,
+          "estimatedHandsFeet": false,
+          "fieldSmoothing": false,
+          "interiorFilling": false,
+          "sourceSurfaceEquivalenceCertified": false
+        },
+        "sourceNeck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 6.413737265529306,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "head-module"
+        },
+        "version": "BODY-IMPLICIT-R22",
+        "build": 13,
+        "pointConstraints": {
+          "global": {
+            "constraints": 9253,
+            "weights": 941359,
+            "beforeRmsMM": 2.1090839417420293,
+            "afterRmsMM": 0.6616204792019169,
+            "iterations": 73,
+            "regularization": 0.04,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.955406993647935e-8,
+            "maxAbsCoefficientMM": 19.662861932274197,
+            "coefficientRmsMM": 3.0666948991154777,
+            "objective": 0.007531260633783749,
+            "solutionL2ErrorBoundMM": 0.0005339615640884218,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          },
+          "local": {
+            "constraints": 9253,
+            "weights": 174201,
+            "beforeRmsMM": 1.2634387283966366,
+            "afterRmsMM": 0.11111141326480932,
+            "iterations": 201,
+            "regularization": 0.002,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.92668359423223e-8,
+            "maxAbsCoefficientMM": 27.983766975635906,
+            "coefficientRmsMM": 2.4105449100697247,
+            "objective": 0.00022176849868187545,
+            "solutionL2ErrorBoundMM": 0.005447297211277152,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          }
+        },
+        "fieldMS": 690.2999999523163,
+        "dimensions": [
+          197,
+          263,
+          86
+        ],
+        "channels": 4,
+        "scalarCoefficients": 4455746,
+        "materialCoordinateCoefficients": 13367238,
+        "localScalarCoefficients": 16748348,
+        "materialCoordinatesFollowBody": true,
+        "authoredNormalField": true,
+        "normalFieldCoefficients": 17822984,
+        "localRegions": [
+          {
+            "region": "left hand",
+            "dimensions": [
+              143,
+              167,
+              178
+            ]
+          },
+          {
+            "region": "right hand",
+            "dimensions": [
+              143,
+              167,
+              178
+            ]
+          },
+          {
+            "region": "left foot",
+            "dimensions": [
+              129,
+              131,
+              244
+            ]
+          },
+          {
+            "region": "right foot",
+            "dimensions": [
+              129,
+              131,
+              244
+            ]
+          }
+        ],
+        "orientedSamples": 9253,
+        "fieldVoxelsNearSamples": 726950,
+        "characterVertices": 0,
+        "characterFaces": 0,
+        "characterTriangleIndices": 0,
+        "usesPolygonConnectivity": false,
+        "headGenerated": false,
+        "sourceDerivedCalibration": true,
+        "exactShapeEquivalenceCertified": false,
+        "fieldStorage": {
+          "schema": "body-field-pages/1",
+          "lossless": true,
+          "fieldValuesChanged": false,
+          "originalBytes": 410557440,
+          "storedBytes": 202317052,
+          "packMS": 637.1000000238419,
+          "regions": [
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 142583872,
+              "storedBytes": 38573652,
+              "activeBricks": 2322,
+              "totalBricks": 9075,
+              "testedNodes": 3393519,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 68013088,
+              "storedBytes": 31494008,
+              "activeBricks": 3718,
+              "totalBricks": 8694,
+              "testedNodes": 2421178,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 68013088,
+              "storedBytes": 31494008,
+              "activeBricks": 3744,
+              "totalBricks": 8694,
+              "testedNodes": 2413849,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 65973696,
+              "storedBytes": 50312156,
+              "activeBricks": 5909,
+              "totalBricks": 8959,
+              "testedNodes": 1255361,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 65973696,
+              "storedBytes": 50312156,
+              "activeBricks": 5945,
+              "totalBricks": 8959,
+              "testedNodes": 1259533,
+              "byteExact": true
+            }
+          ]
+        },
+        "computeFieldMS": 11722.299999952316,
+        "cache": {
+          "entries": 1,
+          "bytes": 143181144,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 0,
+          "pendingRawBytes": 0,
+          "hits": 5,
+          "misses": 8,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": true,
+          "restoreMS": 689.7999999523163,
+          "compressedBytes": 143181144,
+          "rawBytes": 202621978
+        }
+      },
+      "bounds": [
+        [
+          -0.6885289382934571,
+          0.6885347795486451
+        ],
+        [
+          -1.1328351926803588,
+          0.7012803387641907
+        ],
+        [
+          -0.16280188232660292,
+          0.4361212682723999
+        ]
+      ],
+      "dimensions": [
+        197,
+        263,
+        86
+      ],
+      "cap": 0.6513496244495566
+    },
+    "renderer": {
+      "version": "BODY-RAY-LOSSLESS-TRANSPORT-R22",
+      "canvasSize": {
+        "width": 791,
+        "height": 866
+      },
+      "responsiveAspect": true,
+      "characterMeshes": 0,
+      "characterVertexBuffers": 0,
+      "characterElementBuffers": 0,
+      "characterTriangleFaces": 0,
+      "rasterPrimitive": "POINTS",
+      "continuousRestSpaceSurfaceDetails": false,
+      "sourceFidelityAccepted": false,
+      "normalFieldCPUReleased": false,
+      "losslessFieldTransport": true,
+      "gpuSparsePages": false,
+      "lastFieldUploadMS": 432.7999999523163,
+      "cpuFieldBytesEstimate": 202317052,
+      "gpuFieldBytesEstimate": 410557440,
+      "localGpuPrecision": "float32",
+      "rayIterationBudget": 320,
+      "screenTileSize": 64,
+      "draws": 42,
+      "webglError": 0,
+      "camera": {
+        "yaw": 0.28,
+        "pitch": 0.04,
+        "distance": 2.242183890581131,
+        "target": [
+          0,
+          -0.17811852693557734,
+          0
+        ]
+      },
+      "appearance": {
+        "roughness": 0.52,
+        "noise": 1,
+        "oil": 0.45,
+        "bodyVariation": 0.64,
+        "bodyPores": 0.78,
+        "jointTone": 0.42,
+        "neckCreases": 0.34,
+        "enabled": true,
+        "regionalColor": 0.72,
+        "lidWarmth": 0.46,
+        "noseWarmth": 0.38,
+        "earBlood": 0.44,
+        "earTransmission": 0.58,
+        "beardShadow": 0.04,
+        "audit": 0
+      },
+      "lighting": {
+        "key": 1.6,
+        "rim": 3.5,
+        "environment": 0.9,
+        "exposure": 0.7,
+        "keyAzimuth": -154,
+        "keyElevation": 8,
+        "rimAzimuth": 71,
+        "rimElevation": 11.309932,
+        "keyColor": "#ffffff",
+        "rimColor": "#efa37e",
+        "schema": "kaopu.eb1/1",
+        "preset": "custom",
+        "environmentRotation": -69,
+        "background": 0.85,
+        "shadowSize": 2048
+      },
+      "implicitStats": {
+        "intervalCache": {
+          "dimensions": [
+            50,
+            66,
+            22
+          ],
+          "activeCells": 6537,
+          "cells": 72600,
+          "bytes": 72600
+        },
+        "sourceFidelity": {
+          "accepted": false,
+          "sourceDefaultPreserved": true,
+          "intentionalShapeChanges": false,
+          "estimatedAnatomy": false,
+          "estimatedHandsFeet": false,
+          "fieldSmoothing": false,
+          "interiorFilling": false,
+          "sourceSurfaceEquivalenceCertified": false
+        },
+        "sourceNeck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 6.413737265529306,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "head-module"
+        },
+        "version": "BODY-IMPLICIT-R22",
+        "build": 13,
+        "pointConstraints": {
+          "global": {
+            "constraints": 9253,
+            "weights": 941359,
+            "beforeRmsMM": 2.1090839417420293,
+            "afterRmsMM": 0.6616204792019169,
+            "iterations": 73,
+            "regularization": 0.04,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.955406993647935e-8,
+            "maxAbsCoefficientMM": 19.662861932274197,
+            "coefficientRmsMM": 3.0666948991154777,
+            "objective": 0.007531260633783749,
+            "solutionL2ErrorBoundMM": 0.0005339615640884218,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          },
+          "local": {
+            "constraints": 9253,
+            "weights": 174201,
+            "beforeRmsMM": 1.2634387283966366,
+            "afterRmsMM": 0.11111141326480932,
+            "iterations": 201,
+            "regularization": 0.002,
+            "positiveDefinite": true,
+            "relativeSolverResidual": 9.92668359423223e-8,
+            "maxAbsCoefficientMM": 27.983766975635906,
+            "coefficientRmsMM": 2.4105449100697247,
+            "objective": 0.00022176849868187545,
+            "solutionL2ErrorBoundMM": 0.005447297211277152,
+            "coefficientClippingUsed": false,
+            "kernelUnchangedFromR05": true,
+            "converged": true,
+            "method": "Tikhonov sparse least squares on the original row-normalized oriented kernel; preconditioned conjugate gradients on A^T A + lambda I; no polygon connectivity"
+          }
+        },
+        "fieldMS": 690.2999999523163,
+        "dimensions": [
+          197,
+          263,
+          86
+        ],
+        "channels": 4,
+        "scalarCoefficients": 4455746,
+        "materialCoordinateCoefficients": 13367238,
+        "localScalarCoefficients": 16748348,
+        "materialCoordinatesFollowBody": true,
+        "authoredNormalField": true,
+        "normalFieldCoefficients": 17822984,
+        "localRegions": [
+          {
+            "region": "left hand",
+            "dimensions": [
+              143,
+              167,
+              178
+            ]
+          },
+          {
+            "region": "right hand",
+            "dimensions": [
+              143,
+              167,
+              178
+            ]
+          },
+          {
+            "region": "left foot",
+            "dimensions": [
+              129,
+              131,
+              244
+            ]
+          },
+          {
+            "region": "right foot",
+            "dimensions": [
+              129,
+              131,
+              244
+            ]
+          }
+        ],
+        "orientedSamples": 9253,
+        "fieldVoxelsNearSamples": 726950,
+        "characterVertices": 0,
+        "characterFaces": 0,
+        "characterTriangleIndices": 0,
+        "usesPolygonConnectivity": false,
+        "headGenerated": false,
+        "sourceDerivedCalibration": true,
+        "exactShapeEquivalenceCertified": false,
+        "fieldStorage": {
+          "schema": "body-field-pages/1",
+          "lossless": true,
+          "fieldValuesChanged": false,
+          "originalBytes": 410557440,
+          "storedBytes": 202317052,
+          "packMS": 637.1000000238419,
+          "regions": [
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 142583872,
+              "storedBytes": 38573652,
+              "activeBricks": 2322,
+              "totalBricks": 9075,
+              "testedNodes": 3393519,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 68013088,
+              "storedBytes": 31494008,
+              "activeBricks": 3718,
+              "totalBricks": 8694,
+              "testedNodes": 2421178,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 68013088,
+              "storedBytes": 31494008,
+              "activeBricks": 3744,
+              "totalBricks": 8694,
+              "testedNodes": 2413849,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 65973696,
+              "storedBytes": 50312156,
+              "activeBricks": 5909,
+              "totalBricks": 8959,
+              "testedNodes": 1255361,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 65973696,
+              "storedBytes": 50312156,
+              "activeBricks": 5945,
+              "totalBricks": 8959,
+              "testedNodes": 1259533,
+              "byteExact": true
+            }
+          ]
+        },
+        "computeFieldMS": 11722.299999952316,
+        "cache": {
+          "entries": 1,
+          "bytes": 143181144,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 0,
+          "pendingRawBytes": 0,
+          "hits": 5,
+          "misses": 8,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": true,
+          "restoreMS": 689.7999999523163,
+          "compressedBytes": 143181144,
+          "rawBytes": 202621978
+        }
+      }
+    },
+    "sourceFidelityAccepted": false,
+    "intentionalShapeChanges": false,
+    "headGenerated": false,
+    "sourceDerivedData": true,
+    "wholeBodySourceIndependent": false,
+    "allOriginalControlCombinationsCertified": false
+  },
+  "artifactStable": true,
+  "passed": true,
+  "browserClosed": true,
+  "finishedUTC": "2026-10-24T07:34:29.252Z"
+}

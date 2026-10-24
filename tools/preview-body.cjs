@@ -6,9 +6,15 @@ const root=path.resolve(__dirname,'..'),port=8914;
 http.createServer((req,res)=>{
  if(req.method!=='GET'&&req.method!=='HEAD'){res.writeHead(405);res.end();return;}
  try{const url=new URL(req.url,'http://127.0.0.1:'+port),pathname=decodeURIComponent(url.pathname);let manifest;
-  if(pathname==='/')manifest=url.searchParams.get('view')==='workbench'?'BUILD-R21.json':url.searchParams.get('view')==='r20'?'BUILD-R20.json':'BUILD.json';
-  else if(pathname==='/source'||pathname==='/身体_R21_原母体函数对照.html')manifest='BUILD-SOURCE-R21.json';
-  else if(pathname==='/workbench'||pathname==='/人物身体_R21_原数据复刻检查.html')manifest='BUILD-R21.json';
+  if(/^\/assets\/body-skin-r22\/[A-Za-z0-9_-]+\.gz$/.test(pathname)){const assetRoot=path.resolve(root,'delivery/assets/body-skin-r22'),asset=path.resolve(assetRoot,path.basename(pathname));if(!asset.startsWith(assetRoot+path.sep)||!fs.existsSync(asset)){res.writeHead(404);res.end();return;}res.writeHead(200,{'Content-Type':'application/octet-stream','Cache-Control':'private, max-age=31536000, immutable','Content-Length':fs.statSync(asset).size});if(req.method==='HEAD')res.end();else fs.createReadStream(asset).pipe(res);return;}
+  const selected=JSON.parse(fs.readFileSync(path.join(root,'BUILD.json'),'utf8').replace(/^\uFEFF/,'')),companion=selected.companionBuild||'BUILD-R21.json';
+  if(pathname==='/')manifest=url.searchParams.get('view')==='workbench'?companion:url.searchParams.get('view')==='r20'?'BUILD-R20.json':url.searchParams.get('view')==='r21'?'BUILD-SOURCE-R21.json':'BUILD.json';
+  else if(pathname==='/source')manifest='BUILD.json';
+  else if(pathname==='/workbench')manifest=companion;
+  else if(pathname==='/身体_R22_原貌与原灯光对照.html')manifest='BUILD-SOURCE-R22.json';
+  else if(pathname==='/人物身体_R22_原颈部流程与连续参数.html')manifest='BUILD-R22.json';
+  else if(pathname==='/身体_R21_原母体函数对照.html')manifest='BUILD-SOURCE-R21.json';
+  else if(pathname==='/人物身体_R21_原数据复刻检查.html')manifest='BUILD-R21.json';
   else{res.writeHead(404);res.end();return;}
   const build=JSON.parse(fs.readFileSync(path.join(root,manifest),'utf8').replace(/^\uFEFF/,'')),file=path.resolve(root,build.file);if(!file.startsWith(root+path.sep))throw Error('Artifact outside project');
   res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','Content-Length':fs.statSync(file).size});if(req.method==='HEAD')res.end();else fs.createReadStream(file).pipe(res);

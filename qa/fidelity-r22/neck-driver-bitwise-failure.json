@@ -1,0 +1,29 @@
+{
+  "startedUTC": "2026-10-24T06:07:48.368Z",
+  "sourceFidelityAccepted": false,
+  "completedMotherConversion": false,
+  "scope": "Exact body-side source neck stages with corresponding original head boundary; not source surface acceptance",
+  "checks": [
+    {
+      "name": "baseline final Float32 source positions exact",
+      "passed": true
+    },
+    {
+      "name": "baseline pre-harmonic Float32 source positions exact",
+      "passed": true
+    },
+    {
+      "name": "baseline source body input immutable",
+      "passed": true
+    },
+    {
+      "name": "baseline whole continuous driver and source neck positions exact",
+      "passed": false
+    }
+  ],
+  "cases": [],
+  "failure": "Error: baseline whole continuous driver and source neck positions exact\n    at check (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-neck-r22.cjs:1:583)\n    at Object.<anonymous> (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-neck-r22.cjs:4:1090)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Object..js (node:internal/modules/cjs/loader:1943:10)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47",
+  "passed": false,
+  "finishedUTC": "2026-10-24T06:07:48.867Z",
+  "operatorPackageSHA256": "65213763545ca0d6f14467ddfbb16c8b060b89b3e6f8d41ce4f86c550171ebe7"
+}

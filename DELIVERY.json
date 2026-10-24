@@ -1,27 +1,28 @@
 {
-  "schema": "body-function-delivery/6",
-  "reviewedUTC": "2026-10-24T05:14:32.281Z",
-  "selectedVersion": "R21",
-  "status": "verified working checkpoint; source-fidelity comparison candidate, not completed reconstruction",
-  "artifact": "delivery/身体_R21_原母体函数对照.html",
-  "sha256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c",
-  "bytes": 61833887,
+  "schema": "body-function-delivery/7",
+  "reviewedUTC": "2026-10-24T08:47:36.001Z",
+  "selectedVersion": "R22",
+  "status": "checked working candidate; source fidelity and full reconstruction incomplete",
+  "artifact": "delivery/身体_R22_原貌与原灯光对照.html",
+  "sha256": "59314d7715e5c4ab887739b7b321f83ebadce364ed92c6d7e60a7349d5a62e4b",
+  "bytes": 62354025,
   "companionWorkbench": {
-    "file": "delivery/人物身体_R21_原数据复刻检查.html",
-    "sha256": "0a51b52d150ad3977fd8a95724ae7b05c633be05ffc9cb3d3cd21c565a829684",
-    "bytes": 60054816
+    "file": "delivery/人物身体_R22_原颈部流程与连续参数.html",
+    "sha256": "13c65007f677549baa54708f904c425469fc8a020c0e445ef520348047454733",
+    "bytes": 61467802
   },
   "prior": {
-    "version": "R20",
-    "file": "G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\delivery\\人物身体_R20_结构细节与动作调整.html",
-    "sha256": "eca0132b1866a818725feaffbbd262511319a337522a369234be26c6d3d1ea9a",
-    "status": "retained unaccepted research under the newer source-fidelity contract"
+    "version": "R21",
+    "file": "delivery/身体_R21_原母体函数对照.html",
+    "sha256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c",
+    "status": "retained unchanged fallback"
   },
-  "scope": "BODY ONLY - original-source comparison, source material fields, full control/archive preservation",
+  "scope": "BODY ONLY",
   "characterTriangleFaces": 0,
   "characterVertexBuffers": 0,
   "rasterPrimitive": "POINTS",
   "headGenerated": false,
+  "headBoardModified": false,
   "sharedR15ReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
   "sourceDerivedCalibration": true,
   "sourceFacetPartitionInformationRetained": true,
@@ -34,6 +35,13 @@
   "allOriginalControlCombinationsCertified": false,
   "parameterVariationOnSourceCandidate": false,
   "fixedOriginalStates": 9,
+  "continuousHeadProviderImplemented": false,
+  "originalNeckNumericStagesImplemented": true,
+  "actualOriginalBodySkinPipelineImplemented": true,
+  "sourceOwnSkinReproduced": false,
+  "fullVolumeScattering": false,
+  "sourceGraphFieldsByteExact": true,
+  "sourceShadowCaches": true,
   "fullControlsRetainedInCompanion": true,
   "controls": {
     "originalCatalog": 1916,
@@ -47,21 +55,11 @@
   "githubRepository": "haihao0307/Humanoid-Rig-Lab-Next",
   "githubBranch": "body/reconstruction-r18-20261023",
   "implemented": [
-    "original default/control driver restored; estimated R18–R20 geometry modifiers inactive in R21",
-    "fixed original displayed surface, boundaries, original FrontSide and first-hit layers compiled into source-partition function comparison",
-    "Float64 exact-ray display after interaction, shared GLSL source material, stale-frame cancellation and double-click focus",
-    "original body albedo, rest-space microheight/dryness fields, roughness/oil response and original GGX equations under inspection light",
-    "same-surface quad helper rays prevent material differences from crossing body layers; no shape smoothing",
-    "complete original profile archives, compatible exact-profile imports/repeated loads, preservation of unknown old metadata; unsupported source/appearance states rejected without substitution",
-    "full control workbench retains atomic batch operations, both drivers, head/neck-preserving body reset and complete rollback",
-    "session-only bounded lossless field snapshots reuse exact complete states; obsolete pending snapshots are cancelled; unused nearest-point scratch arrays are no longer allocated or transmitted",
-    "all compressed function coefficient arrays bit-checked; byte shuffle selected only when losslessly smaller"
-  ],
-  "notRestored": [
-    "autonomous structural mother and continuously varying new surface",
-    "continuous original neck contour/fairing/harmonic surface integration with the head interface",
-    "full original scene environment/shadow/diffusion/optical pipeline",
-    "complete matched-pixel/edge parity and formally approved source acceptance"
+    "original contour/fairing/harmonic arithmetic recovered and replayed with current state-bound head boundary inputs",
+    "body-side async boundary provider, complete archive retention and atomic failure rollback; stale inputs rejected",
+    "actual enabled original body skin fragment, all four custom 12-level noise fields, shared EB1 environment, two original fixed-state light shadow caches and original 25-tap surface diffusion/output",
+    "direct function intersections with Float64 current exact frame, point-only source material evaluation, stale-frame cancellation and interactive focus",
+    "lossless CPU field pages and bounded cache; original Float32 GPU textures and dense R21 GLSL retained"
   ],
   "storage": {
     "logicalArrays": 54,
@@ -70,194 +68,429 @@
     "uniqueBytes": 104192036,
     "compressedBytes": 46253973,
     "bitExactCoefficients": true,
-    "noLossyQuantization": true
-  },
-  "data": {
-    "file": "data/body-source-atlas-r21.json",
-    "sha256": "11e652353756be59942a0cc7375727fa4d346af0dbbbfb995f035557453edf94",
-    "bytes": 61768594,
-    "storage": {
-      "logicalArrays": 54,
-      "uniqueArrays": 51,
-      "logicalBytes": 108975040,
-      "uniqueBytes": 104192036,
-      "compressedBytes": 46253973,
-      "bitExactCoefficients": true,
-      "noLossyQuantization": true
-    }
+    "noLossyQuantization": true,
+    "workbenchDenseFieldBytes": 352871712,
+    "workbenchStoredFieldBytes": 185193820,
+    "workbenchGPUFieldBytes": 352871712,
+    "skinAssets": 22,
+    "skinAssetCompressedBytes": 105184203
   },
   "verified": {
-    "releaseIntegrityChecks": 222,
-    "actualGPUPointDrawsOnly": true,
-    "completeWorkbenchLifecycleChecks": 12,
-    "losslessFieldCacheChecks": 10,
-    "fieldCacheRestore": {
-      "ms": 795.8185999999987,
-      "compressedBytes": 85834943,
-      "rawBytes": 353159084,
-      "report": {
-        "entries": 1,
-        "bytes": 85834943,
-        "maximumBytes": 201326592,
-        "maximumEntries": 2,
-        "pending": 0,
-        "pendingRawBytes": 0,
-        "hits": 1,
-        "misses": 0,
-        "failures": 0,
-        "lossless": true,
-        "encoding": "gzip-byte-exact"
-      }
-    },
+    "releaseIntegrityChecks": 251,
+    "sourceNeckStates": 17,
+    "sourceNeckChecks": 78,
+    "fieldDisplayChecks": 39,
+    "fieldArrayChecks": 5,
+    "completeWorkbenchLifecycleChecks": 20,
     "sourceProfiles": 9,
     "precisionViews": 12,
-    "matchedInspectionPixelViews": 12,
-    "allOriginalSurfacePiecesVisited": true,
-    "sourceAlbedoMaximumLinearRGBDifference": 2.6810030495649784e-7,
-    "sourceMicroHeightMaximumDifferenceMicrometres": 0.010194071364821866,
-    "actualHTTPPassed": true,
+    "actualSourceOpticsViews": 6,
+    "actualSourceOpticsAllProfileViews": 27,
+    "referenceFullSceneShadowVisibilityPreserved": true,
+    "sourceShadowCacheParity": {
+      "baseline": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "expected": "8563c54e95a2f04cd87fa3002ba9045c297eba1986819ccaf973e67475434720",
+          "actual": "8563c54e95a2f04cd87fa3002ba9045c297eba1986819ccaf973e67475434720",
+          "matched": true,
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "expected": "7f852f83c39bb3a2bc74dabc6aef857ee8d11d9eb8c7e3fd64b9142f8359a26c",
+          "actual": "7f852f83c39bb3a2bc74dabc6aef857ee8d11d9eb8c7e3fd64b9142f8359a26c",
+          "matched": true,
+          "error": 0
+        }
+      ],
+      "lean": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "expected": "b5fdc1f2221c8f3433c849dea185d7425aa051f1ce2d0776e1b03b85e895c2f1",
+          "actual": "2c107b7a5a76fcaf8b151dbba243d80592c18d55753d073d9dd900eb3c7c11f2",
+          "matched": false,
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "expected": "26f9325072754f132d297088bd6c351b9f40415ebb4d12becea2bbb338bf5104",
+          "actual": "690c7bbbea0422662c05204cea252941e9d89798855d68e830ae0856d483d4f6",
+          "matched": false,
+          "error": 0
+        }
+      ],
+      "fuller": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "expected": "5e3bebebf53100e3f69c1661b98c2a554ef402eb3c5aea16adfa99100dd17c18",
+          "actual": "a311339eba31776459374710d711ef2bf2b596d600c8a77c78ffeb520e30dd4e",
+          "matched": false,
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "expected": "8281c8882a36049d755104899e1bbf78d7ea6972dc2eb3b6ef70c01a166487c6",
+          "actual": "54f37f88c4261030899bd6b4bde1015b2554b60fd83846282c6a46062bd8aba6",
+          "matched": false,
+          "error": 0
+        }
+      ],
+      "muscular": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "expected": "c4c69c48107e31a6ecf4b439ee4712a4aa2c5f2fcf01c4b740f0bc149ba05577",
+          "actual": "533d33f14b441c4eae398d5c2aa4f44f8987a7b1c5bd5c9266e50361cb2f08a9",
+          "matched": false,
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "expected": "58faf6472cfee988ebc73ab374cb314dc7dc475d116698586a9aeb3b45ccb4c5",
+          "actual": "63186eae91af848f1381d4fd199548c96604ffd156f5102127287248dddc004e",
+          "matched": false,
+          "error": 0
+        }
+      ],
+      "female": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "expected": "4bf0d3d3d05ad21030997ef4dc0d40403e6dabd53362cda33920ad018439bf0c",
+          "actual": "bc9a5b751214fabc0d93a786f1af1be7578ccc5e88f0a82672706319ce34902f",
+          "matched": false,
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "expected": "0274d1a6411474920808fbfc55c4fdeb85b0e8c9f076b1f86c6291c646627ef4",
+          "actual": "55a1b0fbaf84ba61d95268e787b44c87c7f6cde553b8be0dfa667680cf42835a",
+          "matched": false,
+          "error": 0
+        }
+      ],
+      "A-reach": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "expected": "1d1c91b8dd7fc11faea387ae9c5f10d11a9628af3a180cc52198e1d05ce3f8dd",
+          "actual": "c230fa99f104559276013409bb6256339c5eaf23b2ba3060f91b73d6a6abd0ec",
+          "matched": false,
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "expected": "e75c044e087a4eb62c6deb7191b324b70bb19f900a64e08d2ccfdee1860c10f9",
+          "actual": "f0cb9385e3d5edb6743540218ddfa0c8f8cf35887f531020456be03811f6e7d7",
+          "matched": false,
+          "error": 0
+        }
+      ],
+      "A-joints": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "expected": "bdacb06a89cedeec091f2dd01103ecd2a1a75defc5c1ddedd38a3ffb9916a385",
+          "actual": "512e28f417bb78b3ee31bd53c02c52d7ba8b906aa90c9664e86595ac0563d989",
+          "matched": false,
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "expected": "631436e8343b7a2b1eef662538037d697ea587bda108c2670c3ea532db41fee3",
+          "actual": "6665b68a9f7f39aa7895090b4f1c14d98a807e425f4918281a77595032885c51",
+          "matched": false,
+          "error": 0
+        }
+      ],
+      "B-neutral": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "expected": "e4da46b1174763ea29d37a672a4f4123f4225d269e34b47248018ce088b6ba35",
+          "actual": "c5b1512a6b4e4caf9f651a5f104e96650ebd8b68cef5616a1d16f87597964cf0",
+          "matched": false,
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "expected": "855f9f359b335cfee624432018907d32d0eddb11afdd0a59ab82c36d94839661",
+          "actual": "c5be49d08e1c07a7c9eef038f175c90dc46c7ed5a9f586715108ed5916e40f9d",
+          "matched": false,
+          "error": 0
+        }
+      ],
+      "B-bend": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "expected": "e149bd5db12694dcf00a9206a40773cb57f18ecf81c714ccbcb51a1ed8a63d81",
+          "actual": "29bbab0cc54bdae22fcdc5d65c9d9875c13796018a93a37f2ee255ab1d5cbad4",
+          "matched": false,
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "expected": "e2708b5926f02e457fe0a5def0fe47cc2bede1e0068e03ea686161b3a41775a4",
+          "actual": "08d2bdb66e9052633abf1cda6f45a8336acd2b9d08e49addf49b3280f6c03adb",
+          "matched": false,
+          "error": 0
+        }
+      ]
+    },
+    "pointOnlyDraws": true,
+    "partialShadowUploadRollback": true,
+    "HTTPChecks": 29,
     "newScreenshotFiles": 0
   },
-  "remainingMatchedInspectionDifferences": {
-    "sourceOnlyPixelsAcrossViews": 16,
-    "candidateOnlyPixelsAcrossViews": 12,
-    "maximumRGBCodeDifference": 63,
-    "note": "Residual edge/material and raster coverage differences remain explicitly unaccepted; worst points and source piece attribution are retained in the pixel report."
-  },
+  "remainingActualOpticsDifferences": [
+    {
+      "view": "front",
+      "sourceOnly": 2,
+      "candidateOnly": 3,
+      "commonPixels": 89602,
+      "maximumRGBCodeDifference": 18,
+      "rmsMaximumChannelCodeDifference": 0.16297824118663184,
+      "interior": {
+        "count": 81617,
+        "maximum": 4,
+        "rms": 0.13700583659979076
+      },
+      "edge": {
+        "count": 7985,
+        "maximum": 18,
+        "rms": 0.32588206970665484
+      }
+    },
+    {
+      "view": "side",
+      "sourceOnly": 0,
+      "candidateOnly": 1,
+      "commonPixels": 54478,
+      "maximumRGBCodeDifference": 52,
+      "rmsMaximumChannelCodeDifference": 0.26738876375429055,
+      "interior": {
+        "count": 48809,
+        "maximum": 52,
+        "rms": 0.2729742588854392
+      },
+      "edge": {
+        "count": 5669,
+        "maximum": 3,
+        "rms": 0.21333230434278797
+      }
+    },
+    {
+      "view": "back",
+      "sourceOnly": 1,
+      "candidateOnly": 0,
+      "commonPixels": 87187,
+      "maximumRGBCodeDifference": 7,
+      "rmsMaximumChannelCodeDifference": 0.14483748852122488,
+      "interior": {
+        "count": 79467,
+        "maximum": 7,
+        "rms": 0.13642396824912875
+      },
+      "edge": {
+        "count": 7720,
+        "maximum": 4,
+        "rms": 0.21292437052805122
+      }
+    },
+    {
+      "view": "oblique",
+      "sourceOnly": 0,
+      "candidateOnly": 1,
+      "commonPixels": 85268,
+      "maximumRGBCodeDifference": 76,
+      "rmsMaximumChannelCodeDifference": 0.30083697415933514,
+      "interior": {
+        "count": 77469,
+        "maximum": 76,
+        "rms": 0.3061921463467864
+      },
+      "edge": {
+        "count": 7799,
+        "maximum": 5,
+        "rms": 0.2412728566537612
+      }
+    },
+    {
+      "view": "left-hand",
+      "sourceOnly": 0,
+      "candidateOnly": 1,
+      "commonPixels": 120493,
+      "maximumRGBCodeDifference": 5,
+      "rmsMaximumChannelCodeDifference": 0.11587996354654696,
+      "interior": {
+        "count": 113971,
+        "maximum": 1,
+        "rms": 0.10991824627857232
+      },
+      "edge": {
+        "count": 6522,
+        "maximum": 5,
+        "rms": 0.19222865358505473
+      }
+    },
+    {
+      "view": "left-foot",
+      "sourceOnly": 1,
+      "candidateOnly": 0,
+      "commonPixels": 113890,
+      "maximumRGBCodeDifference": 5,
+      "rmsMaximumChannelCodeDifference": 0.13825677366423772,
+      "interior": {
+        "count": 109238,
+        "maximum": 5,
+        "rms": 0.1368901033042591
+      },
+      "edge": {
+        "count": 4652,
+        "maximum": 1,
+        "rms": 0.16716749057582048
+      }
+    }
+  ],
   "reports": {
     "releaseIntegrity": {
-      "file": "qa/fidelity-r21/release-integrity.json",
-      "sha256": "72d39cfa85da16664ca25e046563bc88a3b6b52026a9e2910be43d9df4a8c0d8",
-      "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
-    },
-    "gpuViews": {
-      "file": "qa/fidelity-r21/atlas-browser.json",
-      "sha256": "8941b7ea16fedb4b1f170b9b730a43b38f636835a93a07119282ca6c752f35a0",
-      "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
+      "file": "qa/fidelity-r22/release-integrity.json",
+      "sha256": "943f8f727edb831f31690e26d07b1fca0695961a770ff6feb10e2a8ca65c41cb",
+      "artifactSHA256": "59314d7715e5c4ab887739b7b321f83ebadce364ed92c6d7e60a7349d5a62e4b"
     },
     "profilesAndArchives": {
-      "file": "qa/fidelity-r21/atlas-profiles-browser.json",
-      "sha256": "46988b90411104e620801cf7b03b18f6ee3b1b7747f5c98871bec8418c5d0e20",
-      "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
+      "file": "qa/fidelity-r22/atlas-profiles-browser.json",
+      "sha256": "cc9053044aa705c2ea45c4cd5e1542f1d0ea4a8fe004251a9d38a47129fd6fbf",
+      "artifactSHA256": "59314d7715e5c4ab887739b7b321f83ebadce364ed92c6d7e60a7349d5a62e4b"
     },
-    "precision": {
-      "file": "qa/fidelity-r21/atlas-precision-browser.json",
-      "sha256": "c1705ca653cdad012722c93ddf4078b1a9483b729913e99ecc0d96f08d3db150",
-      "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
+    "precisionAndPointOnlyRendering": {
+      "file": "qa/fidelity-r22/atlas-precision-browser.json",
+      "sha256": "b8e2b0ff7cd678d9a8beb56d89e35392133df0c1952d56cd147ff13fc7fc4d47",
+      "artifactSHA256": "59314d7715e5c4ab887739b7b321f83ebadce364ed92c6d7e60a7349d5a62e4b"
     },
-    "sourceAlbedo": {
-      "file": "qa/fidelity-r21/source-albedo-browser.json",
-      "sha256": "92bc5ce2b2eb82059ea3defa5c03995e0cb45a03bf3515bb04d8a4f545ecaae5",
-      "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
-    },
-    "sourceMicroSurface": {
-      "file": "qa/fidelity-r21/source-skin-browser.json",
-      "sha256": "ca0ea0da0b209ed6dff1d3b157509a337b0ad66a764aaef507111555c8d9abd8",
-      "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
-    },
-    "matchedInspectionPixels": {
-      "file": "qa/fidelity-r21/source-pixels-browser.json",
-      "sha256": "f2a3704a6ef19df3e074bf91d35c07c0cb258cf24c087e919597adf60cf87467",
-      "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
+    "actualActiveSkinAndSourcePixels": {
+      "file": "qa/fidelity-r22/active-skin-pixels-browser.json",
+      "sha256": "f72f9524bfb4a3cc508b9242194e74d75b2ffd67867790cf8d96c97a29c6d2d6",
+      "artifactSHA256": "59314d7715e5c4ab887739b7b321f83ebadce364ed92c6d7e60a7349d5a62e4b"
     },
     "actualHTTP": {
-      "file": "qa/fidelity-r21/http-viewer.json",
-      "sha256": "19b990037a92d3c985b28972a90c01eeabd032a236dff96e04125af5a308883a",
-      "artifactSHA256": "6e61279f7a287cb24ae6cf8af1660fbba01f1c43b2dfe607134e9d64e11a0a0c"
+      "file": "qa/fidelity-r22/http-viewer.json",
+      "sha256": "19affaf0bd3fbafc284065ea6dc0f55e2c1b4ef653b04983a768e4b1bf2cac12",
+      "artifactSHA256": "59314d7715e5c4ab887739b7b321f83ebadce364ed92c6d7e60a7349d5a62e4b"
     },
     "completeWorkbenchLifecycle": {
-      "file": "qa/fidelity-r21/workbench-lifecycle.json",
-      "sha256": "748754b8972112ff8fc83d08930e90bce98f1507b1b6b66986c0e927cad1ca16",
-      "artifactSHA256": "0a51b52d150ad3977fd8a95724ae7b05c633be05ffc9cb3d3cd21c565a829684"
+      "file": "qa/fidelity-r22/workbench-lifecycle.json",
+      "sha256": "73a1aafe81d720bbc54990f49a2f1ff43a6a4477745601ff71d17a7b695709b9",
+      "artifactSHA256": "13c65007f677549baa54708f904c425469fc8a020c0e445ef520348047454733"
     },
-    "surface-baseline": {
+    "losslessFieldDisplay": {
+      "file": "qa/fidelity-r22/field-pages-browser.json",
+      "sha256": "70191309bfbd14d4908eff2a8dba267cc8d8800c4a5e84b2f48be597cb964aed",
+      "artifactSHA256": "13c65007f677549baa54708f904c425469fc8a020c0e445ef520348047454733"
+    },
+    "losslessFieldArrays": {
+      "file": "qa/fidelity-r22/field-pages-node.json",
+      "sha256": "45be475bb650f31fcc8fec7853a761e7f66eb87044d04d61f5b67e2102800f47"
+    },
+    "sourceNeckReplay": {
+      "file": "qa/fidelity-r22/neck-source-replay.json",
+      "sha256": "6a4d7b74fc1cd78f4fd681d4119d5128605ea68b006fc4bab8867c2e1d545953"
+    },
+    "inheritedGeometry-baseline": {
       "file": "qa/fidelity-r21/atlas-full-fidelity.json",
       "sha256": "1e3fd9ea5a2e519db5436c74a8fe31fcd917108f1790645e6627adfbce7a78e8",
-      "programSHA256": "3f6cdcbd03c630535a7fc1a47304ec8d52d7e3f38540159283ed93550a76bd2d"
+      "programSHA256": "3f6cdcbd03c630535a7fc1a47304ec8d52d7e3f38540159283ed93550a76bd2d",
+      "inheritedGeometryOnly": true
     },
-    "surface-lean": {
+    "inheritedGeometry-lean": {
       "file": "qa/fidelity-r21/atlas-full-lean-fidelity.json",
       "sha256": "505360ba6e2c87a085a79db612b7819c2e0b0373a186f13366799c8637004bb8",
-      "programSHA256": "3d870b20286329943ed2b53cb46776c7fdf2f5d45295e2bbd6a86708206b6513"
+      "programSHA256": "3d870b20286329943ed2b53cb46776c7fdf2f5d45295e2bbd6a86708206b6513",
+      "inheritedGeometryOnly": true
     },
-    "surface-fuller": {
+    "inheritedGeometry-fuller": {
       "file": "qa/fidelity-r21/atlas-full-fuller-fidelity.json",
       "sha256": "4d7b9aa56110354c29e47b30d4629cfbf80a6972e09b303de08eea6b6891e908",
-      "programSHA256": "447d6333590f4c9c3930b2f5a2ae1af4a742554c912b74791cbf05afdb3fd63b"
+      "programSHA256": "447d6333590f4c9c3930b2f5a2ae1af4a742554c912b74791cbf05afdb3fd63b",
+      "inheritedGeometryOnly": true
     },
-    "surface-muscular": {
+    "inheritedGeometry-muscular": {
       "file": "qa/fidelity-r21/atlas-full-muscular-fidelity.json",
       "sha256": "8c482503f895ce6d5ea139fb9096a7a56dc6498d228f8dc9fdbd4c53d96d0d0f",
-      "programSHA256": "fcefaa2a5769d5a42e6d97576a44533628bef508fbb30930a0c6d71ba9120575"
+      "programSHA256": "fcefaa2a5769d5a42e6d97576a44533628bef508fbb30930a0c6d71ba9120575",
+      "inheritedGeometryOnly": true
     },
-    "surface-female": {
+    "inheritedGeometry-female": {
       "file": "qa/fidelity-r21/atlas-full-female-fidelity.json",
       "sha256": "fba4e1bddca79a61d23800a439d399c14121b38239e01cc2720ed62a5d08e87b",
-      "programSHA256": "0d81edfdb96a188dd6523325b55834ec60917a21a71f6eaa1aa222dd814eba21"
+      "programSHA256": "0d81edfdb96a188dd6523325b55834ec60917a21a71f6eaa1aa222dd814eba21",
+      "inheritedGeometryOnly": true
     },
-    "surface-A-reach": {
+    "inheritedGeometry-A-reach": {
       "file": "qa/fidelity-r21/atlas-full-A-reach-fidelity.json",
       "sha256": "9ac677bb2db714a3772f9bd7ce678db42d07cadf7144027ed529eed5e3846783",
-      "programSHA256": "b0301f9fe0910a6f30f85a49a15b0a3defd3068c2a67e512cdb40383bda4a958"
+      "programSHA256": "b0301f9fe0910a6f30f85a49a15b0a3defd3068c2a67e512cdb40383bda4a958",
+      "inheritedGeometryOnly": true
     },
-    "surface-A-joints": {
+    "inheritedGeometry-A-joints": {
       "file": "qa/fidelity-r21/atlas-full-A-joints-fidelity.json",
       "sha256": "76f24ec0a9c676aeb791bbaf593f9e8d1971b5dc659b7a69ec2ab0c95327d72a",
-      "programSHA256": "f10daf1a5157689851835a6e4e5ff0196a7ae03f9e8fec230c81f73b5feea0ca"
+      "programSHA256": "f10daf1a5157689851835a6e4e5ff0196a7ae03f9e8fec230c81f73b5feea0ca",
+      "inheritedGeometryOnly": true
     },
-    "surface-B-neutral": {
+    "inheritedGeometry-B-neutral": {
       "file": "qa/fidelity-r21/atlas-full-B-neutral-fidelity.json",
       "sha256": "d54ac9c19590c4ec3de5e14ce451ea2904d3460579a82e1061250bb91d6cfe14",
-      "programSHA256": "af86fb64609e1c5f3f431483a1439d6684af4729f608f76e54276500b924e8dd"
+      "programSHA256": "af86fb64609e1c5f3f431483a1439d6684af4729f608f76e54276500b924e8dd",
+      "inheritedGeometryOnly": true
     },
-    "surface-B-bend": {
+    "inheritedGeometry-B-bend": {
       "file": "qa/fidelity-r21/atlas-full-B-bend-fidelity.json",
       "sha256": "3f8e783ac8981f2fbdc840002062f1804032d4c5a4abcbbef24f789bcc79bf15",
-      "programSHA256": "9a406f7846b95781fb1b37a1fe45c5e0c612d791b749e3ee4eb584e8223160e0"
+      "programSHA256": "9a406f7846b95781fb1b37a1fe45c5e0c612d791b749e3ee4eb584e8223160e0",
+      "inheritedGeometryOnly": true
     },
-    "coverage": {
+    "inheritedDomainCoverage": {
       "file": "qa/fidelity-r21/source-coverage.json",
-      "sha256": "ad39cdd95469ac115615dabf13fc55316d51ab9b6b0d9650928500500e95c5f9"
+      "sha256": "ad39cdd95469ac115615dabf13fc55316d51ab9b6b0d9650928500500e95c5f9",
+      "inheritedGeometryOnly": true
     },
-    "fieldCache": {
-      "file": "qa/fidelity-r21/field-cache.json",
-      "sha256": "7a368368eba33e4e95db066f0aaa67901a8fda4e0645b782e8d2252db30a8074",
-      "workbenchSHA256": "0a51b52d150ad3977fd8a95724ae7b05c633be05ffc9cb3d3cd21c565a829684"
+    "actualActiveSkinAllProfiles": {
+      "file": "qa/fidelity-r22/active-profiles-pixels-browser.json",
+      "sha256": "2dbed3fc7b1c3da25323744d5bca4a74d6be264819c65844d06f48e096d8bd3d",
+      "artifactSHA256": "59314d7715e5c4ab887739b7b321f83ebadce364ed92c6d7e60a7349d5a62e4b"
     }
   },
   "remaining": [
     {
       "priority": 0,
       "status": "incomplete",
-      "task": "原数据完整复刻验收：连续原颈部后处理、掠射边缘材质/像素差异、完整原光照环境与散射，以及正式误差范围。固定状态对照和技术检查不能替代验收。"
+      "task": "原数据完整复刻验收：非默认状态的阴影快照与强制重建/更新历史尚未核对一致；解决剩余覆盖/首交、局部材质和边缘差异；保留局部最大误差，明确正式验收范围。任意连续状态的真实头侧边界提供方和连续新表面上的原颈部整合仍未完成。"
     },
     {
       "priority": 1,
       "status": "incomplete",
-      "task": "通过原数据基准后，完成中性整体校准、胸肩带/腰腹/骨盆大体积及支撑骨架和软组织响应的分离。R18–R20估算改形不作为已验收原母体。"
+      "task": "通过原数据基准后完成中性整体校准、胸肩带/腰腹/骨盆大体积，并分离支撑骨架与软组织响应；R18–R20估算改形不当作已验收母体。"
     },
     {
       "priority": 2,
       "status": "incomplete",
-      "task": "完成肩髋连接、肘膝腕踝、手足细轮廓及全部动作组合的来源保真和后续参数化变形；不能以九个固定状态替代连续动作。"
+      "task": "完成肩髋连接、肘膝腕踝、手足细轮廓和全部连续动作组合的来源保真及后续变形；九个固定状态不是连续完成。"
     },
     {
       "priority": 3,
       "status": "incomplete",
-      "task": "建立自主结构函数母体，接入全部连续体型/局部/动作控制，并逐区替换来源形态与绑定数据。当前对照仍保留来源分面分区信息。"
+      "task": "建立自主结构函数母体，逐区替换来源分区、形态变化和绑定数据；现有来源分段信息仍保留。"
     },
     {
       "priority": 4,
       "status": "partial",
-      "task": "已完成本对照包逐数组无损压缩/按需解码、参数批量提交和有界的完整状态无损缓存；整个连续系统的局部更新、缓存及完整表层肌理/光学效率仍未完成。"
+      "task": "已完成工作页CPU常驻/传输/缓存字段无损分页；全系统局部更新、动态光学、肌理和缓存效率仍需继续。当前原皮肤/阴影为固定状态来源对照。"
     },
     {
       "priority": 5,
       "status": "incomplete",
-      "task": "头身接口、附件、坐标/跟随和总平台整合仍未完成；头部板块不修改。"
+      "task": "头部、附件、坐标跟随、完整人物和总平台联调尚未完成。身体边界接收侧已实现，头部板块未修改。"
     }
   ],
-  "route": "docs/SOURCE-FIDELITY-R21.md",
+  "route": "docs/SOURCE-FIDELITY-R22.md",
   "viewer": "http://127.0.0.1:8914/",
-  "companionViewer": "http://127.0.0.1:8914/workbench"
+  "companionViewer": "http://127.0.0.1:8914/workbench",
+  "sourceAssetsMustAccompanyHTML": true
 }
