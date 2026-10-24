@@ -12,17 +12,20 @@ const clamp = (x, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, x));
 
 export function quintic01(t) {
   const u = clamp(t);
-  return u * u * u * (10 + u * (-15 + 6 * u));
+  const value = u * u * u * (10 + u * (-15 + 6 * u));
+  return value === 0 ? 0 : value;
 }
 
 export function quinticVelocity01(t) {
   const u = clamp(t);
-  return 30 * u * u * (1 - u) * (1 - u);
+  const value = 30 * u * u * (1 - u) * (1 - u);
+  return value === 0 ? 0 : value;
 }
 
 export function quinticAcceleration01(t) {
   const u = clamp(t);
-  return 60 * u * (1 - u) * (1 - 2 * u);
+  const value = 60 * u * (1 - u) * (1 - 2 * u);
+  return value === 0 ? 0 : value;
 }
 
 /**
