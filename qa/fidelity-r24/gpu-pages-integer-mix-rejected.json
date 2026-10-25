@@ -1,0 +1,19 @@
+{
+  "startedUTC": "2026-10-25T03:17:24.333Z",
+  "artifactSHA256": "6602d2b447f688372787df27c561245bb8a4197b23d65049e8e7a68fc62067fb",
+  "sourceFidelityAccepted": false,
+  "scope": "Original Float32 field words addressed directly on GPU from lossless bricks; exact full-frame comparison against retained dense renderer; not source mother acceptance",
+  "checks": [
+    {
+      "name": "new renderer reads pages without dense expansion",
+      "passed": true
+    }
+  ],
+  "cases": [],
+  "errors": [
+    "ERROR: 0:9: 'mix' : no matching overloaded function found\nERROR: 0:9: '=' : cannot convert from 'const mediump float' to 'mediump 3-component vector of int'\n"
+  ],
+  "newImageFiles": 0,
+  "failure": "page.waitForFunction: Timeout 180000ms exceeded.\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-gpu-pages-r24.cjs:2:1392",
+  "finishedUTC": "2026-10-25T03:20:25.123Z"
+}

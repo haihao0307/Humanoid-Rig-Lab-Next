@@ -1,0 +1,1048 @@
+{
+  "startedUTC": "2026-10-25T03:50:30.032Z",
+  "artifactSHA256": "52e413b9b04cd8a93566acc08941d05918638c9a3de3d0842f8c6da060739a3c",
+  "sourceFidelityAccepted": false,
+  "rendererSource": "src/BodyRayAdaptiveR24.js",
+  "scope": "Original Float32 field words addressed directly on GPU from lossless bricks; exact full-frame comparison against retained dense renderer; not source mother acceptance",
+  "checks": [
+    {
+      "name": "new renderer reads pages without dense expansion",
+      "passed": true
+    },
+    {
+      "name": "baseline exact packed GPU residency reduces field storage",
+      "passed": true
+    },
+    {
+      "name": "baseline front skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline front normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline front depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline side skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline side normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline side depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline back skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline back normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline back depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline oblique skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline oblique normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline oblique depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft exact packed GPU residency reduces field storage",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft front skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft front normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft front depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft side skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft side normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft side depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft back skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft back normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft back depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft oblique skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft oblique normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft oblique depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints exact packed GPU residency reduces field storage",
+      "passed": true
+    },
+    {
+      "name": "A-joints front skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints front normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints front depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints side skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints side normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints side depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints back skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints back normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints back depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints oblique skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints oblique normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "A-joints oblique depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend exact packed GPU residency reduces field storage",
+      "passed": true
+    },
+    {
+      "name": "B-bend front skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend front normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend front depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend side skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend side normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend side depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend back skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend back normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend back depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend oblique skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend oblique normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "B-bend oblique depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "failed real GPU upload restores complete person and original neck boundary",
+      "passed": true
+    },
+    {
+      "name": "GPU failure recovers last displayed field",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "baseline",
+      "unpack": {
+        "gpuMemory": {
+          "paged": 258899608,
+          "dense": 352871712,
+          "pagedUploadMS": 145.39999997615814
+        },
+        "unpackAndUploadMS": 412.89999997615814,
+        "storage": {
+          "schema": "body-field-pages/1",
+          "lossless": true,
+          "fieldValuesChanged": false,
+          "originalBytes": 352871712,
+          "storedBytes": 185193820,
+          "packMS": 611.2999999523163,
+          "regions": [
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 114742656,
+              "storedBytes": 36029348,
+              "activeBricks": 2100,
+              "totalBricks": 7920,
+              "testedNodes": 2611032,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 61228944,
+              "storedBytes": 29395276,
+              "activeBricks": 3399,
+              "totalBricks": 8316,
+              "testedNodes": 2180973,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 61228944,
+              "storedBytes": 29395276,
+              "activeBricks": 3432,
+              "totalBricks": 8316,
+              "testedNodes": 2184717,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 57835584,
+              "storedBytes": 45154192,
+              "activeBricks": 5268,
+              "totalBricks": 7680,
+              "testedNodes": 1077726,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 57835584,
+              "storedBytes": 45154192,
+              "activeBricks": 5296,
+              "totalBricks": 7680,
+              "testedNodes": 1083231,
+              "byteExact": true
+            }
+          ]
+        },
+        "sourceNeck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.7740368999424225,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "baseline"
+        }
+      },
+      "cases": [
+        {
+          "view": "front",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 1346.2000000476837,
+          "denseDrawReadMS": 107.89999997615814,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 44.700000047683716,
+          "denseDrawReadMS": 137.39999997615814,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 47.5,
+          "denseDrawReadMS": 117.5,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 112.60000002384186,
+          "denseDrawReadMS": 32.699999928474426,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 146.5,
+          "denseDrawReadMS": 25.399999976158142,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 119,
+          "denseDrawReadMS": 24.100000023841858,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 120.89999997615814,
+          "denseDrawReadMS": 140.29999995231628,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 22.399999976158142,
+          "denseDrawReadMS": 102.60000002384186,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 130.29999995231628,
+          "denseDrawReadMS": 24.700000047683716,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 102.79999995231628,
+          "denseDrawReadMS": 83.29999995231628,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 40,
+          "denseDrawReadMS": 98.20000004768372,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 22.59999990463257,
+          "denseDrawReadMS": 104.90000009536743,
+          "gpuError": 0
+        }
+      ]
+    },
+    {
+      "id": "calibration-soft",
+      "unpack": {
+        "gpuMemory": {
+          "paged": 251450884,
+          "dense": 344836416,
+          "pagedUploadMS": 90.20000004768372
+        },
+        "unpackAndUploadMS": 2086.1999999284744,
+        "storage": {
+          "schema": "body-field-pages/1",
+          "lossless": true,
+          "fieldValuesChanged": false,
+          "originalBytes": 344836416,
+          "storedBytes": 178993364,
+          "packMS": 588.1999999284744,
+          "regions": [
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 108716640,
+              "storedBytes": 33256340,
+              "activeBricks": 1997,
+              "totalBricks": 6900,
+              "testedNodes": 2492158,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 60468336,
+              "storedBytes": 27681556,
+              "activeBricks": 3304,
+              "totalBricks": 7920,
+              "testedNodes": 2150111,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 60468336,
+              "storedBytes": 27681556,
+              "activeBricks": 3306,
+              "totalBricks": 7920,
+              "testedNodes": 2168513,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 57591552,
+              "storedBytes": 45154188,
+              "activeBricks": 5269,
+              "totalBricks": 7680,
+              "testedNodes": 1066850,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 57591552,
+              "storedBytes": 45154188,
+              "activeBricks": 5314,
+              "totalBricks": 7680,
+              "testedNodes": 1072292,
+              "byteExact": true
+            }
+          ]
+        },
+        "sourceNeck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 6.492164412306832,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "calibration-soft"
+        }
+      },
+      "cases": [
+        {
+          "view": "front",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 2092,
+          "denseDrawReadMS": 102,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 93.69999992847443,
+          "denseDrawReadMS": 65.5,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 46.799999952316284,
+          "denseDrawReadMS": 10.100000023841858,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 117.89999997615814,
+          "denseDrawReadMS": 85.5,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 72.89999997615814,
+          "denseDrawReadMS": 23.800000071525574,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 81.19999992847443,
+          "denseDrawReadMS": 27.200000047683716,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 112,
+          "denseDrawReadMS": 96.5,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 19.600000023841858,
+          "denseDrawReadMS": 105.89999997615814,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 62.200000047683716,
+          "denseDrawReadMS": 37.799999952316284,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 84.79999995231628,
+          "denseDrawReadMS": 60.60000002384186,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 42.799999952316284,
+          "denseDrawReadMS": 68,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 32.5,
+          "denseDrawReadMS": 83.70000004768372,
+          "gpuError": 0
+        }
+      ]
+    },
+    {
+      "id": "A-joints",
+      "unpack": {
+        "gpuMemory": {
+          "paged": 263836924,
+          "dense": 371849552,
+          "pagedUploadMS": 193.30000007152557
+        },
+        "unpackAndUploadMS": 2097.7000000476837,
+        "storage": {
+          "schema": "body-field-pages/1",
+          "lossless": true,
+          "fieldValuesChanged": false,
+          "originalBytes": 371849552,
+          "storedBytes": 186139960,
+          "packMS": 579.6000000238419,
+          "regions": [
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 120736448,
+              "storedBytes": 36029376,
+              "activeBricks": 2113,
+              "totalBricks": 7920,
+              "testedNodes": 2792984,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 56275648,
+              "storedBytes": 27678344,
+              "activeBricks": 3235,
+              "totalBricks": 7128,
+              "testedNodes": 1919290,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 61228944,
+              "storedBytes": 29395276,
+              "activeBricks": 3432,
+              "totalBricks": 8316,
+              "testedNodes": 2184717,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 75772928,
+              "storedBytes": 47817236,
+              "activeBricks": 5622,
+              "totalBricks": 9856,
+              "testedNodes": 1980016,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 57835584,
+              "storedBytes": 45154192,
+              "activeBricks": 5296,
+              "totalBricks": 7680,
+              "testedNodes": 1083231,
+              "byteExact": true
+            }
+          ]
+        },
+        "sourceNeck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.7740368999424225,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "A-joints"
+        }
+      },
+      "cases": [
+        {
+          "view": "front",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 2515.399999976158,
+          "denseDrawReadMS": 44.700000047683716,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 108.40000009536743,
+          "denseDrawReadMS": 24.899999976158142,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 144.39999997615814,
+          "denseDrawReadMS": 111.29999995231628,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 62,
+          "denseDrawReadMS": 135.39999997615814,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 22.5,
+          "denseDrawReadMS": 145.5,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 9.299999952316284,
+          "denseDrawReadMS": 94.79999995231628,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 136.70000004768372,
+          "denseDrawReadMS": 35.199999928474426,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 121.20000004768372,
+          "denseDrawReadMS": 49,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 94.20000004768372,
+          "denseDrawReadMS": 30.699999928474426,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 115.70000004768372,
+          "denseDrawReadMS": 20.100000023841858,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 103.89999997615814,
+          "denseDrawReadMS": 88.40000009536743,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 60.200000047683716,
+          "denseDrawReadMS": 97.89999997615814,
+          "gpuError": 0
+        }
+      ]
+    },
+    {
+      "id": "B-bend",
+      "unpack": {
+        "gpuMemory": {
+          "paged": 267160728,
+          "dense": 400851392,
+          "pagedUploadMS": 99
+        },
+        "unpackAndUploadMS": 1375.5,
+        "storage": {
+          "schema": "body-field-pages/1",
+          "lossless": true,
+          "fieldValuesChanged": false,
+          "originalBytes": 400851392,
+          "storedBytes": 184442152,
+          "packMS": 512.0999999046326,
+          "regions": [
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 138452672,
+              "storedBytes": 36033752,
+              "activeBricks": 2099,
+              "totalBricks": 9016,
+              "testedNodes": 3361362,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 58526400,
+              "storedBytes": 27681324,
+              "activeBricks": 3332,
+              "totalBricks": 7866,
+              "testedNodes": 2044699,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 58526400,
+              "storedBytes": 27681324,
+              "activeBricks": 3319,
+              "totalBricks": 7866,
+              "testedNodes": 2048572,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 72672960,
+              "storedBytes": 47817212,
+              "activeBricks": 5532,
+              "totalBricks": 9856,
+              "testedNodes": 1904287,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 72672960,
+              "storedBytes": 45163004,
+              "activeBricks": 5488,
+              "totalBricks": 9856,
+              "testedNodes": 1916656,
+              "byteExact": true
+            }
+          ]
+        },
+        "sourceNeck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.918962463513892,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "B-bend"
+        }
+      },
+      "cases": [
+        {
+          "view": "front",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 2205.100000023842,
+          "denseDrawReadMS": 81.5,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 102.29999995231628,
+          "denseDrawReadMS": 26,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 135.69999992847443,
+          "denseDrawReadMS": 95.60000002384186,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 48.699999928474426,
+          "denseDrawReadMS": 108.40000009536743,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 21.899999976158142,
+          "denseDrawReadMS": 92.70000004768372,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 15.200000047683716,
+          "denseDrawReadMS": 105.5,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 98.20000004768372,
+          "denseDrawReadMS": 43.5,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 83,
+          "denseDrawReadMS": 32.700000047683716,
+          "gpuError": 0
+        },
+        {
+          "view": "back",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 64.60000002384186,
+          "denseDrawReadMS": 44.699999928474426,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 125.70000004768372,
+          "denseDrawReadMS": 75.09999990463257,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 50.300000071525574,
+          "denseDrawReadMS": 109.39999997615814,
+          "gpuError": 0
+        },
+        {
+          "view": "oblique",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 25.600000023841858,
+          "denseDrawReadMS": 102.5,
+          "gpuError": 0
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "newImageFiles": 0,
+  "passed": true,
+  "artifactStable": true,
+  "finishedUTC": "2026-10-25T03:52:41.668Z"
+}

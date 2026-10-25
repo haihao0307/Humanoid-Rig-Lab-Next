@@ -1,0 +1,26 @@
+{
+  "startedUTC": "2026-10-25T03:35:45.845Z",
+  "artifactSHA256": "3f5515b4ba8fba1744c4a2d5a659ad7460ced59eff3e65f85e9a76b19688d2bd",
+  "sourceFidelityAccepted": false,
+  "rendererSource": "src/BodyRayScalarMapR24.js",
+  "scope": "Original Float32 field words addressed directly on GPU from lossless bricks; exact full-frame comparison against retained dense renderer; not source mother acceptance",
+  "checks": [
+    {
+      "name": "new renderer reads pages without dense expansion",
+      "passed": true
+    },
+    {
+      "name": "quality-2 exact packed GPU residency reduces field storage",
+      "passed": true
+    },
+    {
+      "name": "quality-2 front skin actual pixels unchanged",
+      "passed": false
+    }
+  ],
+  "cases": [],
+  "errors": [],
+  "newImageFiles": 0,
+  "failure": "Error: quality-2 front skin actual pixels unchanged\n    at check (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-gpu-quality-r24.cjs:1:754)\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-gpu-quality-r24.cjs:4:1249",
+  "finishedUTC": "2026-10-25T03:37:19.435Z"
+}

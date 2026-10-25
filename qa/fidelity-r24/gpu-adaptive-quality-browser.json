@@ -1,0 +1,200 @@
+{
+  "startedUTC": "2026-10-25T03:49:32.976Z",
+  "artifactSHA256": "52e413b9b04cd8a93566acc08941d05918638c9a3de3d0842f8c6da060739a3c",
+  "sourceFidelityAccepted": false,
+  "rendererSource": "src/BodyRayAdaptiveR24.js",
+  "scope": "Original Float32 field words addressed directly on GPU from lossless bricks; exact full-frame comparison against retained dense renderer; not source mother acceptance",
+  "checks": [
+    {
+      "name": "new renderer reads pages without dense expansion",
+      "passed": true
+    },
+    {
+      "name": "quality-2 retains original dense precision path",
+      "passed": true
+    },
+    {
+      "name": "quality-2 front skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "quality-2 front normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "quality-2 front depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "quality-2 side skin actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "quality-2 side normals actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "quality-2 side depth actual pixels unchanged",
+      "passed": true
+    },
+    {
+      "name": "failed real GPU upload restores complete person and original neck boundary",
+      "passed": true
+    },
+    {
+      "name": "GPU failure recovers last displayed field",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "quality-2",
+      "unpack": {
+        "gpuMemory": {
+          "paged": 1098073920,
+          "dense": 1098073920,
+          "densePrecisionFallback": true,
+          "pagedUploadMS": 1134.4000000953674
+        },
+        "unpackAndUploadMS": 1245.3000000715256,
+        "storage": {
+          "schema": "body-field-pages/1",
+          "lossless": true,
+          "fieldValuesChanged": false,
+          "originalBytes": 1098073920,
+          "storedBytes": 492713732,
+          "packMS": 1553.2000000476837,
+          "regions": [
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 431141760,
+              "storedBytes": 118079236,
+              "activeBricks": 6872,
+              "totalBricks": 27824,
+              "testedNodes": 10237720,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 189120480,
+              "storedBytes": 83366072,
+              "activeBricks": 9710,
+              "totalBricks": 24960,
+              "testedNodes": 7037841,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 189120480,
+              "storedBytes": 83366072,
+              "activeBricks": 9814,
+              "totalBricks": 24960,
+              "testedNodes": 7032626,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 144345600,
+              "storedBytes": 103885640,
+              "activeBricks": 12336,
+              "totalBricks": 18515,
+              "testedNodes": 2986202,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 144345600,
+              "storedBytes": 103885640,
+              "activeBricks": 12416,
+              "totalBricks": 18515,
+              "testedNodes": 2981984,
+              "byteExact": true
+            }
+          ]
+        },
+        "sourceNeck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.7740368999424225,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "head-module"
+        }
+      },
+      "cases": [
+        {
+          "view": "front",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 262.7000000476837,
+          "denseDrawReadMS": 8.599999904632568,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 19,
+          "denseDrawReadMS": 7.800000071525574,
+          "gpuError": 0
+        },
+        {
+          "view": "front",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 22.299999952316284,
+          "denseDrawReadMS": 16.299999952316284,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "skin",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 7.5,
+          "denseDrawReadMS": 15.200000047683716,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "normals",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 6.300000071525574,
+          "denseDrawReadMS": 5.299999952316284,
+          "gpuError": 0
+        },
+        {
+          "view": "side",
+          "mode": "depth",
+          "differentBytes": 0,
+          "maxDifference": 0,
+          "bytes": 1233284,
+          "packedDrawReadMS": 11.400000095367432,
+          "denseDrawReadMS": 11.399999976158142,
+          "gpuError": 0
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "newImageFiles": 0,
+  "passed": true,
+  "artifactStable": true,
+  "finishedUTC": "2026-10-25T03:51:56.080Z"
+}

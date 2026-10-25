@@ -1,0 +1,120 @@
+{
+  "startedUTC": "2026-10-25T03:38:57.524Z",
+  "artifactSHA256": "a931f04b21e357d761d23f271eb49911390ec69680ba3dc6a26a3e770bb7db7a",
+  "sourceFidelityAccepted": false,
+  "rendererSource": "src/BodyRayWordMapR24.js",
+  "scope": "Original Float32 field words addressed directly on GPU from lossless bricks; exact full-frame comparison against retained dense renderer; not source mother acceptance",
+  "checks": [
+    {
+      "name": "new renderer reads pages without dense expansion",
+      "passed": true
+    },
+    {
+      "name": "quality-2 exact packed GPU residency reduces field storage",
+      "passed": true
+    },
+    {
+      "name": "quality-2 front skin actual pixels unchanged",
+      "passed": false
+    }
+  ],
+  "cases": [
+    {
+      "id": "quality-2",
+      "unpack": {
+        "gpuMemory": {
+          "paged": 712866656,
+          "dense": 1098073920,
+          "pagedUploadMS": 317
+        },
+        "unpackAndUploadMS": 1205.7000000476837,
+        "storage": {
+          "schema": "body-field-pages/1",
+          "lossless": true,
+          "fieldValuesChanged": false,
+          "originalBytes": 1098073920,
+          "storedBytes": 492713732,
+          "packMS": 1435.2999999523163,
+          "regions": [
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 431141760,
+              "storedBytes": 118079236,
+              "activeBricks": 6872,
+              "totalBricks": 27824,
+              "testedNodes": 10237720,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 189120480,
+              "storedBytes": 83366072,
+              "activeBricks": 9710,
+              "totalBricks": 24960,
+              "testedNodes": 7037841,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 189120480,
+              "storedBytes": 83366072,
+              "activeBricks": 9814,
+              "totalBricks": 24960,
+              "testedNodes": 7032626,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 144345600,
+              "storedBytes": 103885640,
+              "activeBricks": 12336,
+              "totalBricks": 18515,
+              "testedNodes": 2986202,
+              "byteExact": true
+            },
+            {
+              "encoding": "lossless Float32 bricks",
+              "originalBytes": 144345600,
+              "storedBytes": 103885640,
+              "activeBricks": 12416,
+              "totalBricks": 18515,
+              "testedNodes": 2981984,
+              "byteExact": true
+            }
+          ]
+        },
+        "sourceNeck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.7740368999424225,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "head-module"
+        }
+      },
+      "cases": [
+        {
+          "view": "front",
+          "mode": "skin",
+          "differentBytes": 2,
+          "maxDifference": 1,
+          "bytes": 1233284,
+          "packedDrawReadMS": 142.10000002384186,
+          "denseDrawReadMS": 3.5999999046325684,
+          "gpuError": 0
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "newImageFiles": 0,
+  "failure": "Error: quality-2 front skin actual pixels unchanged\n    at check (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-gpu-quality-r24.cjs:1:780)\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-gpu-quality-r24.cjs:4:1308",
+  "finishedUTC": "2026-10-25T03:40:06.575Z"
+}

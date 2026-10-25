@@ -1,0 +1,1010 @@
+{
+  "startedUTC": "2026-10-25T03:09:03.760Z",
+  "artifactSHA256": "fae69985802be4c2e1523bcf0a435c88ceb9885f06d499b8d7484ceb025a02ca",
+  "workbenchSHA256": "18e6a84257a86e51e668f1e58175c5b93d8f96744e0158cb80c76dcb2971ced3",
+  "referenceWorkbenchSHA256": "13c65007f677549baa54708f904c425469fc8a020c0e445ef520348047454733",
+  "sourceFidelityAccepted": false,
+  "newImageFiles": 0,
+  "checks": [
+    {
+      "name": "calibration-soft one initial field, no temporary default-body field",
+      "passed": true,
+      "details": {
+        "build": 1,
+        "updates": 1
+      }
+    },
+    {
+      "name": "calibration-soft exact state and whole-person fields transferred",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft all four body surface settings retained",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft camera retained",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft original current neck replay applied",
+      "passed": true,
+      "details": {
+        "schema": "body-neck-source-replay/1",
+        "applied": true,
+        "inputPhase": "after original head rig bridge, before contour",
+        "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+        "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+        "sourceDerived": true,
+        "headSupportSamples": 1398,
+        "bodyChangedSamples": 192,
+        "maxBodyDisplacementMM": 6.492164412306832,
+        "sourceArithmeticPreserved": true,
+        "headSurfaceGenerated": false,
+        "sourceFidelityAccepted": false,
+        "profile": "calibration-soft"
+      }
+    },
+    {
+      "name": "new calibration preserves catalog and compact controls",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft actual saved complete person includes transferred fields",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft source restores matching current person before decoding",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft roundtrip preserves body, head and unknown metadata",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft reverse camera preserved",
+      "passed": true
+    },
+    {
+      "name": "B-bend one initial field, no temporary default-body field",
+      "passed": true,
+      "details": {
+        "build": 1,
+        "updates": 1
+      }
+    },
+    {
+      "name": "B-bend exact state and whole-person fields transferred",
+      "passed": true
+    },
+    {
+      "name": "B-bend all four body surface settings retained",
+      "passed": true
+    },
+    {
+      "name": "B-bend camera retained",
+      "passed": true
+    },
+    {
+      "name": "B-bend original current neck replay applied",
+      "passed": true,
+      "details": {
+        "schema": "body-neck-source-replay/1",
+        "applied": true,
+        "inputPhase": "after original head rig bridge, before contour",
+        "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+        "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+        "sourceDerived": true,
+        "headSupportSamples": 1398,
+        "bodyChangedSamples": 192,
+        "maxBodyDisplacementMM": 7.918962463513892,
+        "sourceArithmeticPreserved": true,
+        "headSurfaceGenerated": false,
+        "sourceFidelityAccepted": false,
+        "profile": "B-bend"
+      }
+    },
+    {
+      "name": "B-bend directly initialized fields match R22 restore bit for bit",
+      "passed": true,
+      "details": {
+        "buffers": 30
+      }
+    },
+    {
+      "name": "B-bend actual saved complete person includes transferred fields",
+      "passed": true
+    },
+    {
+      "name": "B-bend source restores matching current person before decoding",
+      "passed": true
+    },
+    {
+      "name": "B-bend roundtrip preserves body, head and unknown metadata",
+      "passed": true
+    },
+    {
+      "name": "B-bend reverse camera preserved",
+      "passed": true
+    },
+    {
+      "name": "unsupported continuous state stays in parameter page with complete person unchanged",
+      "passed": true
+    },
+    {
+      "name": "unsupported continuous state is explicitly explained",
+      "passed": true
+    },
+    {
+      "name": "new volume calibration button uses the matching original packet",
+      "passed": false
+    }
+  ],
+  "cases": [
+    {
+      "id": "calibration-soft",
+      "elapsedMS": 43902,
+      "current": {
+        "hashes": [
+          {
+            "bytes": 54280,
+            "sha256": "0b938c12b5ab0401f800c091767ad20085639bc3bd78e5635da48b3439cc0193"
+          },
+          {
+            "bytes": 65536,
+            "sha256": "0f02a41725ac1e687a55605c580d8945c3dd0a4168d2ad754136ddc8a8aba71e"
+          },
+          {
+            "bytes": 556,
+            "sha256": "150bf868f362e5035a2b7e7ea825d77ab9069dcab3641fd6213c20b2c8e16b6b"
+          },
+          {
+            "bytes": 636,
+            "sha256": "1a10493c3ed20d1da0b79d33996d06eaea012724bcf8b03347fecfec0f0d9e5d"
+          },
+          {
+            "bytes": 636,
+            "sha256": "1a10493c3ed20d1da0b79d33996d06eaea012724bcf8b03347fecfec0f0d9e5d"
+          },
+          {
+            "bytes": 31680,
+            "sha256": "216b5df57211ce9d508ea548ee6f9884b7a08d8e02b1335ac3c2cb432dd99e50"
+          },
+          {
+            "bytes": 16613376,
+            "sha256": "256e55c35f74c35f67d6b1bfbfaf436a36ced7a15f73d53dd6bab07f11b90142"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "2583215bfa0280fa9ab3e8506d825015b52ba4a801e7f42f4c9fcf617285df52"
+          },
+          {
+            "bytes": 27600,
+            "sha256": "25c5b8c52cd0f347ea20373de0fd3512a9ba8dcb7eb12ea86bf4dcb14c3085a9"
+          },
+          {
+            "bytes": 496,
+            "sha256": "3433bc94c662df9bc63e5c56fb5fad237a49b739dc30fbabe0e17be398c68e12"
+          },
+          {
+            "bytes": 732,
+            "sha256": "3e3fa55c9013500fdb342c74764ffd69de1320da4c36de4e3bde23c688b4e37b"
+          },
+          {
+            "bytes": 684,
+            "sha256": "6a5940587311cf59126b81e6d90288770d811fd6440f0c683693ffb7332eda6a"
+          },
+          {
+            "bytes": 684,
+            "sha256": "6a5940587311cf59126b81e6d90288770d811fd6440f0c683693ffb7332eda6a"
+          },
+          {
+            "bytes": 556,
+            "sha256": "74ae20eb5ae94ea8201e77f6bfa4ca5e48830d2910bb19245e8925c2acd45f31"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "89a35d1998219ec7685da892c8d93671e17b50deddd79d44194d3d99903a8261"
+          },
+          {
+            "bytes": 944,
+            "sha256": "8c5e4ed04aae408c4b15b464cb43970122ea196991b3a1d04eda4066a277a27d"
+          },
+          {
+            "bytes": 944,
+            "sha256": "8c5e4ed04aae408c4b15b464cb43970122ea196991b3a1d04eda4066a277a27d"
+          },
+          {
+            "bytes": 16613376,
+            "sha256": "927500c13971e31e660c0ed6f6d5ac24dc8f11cb43afa2b911cbf6a136735efd"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "9a02ee2a98b021ac1c95d0bacf3f25e994ddeac85cf06f16254ce47359db6c39"
+          },
+          {
+            "bytes": 31680,
+            "sha256": "9deea85ed4ea2c78c77d24ac1f04bc70eddcd749565952ab86704c79d6711591"
+          },
+          {
+            "bytes": 492,
+            "sha256": "9f10662a9e825b77d1c70b31b3eba86969411f07fc5fd5b7a1a616636d7e6d6b"
+          },
+          {
+            "bytes": 492,
+            "sha256": "9f10662a9e825b77d1c70b31b3eba86969411f07fc5fd5b7a1a616636d7e6d6b"
+          },
+          {
+            "bytes": 496,
+            "sha256": "a37cf65c7de520668f9b157164f32af4cd77fdcf87bee09ecbdc263919a2afc1"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "b42f749c44ddf4a7a253d0d0d0d81cc37e3a6af09bacf421ce280d9dc5ea93ce"
+          },
+          {
+            "bytes": 940,
+            "sha256": "b5b31014c226b29c86f0ce6f0a96266a2235891b3b18be264f968f9286a2d0f3"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "c80304f5aae98d65b1bd496fdf4661742d6a316273b33ac0ce97873ed2bfd256"
+          },
+          {
+            "bytes": 316,
+            "sha256": "cb347ffad5772c303a300bd5d229b4c3fae99c7130aaf92f61e3a16c15a9904b"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "e4a104b308394ab5a0a9f81e1b2d6791556c42021d17c11806e2e7690b10afd8"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "efd4244e5d673a879d788fb8345a004d1a16d2e31641832cd6de588b07eeebcf"
+          },
+          {
+            "bytes": 30720,
+            "sha256": "f1c3273adce0ab15d8ac50e8f0f87bffc0d416f6795933362d253323b4e67539"
+          }
+        ],
+        "structure": {
+          "bounds": [
+            [
+              -0.6386041474342347,
+              0.6386041474342347
+            ],
+            [
+              -1.0011412930488586,
+              0.6416387987136841
+            ],
+            [
+              -0.1651059967279434,
+              0.381551696062088
+            ]
+          ],
+          "dimensions": [
+            183,
+            235,
+            79
+          ],
+          "refinement": {
+            "origins": [
+              [
+                0.5117059128137014,
+                0.13591542354380817,
+                0.16632058854150814
+              ],
+              [
+                -0.5117059128137014,
+                0.13591542354380817,
+                0.16632058854150814
+              ],
+              [
+                0.21019500301591504,
+                -0.876503820442585,
+                -0.011778816239841878
+              ],
+              [
+                -0.21019500301591504,
+                -0.876503820442585,
+                -0.011778816239841878
+              ]
+            ],
+            "axes": [
+              [
+                0.29806712466102747,
+                -0.6262959548362603,
+                0.7203536396465591
+              ],
+              [
+                -0.29806712466102747,
+                -0.6262959548362603,
+                0.7203536396465591
+              ],
+              [
+                0.0921043806211661,
+                -0.3561178015562023,
+                0.9298907970752096
+              ],
+              [
+                -0.0921043806211661,
+                -0.3561178015562023,
+                0.9298907970752096
+              ]
+            ],
+            "ranges": [
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ]
+            ],
+            "blend": "anatomical axial quintic partition; box only as exterior support"
+          },
+          "joints": [
+            [
+              0.3770196560171852,
+              0.2716913726962082,
+              -0.012767877119120717
+            ],
+            [
+              -0.3770196560171852,
+              0.2716913726962082,
+              -0.012767877119120717
+            ],
+            [
+              0.1640350935437451,
+              -0.4163891087771551,
+              0.022639984766991115
+            ],
+            [
+              -0.1640350935437451,
+              -0.4163891087771551,
+              0.022639984766991115
+            ],
+            [
+              0.21019500301591504,
+              -0.876503820442585,
+              -0.011778816239841878
+            ],
+            [
+              -0.21019500301591504,
+              -0.876503820442585,
+              -0.011778816239841878
+            ],
+            [
+              0.5117059128137014,
+              0.13591542354380817,
+              0.16632058854150814
+            ],
+            [
+              -0.5117059128137014,
+              0.13591542354380817,
+              0.16632058854150814
+            ]
+          ],
+          "cap": 0.5914409045468677
+        },
+        "neck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 6.492164412306832,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "calibration-soft"
+        },
+        "build": 1,
+        "fieldMS": 12423.5,
+        "cache": {
+          "entries": 0,
+          "bytes": 0,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 1,
+          "pendingRawBytes": 179269716,
+          "hits": 0,
+          "misses": 1,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": false
+        }
+      },
+      "reference": {}
+    },
+    {
+      "id": "B-bend",
+      "elapsedMS": 28371,
+      "current": {
+        "hashes": [
+          {
+            "bytes": 548,
+            "sha256": "046d36a13b9e47caaa3112a350cf03dd6000a6096a6318c889183a021d557218"
+          },
+          {
+            "bytes": 488,
+            "sha256": "0c6f3608ee31a2e3d4f199ea0189eaa8ad2967e171a13da3744b4d97d877a00b"
+          },
+          {
+            "bytes": 712,
+            "sha256": "12cfd16534b8bd068c662a2b5f426955648515674fc5a42225a2759164032bf4"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "1737d4f25d393683b9c8fe227ae13c1e6e2a36ac6b6fdae72d602bb8c7cd3bc0"
+          },
+          {
+            "bytes": 712,
+            "sha256": "2c10904cd4ed0d0b0d05e64d4784b70cd5ec18845c8990511d4f03773345ee02"
+          },
+          {
+            "bytes": 680,
+            "sha256": "37ac1f854e3e4e3e18e54c1e2caea68ab0d020ea5bc6018b1e123327347d438d"
+          },
+          {
+            "bytes": 600,
+            "sha256": "38f05aefab2a1b28a361772e159f7af272e1ce030161a6d8f27bc59718abea5c"
+          },
+          {
+            "bytes": 876,
+            "sha256": "3b4076b1ce764c3341cb04c403df674d3ac34bd22d9e660b7dea9bed9e7b6a93"
+          },
+          {
+            "bytes": 488,
+            "sha256": "3bbf91d55f763eb0fcfd80228cf60d5469ca45b662de7e6a23130fd6c0e0d523"
+          },
+          {
+            "bytes": 39424,
+            "sha256": "3cda47d75b93223d69314ace4d6edb3ff730e1dc79b9f744f833ff68bbea49e3"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "58754e1ce058fb797667497a326a35b22ada6a284d190d7962da95b31b4ff3e8"
+          },
+          {
+            "bytes": 876,
+            "sha256": "5d632c9533bbdff04b0bf53c9d5c0457e557a99ddfcfc9120e14ec9c2b296c57"
+          },
+          {
+            "bytes": 31464,
+            "sha256": "6dd213ef85e65ece75f9871982bb24df4c0716caba8eb6b873463d69d78e235e"
+          },
+          {
+            "bytes": 31464,
+            "sha256": "6f0f43d8d94f8b53ed7894a0d7bfdd487a7999d478b256e4ebb07ee609cdab87"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "754c6fc5ee519574a3f88176dd0488fecd43505456196e09fa7c1409283683c1"
+          },
+          {
+            "bytes": 36064,
+            "sha256": "7a90ce14d25898bc0c8300925bf281c1d9ce35678cf669a9539db2318d56c996"
+          },
+          {
+            "bytes": 600,
+            "sha256": "8aee69c568491c31d6f72b95022c82b33f7c1e04fbbff447f20aa7be2ca96655"
+          },
+          {
+            "bytes": 892,
+            "sha256": "8b8bd9fef377eb71ab30ed0449148f42d4af3bd0e57260a7bd8e8b757d5a3227"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "9bb73f1e60de4cfd5e67f5c5b35c7d41c5719fc306433e70ee6edb81746e55aa"
+          },
+          {
+            "bytes": 70560,
+            "sha256": "9f630a9293f4d6512f6e767176d20d3c87ab7da3be290c1beef962daa5f73df2"
+          },
+          {
+            "bytes": 680,
+            "sha256": "b6a0d11285f898b5cc146266b4da66626bcefb0f36d4348868f77068dd9d1a48"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "c07e62ef7950344e39c226632fc24a4d7155d6a6a10f73c2fd5149d3b601a184"
+          },
+          {
+            "bytes": 548,
+            "sha256": "c1f9930277bafc285a7d165c94616460ba1cb935e912cf91d49f09afba21d07a"
+          },
+          {
+            "bytes": 65536,
+            "sha256": "c228f7fb86bad1229481e6023f4a0a217afc7fbfd5e4bb8ed7338f663fd4ef8b"
+          },
+          {
+            "bytes": 712,
+            "sha256": "d3a27a38e632ab5a14d6f6dc67fbdb6b54f2ee26d9c5c7377b5e74f79e6cb10d"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "e23422970ff7db8b6a410f401032cd0e85dc5bdeb122b94a29c00fd7fc113a45"
+          },
+          {
+            "bytes": 47775744,
+            "sha256": "e2ae9ba885223e190d2fea6fea23fe1a1d4ffe9f5363b784c3d266e7ecbc42d5"
+          },
+          {
+            "bytes": 39424,
+            "sha256": "e52e7c13c52c098e4357ba6cf8f513d9591e62c00d9a9a7388061a3df4cd213d"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "efabf31a0479fa85be9d6f3f36a2b1f7d44e2a7113975a52bdffea26bf707031"
+          },
+          {
+            "bytes": 436,
+            "sha256": "f434343624b99b9ea46d10f2b5a6b882a32b092ea3b3e48859f4977d707c6871"
+          }
+        ],
+        "structure": {
+          "bounds": [
+            [
+              -0.6196829509735108,
+              0.6196777057647705
+            ],
+            [
+              -0.9114619326591492,
+              0.6485228371620179
+            ],
+            [
+              -0.14041659802198408,
+              0.6207501125335694
+            ]
+          ],
+          "dimensions": [
+            178,
+            223,
+            109
+          ],
+          "refinement": {
+            "origins": [
+              [
+                0.503778103093137,
+                0.2294850974220315,
+                0.3864102548345336
+              ],
+              [
+                -0.5037843047370494,
+                0.2294823496754696,
+                0.38641537986364694
+              ],
+              [
+                0.20108426096064055,
+                -0.7170118997971914,
+                0.07191081601210791
+              ],
+              [
+                -0.20108426844458402,
+                -0.717011898482021,
+                0.07191081571864422
+              ]
+            ],
+            "axes": [
+              [
+                0.15992606377700533,
+                -0.43106456956955386,
+                0.888035467189576
+              ],
+              [
+                -0.1599175566371603,
+                -0.431073808150263,
+                0.8880325146108282
+              ],
+              [
+                0.11105817793154636,
+                -0.6899694943327767,
+                0.7152679064551251
+              ],
+              [
+                -0.11078394665028678,
+                -0.6899531284833426,
+                0.7153262176522223
+              ]
+            ],
+            "ranges": [
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ]
+            ],
+            "blend": "anatomical axial quintic partition; box only as exterior support"
+          },
+          "joints": [
+            [
+              0.407773193627308,
+              0.298559223129654,
+              0.14918516030877568
+            ],
+            [
+              -0.4077821075657635,
+              0.298561519069221,
+              0.14919111045974326
+            ],
+            [
+              0.16170143766750505,
+              -0.3042044405888024,
+              0.28228100907117015
+            ],
+            [
+              -0.1617014754211061,
+              -0.304204436169373,
+              0.28228100835294523
+            ],
+            [
+              0.20108426096064055,
+              -0.7170118997971914,
+              0.07191081601210791
+            ],
+            [
+              -0.20108426844458402,
+              -0.717011898482021,
+              0.07191081571864422
+            ],
+            [
+              0.503778103093137,
+              0.2294850974220315,
+              0.3864102548345336
+            ],
+            [
+              -0.5037843047370494,
+              0.2294823496754696,
+              0.38641537986364694
+            ]
+          ],
+          "cap": 0.5857893093065782
+        },
+        "neck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.918962463513892,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "B-bend"
+        },
+        "build": 1,
+        "fieldMS": 12353.5,
+        "cache": {
+          "entries": 0,
+          "bytes": 0,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 1,
+          "pendingRawBytes": 184734784,
+          "hits": 0,
+          "misses": 1,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": false
+        }
+      },
+      "reference": {
+        "hashes": [
+          {
+            "bytes": 548,
+            "sha256": "046d36a13b9e47caaa3112a350cf03dd6000a6096a6318c889183a021d557218"
+          },
+          {
+            "bytes": 488,
+            "sha256": "0c6f3608ee31a2e3d4f199ea0189eaa8ad2967e171a13da3744b4d97d877a00b"
+          },
+          {
+            "bytes": 712,
+            "sha256": "12cfd16534b8bd068c662a2b5f426955648515674fc5a42225a2759164032bf4"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "1737d4f25d393683b9c8fe227ae13c1e6e2a36ac6b6fdae72d602bb8c7cd3bc0"
+          },
+          {
+            "bytes": 712,
+            "sha256": "2c10904cd4ed0d0b0d05e64d4784b70cd5ec18845c8990511d4f03773345ee02"
+          },
+          {
+            "bytes": 680,
+            "sha256": "37ac1f854e3e4e3e18e54c1e2caea68ab0d020ea5bc6018b1e123327347d438d"
+          },
+          {
+            "bytes": 600,
+            "sha256": "38f05aefab2a1b28a361772e159f7af272e1ce030161a6d8f27bc59718abea5c"
+          },
+          {
+            "bytes": 876,
+            "sha256": "3b4076b1ce764c3341cb04c403df674d3ac34bd22d9e660b7dea9bed9e7b6a93"
+          },
+          {
+            "bytes": 488,
+            "sha256": "3bbf91d55f763eb0fcfd80228cf60d5469ca45b662de7e6a23130fd6c0e0d523"
+          },
+          {
+            "bytes": 39424,
+            "sha256": "3cda47d75b93223d69314ace4d6edb3ff730e1dc79b9f744f833ff68bbea49e3"
+          },
+          {
+            "bytes": 45121536,
+            "sha256": "58754e1ce058fb797667497a326a35b22ada6a284d190d7962da95b31b4ff3e8"
+          },
+          {
+            "bytes": 876,
+            "sha256": "5d632c9533bbdff04b0bf53c9d5c0457e557a99ddfcfc9120e14ec9c2b296c57"
+          },
+          {
+            "bytes": 31464,
+            "sha256": "6dd213ef85e65ece75f9871982bb24df4c0716caba8eb6b873463d69d78e235e"
+          },
+          {
+            "bytes": 31464,
+            "sha256": "6f0f43d8d94f8b53ed7894a0d7bfdd487a7999d478b256e4ebb07ee609cdab87"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "754c6fc5ee519574a3f88176dd0488fecd43505456196e09fa7c1409283683c1"
+          },
+          {
+            "bytes": 36064,
+            "sha256": "7a90ce14d25898bc0c8300925bf281c1d9ce35678cf669a9539db2318d56c996"
+          },
+          {
+            "bytes": 600,
+            "sha256": "8aee69c568491c31d6f72b95022c82b33f7c1e04fbbff447f20aa7be2ca96655"
+          },
+          {
+            "bytes": 892,
+            "sha256": "8b8bd9fef377eb71ab30ed0449148f42d4af3bd0e57260a7bd8e8b757d5a3227"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "9bb73f1e60de4cfd5e67f5c5b35c7d41c5719fc306433e70ee6edb81746e55aa"
+          },
+          {
+            "bytes": 70560,
+            "sha256": "9f630a9293f4d6512f6e767176d20d3c87ab7da3be290c1beef962daa5f73df2"
+          },
+          {
+            "bytes": 680,
+            "sha256": "b6a0d11285f898b5cc146266b4da66626bcefb0f36d4348868f77068dd9d1a48"
+          },
+          {
+            "bytes": 111036,
+            "sha256": "c07e62ef7950344e39c226632fc24a4d7155d6a6a10f73c2fd5149d3b601a184"
+          },
+          {
+            "bytes": 548,
+            "sha256": "c1f9930277bafc285a7d165c94616460ba1cb935e912cf91d49f09afba21d07a"
+          },
+          {
+            "bytes": 65536,
+            "sha256": "c228f7fb86bad1229481e6023f4a0a217afc7fbfd5e4bb8ed7338f663fd4ef8b"
+          },
+          {
+            "bytes": 712,
+            "sha256": "d3a27a38e632ab5a14d6f6dc67fbdb6b54f2ee26d9c5c7377b5e74f79e6cb10d"
+          },
+          {
+            "bytes": 27648000,
+            "sha256": "e23422970ff7db8b6a410f401032cd0e85dc5bdeb122b94a29c00fd7fc113a45"
+          },
+          {
+            "bytes": 47775744,
+            "sha256": "e2ae9ba885223e190d2fea6fea23fe1a1d4ffe9f5363b784c3d266e7ecbc42d5"
+          },
+          {
+            "bytes": 39424,
+            "sha256": "e52e7c13c52c098e4357ba6cf8f513d9591e62c00d9a9a7388061a3df4cd213d"
+          },
+          {
+            "bytes": 17997824,
+            "sha256": "efabf31a0479fa85be9d6f3f36a2b1f7d44e2a7113975a52bdffea26bf707031"
+          },
+          {
+            "bytes": 436,
+            "sha256": "f434343624b99b9ea46d10f2b5a6b882a32b092ea3b3e48859f4977d707c6871"
+          }
+        ],
+        "structure": {
+          "bounds": [
+            [
+              -0.6196829509735108,
+              0.6196777057647705
+            ],
+            [
+              -0.9114619326591492,
+              0.6485228371620179
+            ],
+            [
+              -0.14041659802198408,
+              0.6207501125335694
+            ]
+          ],
+          "dimensions": [
+            178,
+            223,
+            109
+          ],
+          "refinement": {
+            "origins": [
+              [
+                0.503778103093137,
+                0.2294850974220315,
+                0.3864102548345336
+              ],
+              [
+                -0.5037843047370494,
+                0.2294823496754696,
+                0.38641537986364694
+              ],
+              [
+                0.20108426096064055,
+                -0.7170118997971914,
+                0.07191081601210791
+              ],
+              [
+                -0.20108426844458402,
+                -0.717011898482021,
+                0.07191081571864422
+              ]
+            ],
+            "axes": [
+              [
+                0.15992606377700533,
+                -0.43106456956955386,
+                0.888035467189576
+              ],
+              [
+                -0.1599175566371603,
+                -0.431073808150263,
+                0.8880325146108282
+              ],
+              [
+                0.11105817793154636,
+                -0.6899694943327767,
+                0.7152679064551251
+              ],
+              [
+                -0.11078394665028678,
+                -0.6899531284833426,
+                0.7153262176522223
+              ]
+            ],
+            "ranges": [
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.035,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ],
+              [
+                -0.045,
+                0.015
+              ]
+            ],
+            "blend": "anatomical axial quintic partition; box only as exterior support"
+          },
+          "joints": [
+            [
+              0.407773193627308,
+              0.298559223129654,
+              0.14918516030877568
+            ],
+            [
+              -0.4077821075657635,
+              0.298561519069221,
+              0.14919111045974326
+            ],
+            [
+              0.16170143766750505,
+              -0.3042044405888024,
+              0.28228100907117015
+            ],
+            [
+              -0.1617014754211061,
+              -0.304204436169373,
+              0.28228100835294523
+            ],
+            [
+              0.20108426096064055,
+              -0.7170118997971914,
+              0.07191081601210791
+            ],
+            [
+              -0.20108426844458402,
+              -0.717011898482021,
+              0.07191081571864422
+            ],
+            [
+              0.503778103093137,
+              0.2294850974220315,
+              0.3864102548345336
+            ],
+            [
+              -0.5037843047370494,
+              0.2294823496754696,
+              0.38641537986364694
+            ]
+          ],
+          "cap": 0.5857893093065782
+        },
+        "neck": {
+          "schema": "body-neck-source-replay/1",
+          "applied": true,
+          "inputPhase": "after original head rig bridge, before contour",
+          "sourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+          "sourceOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+          "sourceDerived": true,
+          "headSupportSamples": 1398,
+          "bodyChangedSamples": 192,
+          "maxBodyDisplacementMM": 7.918962463513892,
+          "sourceArithmeticPreserved": true,
+          "headSurfaceGenerated": false,
+          "sourceFidelityAccepted": false,
+          "profile": "B-bend"
+        },
+        "build": 2,
+        "fieldMS": 12930.5,
+        "cache": {
+          "entries": 1,
+          "bytes": 62601947,
+          "maximumBytes": 201326592,
+          "maximumEntries": 2,
+          "pending": 1,
+          "pendingRawBytes": 184734784,
+          "hits": 0,
+          "misses": 2,
+          "failures": 0,
+          "lossless": true,
+          "encoding": "gzip-byte-exact",
+          "hit": false
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "unsupportedMessage": "这个连续状态尚未接入原貌页。当前人物仍保留在参数页，可以另开原版对照。",
+  "failure": "Error: new volume calibration button uses the matching original packet\n    at check (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-handoff-r24.cjs:4:154)\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-handoff-r24.cjs:24:87",
+  "finishedUTC": "2026-10-25T03:12:57.303Z"
+}

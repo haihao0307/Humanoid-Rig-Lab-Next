@@ -1,0 +1,326 @@
+{
+  "startedUTC": "2026-10-25T03:04:44.577Z",
+  "loaderSHA256": "a69a32ab2367cb3266e40f3f022f2f4699e51d9ac3f2d8a9af4bffc825c29c84",
+  "sourceFidelityAccepted": false,
+  "checks": [
+    {
+      "name": "verified HTTP fields populate local cache exact field gmMesoMap",
+      "passed": true
+    },
+    {
+      "name": "verified HTTP fields populate local cache exact field gmPoreMap",
+      "passed": true
+    },
+    {
+      "name": "verified HTTP fields populate local cache exact field gmWrinkleMap",
+      "passed": true
+    },
+    {
+      "name": "verified HTTP fields populate local cache exact field gmCavityMap",
+      "passed": true
+    },
+    {
+      "name": "first four downloads cached atomically",
+      "passed": true
+    },
+    {
+      "name": "verified local cache exact field gmMesoMap",
+      "passed": true
+    },
+    {
+      "name": "verified local cache exact field gmPoreMap",
+      "passed": true
+    },
+    {
+      "name": "verified local cache exact field gmWrinkleMap",
+      "passed": true
+    },
+    {
+      "name": "verified local cache exact field gmCavityMap",
+      "passed": true
+    },
+    {
+      "name": "valid local cache avoids HTTP and functions",
+      "passed": true
+    },
+    {
+      "name": "corrupt local and HTTP caches regenerate from functions exact field gmMesoMap",
+      "passed": true
+    },
+    {
+      "name": "corrupt local and HTTP caches regenerate from functions exact field gmPoreMap",
+      "passed": true
+    },
+    {
+      "name": "corrupt local and HTTP caches regenerate from functions exact field gmWrinkleMap",
+      "passed": true
+    },
+    {
+      "name": "corrupt local and HTTP caches regenerate from functions exact field gmCavityMap",
+      "passed": true
+    },
+    {
+      "name": "all corruption rejected and original four fields regenerated once",
+      "passed": true
+    },
+    {
+      "name": "regenerated local fields reused exact field gmMesoMap",
+      "passed": true
+    },
+    {
+      "name": "regenerated local fields reused exact field gmPoreMap",
+      "passed": true
+    },
+    {
+      "name": "regenerated local fields reused exact field gmWrinkleMap",
+      "passed": true
+    },
+    {
+      "name": "regenerated local fields reused exact field gmCavityMap",
+      "passed": true
+    },
+    {
+      "name": "rebuilt fields persist as verified local acceleration cache",
+      "passed": true
+    },
+    {
+      "name": "storage unavailable retains verified HTTP loading exact field gmMesoMap",
+      "passed": true
+    },
+    {
+      "name": "storage unavailable retains verified HTTP loading exact field gmPoreMap",
+      "passed": true
+    },
+    {
+      "name": "storage unavailable retains verified HTTP loading exact field gmWrinkleMap",
+      "passed": true
+    },
+    {
+      "name": "storage unavailable retains verified HTTP loading exact field gmCavityMap",
+      "passed": true
+    },
+    {
+      "name": "storage failure does not block page",
+      "passed": true
+    },
+    {
+      "name": "mismatching field recipe rejected before publication",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "label": "verified HTTP fields populate local cache",
+      "elapsedMS": 1791,
+      "requests": 4,
+      "report": {
+        "schema": "body-original-skin-fields/1",
+        "localFields": 0,
+        "downloadedFields": 4,
+        "generatedFields": 0,
+        "rejectedLocalFields": 0,
+        "rejectedDownloads": 0,
+        "generationMS": null,
+        "cacheWritten": true,
+        "cacheUnavailable": false,
+        "headGenerated": false,
+        "sourceFidelityAccepted": false,
+        "rawBytes": 178956960,
+        "allFourFieldsByteExact": true
+      },
+      "fields": [
+        {
+          "name": "gmCavityMap",
+          "levels": 12,
+          "sha256": "eb2cf12f72c005b468804e9251a4465f9a34681e5375dd88057d6d954b792e86"
+        },
+        {
+          "name": "gmPoreMap",
+          "levels": 12,
+          "sha256": "145741339125824c92303771045c41a62acff5044f986053667a7324eadf7ec7"
+        },
+        {
+          "name": "gmMesoMap",
+          "levels": 12,
+          "sha256": "15eb39465abca38cfa66de2abe1bdb5e761ba73730b58614a6028129cd567bf6"
+        },
+        {
+          "name": "gmWrinkleMap",
+          "levels": 12,
+          "sha256": "18672477a20b75db33da756b0e3412a1d1bf2e3b07321db04667c9c879a2ce96"
+        }
+      ]
+    },
+    {
+      "label": "verified local cache",
+      "elapsedMS": 435,
+      "requests": 0,
+      "report": {
+        "schema": "body-original-skin-fields/1",
+        "localFields": 4,
+        "downloadedFields": 0,
+        "generatedFields": 0,
+        "rejectedLocalFields": 0,
+        "rejectedDownloads": 0,
+        "generationMS": null,
+        "cacheWritten": false,
+        "cacheUnavailable": false,
+        "headGenerated": false,
+        "sourceFidelityAccepted": false,
+        "rawBytes": 178956960,
+        "allFourFieldsByteExact": true
+      },
+      "fields": [
+        {
+          "name": "gmMesoMap",
+          "levels": 12,
+          "sha256": "15eb39465abca38cfa66de2abe1bdb5e761ba73730b58614a6028129cd567bf6"
+        },
+        {
+          "name": "gmPoreMap",
+          "levels": 12,
+          "sha256": "145741339125824c92303771045c41a62acff5044f986053667a7324eadf7ec7"
+        },
+        {
+          "name": "gmWrinkleMap",
+          "levels": 12,
+          "sha256": "18672477a20b75db33da756b0e3412a1d1bf2e3b07321db04667c9c879a2ce96"
+        },
+        {
+          "name": "gmCavityMap",
+          "levels": 12,
+          "sha256": "eb2cf12f72c005b468804e9251a4465f9a34681e5375dd88057d6d954b792e86"
+        }
+      ]
+    },
+    {
+      "label": "corrupt local and HTTP caches regenerate from functions",
+      "elapsedMS": 54794,
+      "requests": 4,
+      "report": {
+        "schema": "body-original-skin-fields/1",
+        "localFields": 0,
+        "downloadedFields": 0,
+        "generatedFields": 4,
+        "rejectedLocalFields": 4,
+        "rejectedDownloads": 4,
+        "generationMS": 54058,
+        "cacheWritten": true,
+        "cacheUnavailable": false,
+        "headGenerated": false,
+        "sourceFidelityAccepted": false,
+        "rawBytes": 178956960,
+        "allFourFieldsByteExact": true
+      },
+      "fields": [
+        {
+          "name": "gmMesoMap",
+          "levels": 12,
+          "sha256": "15eb39465abca38cfa66de2abe1bdb5e761ba73730b58614a6028129cd567bf6"
+        },
+        {
+          "name": "gmPoreMap",
+          "levels": 12,
+          "sha256": "145741339125824c92303771045c41a62acff5044f986053667a7324eadf7ec7"
+        },
+        {
+          "name": "gmWrinkleMap",
+          "levels": 12,
+          "sha256": "18672477a20b75db33da756b0e3412a1d1bf2e3b07321db04667c9c879a2ce96"
+        },
+        {
+          "name": "gmCavityMap",
+          "levels": 12,
+          "sha256": "eb2cf12f72c005b468804e9251a4465f9a34681e5375dd88057d6d954b792e86"
+        }
+      ]
+    },
+    {
+      "label": "regenerated local fields reused",
+      "elapsedMS": 618,
+      "requests": 0,
+      "report": {
+        "schema": "body-original-skin-fields/1",
+        "localFields": 4,
+        "downloadedFields": 0,
+        "generatedFields": 0,
+        "rejectedLocalFields": 0,
+        "rejectedDownloads": 0,
+        "generationMS": null,
+        "cacheWritten": false,
+        "cacheUnavailable": false,
+        "headGenerated": false,
+        "sourceFidelityAccepted": false,
+        "rawBytes": 178956960,
+        "allFourFieldsByteExact": true
+      },
+      "fields": [
+        {
+          "name": "gmMesoMap",
+          "levels": 12,
+          "sha256": "15eb39465abca38cfa66de2abe1bdb5e761ba73730b58614a6028129cd567bf6"
+        },
+        {
+          "name": "gmPoreMap",
+          "levels": 12,
+          "sha256": "145741339125824c92303771045c41a62acff5044f986053667a7324eadf7ec7"
+        },
+        {
+          "name": "gmWrinkleMap",
+          "levels": 12,
+          "sha256": "18672477a20b75db33da756b0e3412a1d1bf2e3b07321db04667c9c879a2ce96"
+        },
+        {
+          "name": "gmCavityMap",
+          "levels": 12,
+          "sha256": "eb2cf12f72c005b468804e9251a4465f9a34681e5375dd88057d6d954b792e86"
+        }
+      ]
+    },
+    {
+      "label": "storage unavailable retains verified HTTP loading",
+      "elapsedMS": 1283,
+      "requests": 4,
+      "report": {
+        "schema": "body-original-skin-fields/1",
+        "localFields": 0,
+        "downloadedFields": 4,
+        "generatedFields": 0,
+        "rejectedLocalFields": 0,
+        "rejectedDownloads": 0,
+        "generationMS": null,
+        "cacheWritten": false,
+        "cacheUnavailable": true,
+        "headGenerated": false,
+        "sourceFidelityAccepted": false,
+        "rawBytes": 178956960,
+        "allFourFieldsByteExact": true
+      },
+      "fields": [
+        {
+          "name": "gmCavityMap",
+          "levels": 12,
+          "sha256": "eb2cf12f72c005b468804e9251a4465f9a34681e5375dd88057d6d954b792e86"
+        },
+        {
+          "name": "gmPoreMap",
+          "levels": 12,
+          "sha256": "145741339125824c92303771045c41a62acff5044f986053667a7324eadf7ec7"
+        },
+        {
+          "name": "gmMesoMap",
+          "levels": 12,
+          "sha256": "15eb39465abca38cfa66de2abe1bdb5e761ba73730b58614a6028129cd567bf6"
+        },
+        {
+          "name": "gmWrinkleMap",
+          "levels": 12,
+          "sha256": "18672477a20b75db33da756b0e3412a1d1bf2e3b07321db04667c9c879a2ce96"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "finishedUTC": "2026-10-25T03:05:44.685Z"
+}

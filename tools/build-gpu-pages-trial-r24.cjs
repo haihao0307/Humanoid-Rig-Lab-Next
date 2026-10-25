@@ -1,0 +1,4 @@
+'use strict';
+// Isolated candidate, never changes BUILD.json or the selected workbench.
+Object.assign(process.env,{BODY_PROGRAM_PACKAGE:'data/body-function-program-r17.json',BODY_NUMERIC_SOURCES:'BodyMathR01,BodyShapeR01,BodyMHRFieldsR01,BodyTargetBindingR01,BodyMHRAdapterR01,BodyDriverR01,BodyFieldIntervalsR21,BodyFieldCacheR21,BodyNeckSourceR22,BodyFieldPagesR22',BODY_IMPLICIT_WORKER:process.env.BODY_GPU_WORKER||'src/BodyImplicitWorkerR24.js',BODY_RAY_SOURCE:process.env.BODY_GPU_RAY||'src/BodyRayAdaptiveR24.js',BODY_APP_SOURCE:'src/BodyImplicitAppR24.js',BODY_HTML_POSTPROCESS:'tools/body-ui-r24.cjs',BODY_EXTRA_SOURCES:'src/BodyControlR17.js',BODY_OUTPUT_FILE:'qa/fidelity-r24/offline/gpu-pages-trial.html',BODY_BUILD_MANIFEST:'qa/fidelity-r24/offline/BUILD-GPU-PAGES-TRIAL.json',BODY_VISIBLE_VERSION:'R24'});
+require('./build-implicit.cjs');

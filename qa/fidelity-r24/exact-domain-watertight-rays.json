@@ -1,0 +1,998 @@
+{
+  "startedUTC": "2026-10-25T03:00:56.149Z",
+  "method": "independent original Moller-Trumbore BVH against direct analytic BSP intersections; same camera, projection, rays and original attributes",
+  "sourceFidelityAccepted": false,
+  "acceptanceTolerance": null,
+  "runtimeOriginalTriangles": 0,
+  "offlineReferenceOnly": true,
+  "profiles": [
+    {
+      "id": "baseline",
+      "sourceProgramSHA256": "9c75acaaad99712707b4c2efc1a5b8ebb60447cded77004fc2107ff9ce6ec8f6",
+      "sourceStateSHA256": "81a30e810ba92d4d491a0861b2e06aa27333e9d30b00d473a871a6fb1a61b4db",
+      "referenceCaseSHA256": "3d3df0a9c7f4f0dae2041ccae7cac320c8c71109aa13c2aecd4c4869722fb383",
+      "referenceBVHNodes": 8159,
+      "views": [
+        {
+          "view": "front",
+          "width": 641,
+          "height": 826,
+          "rays": 826,
+          "columns": [
+            320
+          ],
+          "common": 295,
+          "coverageDisagreements": 0,
+          "positionMaximumMetres": 8.881784197001252e-16,
+          "normalMaximumVectorDifference": 5.828670879282072e-15,
+          "restMaximumMetres": 6.38378239159465e-16,
+          "dryMaximum": 9.860761315262648e-32,
+          "palmMaximum": 0,
+          "positionDiagnosticBins": {
+            "over1e12": 0,
+            "over1e9": 0,
+            "over1e6": 0
+          },
+          "worst": [
+            {
+              "x": 320,
+              "y": 123,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 5.551115123125783e-16,
+              "restMetres": 4.163336342344337e-17,
+              "candidateT": 2.1315553405729433,
+              "originalT": 2.131555340572944,
+              "candidateField": 423,
+              "offlineOriginalFace": 423
+            },
+            {
+              "x": 320,
+              "y": 145,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.068614436541605,
+              "originalT": 2.0686144365416057,
+              "candidateField": 281,
+              "offlineOriginalFace": 281
+            },
+            {
+              "x": 320,
+              "y": 164,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 2.045023998518115,
+              "originalT": 2.045023998518114,
+              "candidateField": 1087,
+              "offlineOriginalFace": 1087
+            },
+            {
+              "x": 320,
+              "y": 198,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 1.6940658945086007e-21,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 2.0186213436230322,
+              "originalT": 2.018621343623033,
+              "candidateField": 5371,
+              "offlineOriginalFace": 5371
+            },
+            {
+              "x": 320,
+              "y": 208,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.7755575615628914e-17,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 2.010462935122723,
+              "originalT": 2.0104629351227237,
+              "candidateField": 5371,
+              "offlineOriginalFace": 5371
+            },
+            {
+              "x": 320,
+              "y": 215,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 1.249000902703301e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 2.006941744821693,
+              "originalT": 2.006941744821694,
+              "candidateField": 5361,
+              "offlineOriginalFace": 5361
+            },
+            {
+              "x": 320,
+              "y": 225,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 1.3877787807814457e-17,
+              "restMetres": 3.970466940254533e-23,
+              "candidateT": 2.004046160299705,
+              "originalT": 2.0040461602997057,
+              "candidateField": 5355,
+              "offlineOriginalFace": 5355
+            },
+            {
+              "x": 320,
+              "y": 227,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.7755575615628914e-17,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 2.0038114581448414,
+              "originalT": 2.0038114581448405,
+              "candidateField": 5355,
+              "offlineOriginalFace": 5355
+            },
+            {
+              "x": 320,
+              "y": 233,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 8.326672684688674e-17,
+              "restMetres": 2.6469779601696886e-23,
+              "candidateT": 2.003164664047233,
+              "originalT": 2.003164664047234,
+              "candidateField": 5355,
+              "offlineOriginalFace": 5355
+            },
+            {
+              "x": 320,
+              "y": 237,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 1.0587911840678754e-22,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 2.0027814648787277,
+              "originalT": 2.0027814648787268,
+              "candidateField": 5355,
+              "offlineOriginalFace": 5355
+            },
+            {
+              "x": 320,
+              "y": 239,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 2.0026043348984985,
+              "originalT": 2.0026043348984977,
+              "candidateField": 5355,
+              "offlineOriginalFace": 5355
+            },
+            {
+              "x": 320,
+              "y": 283,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 1.1102230246251565e-16,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.9936591850198444,
+              "originalT": 1.993659185019845,
+              "candidateField": 5435,
+              "offlineOriginalFace": 5435
+            },
+            {
+              "x": 320,
+              "y": 288,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 6.661338147750939e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.989076758974862,
+              "originalT": 1.9890767589748612,
+              "candidateField": 5430,
+              "offlineOriginalFace": 5430
+            },
+            {
+              "x": 320,
+              "y": 289,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 2.498001805406602e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.9881077436405683,
+              "originalT": 1.988107743640569,
+              "candidateField": 5422,
+              "offlineOriginalFace": 5422
+            },
+            {
+              "x": 320,
+              "y": 290,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.9874921732549329,
+              "originalT": 1.9874921732549335,
+              "candidateField": 5422,
+              "offlineOriginalFace": 5422
+            },
+            {
+              "x": 320,
+              "y": 85,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 1.8318679906315083e-15,
+              "restMetres": 4.163336342344337e-17,
+              "candidateT": 2.1686549737054697,
+              "originalT": 2.16865497370547,
+              "candidateField": 9119,
+              "offlineOriginalFace": 9119
+            },
+            {
+              "x": 320,
+              "y": 87,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.1690448092883456,
+              "originalT": 2.169044809288345,
+              "candidateField": 9119,
+              "offlineOriginalFace": 9119
+            },
+            {
+              "x": 320,
+              "y": 88,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 6.106226635438361e-16,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.1692433122567993,
+              "originalT": 2.1692433122568,
+              "candidateField": 9119,
+              "offlineOriginalFace": 9119
+            },
+            {
+              "x": 320,
+              "y": 89,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 6.661338147750939e-16,
+              "restMetres": 1.3877787807814457e-17,
+              "candidateT": 2.1694222598433517,
+              "originalT": 2.169422259843352,
+              "candidateField": 96,
+              "offlineOriginalFace": 96
+            },
+            {
+              "x": 320,
+              "y": 90,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 1.0547118733938987e-15,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 2.16912271699828,
+              "originalT": 2.1691227169982805,
+              "candidateField": 9168,
+              "offlineOriginalFace": 9168
+            }
+          ],
+          "ms": 39.069800000000015
+        },
+        {
+          "view": "side",
+          "width": 641,
+          "height": 826,
+          "rays": 826,
+          "columns": [
+            320
+          ],
+          "common": 689,
+          "coverageDisagreements": 0,
+          "positionMaximumMetres": 1.3322676295501878e-15,
+          "normalMaximumVectorDifference": 1.1268763699945339e-14,
+          "restMaximumMetres": 1.2212453270876722e-15,
+          "dryMaximum": 1.6930901125533637e-15,
+          "palmMaximum": 0,
+          "positionDiagnosticBins": {
+            "over1e12": 0,
+            "over1e9": 0,
+            "over1e6": 0
+          },
+          "worst": [
+            {
+              "x": 320,
+              "y": 83,
+              "positionMetres": 1.3322676295501878e-15,
+              "normalVectorDifference": 1.1268763699945339e-14,
+              "restMetres": 1.2212453270876722e-15,
+              "candidateT": 1.9927218289114004,
+              "originalT": 1.992721828911399,
+              "candidateField": 9782,
+              "offlineOriginalFace": 9782
+            },
+            {
+              "x": 320,
+              "y": 162,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 3.469446951953614e-18,
+              "candidateT": 1.7881162995726636,
+              "originalT": 1.7881162995726627,
+              "candidateField": 12764,
+              "offlineOriginalFace": 12764
+            },
+            {
+              "x": 320,
+              "y": 167,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 5.134781488891349e-16,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 1.775527970309214,
+              "originalT": 1.7755279703092148,
+              "candidateField": 12784,
+              "offlineOriginalFace": 12784
+            },
+            {
+              "x": 320,
+              "y": 171,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 1.6653345369377348e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.764738455873615,
+              "originalT": 1.764738455873614,
+              "candidateField": 12813,
+              "offlineOriginalFace": 12813
+            },
+            {
+              "x": 320,
+              "y": 266,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.7755575615628914e-17,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.9865121253980604,
+              "originalT": 1.9865121253980595,
+              "candidateField": 14537,
+              "offlineOriginalFace": 14537
+            },
+            {
+              "x": 320,
+              "y": 451,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.7755575615628914e-17,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.9128586562393841,
+              "originalT": 1.9128586562393832,
+              "candidateField": 18311,
+              "offlineOriginalFace": 18311
+            },
+            {
+              "x": 320,
+              "y": 723,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 1.8596235662471372e-15,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.017354462339209,
+              "originalT": 2.017354462339208,
+              "candidateField": 15761,
+              "offlineOriginalFace": 15761
+            },
+            {
+              "x": 320,
+              "y": 728,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 4.163336342344337e-16,
+              "restMetres": 3.3306690738754696e-16,
+              "candidateT": 2.0190291802211564,
+              "originalT": 2.0190291802211555,
+              "candidateField": 15759,
+              "offlineOriginalFace": 15759
+            },
+            {
+              "x": 320,
+              "y": 769,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 3.9968028886505635e-15,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.052252697433906,
+              "originalT": 2.052252697433905,
+              "candidateField": 16672,
+              "offlineOriginalFace": 16672
+            },
+            {
+              "x": 320,
+              "y": 97,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 4.440892098500626e-16,
+              "restMetres": 8.673617379884035e-19,
+              "candidateT": 1.9241942027204282,
+              "originalT": 1.9241942027204288,
+              "candidateField": 9789,
+              "offlineOriginalFace": 9789
+            },
+            {
+              "x": 320,
+              "y": 103,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 2.7755575615628914e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.913467454513777,
+              "originalT": 1.9134674545137764,
+              "candidateField": 9790,
+              "offlineOriginalFace": 9790
+            },
+            {
+              "x": 320,
+              "y": 110,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 8.673617379884035e-19,
+              "candidateT": 1.9022911959800293,
+              "originalT": 1.9022911959800286,
+              "candidateField": 9793,
+              "offlineOriginalFace": 9793
+            },
+            {
+              "x": 320,
+              "y": 187,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 3.3306690738754696e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.7326176425386608,
+              "originalT": 1.7326176425386615,
+              "candidateField": 12909,
+              "offlineOriginalFace": 12909
+            },
+            {
+              "x": 320,
+              "y": 258,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 1.6653345369377348e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.9923825009216996,
+              "originalT": 1.9923825009216989,
+              "candidateField": 14341,
+              "offlineOriginalFace": 14341
+            },
+            {
+              "x": 320,
+              "y": 324,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 6.938893903907228e-17,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.9565808093239379,
+              "originalT": 1.9565808093239385,
+              "candidateField": 14947,
+              "offlineOriginalFace": 14947
+            },
+            {
+              "x": 320,
+              "y": 359,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 1.1102230246251565e-16,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.9350394503615396,
+              "originalT": 1.9350394503615402,
+              "candidateField": 14888,
+              "offlineOriginalFace": 14888
+            },
+            {
+              "x": 320,
+              "y": 367,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 2.6020852139652106e-18,
+              "candidateT": 1.9289378781019244,
+              "originalT": 1.928937878101925,
+              "candidateField": 15133,
+              "offlineOriginalFace": 15133
+            },
+            {
+              "x": 320,
+              "y": 374,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 2.7755575615628914e-17,
+              "restMetres": 1.3877787807814457e-17,
+              "candidateT": 1.9242766352031866,
+              "originalT": 1.9242766352031873,
+              "candidateField": 15203,
+              "offlineOriginalFace": 15203
+            },
+            {
+              "x": 320,
+              "y": 385,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 1.1102230246251565e-16,
+              "restMetres": 1.3877787807814457e-17,
+              "candidateT": 1.9189647996826344,
+              "originalT": 1.9189647996826351,
+              "candidateField": 15221,
+              "offlineOriginalFace": 15221
+            },
+            {
+              "x": 320,
+              "y": 395,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.9155038886327125,
+              "originalT": 1.9155038886327131,
+              "candidateField": 18271,
+              "offlineOriginalFace": 18271
+            }
+          ],
+          "ms": 25.873199999999997
+        },
+        {
+          "view": "back",
+          "width": 641,
+          "height": 826,
+          "rays": 826,
+          "columns": [
+            320
+          ],
+          "common": 301,
+          "coverageDisagreements": 0,
+          "positionMaximumMetres": 8.881784197001252e-16,
+          "normalMaximumVectorDifference": 5.869009684201918e-14,
+          "restMaximumMetres": 6.38378239159465e-16,
+          "dryMaximum": 2.262967684655002e-33,
+          "palmMaximum": 0,
+          "positionDiagnosticBins": {
+            "over1e12": 0,
+            "over1e9": 0,
+            "over1e6": 0
+          },
+          "worst": [
+            {
+              "x": 320,
+              "y": 117,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 3.101495839666346e-17,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.1138879229216463,
+              "originalT": 2.113887922921647,
+              "candidateField": 9628,
+              "offlineOriginalFace": 9628
+            },
+            {
+              "x": 320,
+              "y": 120,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 1.6653345369377348e-16,
+              "restMetres": 6.938893903907228e-18,
+              "candidateT": 2.1092435517441017,
+              "originalT": 2.109243551744101,
+              "candidateField": 9628,
+              "offlineOriginalFace": 9628
+            },
+            {
+              "x": 320,
+              "y": 196,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 2.0645873047044274,
+              "originalT": 2.0645873047044283,
+              "candidateField": 14207,
+              "offlineOriginalFace": 14207
+            },
+            {
+              "x": 320,
+              "y": 290,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.636779683484747e-16,
+              "restMetres": 4.163336342344337e-17,
+              "candidateT": 2.072509124657853,
+              "originalT": 2.072509124657854,
+              "candidateField": 14675,
+              "offlineOriginalFace": 14675
+            },
+            {
+              "x": 320,
+              "y": 291,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.1163626406917047e-16,
+              "restMetres": 6.938893903907228e-17,
+              "candidateT": 2.072334837542325,
+              "originalT": 2.072334837542326,
+              "candidateField": 14675,
+              "offlineOriginalFace": 14675
+            },
+            {
+              "x": 320,
+              "y": 292,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 1.491862189340054e-16,
+              "restMetres": 4.163336342344337e-17,
+              "candidateT": 2.072163162005435,
+              "originalT": 2.072163162005436,
+              "candidateField": 14675,
+              "offlineOriginalFace": 14675
+            },
+            {
+              "x": 320,
+              "y": 302,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 3.191891195797325e-16,
+              "restMetres": 4.163336342344337e-17,
+              "candidateT": 2.0689807434473817,
+              "originalT": 2.0689807434473826,
+              "candidateField": 15022,
+              "offlineOriginalFace": 15022
+            },
+            {
+              "x": 320,
+              "y": 352,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 1.625218016707023e-14,
+              "restMetres": 2.220446049250313e-16,
+              "candidateT": 2.062619916470029,
+              "originalT": 2.06261991647003,
+              "candidateField": 5612,
+              "offlineOriginalFace": 14753
+            },
+            {
+              "x": 320,
+              "y": 358,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 1.3877787807814457e-17,
+              "candidateT": 2.067074004717473,
+              "originalT": 2.067074004717474,
+              "candidateField": 14755,
+              "offlineOriginalFace": 14755
+            },
+            {
+              "x": 320,
+              "y": 360,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 6.782376690915353e-17,
+              "restMetres": 2.0816681711721685e-17,
+              "candidateT": 2.0684093939356494,
+              "originalT": 2.0684093939356503,
+              "candidateField": 14755,
+              "offlineOriginalFace": 14755
+            },
+            {
+              "x": 320,
+              "y": 85,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 1.5612511283791264e-17,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.1590992642094786,
+              "originalT": 2.159099264209479,
+              "candidateField": 90,
+              "offlineOriginalFace": 90
+            },
+            {
+              "x": 320,
+              "y": 87,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.1563011851074996,
+              "originalT": 2.1563011851075,
+              "candidateField": 90,
+              "offlineOriginalFace": 90
+            },
+            {
+              "x": 320,
+              "y": 90,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.152189732750247,
+              "originalT": 2.1521897327502475,
+              "candidateField": 335,
+              "offlineOriginalFace": 335
+            },
+            {
+              "x": 320,
+              "y": 91,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 1.0028870095490916e-18,
+              "candidateT": 2.1508512759765246,
+              "originalT": 2.150851275976524,
+              "candidateField": 335,
+              "offlineOriginalFace": 335
+            },
+            {
+              "x": 320,
+              "y": 93,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 3.3306690738754696e-16,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.148182953819986,
+              "originalT": 2.1481829538199864,
+              "candidateField": 335,
+              "offlineOriginalFace": 335
+            },
+            {
+              "x": 320,
+              "y": 96,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 1.3877787807814457e-17,
+              "candidateT": 2.14369777086825,
+              "originalT": 2.1436977708682496,
+              "candidateField": 367,
+              "offlineOriginalFace": 367
+            },
+            {
+              "x": 320,
+              "y": 97,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 4.119968255444917e-18,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 2.1420969349994405,
+              "originalT": 2.142096934999441,
+              "candidateField": 367,
+              "offlineOriginalFace": 367
+            },
+            {
+              "x": 320,
+              "y": 100,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 3.3306690738754696e-16,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 2.1376304135393953,
+              "originalT": 2.137630413539395,
+              "candidateField": 369,
+              "offlineOriginalFace": 369
+            },
+            {
+              "x": 320,
+              "y": 108,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 4.440892098500626e-16,
+              "restMetres": 2.220446049250313e-16,
+              "candidateT": 2.1263187648551742,
+              "originalT": 2.1263187648551747,
+              "candidateField": 451,
+              "offlineOriginalFace": 451
+            },
+            {
+              "x": 320,
+              "y": 109,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 2.7755575615628914e-16,
+              "restMetres": 6.938893903907228e-18,
+              "candidateT": 2.124833873680414,
+              "originalT": 2.1248338736804135,
+              "candidateField": 451,
+              "offlineOriginalFace": 451
+            }
+          ],
+          "ms": 18.255300000000005
+        },
+        {
+          "view": "half",
+          "width": 641,
+          "height": 826,
+          "rays": 826,
+          "columns": [
+            320
+          ],
+          "common": 416,
+          "coverageDisagreements": 0,
+          "positionMaximumMetres": 8.881784197001252e-16,
+          "normalMaximumVectorDifference": 3.497202527569243e-15,
+          "restMaximumMetres": 3.7470027081099033e-16,
+          "dryMaximum": 8.320017359752859e-32,
+          "palmMaximum": 0,
+          "positionDiagnosticBins": {
+            "over1e12": 0,
+            "over1e9": 0,
+            "over1e6": 0
+          },
+          "worst": [
+            {
+              "x": 320,
+              "y": 506,
+              "positionMetres": 8.881784197001252e-16,
+              "normalVectorDifference": 2.498001805406602e-16,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.3645669951506465,
+              "originalT": 1.3645669951506474,
+              "candidateField": 5422,
+              "offlineOriginalFace": 5422
+            },
+            {
+              "x": 320,
+              "y": 273,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 1.1102230246251565e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.4077568368388416,
+              "originalT": 1.4077568368388422,
+              "candidateField": 214,
+              "offlineOriginalFace": 214
+            },
+            {
+              "x": 320,
+              "y": 346,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 2.8782179547701126e-17,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.356100806753692,
+              "originalT": 1.3561008067536913,
+              "candidateField": 1083,
+              "offlineOriginalFace": 1083
+            },
+            {
+              "x": 320,
+              "y": 374,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.3497946279515676,
+              "originalT": 1.3497946279515682,
+              "candidateField": 5371,
+              "offlineOriginalFace": 5371
+            },
+            {
+              "x": 320,
+              "y": 428,
+              "positionMetres": 6.661338147750939e-16,
+              "normalVectorDifference": 1.3877787807814457e-17,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.3514640844364036,
+              "originalT": 1.3514640844364043,
+              "candidateField": 5355,
+              "offlineOriginalFace": 5355
+            },
+            {
+              "x": 320,
+              "y": 202,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 1.8318679906315083e-15,
+              "restMetres": 4.163336342344337e-17,
+              "candidateT": 1.4578484674868875,
+              "originalT": 1.457848467486887,
+              "candidateField": 9119,
+              "offlineOriginalFace": 9119
+            },
+            {
+              "x": 320,
+              "y": 217,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 1.3739009929736312e-15,
+              "restMetres": 3.4558944247975454e-19,
+              "candidateT": 1.4601975710466581,
+              "originalT": 1.4601975710466586,
+              "candidateField": 9168,
+              "offlineOriginalFace": 9168
+            },
+            {
+              "x": 320,
+              "y": 229,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 5.204170427930421e-16,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.4579129629066503,
+              "originalT": 1.4579129629066507,
+              "candidateField": 38,
+              "offlineOriginalFace": 38
+            },
+            {
+              "x": 320,
+              "y": 232,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 2.480654570646834e-16,
+              "restMetres": 2.7755575615628914e-17,
+              "candidateT": 1.457384271055663,
+              "originalT": 1.4573842710556635,
+              "candidateField": 38,
+              "offlineOriginalFace": 38
+            },
+            {
+              "x": 320,
+              "y": 240,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 2.3869795029440866e-15,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 1.4539892347218037,
+              "originalT": 1.4539892347218033,
+              "candidateField": 100,
+              "offlineOriginalFace": 100
+            },
+            {
+              "x": 320,
+              "y": 247,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 1.4458629118883044,
+              "originalT": 1.445862911888304,
+              "candidateField": 421,
+              "offlineOriginalFace": 421
+            },
+            {
+              "x": 320,
+              "y": 248,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 1.4449171848255387,
+              "originalT": 1.4449171848255382,
+              "candidateField": 421,
+              "offlineOriginalFace": 421
+            },
+            {
+              "x": 320,
+              "y": 251,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 1.4420957096991518,
+              "originalT": 1.4420957096991514,
+              "candidateField": 421,
+              "offlineOriginalFace": 421
+            },
+            {
+              "x": 320,
+              "y": 255,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 5.551115123125783e-16,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 1.4376188166861972,
+              "originalT": 1.4376188166861967,
+              "candidateField": 423,
+              "offlineOriginalFace": 423
+            },
+            {
+              "x": 320,
+              "y": 258,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 4.440892098500626e-16,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 1.4338045568086881,
+              "originalT": 1.4338045568086877,
+              "candidateField": 423,
+              "offlineOriginalFace": 423
+            },
+            {
+              "x": 320,
+              "y": 266,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 1.1102230246251565e-16,
+              "restMetres": 6.938893903907228e-17,
+              "candidateT": 1.4196099719274629,
+              "originalT": 1.4196099719274624,
+              "candidateField": 425,
+              "offlineOriginalFace": 425
+            },
+            {
+              "x": 320,
+              "y": 268,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 2.220446049250313e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.4161230746076812,
+              "originalT": 1.4161230746076816,
+              "candidateField": 214,
+              "offlineOriginalFace": 214
+            },
+            {
+              "x": 320,
+              "y": 293,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 5.551115123125783e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.38016580532531,
+              "originalT": 1.3801658053253105,
+              "candidateField": 281,
+              "offlineOriginalFace": 281
+            },
+            {
+              "x": 320,
+              "y": 295,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 3.3306690738754696e-16,
+              "restMetres": 5.551115123125783e-17,
+              "candidateT": 1.3782209079127812,
+              "originalT": 1.3782209079127816,
+              "candidateField": 281,
+              "offlineOriginalFace": 281
+            },
+            {
+              "x": 320,
+              "y": 308,
+              "positionMetres": 4.440892098500626e-16,
+              "normalVectorDifference": 5.551115123125783e-17,
+              "restMetres": 1.1102230246251565e-16,
+              "candidateT": 1.3691306846155002,
+              "originalT": 1.3691306846155007,
+              "candidateField": 279,
+              "offlineOriginalFace": 279
+            }
+          ],
+          "ms": 19.318600000000004
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "finishedUTC": "2026-10-25T03:00:56.398Z",
+  "diagnosticCompleted": true
+}

@@ -1,0 +1,19 @@
+{
+  "startedUTC": "2026-10-25T03:13:38.649Z",
+  "artifactSHA256": "f000a1deaded4e5fb2ca51eabb7de0b35a6f960c8ec1aa798eb4722f6a287cca",
+  "sourceFidelityAccepted": false,
+  "scope": "Original Float32 field words addressed directly on GPU from lossless bricks; exact full-frame comparison against retained dense renderer; not source mother acceptance",
+  "checks": [
+    {
+      "name": "new renderer reads pages without dense expansion",
+      "passed": true
+    }
+  ],
+  "cases": [],
+  "errors": [],
+  "newImageFiles": 0,
+  "failure": "page.goto: Timeout 180000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:8914/gpu-pages-trial.html\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-gpu-pages-r24.cjs:2:1112",
+  "finishedUTC": "2026-10-25T03:16:39.377Z",
+  "adopted": false,
+  "reason": "Branching indirect field fetch caused shader construction to block DOM readiness; production renderer was unchanged."
+}

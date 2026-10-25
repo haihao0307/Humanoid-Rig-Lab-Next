@@ -1,21 +1,21 @@
 {
-  "schema": "body-function-delivery/8",
-  "reviewedUTC": "2026-10-24T11:04:58.167Z",
-  "selectedVersion": "R23",
-  "status": "checked working candidate; source fidelity and full reconstruction incomplete",
-  "artifact": "delivery/身体_R23_原貌与按需细节.html",
-  "sha256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
-  "bytes": 714365,
+  "schema": "body-function-delivery/9",
+  "reviewedUTC": "2026-10-25T03:59:23.614Z",
+  "selectedVersion": "R24",
+  "status": "checked working candidate; source fidelity and full body reconstruction incomplete",
+  "artifact": "delivery/身体_R24_原貌与原函数皮纹.html",
+  "sha256": "fae69985802be4c2e1523bcf0a435c88ceb9885f06d499b8d7484ceb025a02ca",
+  "bytes": 824151,
   "companionWorkbench": {
-    "file": "delivery/人物身体_R23_完整参数与人物衔接.html",
-    "sha256": "2efbad66b178b54687d7763d5961cd29cc7c50fa175f32e58e6dfaeb31bffcb5",
-    "bytes": 1557089
+    "file": "delivery/人物身体_R24_完整参数与人物衔接.html",
+    "sha256": "52e413b9b04cd8a93566acc08941d05918638c9a3de3d0842f8c6da060739a3c",
+    "bytes": 1680099
   },
   "prior": {
-    "version": "R22",
-    "file": "delivery/身体_R22_原貌与原灯光对照.html",
-    "sha256": "59314d7715e5c4ab887739b7b321f83ebadce364ed92c6d7e60a7349d5a62e4b",
-    "delivery": "DELIVERY-R22.json",
+    "version": "R23",
+    "file": "delivery/身体_R23_原貌与按需细节.html",
+    "sha256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
+    "delivery": "DELIVERY-R23.json",
     "status": "retained unchanged fallback"
   },
   "scope": "BODY ONLY",
@@ -24,7 +24,6 @@
   "rasterPrimitive": "POINTS",
   "headGenerated": false,
   "headBoardModified": false,
-  "sharedR15ReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
   "sourceDerivedCalibration": true,
   "sourceFacetPartitionInformationRetained": true,
   "wholeBodySourceIndependent": false,
@@ -35,7 +34,13 @@
   "acceptanceTolerance": null,
   "allOriginalControlCombinationsCertified": false,
   "geometryParameterVariationOnSourceCandidate": false,
-  "fixedOriginalStates": 9,
+  "fixedOriginalStates": 10,
+  "controls": {
+    "originalCatalog": 1916,
+    "bodyControls": 965,
+    "symmetricPairs": 34,
+    "independentDegreesDeleted": 0
+  },
   "originalBodySurfaceControls": [
     "bodyVariation",
     "bodyPores",
@@ -43,237 +48,240 @@
     "neckCreases"
   ],
   "originalBodySurfaceControlsImplemented": true,
+  "fullControlsRetainedInCompanion": true,
   "continuousHeadProviderImplemented": false,
   "originalNeckNumericStagesImplemented": true,
-  "actualOriginalBodySkinPipelineImplemented": true,
+  "headBoundaryReferenceStates": 10,
+  "headSupportSamples": 1398,
+  "calibration": {
+    "profile": "calibration-soft",
+    "sourceParametersOnly": true,
+    "muscle": 0.5,
+    "weight": 0.5,
+    "bodyLocalControlsZeroed": 127,
+    "bodyLocalValueChanges": 18,
+    "headOnlyFieldsPreserved": true,
+    "originalAgeHeightAndProportionsPreserved": true,
+    "sourceDefaultReplaced": false,
+    "acceptedMother": false
+  },
+  "bindingInspection": {
+    "fixedAndCurrentBothRigs": true,
+    "joints": 12,
+    "measuredAnatomicalBoneLengths": false,
+    "skeletonSoftTissueDecoupled": false,
+    "archiveOrShapeChangedByInspection": false
+  },
+  "originalSkin": {
+    "fullRGBAFieldsRegenerated": 4,
+    "mipLevelsPerField": 12,
+    "rawBytes": 178956960,
+    "allRawFieldsByteExact": true,
+    "downloadedFieldsOptionalAccelerationCache": true,
+    "verifiedLocalCache": true,
+    "cacheCorruptionFallbackToOriginalFunctions": true,
+    "headGeometryGenerated": false,
+    "sourceOwnSkinReproduced": false
+  },
+  "gpuStorage": {
+    "standard": {
+      "denseBaselineBytes": 352871712,
+      "residentBaselineBytes": 258899608,
+      "expandedDenseField": false,
+      "allAuditedWords": 106686702,
+      "differentWords": 0
+    },
+    "precision": {
+      "originalDenseFloat32Path": true,
+      "roundingDifferenceInDirectPagedExperiment": {
+        "differentBytes": 2,
+        "maximumRGBCodeDifference": 1,
+        "adopted": false
+      }
+    },
+    "densitySwitchDisposesPreviousResources": true
+  },
+  "sourceComparison": {
+    "views": 40,
+    "rays": 21178640,
+    "coverageDisagreements": 0,
+    "maximumPositionDifferenceMetres": 2.4868995751603507e-14,
+    "maximumNormalVectorDifference": 1.308703145852519e-12,
+    "method": "independent watertight projected original-triangle BVH against direct analytic BSP intersections; same camera, projection, rays and original attributes",
+    "formalAcceptance": false
+  },
+  "nativeAppearanceComparison": {
+    "views": 30,
+    "maximumRGBCodeDifference": 129,
+    "interiorMaximumRGBCodeDifference": 97,
+    "maximumCoverageDisagreementsPerView": 7,
+    "allRecordedShadowMapsAndMatricesMatch": true,
+    "shadowScope": "20 fixed source maps under recorded original update history; arbitrary histories and continuous dynamic shadows incomplete",
+    "formalAcceptance": false
+  },
   "sourceOwnSkinReproduced": false,
   "fullVolumeScattering": false,
-  "sourceGraphFieldsByteExact": true,
-  "sourceShadowCaches": true,
-  "shadowCacheScope": "18 original maps and matrices match the nine recorded native update states; arbitrary transition history and continuous dynamic shadows remain incomplete",
-  "fullControlsRetainedInCompanion": true,
-  "controls": {
-    "originalCatalog": 1916,
-    "bodyControls": 965,
-    "symmetricPairs": 34,
-    "independentDegreesDeleted": 0
-  },
   "mainPlatformMigrated": false,
   "publicWebDeployment": false,
   "githubSyncRequested": true,
   "githubRepository": "haihao0307/Humanoid-Rig-Lab-Next",
   "githubBranch": "body/reconstruction-r18-20261023",
   "implemented": [
-    "four original body surface controls use the unchanged original material formula and reuse current exact geometry",
-    "source coefficients load by state with compressed/raw hashes, atomic failure preservation and a two-state decoded cache",
-    "complete workbench byte packet avoids duplicate bulk base64 and verifies bytes before initializing one current field",
-    "both page directions preserve complete-person archives, original head and unknown fields, surface controls and camera",
-    "actual precision-worker cancellation and latest-camera coalescing; diagnostic GPU context created only on demand",
-    "source WebGL loss recovery and download of retained persons; failed packet and coefficient loads preserve incoming persons",
-    "three full RGBA original procedural skin fields and cavity R regenerate bit exactly from the original function and recipe"
+    "exact projective-integer source domain compilation and rate-sign ray traversal without changing original surface/material coefficients",
+    "separate source-parameter calibration and matching original neck input; sparse archive key presence preserved",
+    "live original binding references for both original rigs; explicitly not measured anatomy or decoupling",
+    "all four original RGBA procedural fields reconstructed exactly, with verified persistent cache and function fallback",
+    "lossless GPU address maps for standard mode; original dense shader retained for precision mode",
+    "complete original control catalog, both rigs, head and unknown archive fields, both page directions and failure restoration retained"
   ],
-  "storage": {
-    "logicalArrays": 54,
-    "uniqueArrays": 51,
-    "logicalBytes": 108975040,
-    "uniqueBytes": 104192036,
-    "compressedBytes": 46253973,
-    "bitExactCoefficients": true,
-    "noLossyQuantization": true,
-    "externalCoefficients": true,
-    "loadCurrentStateOnly": true,
-    "sourceHTMLBytes": 714365,
-    "workbenchHTMLBytes": 1557089,
-    "initialSourceCoefficientBlobs": 6,
-    "initialSourceCoefficientCompressedBytes": 5278913,
-    "maximumDecodedStates": 2,
-    "workbenchPacketCompressedBytes": 44950878,
-    "workbenchPacketRawBytes": 90490457,
-    "allDeliveryAssets": 74,
-    "allDeliveryAssetCompressedBytes": 196389054,
-    "workbenchGPUFieldBytes": 352871712
-  },
-  "proceduralRegeneration": {
-    "fullRGBA": [
-      "gmMesoMap",
-      "gmPoreMap",
-      "gmWrinkleMap"
-    ],
-    "cavityR": true,
-    "cavityAuxiliaryGBA": "original cached head/appendage channels retained; not claimed regenerated",
-    "sourceIndependentSkin": false
-  },
-  "evidence": {
-    "integrity": {
-      "file": "qa/fidelity-r23/release-integrity.json",
-      "sha256": "669b75f4e8071cb53b494dbdc197391dfd08ee1d9e8ba92349fb913d59d71149",
-      "result": "passed",
-      "artifactSHA256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
-      "checks": 189,
-      "cases": null,
-      "finishedUTC": null
-    },
-    "sourceRuntime": {
-      "file": "qa/fidelity-r23/source-browser.json",
-      "sha256": "56b7c401bc3c45734cbe428c4c1d0d2536fc76d9498244d83675d39f63166116",
-      "result": "runtimeChecksPassed",
-      "artifactSHA256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
-      "checks": 45,
-      "cases": 27,
-      "finishedUTC": "2026-10-24T11:00:44.963Z"
-    },
-    "sourceLifecycle": {
-      "file": "qa/fidelity-r23/source-lifecycle-browser.json",
-      "sha256": "74deceebaffa2e08bb2c2d0f09928e93edd24bb2e2586a4ae3e0b91211d32157",
-      "result": "passed",
-      "artifactSHA256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
-      "checks": 17,
-      "cases": null,
-      "finishedUTC": "2026-10-24T10:32:26.926Z"
-    },
-    "workbenchPacket": {
-      "file": "qa/fidelity-r23/body-packet-browser.json",
-      "sha256": "504a0b9327344236d926cd33589031988e8c77f1a284647c66e4de417184fac3",
-      "result": "passed",
-      "artifactSHA256": "2efbad66b178b54687d7763d5961cd29cc7c50fa175f32e58e6dfaeb31bffcb5",
-      "checks": 20,
-      "cases": 4,
-      "finishedUTC": "2026-10-24T10:22:20.567Z"
-    },
-    "personHandoff": {
-      "file": "qa/fidelity-r23/page-handoff-browser.json",
-      "sha256": "7b12ea6e98484a4afb5aa6b9284a9505e8568406c75b9d808585c140941c09a1",
-      "result": "passed",
-      "artifactSHA256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
-      "checks": 22,
-      "cases": 2,
-      "finishedUTC": "2026-10-24T10:59:10.589Z"
-    },
-    "workerCancellation": {
-      "file": "qa/fidelity-r23/worker-cancellation-browser.json",
-      "sha256": "d0d750f4a098d1e27f2c9820c1d7bfefab1c634394fc1b323ce2d57eb9301795",
-      "result": "passed",
-      "artifactSHA256": null,
-      "checks": null,
-      "cases": null,
-      "finishedUTC": "2026-10-24T10:08:15.256Z"
-    },
-    "httpViewer": {
-      "file": "qa/fidelity-r23/http-viewer.json",
-      "sha256": "11f293b5b023231dd2780f1740e7ec304fb505a976c5a6ff7537f678155d6b95",
-      "result": "passed",
-      "artifactSHA256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
-      "checks": 91,
-      "cases": null,
-      "finishedUTC": "2026-10-24T10:55:35.980Z"
-    },
-    "originalProfiles": {
-      "file": "qa/fidelity-r23/active-profiles-pixels-browser.json",
-      "sha256": "fcea8979c909898afcc7ba91180822485621fe5f34b7e5ff0a1553b191133a8b",
-      "result": "diagnosticCompleted",
-      "artifactSHA256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
-      "checks": null,
-      "cases": 27,
-      "finishedUTC": "2026-10-24T10:45:47.985Z"
-    },
-    "originalBodyControls": {
-      "file": "qa/fidelity-r23/body-surface-source-browser.json",
-      "sha256": "f0e751a9c02f42cc3ea24c417fadc4ebdbfba09a72af76d8a607e64e9f75a347",
-      "result": "diagnosticCompleted",
-      "artifactSHA256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
-      "checks": null,
-      "cases": 42,
-      "finishedUTC": "2026-10-24T10:57:04.893Z"
-    },
-    "proceduralFields": {
-      "file": "qa/fidelity-r23/procedural-field-regeneration.json",
-      "sha256": "bb2b326d447263160d827540149b9c52c5f393428fe968d67db388ad8f098640",
-      "result": "passed",
-      "artifactSHA256": null,
-      "checks": null,
-      "cases": null,
-      "finishedUTC": "2026-10-24T09:34:16.177Z"
-    },
-    "cleanFieldRebuild": {
-      "file": "qa/fidelity-r23/clean-field-rebuild.json",
-      "sha256": "1fa291dde6ebf476e22173d63f8aef317b814c433bd8a4cfd0b0ed72a9aa806c",
-      "result": "passed",
-      "artifactSHA256": null,
-      "checks": null,
-      "cases": null,
-      "finishedUTC": "2026-10-24T09:38:01.778Z"
-    },
-    "gitTreeRebuild": {
-      "file": "qa/fidelity-r23/git-tree-rebuild.json",
-      "sha256": "0523e708c8efd174d154ddc45eb38119b97b018df9e25fae02f09580598c06d1",
-      "result": "passed",
-      "artifactSHA256": null,
-      "checks": 78,
-      "cases": null,
-      "finishedUTC": "2026-10-24T11:04:27.755Z"
-    }
-  },
-  "originalComparison": {
-    "profiles": {
-      "cases": 27,
-      "nonBodyDraws": 0,
-      "maximumRGBCodeDifference": 129,
-      "maximumInteriorRGBCodeDifference": 97,
-      "maximumCoverageDisagreementPixels": 7,
-      "accepted": false
-    },
-    "bodySurfaceControls": {
-      "cases": 42,
-      "nonBodyDraws": 0,
-      "maximumRGBCodeDifference": 19,
-      "maximumInteriorRGBCodeDifference": 19,
-      "maximumCoverageDisagreementPixels": 6,
-      "accepted": false
-    },
-    "strictNonBodyDrawExclusion": true,
-    "sourceFullSceneShadowVisibilityPreserved": true,
-    "sourceShadowCachesAndMatricesMatched": true,
-    "crossContextPixelExact": false,
-    "pixelComparisonAcceptance": false
-  },
-  "inheritedEvidence": {
-    "release": "DELIVERY-R22.json",
-    "scope": "unchanged original neck arithmetic/operator, dense GPU shader, original body program and source surface coefficients; not complete source acceptance",
-    "sourceNeckStates": 17,
-    "sourceNeckChecks": 78
-  },
   "remaining": [
     {
       "priority": 0,
       "status": "incomplete",
-      "task": "完成原表面、首交、边界、分层、法线与外观正式复刻验收；仍有边缘和局部像素差异，正式容差未设定。记录顺序下的18幅阴影已复现，任意历史及连续状态的动态阴影尚未完成。"
+      "task": "完成原表面、边界、分层、法线、首交和整页外观的正式复刻验收；当前30组原版材质对照仍有边缘和局部像素差异，正式容差仍为null。"
     },
     {
       "priority": 1,
-      "status": "incomplete",
-      "task": "原数据基准通过后，完成中性整体校准、胸肩带、腰腹与骨盆体量，并分离支撑骨架与软组织响应；不将R18–R20估算改形当作已验收母体。"
+      "status": "partial",
+      "task": "已建立独立原参数体量校准档与A/B连续绑定参照；胸肩带、腰腹及骨盆大体积和骨架/软组织响应分离仍未完成，校准档不是已验收的成人母体。"
     },
     {
       "priority": 2,
       "status": "incomplete",
-      "task": "完成肩髋连接、肘膝腕踝、手足细轮廓与连续动作组合；原貌页目前只有9个记录状态，完整控制仍在另一个未验收的连续函数工作页。"
+      "task": "完成肩髋连接、肘膝腕踝、手足细轮廓及连续组合动作的来源保真和后续变形；原貌页仍只支持10个固定状态。"
     },
     {
       "priority": 3,
       "status": "incomplete",
-      "task": "建立自主结构函数母体，逐区替换来源分面分区、形态和绑定数据；当前仍保留来源分区信息，不能声称自主母体完成。"
+      "task": "建立自主结构函数母体，逐区替换来源分面分区、形态和绑定数据；连续参数页的旧隐式表面仍未通过来源复刻验收。"
     },
     {
       "priority": 4,
       "status": "partial",
-      "task": "已完成按需原貌字段、字节包传输、CPU无损分页与部分皮纹函数重建；全系统局部更新、GPU内存、动态光学、其余肌理仍需继续。"
+      "task": "四组原皮纹完整函数重建、持久校验缓存和标准模式无损GPU寻址已完成；全系统局部计算、精细模式显存、动态阴影、完整体积散射仍未完成。"
     },
     {
       "priority": 5,
       "status": "incomplete",
-      "task": "完成真实连续头侧边界提供方、身体颈部在连续新表面的整合，以及头部、附件、坐标跟随与总平台联调；头部项目未修改。"
+      "task": "接通任意连续状态的真实头侧边界提供方，并完成头部、附件、坐标跟随与总平台联调；独立头部项目未修改。"
     }
   ],
-  "localViewer": "http://127.0.0.1:8914/?v=R23-db26e1dc",
-  "localWorkbench": "http://127.0.0.1:8914/?view=workbench"
+  "evidence": [
+    {
+      "file": "qa/fidelity-r24/release-integrity.json",
+      "sha256": "c8a75cd54863bc31bdaeb73f583c7e0893b4d218367613afe08f4b7df4ce5fa4",
+      "checks": 289,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/product-browser.json",
+      "sha256": "0b831167a312c3f9e5aaf5ed8b3c66b3734d396c403bb8bcbcfc3d20691edda5",
+      "checks": 34,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/source-lifecycle-browser.json",
+      "sha256": "fb0c233e2662441a84bad0d0a8d01436d77665674ca018ce9945f3ed3d0e5840",
+      "checks": 17,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/page-handoff-browser.json",
+      "sha256": "679b2700ad558adebca40468fb9de78309a3c7bd08e300b0df9d2cac23083dc0",
+      "checks": 23,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/workbench-lifecycle.json",
+      "sha256": "d4b008c2c5a51920c24c1bca73b0ac665ebef21051b50107dc501371f5c0e60b",
+      "checks": 21,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/live-support-browser.json",
+      "sha256": "42c03f9af20b87e282d4912bdd35cef4d1b89548623cd89952bdeb518b54b52d",
+      "checks": 11,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/gpu-selected-standard-browser.json",
+      "sha256": "b51cba71b76a07bef1813d46176f4b77547862928b5cdc787e890546353aeed4",
+      "checks": 55,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/gpu-adaptive-quality-browser.json",
+      "sha256": "f0370175784f670d5ecd32025eddc844482a527c1c812977c4a9e2af0ecafff2",
+      "checks": 10,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/gpu-word-audit.json",
+      "sha256": "6243be465ece39824bfa027d8deefbe2a0edf2df18ca5cc8cfd06d35d0b1ad28",
+      "checks": 0,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/renderer-switch-browser.json",
+      "sha256": "f36e78c6b98350ce1ce6e8dea3def70c6eec77b1406b97cdb95371d39e79e4da",
+      "checks": 14,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/skin-loader.json",
+      "sha256": "31ef2775fe2fe9cdbf7132dc246617b4f7c7fb074b44171b08e0ac396ecec42e",
+      "checks": 26,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/browser-skin-worker.json",
+      "sha256": "6dc3b6d2ee51499b87c586669f343f66531276b56196e7622f7d5c879b63c5bd",
+      "checks": null,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/full-skin-regeneration.json",
+      "sha256": "61953f3c4bc973dcbfacf45af11fb925b4d0df2762ecb9cb77390a17b35b2b4e",
+      "checks": null,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/calibration-export.json",
+      "sha256": "ab53effea9c97e3f5304235ee235d381cd19cc4838be9d0179f9ae3a92eb6565",
+      "checks": 20,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/calibration-neck.json",
+      "sha256": "99395455412d049afc1eed5c0fe1c4f57b0bad06674f6edb81cd07515ea7d095",
+      "checks": null,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/http-viewer.json",
+      "sha256": "71439b0a519b65f9e1b40c127a61be543fc06e81d6b9bd25820d294e6c6cbaf3",
+      "checks": 101,
+      "passed": true
+    }
+  ],
+  "comparisonEvidence": [
+    {
+      "file": "qa/fidelity-r24/exact-domain-verified-rays.json",
+      "sha256": "525126833fc6a59061def0af38d2394b592f8d476d76005351ac9448cbeed5f9",
+      "sourceFidelityAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/active-profiles-pixels-browser.json",
+      "sha256": "77cb3811e3d51dbe00c26f08839bc8c17baf698387bda0ca0489c836adf8d5ee",
+      "sourceFidelityAccepted": false
+    }
+  ],
+  "runtimeAssets": {
+    "count": 82,
+    "compressedBytes": 198754116,
+    "coefficientArrays": 57
+  },
+  "newUserFacingImageGallery": false,
+  "newInternalLayoutScreenshots": 1,
+  "notes": "Full runtime assets remain alongside the small HTML files. Git synchronization is not public web deployment. Never infer source acceptance from data identity, runtime checks or source-derived fixed states."
 }
