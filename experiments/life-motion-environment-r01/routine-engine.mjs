@@ -64,6 +64,22 @@ const consumesByTask=Object.freeze({
  'release-book-table':['holding-book']
 });
 export const RESIDENT_ROUTINE_R01=Object.freeze(rows.map(([id,skill,target,requires,produces,gates])=>Object.freeze({id,skill,target,requires:requires.split(' '),produces:produces.split(' '),consumes:[...(consumesByTask[id]||[])],gates:gates.split(' ')})));
+export function validateRoutineGraph(routine=RESIDENT_ROUTINE_R01,{initialFacts=['standing','hands-free']}={}){
+ const errors=[],ids=new Set();let facts=new Set(initialFacts);const trace=[];
+ if(!Array.isArray(routine)||routine.length===0)return{ok:false,errors:['empty-routine'],trace:[]};
+ for(let i=0;i<routine.length;i++){
+  const task=routine[i];
+  if(!task||typeof task.id!=='string'||!task.id) {errors.push({index:i,code:'invalid-task-id'});continue;}
+  if(ids.has(task.id))errors.push({index:i,taskId:task.id,code:'duplicate-task-id'});ids.add(task.id);
+  for(const key of ['requires','produces','gates'])if(!Array.isArray(task[key])||task[key].length===0||task[key].some(v=>typeof v!=='string'||!v))errors.push({index:i,taskId:task.id,code:'invalid-'+key});
+  const missing=(task.requires||[]).filter(f=>!facts.has(f));
+  if(missing.length)errors.push({index:i,taskId:task.id,code:'unsatisfied-precondition',missing});
+  for(const f of task.consumes||[])facts.delete(f);
+  for(const f of task.produces||[])facts.add(f);
+  trace.push({index:i,taskId:task.id,factsAfter:[...facts]});
+ }
+ return{ok:errors.length===0,errors,trace,taskCount:routine.length,uniqueTaskCount:ids.size,finalFacts:[...facts]};
+}
 const clone=x=>x==null?x:structuredClone(x), nonnegative=x=>Number.isFinite(x)&&x>=0, terminal=new Set(['completed','failed','cancelled']);
 export function validateObservation(task,o,limits=LIMITS){
  const failures=[];if(!o||typeof o!=='object')return{ok:false,failures:['missing-observation'],metrics:{}};const m=o.metrics||{};
