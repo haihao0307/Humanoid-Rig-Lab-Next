@@ -10,7 +10,7 @@ const variants=[['baseline',Baseline],['smoothed',Smoothed]],results=[];
 for(const [variant,Controller] of variants)for(const dt of dts)for(let offset=0;offset<targets.length;offset++){
  const c=new Controller(rig,new FlatWorld());let steps=0,faults=0,timeouts=0,maxYawRate=0,maxYawAcceleration=0,prevYaw=c.state.yaw,prevRate=0;
  const sequence=[...targets.slice(offset),...targets.slice(0,offset)];
- for(const yaw of sequence){
+ for(let repetition=0;repetition<10;repetition++)for(const yaw of sequence){
   const cmd=c.command({type:'turn',yaw});if(!cmd.accepted){results.push({variant,dt,offset,yaw,status:'rejected',reason:cmd.reason});continue;}
   let n=0;while(c.state.command&&n<6000&&!c.state.fault&&c.state.status!=='blocked'){
    c.update(dt);n++;steps++;
@@ -23,4 +23,4 @@ for(const [variant,Controller] of variants)for(const dt of dts)for(let offset=0;
  assert.equal(faults,0,JSON.stringify({variant,dt,offset,issue:'fault'}));assert.equal(timeouts,0,JSON.stringify({variant,dt,offset,issue:'timeout'}));
 }
 const summaries=results.filter(x=>x.status==='completed'),aggregate=Object.fromEntries(variants.map(([v])=>{const a=summaries.filter(x=>x.variant===v);return[v,{cases:a.length,steps:a.reduce((n,x)=>n+x.steps,0),maxYawRate:Math.max(...a.map(x=>x.maxYawRate)),maxYawAcceleration:Math.max(...a.map(x=>x.maxYawAcceleration))}]}));
-console.log(JSON.stringify({suite:'controller-turn-sequence-sweep',cases:summaries.length,anglesPerSequence:targets.length,timestepCount:dts.length,aggregate,results,limitations:['Kinematic yaw/foot-lock test only; no rendered full-body naturalness evidence']},null,2));
+console.log(JSON.stringify({suite:'controller-turn-sequence-sweep',cases:summaries.length,anglesPerSequence:targets.length,repetitionsPerCase:10,timestepCount:dts.length,aggregate,results,limitations:['Kinematic yaw/foot-lock test only; no rendered full-body naturalness evidence']},null,2));
