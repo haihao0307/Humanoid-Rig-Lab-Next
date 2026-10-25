@@ -22,7 +22,7 @@ const dt=1/120, results=[];
 let globalFrame=0;
 function quatYaw(yaw){return[0,Math.sin(yaw/2),0,Math.cos(yaw/2)];}
 for(let caseIndex=0;caseIndex<routes.length;caseIndex++){
- const world=new FlatWorld(obstacles),controller=new SmoothedController(rig,world);
+ const world=new FlatWorld([]),controller=new SmoothedController(rig,world);
  const trace={schema:TRACE_SCHEMA,frames:[]},anchors={left:null,right:null};let localFrame=0;
  const state=controller.state;
  const first=routes[caseIndex][0];
