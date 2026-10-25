@@ -5,7 +5,7 @@ Date: 2026-10-25
 ## Completed
 
 - Added an isolated 51-task resident routine covering two-way crate and book transfers, window operation, door operation and traversal, stair ascent/landing turn/descent, and return to idle.
-- Added precondition/fact checks, task checkpoints, monotonic progress checks, bounded retry, append-only event journal, and safe cancellation behavior when an object is still held.
+- Added precondition/fact checks with explicit consumed-state transitions, task checkpoints, monotonic progress checks, bounded retry, append-only event journal, held-object ownership verification, and safe cancellation behavior when an object is still held.
 - Added acceptance gates for contact, support, object settling, self/environment collision, foot slip, contact residual, joint-limit violation, penetration, pose velocity and pose acceleration.
 - Local Node.js checks passed. Contract test executed two full deterministic cycles: 102 verified task results. Failure recovery, rejected penetration, and held-object cancellation guard passed.
 
