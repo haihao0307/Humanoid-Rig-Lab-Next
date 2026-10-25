@@ -5,7 +5,7 @@ class FakeAdapter{
  constructor({failFirstObservation=false}={}){this.active=null;this.holdingObject=null;this.started=0;this.completed=0;this.restoreCount=0;this.failFirstObservation=failFirstObservation;this.observations=0;this.forceRunning=false;}
  checkpoint(){return{holdingObject:this.holdingObject,active:this.active};}
  startTask(task){this.active=task;this.started++;}
- stepTask(){if(this.forceRunning)return{status:'running',progress:0};this.completed++;if(this.active?.id==='grasp-crate')this.holdingObject='crate-01';if(this.active?.id==='grasp-book')this.holdingObject='book-01';if(this.active?.id==='release-crate'||this.active?.id==='release-book')this.holdingObject=null;return{status:'succeeded',progress:1};}
+ stepTask(){if(this.forceRunning)return{status:'running',progress:0};this.completed++;if(['grasp-crate','grasp-stored-crate'].includes(this.active?.id))this.holdingObject='crate-01';if(['grasp-book','grasp-book-shelf'].includes(this.active?.id))this.holdingObject='book-01';if(['release-crate','release-crate-table','release-book','release-book-table'].includes(this.active?.id))this.holdingObject=null;return{status:'succeeded',progress:1};}
  observe(){this.observations++;const failed=this.failFirstObservation&&this.observations===1;return{holdingObject:this.holdingObject,contactStable:!failed,gripOwnership:true,noPenetration:true,jointLimits:true,supportStable:true,selfCollisionFree:true,environmentCollisionFree:true,objectSupported:true,objectSettled:true,leftFootContact:true,rightFootContact:true,metrics:{...goodMetrics}};}
  restore(checkpoint){this.holdingObject=checkpoint.holdingObject;this.active=checkpoint.active;this.restoreCount++;}
  recover(){return true;}
@@ -15,7 +15,7 @@ assert(RESIDENT_ROUTINE_R01.length>=50,'routine must be materially longer than a
 assert(RESIDENT_ROUTINE_R01.some(t=>t.skill==='climb-stairs')&&RESIDENT_ROUTINE_R01.some(t=>t.skill==='operate-door')&&RESIDENT_ROUTINE_R01.some(t=>t.skill==='operate-window'));
 const adapter=new FakeAdapter(),runner=new LifeRoutineRunner(adapter);runner.start({repeatCount:2});let ticks=0;
 while(runner.state==='running'&&ticks<5000){runner.tick(1/60);ticks++;}
-assert.equal(runner.state,'completed');assert.equal(runner.cycle,2);assert.equal(runner.snapshot().journal.filter(e=>e.type==='task-verified').length,RESIDENT_ROUTINE_R01.length*2);assert.equal(adapter.holdingObject,null);assert.equal(adapter.started,RESIDENT_ROUTINE_R01.length*2);
+assert.equal(runner.state,'completed');assert.equal(runner.cycle,2);assert.equal(runner.snapshot().journal.filter(e=>e.type==='task-verified').length,RESIDENT_ROUTINE_R01.length*2);assert.equal(adapter.holdingObject,null);assert.equal(adapter.started,RESIDENT_ROUTINE_R01.length*2);assert.equal(runner.facts.has('holding-crate'),false);assert.equal(runner.facts.has('holding-book'),false);
 const one=[{id:'test-contact',skill:'reach',target:'test-object',requires:['standing'],produces:['contact-ok'],gates:['contactStable','noPenetration']}];
 const retryAdapter=new FakeAdapter({failFirstObservation:true}),retryRunner=new LifeRoutineRunner(retryAdapter,{routine:one,maxRetriesPerTask:1});retryRunner.start();
 let guard=0;const firstRetry=retryRunner.tick(1/60);assert.equal(firstRetry.retryScheduled,true,'one bounded retry should be scheduled after recoverable failure');
