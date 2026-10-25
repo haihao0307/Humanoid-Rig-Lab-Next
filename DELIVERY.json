@@ -1,6 +1,6 @@
 {
   "schema": "body-function-delivery/9",
-  "reviewedUTC": "2026-10-25T04:37:24.518Z",
+  "reviewedUTC": "2026-10-25T04:49:35.174Z",
   "selectedVersion": "R24",
   "status": "checked working candidate; source fidelity and full body reconstruction incomplete",
   "artifact": "delivery/身体_R24_原貌与原函数皮纹.html",
@@ -138,7 +138,7 @@
     {
       "priority": 0,
       "status": "incomplete",
-      "task": "完成原表面、边界、分层、法线、首交和整页外观的正式复刻验收；当前30组原版材质对照仍有边缘和局部像素差异，正式容差仍为null。"
+      "task": "先完成连续原表面、边界、分层、法线及首交复刻；旧连续隐式面已测得轮廓和遮挡差异，不能当作来源通过。原貌页30组材质对照仍有像素差异，正式容差仍为null。"
     },
     {
       "priority": 1,
@@ -169,8 +169,8 @@
   "evidence": [
     {
       "file": "qa/fidelity-r24/release-integrity.json",
-      "sha256": "85c94e6dc727da62b9c65963e9c785982e64f34710da59ffe2f168c7bcd717e5",
-      "checks": 314,
+      "sha256": "ddae0cb1cc3b9007d6636bcc14c39dd104acac621728aa6f79bd61ad4f2d2d5c",
+      "checks": 316,
       "passed": true
     },
     {
@@ -271,8 +271,8 @@
     },
     {
       "file": "qa/fidelity-r24/git-tree-rebuild.json",
-      "sha256": "cb654ffd09d3a0f85097450f7c650d339952ed92f61c166ef36791cf3ee63b24",
-      "checks": 86,
+      "sha256": "8983dbf652b58a198fee0e1ecabc2bb36a14aef6e70f8bb8f173cd874efbd00e",
+      "checks": 88,
       "passed": true
     }
   ],
@@ -355,6 +355,22 @@
       "measured independent skeleton"
     ]
   },
+  "continuousSourceFailureComparison": {
+    "views": 16,
+    "rays": 4933136,
+    "sourceOnlyRays": 591,
+    "continuousOnlyRays": 13796,
+    "maximumFirstHitDistanceDifferenceMetres": 0.7352923410977121,
+    "largeDistanceCanBeDifferentOccludingLayers": true,
+    "notActualSoftTissueDisplacement": true,
+    "sourceSamplesProbed": 37012,
+    "maximumAbsoluteRawScalarAtSourceSamples": 0.0049507306787590615,
+    "rawScalarIsCertifiedDistance": false,
+    "sourceFidelityAccepted": false,
+    "visualAccepted": false,
+    "acceptanceTolerance": null
+  },
+  "sourceDefaultPreservationScope": "Original person parameters and original pre-surface control samples are preserved; this does not establish continuous rendered-source-surface equivalence.",
   "researchAndProofEvidence": [
     {
       "file": "qa/fidelity-r24/exact-area-proof-baseline.json",
@@ -490,13 +506,25 @@
     },
     {
       "file": "qa/fidelity-r24/soft-research-build.json",
-      "sha256": "69e31231bc2696087252adf2d1374177d3c53e6d4d2626dd8a1fa38615c023c5",
+      "sha256": "b435d82679082b4d0602a765701d21461fca76aee7b80d4bc6171709907fba08",
       "sourceFidelityAccepted": false,
       "visualAccepted": false
     },
     {
       "file": "qa/fidelity-r24/soft-local-shape-diagnostic.json",
       "sha256": "243d1e6fb5ab167c32539458a6ea02f66c93e5a0bf07840d3b3428495e113a07",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/continuous-source-first-hit.json",
+      "sha256": "2c2861f05d6a2d533468a6d570c6b859f35fcd9439c2a649f9639ab31881da3f",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/continuous-source-field-probes.json",
+      "sha256": "668893f283074c934b3270af3b286b003daee1d84a117b0c2773f76675f8d057",
       "sourceFidelityAccepted": false,
       "visualAccepted": false
     }
