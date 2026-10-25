@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {auditMotionTrace,TRACE_SCHEMA,TRACE_LIMITS} from './motion-trace-audit.mjs';
+const makeTrace=()=>({schema:TRACE_SCHEMA,frames:Array.from({length:4},(_,i)=>({timeS:i/30,root:[i*.005,0,0],joints:{hips:{p:[i*.005,1,0],q:[0,0,0,1]},left_hand:{p:[.3+i*.003,1.2,.2],q:[0,0,0,1]}},contacts:{leftFoot:{active:true,anchor:[-.1,0,0],position:[-.1,0,0]},rightFoot:{active:true,anchor:[.1,0,0],position:[.1,0,0]},leftHand:{active:true,actualPosition:[.3+i*.003,1.2,.2],targetPosition:[.3+i*.003,1.2,.2]}},collisions:{selfPenetrationM:0,environmentPenetrationM:0},jointLimitViolationDeg:0}))});
+const good=auditMotionTrace(makeTrace());assert.equal(good.ok,true,JSON.stringify(good.errors));assert.equal(good.metrics.frameCount,4);assert(Math.abs(good.metrics.maxRootSpeedMps-.15)<1e-9);
+const collision=makeTrace();collision.frames[2].collisions.selfPenetrationM=.01;assert(auditMotionTrace(collision).errors.some(e=>e.code==='penetration'));
+const slip=makeTrace();slip.frames[1].contacts.leftFoot.position=[-.08,0,0];assert(auditMotionTrace(slip).errors.some(e=>e.code==='foot-slip'));
+const contact=makeTrace();contact.frames[1].contacts.leftHand.actualPosition=[.4,1.2,.2];assert(auditMotionTrace(contact).errors.some(e=>e.code==='hand-contact-error'));
+const limits=makeTrace();limits.frames[1].jointLimitViolationDeg=2;assert(auditMotionTrace(limits).errors.some(e=>e.code==='joint-limit-violation'));
+const timing=makeTrace();timing.frames[2].timeS=timing.frames[1].timeS;assert(auditMotionTrace(timing).errors.some(e=>e.code==='non-monotonic-time'));
+const missing=makeTrace();delete missing.frames[2].collisions;assert(auditMotionTrace(missing).errors.some(e=>e.code==='missing-or-invalid-collision-metric'));
+const tooFast=makeTrace();tooFast.frames[2].root=[2,0,0];assert(auditMotionTrace(tooFast).errors.some(e=>e.code==='linear-speed-limit'));
+const jointSet=makeTrace();delete jointSet.frames[2].joints.left_hand;assert(auditMotionTrace(jointSet).errors.some(e=>e.code==='joint-set-changed'));
+console.log(JSON.stringify({suite:'motion-trace-audit',validTrace:'passed',frameCount:4,negativeCases:8,checks:['penetration','foot-slip','hand-contact','joint-limits','non-monotonic-time','missing-collision-data','linear-speed','joint-set-change'],limits:TRACE_LIMITS,liveRuntimeTraceIntegrated:false,visualAcceptance:false},null,2));
