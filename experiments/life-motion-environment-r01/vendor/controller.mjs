@@ -8,8 +8,13 @@ const SIDES = ['left', 'right'];
 const horizontal = v => [v[0], 0, v[2]];
 
 export class MotionController {
-  constructor(rig, world = new FlatWorld()) {
+  constructor(rig, world = new FlatWorld(), options = {}) {
     this.rig = structuredClone(rig); this.world = world;
+    this.control = Object.freeze({
+      maxLinearAccelerationMps2: Number.isFinite(options.maxLinearAccelerationMps2) ? clamp(options.maxLinearAccelerationMps2, .1, 2.5) : .85,
+      maxYawAccelerationRadS2: Number.isFinite(options.maxYawAccelerationRadS2) ? clamp(options.maxYawAccelerationRadS2, .2, 5) : 2.2,
+      maxYawSpeedRadS: Number.isFinite(options.maxYawSpeedRadS) ? clamp(options.maxYawSpeedRadS, .2, 1.8) : 1.0,
+    });
     if (!['hipHalf', 'ankleHeight', 'hipHeight', 'torso'].every(k => Number.isFinite(rig[k]) && rig[k] > 0) || !SIDES.every(s => ['upper', 'lower'].every(k => Number.isFinite(rig.legs?.[s]?.[k]) && rig.legs[s][k] > 0))) throw Error('Invalid rig');
     this.motion = new FullBodyMotion(this.rig.nodes);
     this.reset();
@@ -70,7 +75,7 @@ export class MotionController {
       // displacement per frame, which bounded angular speed but allowed an
       // instantaneous angular-acceleration spike at turn start/stop.
       const yawError = angle(targetYaw - s.yaw);
-      const maxYawSpeed = 1.0, maxYawAcceleration = 2.2;
+      const maxYawSpeed = this.control.maxYawSpeedRadS, maxYawAcceleration = this.control.maxYawAccelerationRadS2;
       let wantedYawRate = Math.sign(yawError) * Math.min(maxYawSpeed, Math.sqrt(2 * maxYawAcceleration * Math.abs(yawError)));
       if (Math.abs(yawError) < .002) wantedYawRate = 0;
       // Start braking before a planted foot reaches its twist limit. Without
@@ -102,7 +107,7 @@ export class MotionController {
       const heading = rotateY([0, 0, 1], s.yaw);
       const desiredVelocity = c?.type === 'walk' ? mul(heading, wantedSpeed) : [0, 0, 0];
       const velocityDelta = sub(desiredVelocity, s.velocity || [0, 0, 0]);
-      const deltaSpeed = length(velocityDelta), maxLinearAcceleration = .85;
+      const deltaSpeed = length(velocityDelta), maxLinearAcceleration = this.control.maxLinearAccelerationMps2;
       const appliedDelta = deltaSpeed > maxLinearAcceleration * dt ? mul(velocityDelta, maxLinearAcceleration * dt / deltaSpeed) : velocityDelta;
       s.velocity = add(s.velocity || [0, 0, 0], appliedDelta); s.velocity[1] = 0;
       s.speed = length(horizontal(s.velocity));
