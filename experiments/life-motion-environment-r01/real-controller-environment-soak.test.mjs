@@ -30,7 +30,7 @@ function quatYaw(yaw){return[0,Math.sin(yaw/2),0,Math.cos(yaw/2)];}
 for(const [variant,Controller] of [['baseline',BaselineController],['smoothed',SmoothedController]]){
  let globalFrame=0; const direct={variant,maxLinearAccelerationMps2:0,maxYawAccelerationRadS2:0,maxLinearSpeedMps:0,maxYawRateRadS:0,velocityBoundViolations:0,yawBoundViolations:0};
  for(let caseIndex=0;caseIndex<routes.length;caseIndex++){
- const world=new FlatWorld([]),controller=new Controller(rig,world);
+ const world=new FlatWorld([]),controller=new Controller(rig,world); let prevRoot=[...controller.state.root],prevRootVelocity=[0,0,0],prevYaw=controller.state.yaw,prevYawRate=0;
  const trace={schema:TRACE_SCHEMA,frames:[]},anchors={left:null,right:null};let localFrame=0;
  const state=controller.state;
  const first=routes[caseIndex][0];
@@ -46,6 +46,11 @@ for(const [variant,Controller] of [['baseline',BaselineController],['smoothed',S
   let steps=0;
   while(controller.state.command&&steps<2400&&controller.state.status!=='blocked'&&!controller.state.fault){
    controller.update(dt);steps++;globalFrame++;localFrame++;
+   const currentRoot=[...controller.state.root],rootVelocity=[(currentRoot[0]-prevRoot[0])/dt,0,(currentRoot[2]-prevRoot[2])/dt];
+   const linearAcceleration=Math.hypot(rootVelocity[0]-prevRootVelocity[0],rootVelocity[2]-prevRootVelocity[2])/dt;
+   const yawRate=Math.atan2(Math.sin(controller.state.yaw-prevYaw),Math.cos(controller.state.yaw-prevYaw))/dt,yawAcceleration=Math.abs(yawRate-prevYawRate)/dt;
+   direct.maxLinearAccelerationMps2=Math.max(direct.maxLinearAccelerationMps2,linearAcceleration);direct.maxYawAccelerationRadS2=Math.max(direct.maxYawAccelerationRadS2,yawAcceleration);direct.maxLinearSpeedMps=Math.max(direct.maxLinearSpeedMps,Math.hypot(rootVelocity[0],rootVelocity[2]));direct.maxYawRateRadS=Math.max(direct.maxYawRateRadS,Math.abs(yawRate));
+   prevRoot=currentRoot;prevRootVelocity=rootVelocity;prevYaw=controller.state.yaw;prevYawRate=yawRate;
    if(controller.state.fault||controller.state.status==='blocked')break;
    const s=controller.snapshot(),joints={};
    for(const side of ['left','right']){
