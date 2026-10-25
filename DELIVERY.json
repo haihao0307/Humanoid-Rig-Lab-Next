@@ -1,20 +1,20 @@
 {
   "schema": "body-delivery-r25/1",
   "version": "R25",
-  "updatedUTC": "2026-10-25T06:59:32.267Z",
+  "updatedUTC": "2026-10-25T08:05:22.738Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
     "file": "delivery/身体_R25_精确原表面边界.html",
-    "sha256": "c0b4357d7a0389e5d8d79d988f9bd4ca6127f76c298a88e7988cd8f6aff94955",
-    "bytes": 846150,
-    "url": "http://127.0.0.1:8914/?v=R25-c0b4357d"
+    "sha256": "22e86e2b6d1fe5d500a552a08e038236bf12e52da090ad9fe689e9bb3acac13a",
+    "bytes": 846755,
+    "url": "http://127.0.0.1:8914/?v=R25-22e86e2b"
   },
   "workbench": {
     "file": "delivery/人物身体_R25_原貌与连续参数.html",
-    "sha256": "5a7de9139f464ffdd3cd0235978894170b0b39d7b919752709cd7b1ebee7ea65",
-    "bytes": 1735172,
-    "url": "http://127.0.0.1:8914/workbench?v=R25-5a7de913"
+    "sha256": "b15556429d5a082e8e9f0fc17d7a6b86b765745cdadd404aa4bf3a9e5b5b0015",
+    "bytes": 1735399,
+    "url": "http://127.0.0.1:8914/workbench?v=R25-b1555642"
   },
   "runtimeCharacterTriangleFaces": 0,
   "characterVertexBuffers": 0,
@@ -43,9 +43,21 @@
     "interactivePreviewPrecision": "Float32",
     "sharedTieAttributes": "lowest original function ID; native raster equivalence not certified"
   },
+  "sameCameraGeometryReuse": {
+    "enabled": true,
+    "requiresCompletedExactFrame": true,
+    "originalMaterialReevaluated": true,
+    "extraCPUSurfaceCache": false
+  },
   "sourceComparison": {
-    "referenceArtifactSHA256": "d2450b5c8d05e4cc6904721e0049aba39ee03183c43f039cb3d7b3ca8b3b0a8e",
-    "scope": "Frozen pre-dispatch-reference function viewer versus original native renderer; original material and mathematical kernel retained in current default. This is diagnostic, not an acceptance proof of arbitrary continuous states.",
+    "evidenceFile": "qa/fidelity-r25/native-source-pixels.json",
+    "evidenceSHA256": "f21bb74bd955ec6992f0539b87f0556e0bc037ca7f0c301c3ba34488cde4418c",
+    "backendDiagnosticFile": "qa/fidelity-r25/material-backend-comparison.json",
+    "backendDiagnosticSHA256": "2e6e7b2f79c4b11c9f9fece6d8606554985ab6b55e00b890790841f167333bcb",
+    "materialRootCauseEstablished": false,
+    "currentArtifactCompared": true,
+    "comparedFunctionArtifactSHA256": "22e86e2b6d1fe5d500a552a08e038236bf12e52da090ad9fe689e9bb3acac13a",
+    "scope": "Current selected function viewer versus original native renderer, with matched views and original shadow history. Diagnostic, not source acceptance.",
     "views": 30,
     "maximumRGBCodeDifference": 129,
     "sourceFidelityAccepted": false
@@ -53,20 +65,20 @@
   "evidence": [
     {
       "file": "qa/fidelity-r25/release-integrity.json",
-      "sha256": "b0cee1a25a5e7e66352eba84e6c286caf11c0492ee4cc9a81a20edbaa5a6d649",
+      "sha256": "7acca69b35426f219b3ff2df2b47cb578376a25ebca372ecefa2b91ee4eb981d",
       "checks": 174,
       "passed": true
     },
     {
       "file": "qa/fidelity-r25/source-browser.json",
-      "sha256": "27d752c7b2c6bb392a5dc355686696b76278b866f5caed1e5e027422fd3e9046",
-      "checks": 27,
+      "sha256": "04f9b00ac77e5fb031d6e130159450cbb88ca70201b3c83f9286277f469e4c31",
+      "checks": 30,
       "passed": true
     },
     {
       "file": "qa/fidelity-r25/workbench-browser.json",
-      "sha256": "3bac44b695f44e934340f1c90969887b0b49a6e597b59309204e25f8dd93b771",
-      "checks": 40,
+      "sha256": "dfc6b90376d3e735c073cd2862442259d7a19d09b561054a49562bbc9167bf50",
+      "checks": 44,
       "passed": true
     },
     {
@@ -77,20 +89,26 @@
     },
     {
       "file": "qa/fidelity-r25/head-archive-browser.json",
-      "sha256": "6a4ecf989e8114ad5753a0798a7bc745cfde21b67433f701cf300644e3b23aec",
+      "sha256": "349235c0148b562df68581ca89ba7996faab3380a6d341a6c64aace7cf0c0161",
       "checks": 10,
       "passed": true
     },
     {
       "file": "qa/fidelity-r25/exact-browser.json",
-      "sha256": "621b3e3f5ec9dbf295e70f4a2487f3bd725af87b1f27299bb2f76e84eeaadaa1",
+      "sha256": "18ac1ba5f287c827711d3c660c68a97f2fdb4220146ebd6eab71236879311264",
       "checks": null,
       "passed": true
     },
     {
       "file": "qa/fidelity-r25/http-viewer.json",
-      "sha256": "b1f8ed8b14fd4de089ddf34fb5daefa2d84b307080e1370ddf19e6dc952e16c3",
+      "sha256": "6d35fa67814f9bd9b595b238322aa048a080f5a0965b6f2337a687d36dc0c115",
       "checks": 99,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r25/git-tree-rebuild.json",
+      "sha256": "731560929975dd3b7cc1fd46812b6a2244ba1a1199586a0ffb3d7e2501213b08",
+      "checks": 6,
       "passed": true
     }
   ],
@@ -102,7 +120,12 @@
     "dynamicRowScheduler": false,
     "originPredicateCache": false,
     "branchlessMaterial": false,
-    "nicestDerivativeMaterial": false
+    "nicestDerivativeMaterial": false,
+    "outerBoundsFilter": false,
+    "skipFractionFormatting": false,
+    "noQuadMaterial": false,
+    "fullTextureRespecification": false,
+    "separatePrecisionTextures": false
   },
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
@@ -133,7 +156,7 @@
     {
       "priority": 4,
       "status": "partial",
-      "task": "已跳过匹配状态的旧隐式场、释放非活动GPU字段，并复用表面编辑的精确几何。全系统局部更新、精细模式显存、动态阴影和完整体积散射未完成；额外调度与材质试验隔离。"
+      "task": "已跳过匹配状态的旧隐式场、释放非活动GPU字段，并复用表面编辑及重复同机位的精确几何。全系统局部更新、精细模式显存、动态阴影和完整体积散射未完成；额外调度与材质试验隔离。"
     },
     {
       "priority": 5,
