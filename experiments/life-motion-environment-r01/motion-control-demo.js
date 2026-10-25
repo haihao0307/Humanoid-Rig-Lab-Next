@@ -1,5 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
-import {MotionController} from 'https://cdn.jsdelivr.net/gh/haihao0307/Humanoid-Rig-Lab-Next@75bd3c6ed3ec3de843cfbb24127e8c4d887b755f/experiments/life-motion-environment-r01/vendor/controller.mjs';
+import {MotionController} from 'https://cdn.jsdelivr.net/gh/haihao0307/Humanoid-Rig-Lab-Next@ca5ad6d1fc2d8e09dce50f1d2d7daebf5cc18383/experiments/life-motion-environment-r01/vendor/controller.mjs';
 import {rigFromSource} from 'https://cdn.jsdelivr.net/gh/haihao0307/Humanoid-Rig-Lab-Next@75bd3c6ed3ec3de843cfbb24127e8c4d887b755f/motion/vendor/rig.mjs';
 import {FlatWorld} from 'https://cdn.jsdelivr.net/gh/haihao0307/Humanoid-Rig-Lab-Next@75bd3c6ed3ec3de843cfbb24127e8c4d887b755f/motion/vendor/world.mjs';
 const $=id=>document.getElementById(id),stage=$('stage');
