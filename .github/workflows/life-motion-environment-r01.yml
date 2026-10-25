@@ -33,6 +33,7 @@ jobs:
       - name: Syntax-check isolated routine
         run: |
           node --check experiments/life-motion-environment-r01/routine-engine.mjs
+          node --check experiments/life-motion-environment-r01/motion-control-demo.js
           node --check experiments/life-motion-environment-r01/routine-engine.test.mjs
           node --check experiments/life-motion-environment-r01/motion-trace-audit.mjs
           node --check experiments/life-motion-environment-r01/motion-trace-audit.test.mjs
