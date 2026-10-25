@@ -114,7 +114,7 @@ export class MotionController {
       const feetAligned = SIDES.every(side => distance(s.feet[side].position, this.stance(s, side)) < .055 && Math.abs(angle(s.yaw - s.feet[side].yaw)) < .08);
       const remainingAfterMove = c?.type === 'walk' ? length(horizontal(sub(c.target, s.root))) : 0;
       const atGoal = c?.type === 'walk' ? remainingAfterMove <= .015 : c?.type === 'turn' ? Math.abs(angle(c.yaw - s.yaw)) < .015 : true;
-      if (s.speed < .02 && !s.swing && feetAligned && atGoal) {
+      if (s.speed < .005 && !s.swing && feetAligned && atGoal) {
         s.speed = 0; s.velocity = [0, 0, 0];
         if (c && c.type !== 'stop') s.metrics.completed++;
         s.command = null; s.status = 'idle';
