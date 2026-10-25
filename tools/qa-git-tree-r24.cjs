@@ -37,7 +37,7 @@ try{
  }
  if(fs.existsSync(path.join(folder,'qa/fidelity-r24/rational-domain-data.json'))){
   const report=JSON.parse(cp.execFileSync(process.execPath,['tools/research/r24/check-rational-bundle.cjs'],{cwd:folder,encoding:'utf8',timeout:120000}));
-  check('committed exact source-function research needs no offline original',report.passed&&report.exactRationalCases===168&&report.offlineOriginalInputsRead===false&&report.defaultBuildSelected===false&&report.displayIntegrationComplete===false);
+  check('committed exact source-function research needs no offline original',report.passed&&report.exactRationalCases===420&&report.offlineOriginalInputsRead===false&&report.defaultBuildSelected===false&&report.displayIntegrationComplete===false);
   q.rationalFunctionResearch=report;
  }
  q.assetCount=assets.length;q.assetCompressedBytes=assets.reduce((n,a)=>n+a.bytes,0);q.ignoredReferenceInputsRead=false;q.externalRuntimeDownloads=0;q.sourceSHA256=source.sha256;q.workbenchSHA256=workbench.sha256;q.passed=true;

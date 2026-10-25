@@ -1,6 +1,6 @@
 {
   "schema": "body-function-delivery/9",
-  "reviewedUTC": "2026-10-25T05:05:18.201Z",
+  "reviewedUTC": "2026-10-25T05:12:03.666Z",
   "selectedVersion": "R24",
   "status": "checked working candidate; source fidelity and full body reconstruction incomplete",
   "artifact": "delivery/身体_R24_原貌与原函数皮纹.html",
@@ -138,7 +138,7 @@
     {
       "priority": 0,
       "status": "incomplete",
-      "task": "先完成连续原表面、边界、分层、法线及首交复刻；旧连续隐式面已测得轮廓和遮挡差异，不能当作来源通过。原貌页共享边界漏命中已由精确参照证实，整数函数核仅四档168例通过、尚未接入显示；30组材质仍有像素差异，正式容差仍为null。"
+      "task": "先完成连续原表面、边界、分层、法线及首交复刻；旧连续隐式面已测得轮廓和遮挡差异，不能当作来源通过。原貌页共享边界漏命中已由精确参照证实，整数函数核已补齐十档420例、尚未接入显示；30组材质仍有像素差异，正式容差仍为null。"
     },
     {
       "priority": 1,
@@ -169,7 +169,7 @@
   "evidence": [
     {
       "file": "qa/fidelity-r24/release-integrity.json",
-      "sha256": "6d9f010d1611a6881b940fcf4b3018d859cabacf40361f8014af9d9b3cd181f8",
+      "sha256": "c8b42721e33c4bc893ebf5487e01feff6fc9a3f2a78d668b29926100839c0c49",
       "checks": 319,
       "passed": true
     },
@@ -271,8 +271,8 @@
     },
     {
       "file": "qa/fidelity-r24/git-tree-rebuild.json",
-      "sha256": "aee4dfcb33e03734dacf6f182a85c66c47fc0d9470bed47c05088e46dd39d774",
-      "checks": 88,
+      "sha256": "c2fbddd44225f612d41e92b9670c7980febee55dcc62df3758881531a6e731b3",
+      "checks": 89,
       "passed": true
     }
   ],
@@ -372,32 +372,41 @@
   },
   "sourceDefaultPreservationScope": "Original person parameters and original pre-surface control samples are preserved; this does not establish continuous rendered-source-surface equivalence.",
   "sourceBoundaryResearch": {
-    "directedProfiles": 4,
-    "directedRays": 664044,
-    "floatOracleCoverageDisagreements": 1037,
-    "loggedCasesTriagedByExactOriginal": 168,
-    "currentCandidateCoverageDisagreementsWithExactOriginal": 126,
-    "floatOracleCoverageDisagreementsWithExactOriginal": 2,
-    "currentCandidateWrongFirstSourceCells": 21,
+    "directedProfiles": 10,
+    "directedRays": 1660110,
+    "floatOracleCoverageDisagreements": 2552,
+    "loggedCasesTriagedByExactOriginal": 420,
+    "currentCandidateCoverageDisagreementsWithExactOriginal": 314,
+    "floatOracleCoverageDisagreementsWithExactOriginal": 6,
+    "currentCandidateWrongFirstSourceCells": 51,
     "simpleClosedIntervalTrialAdopted": false,
     "integerFunctionKernel": {
-      "exactLoggedCases": 168,
-      "checks": 21,
+      "exactLoggedCases": 420,
+      "checks": 51,
       "actualBrowserAndNode": true,
       "exactParameterAndFloat64RoundingMatch": true,
       "data": {
         "schema": "body-rational-domain-research-data/1",
         "file": "data/body-rational-domains-research-r24.json.gz",
-        "compressedBytes": 10888957,
-        "compressedSHA256": "49fdc7c45bcf9b9ca48cc64e31aac8b131ed7686f4e629a73dc779b4475361fe",
-        "rawBytes": 42902319,
-        "rawSHA256": "d665d48b03c9f0559a0d3a15d0f3569ab72d650a6b8718fb6cd417154317f858",
+        "compressedBytes": 27454400,
+        "compressedSHA256": "19798376b9e537d6f74fbf420ec4d511c62396caaa26e4e5830835d5acc1780d",
+        "rawBytes": 109477964,
+        "rawSHA256": "a9666aebd240ea06938531f39c8f5674b97b5799599be825afc363dee185ce09",
         "profiles": [
           "baseline",
-          "calibration-soft",
+          "lean",
+          "fuller",
+          "muscular",
+          "female",
           "A-joints",
-          "B-bend"
+          "A-reach",
+          "B-neutral",
+          "B-bend",
+          "calibration-soft"
         ],
+        "referenceFile": "qa/fidelity-r24/source-boundary-rational-all.json",
+        "referenceSHA256": "ab1ad12e33522cedc4f13a1c4f64684693e441588da711ec78d6b81e39ed43bf",
+        "exactRationalCases": 420,
         "runtimeCharacterFaces": 0,
         "sourceFacetPartitionInformationRetained": true,
         "completedMotherConversion": false,
@@ -408,7 +417,7 @@
       },
       "selectedByDefault": false,
       "displayIntegrationComplete": false,
-      "otherSixProfilesImplemented": false,
+      "allTenFixedProfilesImplemented": true,
       "allContinuousRaysProven": false,
       "sourceFacetPartitionInformationRetained": true,
       "completedMotherConversion": false,
@@ -599,13 +608,25 @@
     },
     {
       "file": "qa/fidelity-r24/rational-domain-data.json",
-      "sha256": "0c3d203e22901555fadae64978b2eadc4b2ae74aac05bb5b4013c3f77c417801",
+      "sha256": "cad27a4623fb4518435d8449b70132945a015e039ad9966f3f28a04b9b7f4910",
       "sourceFidelityAccepted": false,
       "visualAccepted": false
     },
     {
       "file": "qa/fidelity-r24/rational-domain-kernel.json",
-      "sha256": "859dc8e187dafddd4e8a5b994084d9381ab900317bf04f7497d3dd24d0b36870",
+      "sha256": "ebfb7de1b1ffe2774c02ea1c7458949a6ce7ef5d7f61daa5d8e028ac0746d582",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-rays-all.json",
+      "sha256": "d8a8b0bac86d425b3b59c3d186e51b051977b5419a68f68aed0769b8d8723664",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-rational-all.json",
+      "sha256": "ab1ad12e33522cedc4f13a1c4f64684693e441588da711ec78d6b81e39ed43bf",
       "sourceFidelityAccepted": false,
       "visualAccepted": false
     },
@@ -616,8 +637,26 @@
       "visualAccepted": false
     },
     {
-      "file": "qa/fidelity-r24/rational-domain-prototype-calibration-soft.json",
-      "sha256": "31d692dcef71ba6cc1fd45ffa65e25c06c1da45642ad6126cd7dfaacade1ddd4",
+      "file": "qa/fidelity-r24/rational-domain-prototype-lean.json",
+      "sha256": "f76c10f5a958c6bd356939075ac0d6ec1dfa7e9d3eade42bc525d360c1cbe72d",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-fuller.json",
+      "sha256": "5d161599382ed19d525417fb98f3a090b6946a240507354cca303719ad169983",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-muscular.json",
+      "sha256": "662cbb3f513830cbf79e3673d828b87a84834a5733b9876771a674f548f951ac",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-female.json",
+      "sha256": "38b0db54aee2067771871dfc0bd5f178e306d1cc3b6071b0f4e5e63994b5a6b6",
       "sourceFidelityAccepted": false,
       "visualAccepted": false
     },
@@ -628,8 +667,26 @@
       "visualAccepted": false
     },
     {
+      "file": "qa/fidelity-r24/rational-domain-prototype-A-reach.json",
+      "sha256": "0820f154a6b8813a5aab76d93407f9dd8d2b1345cfff98d56df632ab788d81bf",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-B-neutral.json",
+      "sha256": "cf4949029065324095261a14922ae1b448adc1fcb479c76ff35bfb913a398e36",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
       "file": "qa/fidelity-r24/rational-domain-prototype-B-bend.json",
       "sha256": "4bcdbe9cb4ebe4b583d04d4c1525ff9f28f18587664e7cb7a43f58c97635c3b5",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-calibration-soft.json",
+      "sha256": "31d692dcef71ba6cc1fd45ffa65e25c06c1da45642ad6126cd7dfaacade1ddd4",
       "sourceFidelityAccepted": false,
       "visualAccepted": false
     }

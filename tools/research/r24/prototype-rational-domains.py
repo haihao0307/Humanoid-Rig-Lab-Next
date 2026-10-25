@@ -8,7 +8,7 @@ retains original facet partition information and is not an autonomous mother.
 from pathlib import Path
 from fractions import Fraction as F
 from math import gcd,lcm
-import json,sys,hashlib,time
+import json,sys,hashlib,time,os
 root=Path(__file__).resolve().parents[3];profile=sys.argv[1] if len(sys.argv)>1 else 'baseline';started=time.monotonic()
 source=(root/'tools/compile-source-atlas-r21.py').read_text(encoding='utf8');helper=(root/'tools/research/r24/exact-domain-functions.py').read_text(encoding='utf8')
 begin=source.index('def signed_area(');end=source.index('def node_leaf(');source=source[:begin]+helper+'\nexact_lines={}\n'+source[end:]
@@ -65,7 +65,7 @@ def function_ray(origin,direction):
     elif b is not None and split>b:stack.append((near,a,b))
     else:stack.append((far,split,b));stack.append((near,a,split))
  return best,sorted(best_ids)
-triage=json.loads((root/'qa/fidelity-r24/source-boundary-rational-triage.json').read_text(encoding='utf8'));reference=next(p for p in triage['profiles']if p['id']==profile);cases=[]
+triage=json.loads((root/os.environ.get('BODY_RATIONAL_TRIAGE','qa/fidelity-r24/source-boundary-rational-triage.json')).read_text(encoding='utf8'));reference=next(p for p in triage['profiles']if p['id']==profile);cases=[]
 for item in reference['cases']:
  t,ids=function_ray(list(map(fraction,item['origin'])),list(map(fraction,item['direction'])));expected=item['exactDistanceRational'];expected=F(int(expected['numerator']),int(expected['denominator']))if expected else None
  cases.append({'kind':item['kind'],'sourceId':item['sourceId'],'slant':item['slant'],'coverageExactlyMatchesOriginal':(t is None)==(expected is None),'firstDistanceExactlyMatchesOriginal':t==expected,'functionIDs':ids,'functionsRemainSourceDerived':True})
