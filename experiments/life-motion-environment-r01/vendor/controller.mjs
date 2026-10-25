@@ -57,9 +57,11 @@ export class MotionController {
     try {
       let wantedSpeed = 0, targetYaw = s.yaw;
       const remaining = c?.type === 'walk' ? length(horizontal(sub(c.target, s.root))) : 0;
-      if (c?.type === 'walk' && remaining > .015) {
+      if (c?.type === 'walk' && remaining > .002) {
         const d = sub(c.target, s.root); targetYaw = Math.atan2(d[0], d[2]);
-        wantedSpeed = Math.min(.48, Math.sqrt(2 * .9 * remaining)) * clamp(1 - Math.abs(angle(targetYaw - s.yaw)) / .6, 0, 1);
+        // Match the stopping-speed envelope to the actual acceleration bound.
+        // This avoids reaching the goal at speed and clipping the final displacement.
+        wantedSpeed = Math.min(.48, Math.sqrt(2 * .42 * remaining)) * clamp(1 - Math.abs(angle(targetYaw - s.yaw)) / .6, 0, 1);
       }
       if (c?.type === 'turn') targetYaw = c.yaw;
       // Planted foot orientation constrains root turn. The stepping scheduler
@@ -89,8 +91,9 @@ export class MotionController {
       const appliedDelta = deltaSpeed > maxLinearAcceleration * dt ? mul(velocityDelta, maxLinearAcceleration * dt / deltaSpeed) : velocityDelta;
       s.velocity = add(s.velocity || [0, 0, 0], appliedDelta); s.velocity[1] = 0;
       s.speed = length(horizontal(s.velocity));
-      let travelVector = mul(s.velocity, dt);
-      if (c?.type === 'walk' && length(horizontal(travelVector)) > remaining) travelVector = mul(normalize(horizontal(travelVector)), remaining);
+      const travelVector = mul(s.velocity, dt);
+      // Never teleport/snap the root to the target. Let the acceleration-limited
+      // velocity profile settle inside the goal tolerance.
       const sweep = this.world.sweep(s.root, add(s.root, travelVector), .23);
       s.root = sweep.position;
       if (sweep.blocked) { s.speed = 0; s.velocity = [0, 0, 0]; s.status = 'blocked'; }
@@ -109,8 +112,10 @@ export class MotionController {
         if (prior.feet[side].contact && foot.contact && distance(prior.feet[side].position, foot.position) > 1e-8) throw Error('支撑脚锚点发生漂移');
       }
       const feetAligned = SIDES.every(side => distance(s.feet[side].position, this.stance(s, side)) < .055 && Math.abs(angle(s.yaw - s.feet[side].yaw)) < .08);
-      const atGoal = c?.type === 'walk' ? remaining <= .015 : c?.type === 'turn' ? Math.abs(angle(c.yaw - s.yaw)) < .015 : true;
-      if (s.speed < .001 && !s.swing && feetAligned && atGoal) {
+      const remainingAfterMove = c?.type === 'walk' ? length(horizontal(sub(c.target, s.root))) : 0;
+      const atGoal = c?.type === 'walk' ? remainingAfterMove <= .015 : c?.type === 'turn' ? Math.abs(angle(c.yaw - s.yaw)) < .015 : true;
+      if (s.speed < .02 && !s.swing && feetAligned && atGoal) {
+        s.speed = 0; s.velocity = [0, 0, 0];
         if (c && c.type !== 'stop') s.metrics.completed++;
         s.command = null; s.status = 'idle';
       }
