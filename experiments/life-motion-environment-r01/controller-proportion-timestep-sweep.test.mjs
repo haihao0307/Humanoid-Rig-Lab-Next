@@ -13,7 +13,7 @@ for(const [variant,Controller] of variants)for(let si=0;si<scales.length;si++)fo
  const scale=scales[si],dt=dts[di],hipWidthScale=[.88,.94,1,1.06,1.12][(si+di)%5],rig=makeRig(scale,hipWidthScale),controller=new Controller(rig,new FlatWorld());
  let commands=0,steps=0,faults=0,timeouts=0,blocked=0,maxRootSpeed=0,maxRootAcceleration=0,maxYawSpeed=0,maxYawAcceleration=0;
  let prevRoot=[...controller.state.root],prevVel=[0,0,0],prevYaw=controller.state.yaw,prevYawRate=0;const route=routes[(si+di)%routes.length];
- for(let lap=0;lap<2;lap++)for(let ri=1;ri<route.length;ri++){
+ for(let lap=0;lap<20;lap++)for(let ri=1;ri<route.length;ri++){
   const target=route[ri],cmd=controller.command({type:'walk',target});if(!cmd.accepted){results.push({variant,scale,dt,lap,ri,status:'rejected',reason:cmd.reason});continue;}
   let local=0;while(controller.state.command&&local<6000&&!controller.state.fault&&controller.state.status!=='blocked'){
    controller.update(dt);local++;steps++;const root=controller.state.root,vel=[(root[0]-prevRoot[0])/dt,0,(root[2]-prevRoot[2])/dt],acc=Math.hypot(vel[0]-prevVel[0],vel[2]-prevVel[2])/dt;
@@ -30,4 +30,4 @@ for(const [variant,Controller] of variants)for(let si=0;si<scales.length;si++)fo
  assert.equal(faults,0,JSON.stringify({variant,scale,dt,problem:'fault'}));assert.equal(timeouts,0,JSON.stringify({variant,scale,dt,problem:'timeout'}));
 }
 const summaries=results.filter(x=>x.status==='case-summary'),aggregate=Object.fromEntries(variants.map(([v])=>{const a=summaries.filter(x=>x.variant===v);return[v,{cases:a.length,commands:a.reduce((n,x)=>n+x.commands,0),steps:a.reduce((n,x)=>n+x.steps,0),maxRootSpeed:Math.max(...a.map(x=>x.maxRootSpeed)),maxRootAcceleration:Math.max(...a.map(x=>x.maxRootAcceleration)),maxYawSpeed:Math.max(...a.map(x=>x.maxYawSpeed)),maxYawAcceleration:Math.max(...a.map(x=>x.maxYawAcceleration)),blocked:a.reduce((n,x)=>n+x.blocked,0)}]}));
-console.log(JSON.stringify({suite:'controller-proportion-timestep-sweep',caseCount:summaries.length,scaleCount:scales.length,timestepCount:dts.length,routeTemplates:routes.length,passesPerCase:2,aggregate,results,limitations:['Source-level kinematic controller testing, not rendered-skin or full manipulation physics','Anthropometric sweep scales leg proportions and hip width only; it is not a validated full-body morphology model']},null,2));
+console.log(JSON.stringify({suite:'controller-proportion-timestep-sweep',caseCount:summaries.length,scaleCount:scales.length,timestepCount:dts.length,routeTemplates:routes.length,passesPerCase:20,aggregate,results,limitations:['Source-level kinematic controller testing, not rendered-skin or full manipulation physics','Anthropometric sweep scales leg proportions and hip width only; it is not a validated full-body morphology model']},null,2));
