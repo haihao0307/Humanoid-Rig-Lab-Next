@@ -1,0 +1,3 @@
+'use strict';
+const fs=require('fs');
+for(const name of ['BodyOriginalSkinR26','BodyAtlasRayR26']){let s=fs.readFileSync('src/'+name+'.js','utf8');if(name==='BodyOriginalSkinR26'){const a='const names={enabled:';if(!s.includes(a))throw Error('Original shader control entry missing');s=s.replace(a,"const names={originalRoughness:'csRoughness',originalOil:'csOil',originalDetail:'csDetail',originalVariation:'csVariation',originalRedness:'csRedness',originalOilFilm:'personOilFilm',enabled:");}else{s=s.replace('return{sourceLightingR26(values)','return{originalMaterialR26(values){if(!own)throw Error("Original skin unavailable");own.appearance(values);if(diagnostic===12)own.redraw();},sourceLightingR26(values)');}fs.writeFileSync('src/'+name+'.js',s);}

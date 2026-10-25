@@ -1,0 +1,18 @@
+{
+  "checkedUTC": "2026-10-25T10:30:59.693Z",
+  "auditFractionFormatting": {
+    "selectedByDefault": false,
+    "report": "qa/fidelity-r26/audit-kernel.json",
+    "reason": "Output parity is not performance acceptance; paired CPU rounds did not establish a stable net benefit"
+  },
+  "mrtMaterial": {
+    "selectedByDefault": false,
+    "stableRedrawReport": "qa/fidelity-r26/mrt-comparison.json",
+    "coldReport": "qa/fidelity-r26/mrt-cold-comparison.json",
+    "nativePerformanceReport": "qa/fidelity-r26/mrt-native-performance.json",
+    "reason": "Cold colour/depth control did not fully match; original self-variance remains. Native paired distributions overlap and one slow original round includes exact jobs. No production replacement or FPS multiplier claimed"
+  },
+  "preservedExactKernel": "R25",
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false
+}

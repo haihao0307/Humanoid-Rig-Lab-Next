@@ -1,0 +1,267 @@
+{
+  "startedUTC": "2026-10-25T09:19:36.762Z",
+  "scope": "Exact-root audit-text optimization only; no geometric, boundary or attribute simplification",
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "profiles": [
+    {
+      "id": "baseline",
+      "rays": 30603,
+      "differences": 0
+    },
+    {
+      "id": "lean",
+      "rays": 30603,
+      "differences": 0
+    },
+    {
+      "id": "fuller",
+      "rays": 30603,
+      "differences": 0
+    },
+    {
+      "id": "muscular",
+      "rays": 30603,
+      "differences": 0
+    },
+    {
+      "id": "female",
+      "rays": 30603,
+      "differences": 0
+    },
+    {
+      "id": "A-joints",
+      "rays": 30603,
+      "differences": 0
+    },
+    {
+      "id": "A-reach",
+      "rays": 30603,
+      "differences": 0
+    },
+    {
+      "id": "B-neutral",
+      "rays": 30603,
+      "differences": 0
+    },
+    {
+      "id": "B-bend",
+      "rays": 30603,
+      "differences": 0
+    },
+    {
+      "id": "calibration-soft",
+      "rays": 30603,
+      "differences": 0
+    }
+  ],
+  "timing": [
+    {
+      "profile": "baseline",
+      "scope": "CPU kernel only; excludes browser, GPU, upload and full scene FPS",
+      "rounds": [
+        {
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "baseline": {
+            "ms": 18353.189400000032,
+            "sum": 7364.933296209583
+          },
+          "candidate": {
+            "ms": 19344.3125,
+            "sum": 7364.933296209583
+          }
+        },
+        {
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "candidate": {
+            "ms": 18942.48179999995,
+            "sum": 7364.933296209583
+          },
+          "baseline": {
+            "ms": 19509.415099999984,
+            "sum": 7364.933296209583
+          }
+        },
+        {
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "baseline": {
+            "ms": 21157.569099999964,
+            "sum": 7364.933296209583
+          },
+          "candidate": {
+            "ms": 23008.963699999964,
+            "sum": 7364.933296209583
+          }
+        },
+        {
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "candidate": {
+            "ms": 26946.778600000078,
+            "sum": 7364.933296209583
+          },
+          "baseline": {
+            "ms": 25282.795900000026,
+            "sum": 7364.933296209583
+          }
+        }
+      ]
+    },
+    {
+      "profile": "A-joints",
+      "scope": "CPU kernel only; excludes browser, GPU, upload and full scene FPS",
+      "rounds": [
+        {
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "baseline": {
+            "ms": 25185.151700000046,
+            "sum": 7567.035284196827
+          },
+          "candidate": {
+            "ms": 27888.558499999926,
+            "sum": 7567.035284196827
+          }
+        },
+        {
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "candidate": {
+            "ms": 26812.790700000012,
+            "sum": 7567.035284196827
+          },
+          "baseline": {
+            "ms": 22873.993600000045,
+            "sum": 7567.035284196827
+          }
+        },
+        {
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "baseline": {
+            "ms": 20127.99179999996,
+            "sum": 7567.035284196827
+          },
+          "candidate": {
+            "ms": 20261.153900000034,
+            "sum": 7567.035284196827
+          }
+        },
+        {
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "candidate": {
+            "ms": 26218.1865999999,
+            "sum": 7567.035284196827
+          },
+          "baseline": {
+            "ms": 27924.80190000008,
+            "sum": 7567.035284196827
+          }
+        }
+      ]
+    },
+    {
+      "profile": "B-bend",
+      "scope": "CPU kernel only; excludes browser, GPU, upload and full scene FPS",
+      "rounds": [
+        {
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "baseline": {
+            "ms": 28525.39040000015,
+            "sum": 6906.112547172135
+          },
+          "candidate": {
+            "ms": 29566.534599999897,
+            "sum": 6906.112547172135
+          }
+        },
+        {
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "candidate": {
+            "ms": 27379.050400000066,
+            "sum": 6906.112547172135
+          },
+          "baseline": {
+            "ms": 20860.464500000002,
+            "sum": 6906.112547172135
+          }
+        },
+        {
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "baseline": {
+            "ms": 20549.72999999998,
+            "sum": 6906.112547172135
+          },
+          "candidate": {
+            "ms": 20773.315500000026,
+            "sum": 6906.112547172135
+          }
+        },
+        {
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "candidate": {
+            "ms": 21210.94250000012,
+            "sum": 6906.112547172135
+          },
+          "baseline": {
+            "ms": 21391.563700000057,
+            "sum": 6906.112547172135
+          }
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "sourceFiles": [
+    {
+      "file": "src/BodyExactDomainR25.js",
+      "sha256": "b50161c0867cb913bdc6117971fcb7046a6bdec7c493f5b364b2f2f35481f295"
+    },
+    {
+      "file": "src/BodyFilteredDomainR25.js",
+      "sha256": "d495228a5f56cf390fd7b22bea9c218d7fcf763c0bfa596e1bf7d87c479fc393"
+    },
+    {
+      "file": "src/research/r26/BodyExactAuditR26.js",
+      "sha256": "860a8fbd4e94cde0864cf913b44e333c71423047189a2663c72ba40e6cd974db"
+    },
+    {
+      "file": "src/research/r26/BodyFilteredAuditR26.js",
+      "sha256": "f1f9141afb5ddef53567cc6226e6ccddcd517c1953da4e306df47a5a690e35bc"
+    }
+  ],
+  "passed": true,
+  "finishedUTC": "2026-10-25T09:41:54.046Z"
+}

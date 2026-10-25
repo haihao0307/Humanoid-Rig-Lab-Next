@@ -137,10 +137,10 @@
   },
   "originalEB1LightsAndEnvironmentRestored": true,
   "schema": "body-source-atlas-viewer/2",
-  "builtUTC": "2026-10-25T07:54:19.351Z",
-  "file": "delivery/身体_R25_精确原表面边界.html",
-  "sha256": "22e86e2b6d1fe5d500a552a08e038236bf12e52da090ad9fe689e9bb3acac13a",
-  "bytes": 846755,
+  "builtUTC": "2026-10-25T10:34:03.412Z",
+  "file": "delivery/身体_R26_原形体与参数衔接.html",
+  "sha256": "faeb6268cc49572b87415538a1e3d17ff8fc79f41e2ab37bacaf342dc06e3d7f",
+  "bytes": 878259,
   "data": {
     "file": "data/body-source-atlas-r24.json",
     "sha256": "172a19de2613102f037dafa79ac370547824f84da0d4c52ac29c10b04f06f97d",
@@ -529,6 +529,70 @@
     {
       "file": "src/BodyAtlasRayR25.js",
       "sha256": "d3d9f9cb2f30d993723be5ea6e091644a605c1d61a96369e221bbfacb970be72"
+    },
+    {
+      "file": "src/BodyStateIdentityR26.js",
+      "sha256": "ce58091658b008a3f6e59cfc3d4c978c622b67cd6431fb346610da57be0db8ab"
+    },
+    {
+      "file": "src/BodyBoundaryPackageR26.js",
+      "sha256": "536b1068a458e776b3112c89068013d36d3cf91824fb9017c59fb4dd60d92a57"
+    },
+    {
+      "file": "src/BodySourceBoundaryR26.js",
+      "sha256": "4e435534ef15f3b720979b9644b0a3a60f8c79ef8396434e4999e0a3aba47f9d"
+    },
+    {
+      "file": "src/BodySourceLookR26.js",
+      "sha256": "43d6c6486d064d3d532aa37027613957f52f4b2aea8f511b2e821d8cd9f416c8"
+    },
+    {
+      "file": "src/BodySourceMaterialControlsR26.js",
+      "sha256": "49ae64ac0076d7d0f6671e8be8a15d0fea4f7fb172bad5fb0a103e654e63360f"
+    },
+    {
+      "file": "src/BodyOriginalSkinR26.js",
+      "sha256": "74784291df3979e51b3c759e6cd06ff9ec24fdcfabdd944b704c99682120a3ec"
+    },
+    {
+      "file": "src/BodyAtlasRayR26.js",
+      "sha256": "921589b9461c9c2c4420b785bd848c63a44b1b93f2550f1190301ac62152a0b0"
+    },
+    {
+      "file": "data/body-state-identity-r26.json",
+      "sha256": "08b04a1da4a24a5c3259a8316c1f44b1628b7d7371fc84a93226e70866244b59"
+    },
+    {
+      "file": "data/body-reference-boundary-inputs-r26.json",
+      "sha256": "15f865b302de414173ee723aefaa9c3011b7cda7ab87d028f1243627af2fc8c1"
+    },
+    {
+      "file": "data/body-neck-operator-r24.json",
+      "sha256": "664a6a69cf288d23f7ec8db75d22d37c06f6ac503acaca8187398457694b96ed"
+    },
+    {
+      "file": "qa/original-person-archive.json",
+      "sha256": "b70d2831c95408c6a5a2d0d8584a5f2c04bd9de25d23638828329f7419b2b62b"
+    },
+    {
+      "file": "tools/build-source-r26.cjs",
+      "sha256": "fb1270973a620e57e05dd81f1a4985a9b18362a74717c1f8c9410314d6a793a1"
+    },
+    {
+      "file": "tools/pack-boundary-inputs-r26.cjs",
+      "sha256": "5c886289185bbd84798449b9ed296b7abe67d50dd8ab23a2c330f71808655136"
+    },
+    {
+      "file": "tools/compile-state-identity-r26.cjs",
+      "sha256": "bbd6b5ed9acc4d2466486c0257a5e56a3ee871c62f73f25f945eeb2db0d300a4"
+    },
+    {
+      "file": "src/BodyAtlasPrecisionR26.js",
+      "sha256": "69d579d92900ffc4dda004f8195bee6c5a2dbaf740e326a51d9a108a80ed5106"
+    },
+    {
+      "file": "src/BodySourceSkinR26.glsl",
+      "sha256": "f8afc0bb8f0736f298564a1328503d53a750c9b03d7edf2659d885c7900f2373"
     }
   ],
   "characterTriangleFaces": 0,
@@ -924,8 +988,8 @@
     "referenceOnly": true,
     "measuredAnatomicalBoneLengths": false
   },
-  "canonicalFile": "delivery/身体_R25_精确原表面边界.html",
-  "version": "R25",
+  "canonicalFile": "delivery/身体_R26_原形体与参数衔接.html",
+  "version": "R26",
   "exactDomainAssets": [
     {
       "file": "delivery/assets/body-exact-r25/2e9bf28a922ddfd1d85b236ca3e2919108e6d3182219de499b53c0efc2328ba2.gz",
@@ -987,8 +1051,71 @@
   "exactSharedBoundaryTiesRetained": true,
   "attributeBoundaryOwnership": "lowest original source function ID; native raster equivalence not certified",
   "sourceBoundaryInputsVerified": true,
-  "selectedVersion": "R25",
-  "companionBuild": "BUILD-R25.json",
-  "companionWorkbench": "BUILD-R25.json",
-  "selection": "exact original fixed-state function intersections after interaction; original detail integrated into complete parameter workbench; arbitrary continuous surface and full source fidelity remain unaccepted"
+  "boundaryInputAssets": [
+    {
+      "file": "delivery/assets/body-boundary-r26/f9acc3acb1ea8e30e59fad0b1a03f49e54635c25c5a86e7a97d7db0de06bfa35.gz",
+      "sha256": "f9acc3acb1ea8e30e59fad0b1a03f49e54635c25c5a86e7a97d7db0de06bfa35",
+      "bytes": 42508
+    },
+    {
+      "file": "delivery/assets/body-boundary-r26/ba08d1b92cc9bb102d5163868e5724421549c1dda87e9b7caa6c99cce7b1e4cc.gz",
+      "sha256": "ba08d1b92cc9bb102d5163868e5724421549c1dda87e9b7caa6c99cce7b1e4cc",
+      "bytes": 42444
+    },
+    {
+      "file": "delivery/assets/body-boundary-r26/9859e47000b9d1b6ab451dea26a1df1f65901b38775f9cc6ffc1089699e34b77.gz",
+      "sha256": "9859e47000b9d1b6ab451dea26a1df1f65901b38775f9cc6ffc1089699e34b77",
+      "bytes": 42503
+    },
+    {
+      "file": "delivery/assets/body-boundary-r26/36030ffb3295ca803f69f862ff628d25bbd818d650bb21deb6f494022164fc39.gz",
+      "sha256": "36030ffb3295ca803f69f862ff628d25bbd818d650bb21deb6f494022164fc39",
+      "bytes": 42439
+    },
+    {
+      "file": "delivery/assets/body-boundary-r26/7897289bffcc3c3eaaea3a94a5ad9fc33dec0340050dd972ac6b48d083b12f2f.gz",
+      "sha256": "7897289bffcc3c3eaaea3a94a5ad9fc33dec0340050dd972ac6b48d083b12f2f",
+      "bytes": 42594
+    },
+    {
+      "file": "delivery/assets/body-boundary-r26/a0b42a71216b5f6738a4da1464d18c5a9cab23168b6f3fbcbb8d4ba6072ea924.gz",
+      "sha256": "a0b42a71216b5f6738a4da1464d18c5a9cab23168b6f3fbcbb8d4ba6072ea924",
+      "bytes": 42530
+    },
+    {
+      "file": "delivery/assets/body-boundary-r26/126795b15514d209b0d85b261643588dbc18dd8efc8d45114b7ba845ee22f461.gz",
+      "sha256": "126795b15514d209b0d85b261643588dbc18dd8efc8d45114b7ba845ee22f461",
+      "bytes": 42555
+    },
+    {
+      "file": "delivery/assets/body-boundary-r26/2308445c43bd0c1e74faa77ba1fcfcf96035f982bf47fa850699d9cc937dc349.gz",
+      "sha256": "2308445c43bd0c1e74faa77ba1fcfcf96035f982bf47fa850699d9cc937dc349",
+      "bytes": 42423
+    },
+    {
+      "file": "delivery/assets/body-boundary-r26/8e8af3e7ac4c877bdda3c22e304106349b3867b558aa5cd8ce76647744ea995f.gz",
+      "sha256": "8e8af3e7ac4c877bdda3c22e304106349b3867b558aa5cd8ce76647744ea995f",
+      "bytes": 42505
+    },
+    {
+      "file": "delivery/assets/body-boundary-r26/09e782725205d9e16c599c5ccdb42dfd371e6c0ce626a246bb9c772ef3b61df1.gz",
+      "sha256": "09e782725205d9e16c599c5ccdb42dfd371e6c0ce626a246bb9c772ef3b61df1",
+      "bytes": 42432
+    }
+  ],
+  "boundaryInputDescriptor": {
+    "file": "data/body-reference-boundary-inputs-r26.json",
+    "sha256": "15f865b302de414173ee723aefaa9c3011b7cda7ab87d028f1243627af2fc8c1"
+  },
+  "sourceStateIdentity": {
+    "file": "data/body-state-identity-r26.json",
+    "sha256": "08b04a1da4a24a5c3259a8316c1f44b1628b7d7371fc84a93226e70866244b59",
+    "parameterQuantization": false,
+    "headStateIgnored": false,
+    "archivesPreserveExactInputSpelling": true
+  },
+  "selectedVersion": "R26",
+  "companionBuild": "BUILD-R26.json",
+  "companionWorkbench": "BUILD-R26.json",
+  "selection": "original fixed-state geometry with conservative equivalent input identity, actual original material controls and explicit structure lighting; consistent continuous-field edit/archive reference; arbitrary continuous source fidelity and autonomous mother remain unaccepted"
 }

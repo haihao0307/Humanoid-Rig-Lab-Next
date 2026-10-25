@@ -6,11 +6,13 @@ const root=path.resolve(__dirname,'..'),port=8914;
 http.createServer((req,res)=>{
  if(req.method!=='GET'&&req.method!=='HEAD'){res.writeHead(405);res.end();return;}
  try{const url=new URL(req.url,'http://127.0.0.1:'+port),pathname=decodeURIComponent(url.pathname);let manifest;
-  if(/^\/assets\/(body-skin-r22|body-skin-r24|body-atlas-r23|body-atlas-r24|body-exact-r25|body-program-r23)\/[A-Za-z0-9_-]+\.gz$/.test(pathname)){const folder=pathname.split('/')[2],assetRoot=path.resolve(root,'delivery/assets',folder),asset=path.resolve(assetRoot,path.basename(pathname));if(!asset.startsWith(assetRoot+path.sep)||!fs.existsSync(asset)){res.writeHead(404);res.end();return;}res.writeHead(200,{'Content-Type':'application/octet-stream','Cache-Control':'private, max-age=31536000, immutable','Content-Length':fs.statSync(asset).size});if(req.method==='HEAD')res.end();else fs.createReadStream(asset).pipe(res);return;}
+  if(/^\/assets\/(body-skin-r22|body-skin-r24|body-atlas-r23|body-atlas-r24|body-exact-r25|body-boundary-r26|body-program-r23)\/[A-Za-z0-9_-]+\.gz$/.test(pathname)){const folder=pathname.split('/')[2],assetRoot=path.resolve(root,'delivery/assets',folder),asset=path.resolve(assetRoot,path.basename(pathname));if(!asset.startsWith(assetRoot+path.sep)||!fs.existsSync(asset)){res.writeHead(404);res.end();return;}res.writeHead(200,{'Content-Type':'application/octet-stream','Cache-Control':'private, max-age=31536000, immutable','Content-Length':fs.statSync(asset).size});if(req.method==='HEAD')res.end();else fs.createReadStream(asset).pipe(res);return;}
   const selected=JSON.parse(fs.readFileSync(path.join(root,'BUILD.json'),'utf8').replace(/^\uFEFF/,'')),companion=selected.companionBuild||'BUILD-R21.json';
   if(pathname==='/')manifest=url.searchParams.get('view')==='workbench'?companion:url.searchParams.get('view')==='r20'?'BUILD-R20.json':url.searchParams.get('view')==='r21'?'BUILD-SOURCE-R21.json':'BUILD.json';
   else if(pathname==='/source')manifest='BUILD.json';
   else if(pathname==='/workbench')manifest=companion;
+  else if(pathname==='/身体_R26_原形体与参数衔接.html')manifest='BUILD-SOURCE-R26.json';
+  else if(pathname==='/人物身体_R26_原形体与参数工作页.html')manifest='BUILD-R26.json';
   else if(pathname==='/身体_R25_精确原表面边界.html')manifest='BUILD-SOURCE-R25.json';
   else if(pathname==='/人物身体_R25_原貌与连续参数.html')manifest='BUILD-R25.json';
   else if(pathname==='/身体_R24_原貌与原函数皮纹.html')manifest='BUILD-SOURCE-R24.json';
