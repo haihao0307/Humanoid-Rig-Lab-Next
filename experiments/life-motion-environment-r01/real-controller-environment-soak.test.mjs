@@ -63,7 +63,7 @@ for(let caseIndex=0;caseIndex<routes.length;caseIndex++){
  assert.equal(s.fault,null);
  results.push({caseIndex,status:'case-complete',frames:trace.frames.length-startFrame,steps:s.metrics.steps,completed:s.metrics.completed,rejected:s.metrics.rejected});
 }
-const blockedWorld=new FlatWorld(obstacles);const blockedProbe=blockedWorld.sweep([0,0,1],[0,0,2],.23);assert(blockedProbe.blocked,'obstacle sweep must reject an intersecting path');
+const blockedWorld=new FlatWorld(obstacles);const blockedProbe=blockedWorld.sweep([.5,0,.2],[.5,0,2],.23);assert(blockedProbe.blocked,'obstacle sweep must reject an intersecting path');
 const audit=auditMotionTrace(trace);
 assert.equal(audit.ok,true,JSON.stringify(audit.errors.slice(0,8)));
 assert(trace.frames.length>1000,'must audit a substantive motion trace');
