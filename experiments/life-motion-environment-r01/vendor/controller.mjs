@@ -76,7 +76,7 @@ export class MotionController {
       if (Math.abs(yawDelta) > Math.abs(yawError)) { yawDelta = yawError; yawRate = 0; }
       for (const foot of Object.values(s.feet)) if (foot.contact) {
         const twist = angle(s.yaw + yawDelta - foot.yaw);
-        if (Math.abs(twist) > .28 && Math.sign(twist) === Math.sign(yawDelta)) { yawDelta = 0; yawRate = 0; }
+        if (Math.abs(twist) > .28 && Math.sign(twist) === Math.sign(yawDelta)) { yawDelta = 0; yawRate += clamp(-yawRate, -maxYawAcceleration * dt, maxYawAcceleration * dt); }
       }
       s.yawRate = yawRate;
       s.yaw = angle(s.yaw + yawDelta);
