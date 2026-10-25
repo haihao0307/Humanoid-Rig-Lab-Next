@@ -77,21 +77,6 @@ for(const [variant,Controller] of [['baseline',BaselineController],['smoothed',S
   assert.equal(controller.state.command,null,'route command should finish');
   results.push({variant,caseIndex,routeIndex,status:'completed',steps,root:[...controller.state.root],footSlipMaxM:controller.state.metrics.maxContactError,ikResidualM:controller.state.metrics.maxIKResidual});
    }
-   const contacts={};
-   for(const side of ['left','right']){
-    if(!s.feet[side].contact)anchors[side]=null;
-    else if(!anchors[side])anchors[side]=[...s.feet[side].position];
-    contacts[side+'Foot']={active:s.feet[side].contact,anchor:anchors[side]?[...anchors[side]]:[...s.feet[side].position],position:[...s.feet[side].position]};
-   }
-   trace.frames.push({timeS:localFrame*dt,root:[s.root[0],0,s.root[2]],joints,contacts,collisions:{selfPenetrationM:0,environmentPenetrationM:0},jointLimitViolationDeg:Math.max(s.metrics.maxBoneError*1000,s.metrics.maxIKResidual*1000)});
-   if(s.fault)break;
-  }
-  assert(steps<2400,JSON.stringify({error:'route command timed out',caseIndex,routeIndex,state:controller.snapshot()}));
-  assert.equal(controller.state.fault,null,'controller must not fault during route');
-  assert.notEqual(controller.state.status,'blocked','route unexpectedly blocked by world sweep');
-  assert.equal(controller.state.command,null,'route command should finish');
-  results.push({variant,caseIndex,routeIndex,status:'completed',steps,root:[...controller.state.root],footSlipMaxM:controller.state.metrics.maxContactError,ikResidualM:controller.state.metrics.maxIKResidual});
- }
  const s=controller.snapshot();
  assert.equal(s.fault,null);
  results.push({variant,caseIndex,status:'case-complete',frames:trace.frames.length,steps:s.metrics.steps,completed:s.metrics.completed,rejected:s.metrics.rejected});traces.push({variant,trace});
