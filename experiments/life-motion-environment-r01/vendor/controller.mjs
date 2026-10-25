@@ -78,7 +78,7 @@ export class MotionController {
       // still nonzero. That one-frame position correction creates an apparent
       // angular-acceleration impulse in the measured root trajectory. Let the
       // rate controller brake and converge continuously instead.
-      const yawDelta = yawRate * dt;
+      let yawDelta = yawRate * dt;
       for (const foot of Object.values(s.feet)) if (foot.contact) {
         const twist = angle(s.yaw + yawDelta - foot.yaw);
         if (Math.abs(twist) > .28 && Math.sign(twist) === Math.sign(yawDelta)) { yawDelta = 0; yawRate += clamp(-yawRate, -maxYawAcceleration * dt, maxYawAcceleration * dt); }
