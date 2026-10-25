@@ -10,6 +10,7 @@
 - routine-engine.test.mjs：50 轮长任务契约测试，使用假适配器，不模拟人体或物理。
 - motion-trace-audit.mjs：对真实运行时导出的逐帧 trace 计算根/关节速度与加速度、脚滑、手物接触误差、穿透和关节越界。
 - motion-trace-audit.test.mjs：正常 trace 加 8 类异常 trace 的回归测试。
+- CI 只读运行人物总台已有的步态相位、足底支撑、动作过渡、蒙皮连接和撤手路径回归脚本；不修改这些生产源码。
 - TASK_ANCHOR.json：任务边界、保护项与验收门槛。
 - VALIDATION_REPORT.md：测试范围与明确限制。
 
