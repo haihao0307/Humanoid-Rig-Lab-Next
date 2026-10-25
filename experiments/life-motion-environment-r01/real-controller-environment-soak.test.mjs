@@ -12,12 +12,15 @@ const obstacles=[
  {minX:-1.25,maxX:-.95,minZ:1.2,maxZ:2.25},
  {minX:.9,maxX:1.35,minZ:-.25,maxZ:.15}
 ];
-const routes=[
+const baseRoutes=[
  [[0,0,1.1],[.25,0,1.8],[.8,0,2.1],[.2,0,.7]],
  [[0,0,.8],[-.35,0,1.65],[-.65,0,2.2],[0,0,.6]],
  [[0,0,1.0],[.35,0,.45],[.15,0,1.7],[-.2,0,.8]],
  [[0,0,.7],[-.5,0,.8],[-.5,0,1.8],[.1,0,1.0]]
 ];
+// Long-horizon route set: each geometry is traversed forward, reversed, then
+// traversed forward again to expose cumulative heading/support drift.
+const routes=baseRoutes.map(route=>[...route,...route.slice(0,-1).reverse(),...route.slice(1)]);
 const dt=1/120, results=[], traces=[], audits=[];
 function quatYaw(yaw){return[0,Math.sin(yaw/2),0,Math.cos(yaw/2)];}
 for(const [variant,Controller] of [['baseline',BaselineController],['smoothed',SmoothedController]]){
@@ -73,9 +76,9 @@ for(const [variant,Controller] of [['baseline',BaselineController],['smoothed',S
 const blockedWorld=new FlatWorld(obstacles);const blockedProbe=blockedWorld.sweep([.5,0,.2],[.5,0,2],.23);assert(blockedProbe.blocked,'obstacle sweep must reject an intersecting path');
 const baseline=audits.find(x=>x.variant==='baseline'),smoothed=audits.find(x=>x.variant==='smoothed');
 assert(baseline&&smoothed,'both controller variants must be audited');
-assert(baseline.frames>1000&&smoothed.frames>1000,'both variants need substantive traces');
+assert(baseline.frames>10000&&smoothed.frames>10000,'both variants need long-horizon traces');
 const audit={ok:smoothed.errors.length===0,errors:smoothed.errors,metrics:smoothed.metrics};
 const comparison={baseline:{frames:baseline.frames,durationS:baseline.durationS,errorCount:baseline.errors.length,codes:[...new Set(baseline.errors.map(e=>e.code))],metrics:baseline.metrics},smoothed:{frames:smoothed.frames,durationS:smoothed.durationS,errorCount:smoothed.errors.length,codes:[...new Set(smoothed.errors.map(e=>e.code))],metrics:smoothed.metrics}};
 assert(smoothed.errors.length>0,'current controller defects must remain visible until measured motion defects are fixed');
 const peakFailures={baseline:baseline.errors.slice().sort((a,b)=>(b.accelerationMps2||b.angularAccelerationRadS2||0)-(a.accelerationMps2||a.angularAccelerationRadS2||0)).slice(0,8),smoothed:smoothed.errors.slice().sort((a,b)=>(b.accelerationMps2||b.angularAccelerationRadS2||0)-(a.accelerationMps2||a.angularAccelerationRadS2||0)).slice(0,8)};
-console.log(JSON.stringify({suite:'real-motion-controller-environment-soak',peakFailures,controller:'baseline vs acceleration-limited controller + FullBodyMotion + FlatWorld',cases:routes.length,routeCommandsCompleted:Object.fromEntries(['baseline','smoothed'].map(v=>[v,results.filter(x=>x.variant===v&&x.status==='completed').length])),comparison,auditPassed:audit.ok,auditFailureCount:audit.errors.length,auditFailureCodes:[...new Set(audit.errors.map(e=>e.code))],results,limitations:['Locomotion traces use clear routes; obstacle sweep rejection is tested separately, this controller does not perform autonomous detours','No rendered skin/GPU evidence','No stair geometry or manipulation/door/window physics in this controller','Collision fields are from the controller world sweep; self-surface penetration is not measured by this controller','Leg IK residual is reported via the joint-limit channel as a conservative proxy, not anatomical joint limits']},null,2));
+console.log(JSON.stringify({suite:'real-motion-controller-environment-soak',peakFailures,controller:'baseline vs acceleration-limited controller + FullBodyMotion + FlatWorld',baseLayouts:baseRoutes.length,routeLegsPerLayout:routes[0].length,cases:routes.length,routeCommandsCompleted:Object.fromEntries(['baseline','smoothed'].map(v=>[v,results.filter(x=>x.variant===v&&x.status==='completed').length])),comparison,auditPassed:audit.ok,auditFailureCount:audit.errors.length,auditFailureCodes:[...new Set(audit.errors.map(e=>e.code))],results,limitations:['Locomotion traces use clear routes; obstacle sweep rejection is tested separately, this controller does not perform autonomous detours','No rendered skin/GPU evidence','No stair geometry or manipulation/door/window physics in this controller','Collision fields are from the controller world sweep; self-surface penetration is not measured by this controller','Leg IK residual is reported via the joint-limit channel as a conservative proxy, not anatomical joint limits']},null,2));
