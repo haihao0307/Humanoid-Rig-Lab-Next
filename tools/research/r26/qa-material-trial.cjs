@@ -1,0 +1,3 @@
+'use strict';
+// Same pixel/self-redraw diagnostic, but fail immediately on rejected trial GLSL.
+const fs=require('fs'),cp=require('child_process');let script=fs.readFileSync('tools/qa-material-repeat-r26.cjs','utf8'),old='await p.waitForFunction(()=>window.__BODY_SOURCE_ATLAS_R25_READY__);';if(script.split(old).length!==2)throw Error('Original repeat diagnostic changed');script=script.replace(old,'await p.waitForFunction(()=>{if(window.__BODY_SOURCE_ATLAS_R21_ERROR__)throw Error(__BODY_SOURCE_ATLAS_R21_ERROR__);return window.__BODY_SOURCE_ATLAS_R25_READY__;});');const r=cp.spawnSync(process.execPath,['-e',script],{stdio:'inherit',windowsHide:true});process.exitCode=r.status??1;

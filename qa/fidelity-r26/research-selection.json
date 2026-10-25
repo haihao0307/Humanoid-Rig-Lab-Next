@@ -14,5 +14,32 @@
   },
   "preservedExactKernel": "R25",
   "sourceFidelityAccepted": false,
-  "visualAccepted": false
+  "visualAccepted": false,
+  "updatedUTC": "2026-10-25T11:10:00.357Z",
+  "vertexSamplerPrecision": {
+    "selectedByDefault": false,
+    "report": "qa/fidelity-r26/highp-vertex-selection.json",
+    "reason": "All tested original and repeated pixels/layers unchanged; self-redraw issue remains"
+  },
+  "postMaterialHelperDiscard": {
+    "selectedByDefault": false,
+    "report": "qa/fidelity-r26/helper-blend-repeat.json",
+    "reason": "Blend/depth helper route retains first-redraw differences and changes some output rounding"
+  },
+  "nativeDepthState": {
+    "selectedByDefault": false,
+    "report": "qa/fidelity-r26/native-depth-repeat.json",
+    "reason": "LEQUAL instead of ALWAYS preserves first-redraw differences"
+  },
+  "invariantOutputs": {
+    "selectedByDefault": false,
+    "report": "qa/fidelity-r26/invariant-material-repeat.json",
+    "reason": "Explicit invariant position/depth declarations preserve first-redraw differences"
+  },
+  "narrowing": {
+    "actualGPUInputs": "qa/fidelity-r26/gpu-input-readback.json",
+    "nativeOriginalSelf": "qa/fidelity-r26/native-original-self.json",
+    "uninstrumented": "qa/fidelity-r26/uninstrumented-redraw.json",
+    "scope": "Six actual geometric/attribute texture readbacks stable across tested redraws; actual original baseline self-control stable in three views; function back redraw difference also occurs without prototype hooks or mask/layer probes. Full root cause is still not established."
+  }
 }

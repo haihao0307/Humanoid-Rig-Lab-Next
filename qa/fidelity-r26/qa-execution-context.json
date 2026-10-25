@@ -1,0 +1,54 @@
+{
+  "startedUTC": "2026-10-25T11:17:55.161Z",
+  "scope": "Same exact source implementation in contextified versus native Node globals; CPU verification harness only; no runtime/FPS claim",
+  "sourceFiles": [
+    {
+      "file": "src/BodyExactDomainR25.js",
+      "sha256": "b50161c0867cb913bdc6117971fcb7046a6bdec7c493f5b364b2f2f35481f295"
+    },
+    {
+      "file": "src/BodyFilteredDomainR25.js",
+      "sha256": "d495228a5f56cf390fd7b22bea9c218d7fcf763c0bfa596e1bf7d87c479fc393"
+    },
+    {
+      "file": "src/BodyAtlasCpuR25.js",
+      "sha256": "42e3f9a57d2f30428e8242702df03098caef4d9a0fd549d27591b4df1add27c4"
+    }
+  ],
+  "sourceFidelityAccepted": false,
+  "runtimeChanged": false,
+  "rays": 1025,
+  "differences": 0,
+  "rounds": [
+    {
+      "order": [
+        "contextified",
+        "native"
+      ],
+      "contextified": {
+        "ms": 988.9925999999998,
+        "checksum": 243.42899435045854
+      },
+      "native": {
+        "ms": 44.0018,
+        "checksum": 243.42899435045854
+      }
+    },
+    {
+      "order": [
+        "native",
+        "contextified"
+      ],
+      "native": {
+        "ms": 43.1246000000001,
+        "checksum": 243.42899435045854
+      },
+      "contextified": {
+        "ms": 1013.9973,
+        "checksum": 243.42899435045854
+      }
+    }
+  ],
+  "parityPassed": true,
+  "finishedUTC": "2026-10-25T11:17:59.019Z"
+}

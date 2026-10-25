@@ -1,0 +1,1687 @@
+{
+  "startedUTC": "2026-10-25T10:55:32.302Z",
+  "artifactSHA256": "faeb6268cc49572b87415538a1e3d17ff8fc79f41e2ab37bacaf342dc06e3d7f",
+  "sourceFidelityAccepted": false,
+  "acceptanceTolerance": null,
+  "bodySkinOnly": true,
+  "attachmentsExcludedAfterOriginalSceneHooks": true,
+  "matchedCameraBasis": true,
+  "shadowHistory": "original m.compute -> v.update -> v.render per state, no forced shadow refresh; full source casters retained during refresh",
+  "scope": "Actual frozen original body and compose render; head/attachment meshes hidden offline only; source body faces retained only in the original reference page",
+  "newImageFiles": 0,
+  "cases": [
+    {
+      "id": "baseline",
+      "view": "front",
+      "samples": 169,
+      "maximumRGBCodeDifference": 1,
+      "rmsMaximumChannelCodeDifference": 0.07692307692307693,
+      "pixelsDifferent": 1,
+      "worst": [
+        {
+          "x": 371,
+          "y": 299,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            157,
+            90,
+            57
+          ],
+          "candidateRGB": [
+            157,
+            90,
+            58
+          ]
+        },
+        {
+          "x": 227,
+          "y": 563,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            92,
+            67,
+            50
+          ],
+          "candidateRGB": [
+            92,
+            67,
+            50
+          ]
+        },
+        {
+          "x": 251,
+          "y": 563,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            150,
+            79,
+            43
+          ],
+          "candidateRGB": [
+            150,
+            79,
+            43
+          ]
+        },
+        {
+          "x": 395,
+          "y": 563,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            80,
+            56,
+            39
+          ],
+          "candidateRGB": [
+            80,
+            56,
+            39
+          ]
+        },
+        {
+          "x": 419,
+          "y": 563,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            172,
+            98,
+            64
+          ],
+          "candidateRGB": [
+            172,
+            98,
+            64
+          ]
+        },
+        {
+          "x": 227,
+          "y": 587,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            89,
+            64,
+            47
+          ],
+          "candidateRGB": [
+            89,
+            64,
+            47
+          ]
+        },
+        {
+          "x": 251,
+          "y": 587,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            152,
+            80,
+            44
+          ],
+          "candidateRGB": [
+            152,
+            80,
+            44
+          ]
+        },
+        {
+          "x": 395,
+          "y": 587,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            82,
+            58,
+            41
+          ],
+          "candidateRGB": [
+            82,
+            58,
+            41
+          ]
+        }
+      ],
+      "source": {
+        "postRenderRestoredNonBodyMeshes": [
+          "NATIVE_CLEAR_SHORT_CROP_R08"
+        ],
+        "nonBodyDraws": 0,
+        "bodyOnlyEnforcedAfterOriginalHooks": true,
+        "nativeSelf": [
+          {
+            "attempt": 1,
+            "differentBytes": 0,
+            "maximum": 0,
+            "layers": [
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              }
+            ]
+          },
+          {
+            "attempt": 2,
+            "differentBytes": 0,
+            "maximum": 0,
+            "layers": [
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              }
+            ]
+          }
+        ],
+        "nativeSubpixelBits": 4,
+        "error": 0,
+        "sourceDrawRange": {
+          "start": 0,
+          "count": null
+        },
+        "activeGroups": [
+          {
+            "start": 0,
+            "count": 0,
+            "materialIndex": 0
+          },
+          {
+            "start": 234912,
+            "count": 55248,
+            "materialIndex": 1
+          }
+        ],
+        "activeMaterial": "HEAD-PROCEDURAL-R01-NO-SKIN-TEXTURES",
+        "toneMapping": 7,
+        "exposure": 0.7,
+        "actualDiffusion": {
+          "source": "own 25-tap normalized RGB mixture over native render targets",
+          "radiusMM": 1.3,
+          "strength": 0.65,
+          "profileScalesMM": [
+            [
+              0.25,
+              1,
+              2.6
+            ],
+            [
+              0.1,
+              0.35,
+              0.8
+            ],
+            [
+              0.06,
+              0.18,
+              0.35
+            ]
+          ],
+          "specularBlurred": false,
+          "pigmentSplit": true,
+          "depthBounded": true,
+          "bodyDiffusion": true,
+          "fullVolumeScattering": false
+        },
+        "cameraUp": [
+          0,
+          1,
+          0
+        ],
+        "cameraPosition": [
+          0,
+          -0.09331379013091702,
+          2.1189875696628837
+        ]
+      },
+      "fullFrame": {
+        "common": 101750,
+        "sourceOnly": 2,
+        "candidateOnly": 4,
+        "RGBMaximum": 17,
+        "interior": {
+          "count": 93158,
+          "maximum": 4,
+          "rms": 0.13223623149235006
+        },
+        "edge": {
+          "count": 8592,
+          "maximum": 17,
+          "rms": 0.3569931849184411
+        },
+        "worst": [
+          {
+            "x": 255,
+            "y": 234,
+            "max": 17,
+            "interior": false,
+            "sourceRGB": [
+              232,
+              226,
+              223
+            ],
+            "candidateRGB": [
+              216,
+              209,
+              206
+            ]
+          },
+          {
+            "x": 460,
+            "y": 177,
+            "max": 16,
+            "interior": false,
+            "sourceRGB": [
+              195,
+              135,
+              112
+            ],
+            "candidateRGB": [
+              194,
+              126,
+              96
+            ]
+          },
+          {
+            "x": 274,
+            "y": 524,
+            "max": 5,
+            "interior": false,
+            "sourceRGB": [
+              136,
+              70,
+              33
+            ],
+            "candidateRGB": [
+              141,
+              72,
+              35
+            ]
+          },
+          {
+            "x": 427,
+            "y": 717,
+            "max": 4,
+            "interior": false,
+            "sourceRGB": [
+              201,
+              131,
+              101
+            ],
+            "candidateRGB": [
+              205,
+              132,
+              100
+            ]
+          },
+          {
+            "x": 320,
+            "y": 176,
+            "max": 4,
+            "interior": true,
+            "sourceRGB": [
+              135,
+              88,
+              64
+            ],
+            "candidateRGB": [
+              138,
+              91,
+              68
+            ]
+          },
+          {
+            "x": 410,
+            "y": 758,
+            "max": 3,
+            "interior": false,
+            "sourceRGB": [
+              193,
+              114,
+              76
+            ],
+            "candidateRGB": [
+              190,
+              112,
+              76
+            ]
+          },
+          {
+            "x": 413,
+            "y": 449,
+            "max": 3,
+            "interior": false,
+            "sourceRGB": [
+              181,
+              100,
+              62
+            ],
+            "candidateRGB": [
+              184,
+              101,
+              62
+            ]
+          },
+          {
+            "x": 230,
+            "y": 758,
+            "max": 2,
+            "interior": false,
+            "sourceRGB": [
+              118,
+              95,
+              80
+            ],
+            "candidateRGB": [
+              116,
+              94,
+              80
+            ]
+          },
+          {
+            "x": 231,
+            "y": 757,
+            "max": 2,
+            "interior": false,
+            "sourceRGB": [
+              112,
+              84,
+              65
+            ],
+            "candidateRGB": [
+              110,
+              83,
+              64
+            ]
+          },
+          {
+            "x": 409,
+            "y": 757,
+            "max": 2,
+            "interior": false,
+            "sourceRGB": [
+              186,
+              114,
+              79
+            ],
+            "candidateRGB": [
+              184,
+              113,
+              79
+            ]
+          },
+          {
+            "x": 427,
+            "y": 595,
+            "max": 2,
+            "interior": false,
+            "sourceRGB": [
+              197,
+              111,
+              71
+            ],
+            "candidateRGB": [
+              199,
+              112,
+              72
+            ]
+          },
+          {
+            "x": 288,
+            "y": 487,
+            "max": 2,
+            "interior": false,
+            "sourceRGB": [
+              104,
+              52,
+              21
+            ],
+            "candidateRGB": [
+              106,
+              52,
+              22
+            ]
+          },
+          {
+            "x": 412,
+            "y": 450,
+            "max": 2,
+            "interior": false,
+            "sourceRGB": [
+              167,
+              91,
+              54
+            ],
+            "candidateRGB": [
+              169,
+              92,
+              54
+            ]
+          },
+          {
+            "x": 306,
+            "y": 435,
+            "max": 2,
+            "interior": false,
+            "sourceRGB": [
+              48,
+              31,
+              15
+            ],
+            "candidateRGB": [
+              47,
+              29,
+              14
+            ]
+          },
+          {
+            "x": 311,
+            "y": 384,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              69,
+              39,
+              19
+            ],
+            "candidateRGB": [
+              71,
+              40,
+              19
+            ]
+          },
+          {
+            "x": 390,
+            "y": 366,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              127,
+              78,
+              53
+            ],
+            "candidateRGB": [
+              125,
+              77,
+              52
+            ]
+          }
+        ],
+        "sourceMaskCorner": 0,
+        "candidateMaskCorner": 0,
+        "linearLayers": [
+          {
+            "count": 101750,
+            "maximum": 0.19140625,
+            "rms": 0.0006898274794053015
+          },
+          {
+            "count": 101750,
+            "maximum": 0.08447265625,
+            "rms": 0.00038052411573061225
+          },
+          {
+            "count": 101750,
+            "maximum": 0.02490234375,
+            "rms": 0.00025701049503010394
+          }
+        ],
+        "RGBRMS": 0.16361998280008092
+      }
+    },
+    {
+      "id": "baseline",
+      "view": "side",
+      "samples": 106,
+      "maximumRGBCodeDifference": 1,
+      "rmsMaximumChannelCodeDifference": 0.19425717247145283,
+      "pixelsDifferent": 4,
+      "worst": [
+        {
+          "x": 323,
+          "y": 155,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            198,
+            137,
+            110
+          ],
+          "candidateRGB": [
+            197,
+            137,
+            110
+          ]
+        },
+        {
+          "x": 299,
+          "y": 107,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            171,
+            108,
+            81
+          ],
+          "candidateRGB": [
+            170,
+            107,
+            80
+          ]
+        },
+        {
+          "x": 179,
+          "y": 299,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            190,
+            124,
+            93
+          ],
+          "candidateRGB": [
+            191,
+            125,
+            93
+          ]
+        },
+        {
+          "x": 299,
+          "y": 395,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            184,
+            113,
+            80
+          ],
+          "candidateRGB": [
+            185,
+            113,
+            81
+          ]
+        },
+        {
+          "x": 299,
+          "y": 563,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            162,
+            91,
+            57
+          ],
+          "candidateRGB": [
+            162,
+            91,
+            57
+          ]
+        },
+        {
+          "x": 323,
+          "y": 563,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            188,
+            119,
+            88
+          ],
+          "candidateRGB": [
+            188,
+            119,
+            88
+          ]
+        },
+        {
+          "x": 347,
+          "y": 563,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            177,
+            137,
+            119
+          ],
+          "candidateRGB": [
+            177,
+            137,
+            119
+          ]
+        },
+        {
+          "x": 299,
+          "y": 587,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            160,
+            91,
+            58
+          ],
+          "candidateRGB": [
+            160,
+            91,
+            58
+          ]
+        }
+      ],
+      "source": {
+        "postRenderRestoredNonBodyMeshes": [
+          "NATIVE_CLEAR_SHORT_CROP_R08"
+        ],
+        "nonBodyDraws": 0,
+        "bodyOnlyEnforcedAfterOriginalHooks": true,
+        "nativeSelf": [
+          {
+            "attempt": 1,
+            "differentBytes": 0,
+            "maximum": 0,
+            "layers": [
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              }
+            ]
+          },
+          {
+            "attempt": 2,
+            "differentBytes": 0,
+            "maximum": 0,
+            "layers": [
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              }
+            ]
+          }
+        ],
+        "nativeSubpixelBits": 4,
+        "error": 0,
+        "sourceDrawRange": {
+          "start": 0,
+          "count": null
+        },
+        "activeGroups": [
+          {
+            "start": 0,
+            "count": 0,
+            "materialIndex": 0
+          },
+          {
+            "start": 234912,
+            "count": 55248,
+            "materialIndex": 1
+          }
+        ],
+        "activeMaterial": "HEAD-PROCEDURAL-R01-NO-SKIN-TEXTURES",
+        "toneMapping": 7,
+        "exposure": 0.7,
+        "actualDiffusion": {
+          "source": "own 25-tap normalized RGB mixture over native render targets",
+          "radiusMM": 1.3,
+          "strength": 0.65,
+          "profileScalesMM": [
+            [
+              0.25,
+              1,
+              2.6
+            ],
+            [
+              0.1,
+              0.35,
+              0.8
+            ],
+            [
+              0.06,
+              0.18,
+              0.35
+            ]
+          ],
+          "specularBlurred": false,
+          "pigmentSplit": true,
+          "depthBounded": true,
+          "bodyDiffusion": true,
+          "fullVolumeScattering": false
+        },
+        "cameraUp": [
+          0,
+          1,
+          0
+        ],
+        "cameraPosition": [
+          2.1189875696628837,
+          -0.09331379013091702,
+          1.29750567231034e-16
+        ]
+      },
+      "fullFrame": {
+        "common": 62112,
+        "sourceOnly": 1,
+        "candidateOnly": 0,
+        "RGBMaximum": 19,
+        "interior": {
+          "count": 56062,
+          "maximum": 19,
+          "rms": 0.1975104588711454
+        },
+        "edge": {
+          "count": 6050,
+          "maximum": 4,
+          "rms": 0.23460887091934438
+        },
+        "worst": [
+          {
+            "x": 181,
+            "y": 302,
+            "max": 19,
+            "interior": true,
+            "sourceRGB": [
+              146,
+              92,
+              65
+            ],
+            "candidateRGB": [
+              138,
+              78,
+              46
+            ]
+          },
+          {
+            "x": 358,
+            "y": 100,
+            "max": 6,
+            "interior": true,
+            "sourceRGB": [
+              176,
+              141,
+              123
+            ],
+            "candidateRGB": [
+              180,
+              146,
+              129
+            ]
+          },
+          {
+            "x": 229,
+            "y": 240,
+            "max": 4,
+            "interior": false,
+            "sourceRGB": [
+              193,
+              134,
+              107
+            ],
+            "candidateRGB": [
+              197,
+              135,
+              106
+            ]
+          },
+          {
+            "x": 261,
+            "y": 304,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              155,
+              95,
+              69
+            ],
+            "candidateRGB": [
+              156,
+              95,
+              66
+            ]
+          },
+          {
+            "x": 303,
+            "y": 175,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              178,
+              112,
+              82
+            ],
+            "candidateRGB": [
+              175,
+              112,
+              84
+            ]
+          },
+          {
+            "x": 356,
+            "y": 136,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              145,
+              120,
+              107
+            ],
+            "candidateRGB": [
+              143,
+              117,
+              104
+            ]
+          },
+          {
+            "x": 355,
+            "y": 759,
+            "max": 2,
+            "interior": false,
+            "sourceRGB": [
+              100,
+              77,
+              61
+            ],
+            "candidateRGB": [
+              99,
+              75,
+              59
+            ]
+          },
+          {
+            "x": 322,
+            "y": 748,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              168,
+              98,
+              65
+            ],
+            "candidateRGB": [
+              167,
+              96,
+              63
+            ]
+          },
+          {
+            "x": 323,
+            "y": 748,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              167,
+              96,
+              63
+            ],
+            "candidateRGB": [
+              166,
+              95,
+              61
+            ]
+          },
+          {
+            "x": 322,
+            "y": 747,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              170,
+              100,
+              66
+            ],
+            "candidateRGB": [
+              169,
+              98,
+              64
+            ]
+          },
+          {
+            "x": 323,
+            "y": 747,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              168,
+              98,
+              64
+            ],
+            "candidateRGB": [
+              167,
+              96,
+              62
+            ]
+          },
+          {
+            "x": 292,
+            "y": 685,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              181,
+              113,
+              82
+            ],
+            "candidateRGB": [
+              183,
+              114,
+              83
+            ]
+          },
+          {
+            "x": 293,
+            "y": 685,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              178,
+              109,
+              78
+            ],
+            "candidateRGB": [
+              180,
+              111,
+              79
+            ]
+          },
+          {
+            "x": 323,
+            "y": 667,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              163,
+              88,
+              51
+            ],
+            "candidateRGB": [
+              165,
+              90,
+              52
+            ]
+          },
+          {
+            "x": 315,
+            "y": 558,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              183,
+              110,
+              77
+            ],
+            "candidateRGB": [
+              183,
+              109,
+              75
+            ]
+          },
+          {
+            "x": 315,
+            "y": 557,
+            "max": 2,
+            "interior": true,
+            "sourceRGB": [
+              184,
+              111,
+              77
+            ],
+            "candidateRGB": [
+              183,
+              109,
+              75
+            ]
+          }
+        ],
+        "sourceMaskCorner": 0,
+        "candidateMaskCorner": 0,
+        "linearLayers": [
+          {
+            "count": 62112,
+            "maximum": 0.078125,
+            "rms": 0.000616847899782169
+          },
+          {
+            "count": 62112,
+            "maximum": 0.071044921875,
+            "rms": 0.0006282889630521073
+          },
+          {
+            "count": 62112,
+            "maximum": 0.0146484375,
+            "rms": 0.0003839075880858842
+          }
+        ],
+        "RGBRMS": 0.20142460170002932
+      }
+    },
+    {
+      "id": "baseline",
+      "view": "back",
+      "samples": 167,
+      "maximumRGBCodeDifference": 1,
+      "rmsMaximumChannelCodeDifference": 0.17303213505149567,
+      "pixelsDifferent": 5,
+      "worst": [
+        {
+          "x": 227,
+          "y": 731,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            106,
+            80,
+            63
+          ],
+          "candidateRGB": [
+            106,
+            79,
+            62
+          ]
+        },
+        {
+          "x": 275,
+          "y": 443,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            138,
+            110,
+            93
+          ],
+          "candidateRGB": [
+            137,
+            109,
+            92
+          ]
+        },
+        {
+          "x": 299,
+          "y": 323,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            157,
+            127,
+            108
+          ],
+          "candidateRGB": [
+            158,
+            127,
+            108
+          ]
+        },
+        {
+          "x": 323,
+          "y": 371,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            83,
+            59,
+            43
+          ],
+          "candidateRGB": [
+            84,
+            59,
+            43
+          ]
+        },
+        {
+          "x": 347,
+          "y": 395,
+          "maxCodeDifference": 1,
+          "sourceRGB": [
+            101,
+            76,
+            60
+          ],
+          "candidateRGB": [
+            101,
+            75,
+            59
+          ]
+        },
+        {
+          "x": 299,
+          "y": 83,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            175,
+            140,
+            121
+          ],
+          "candidateRGB": [
+            175,
+            140,
+            121
+          ]
+        },
+        {
+          "x": 323,
+          "y": 83,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            150,
+            119,
+            101
+          ],
+          "candidateRGB": [
+            150,
+            119,
+            101
+          ]
+        },
+        {
+          "x": 347,
+          "y": 83,
+          "maxCodeDifference": 0,
+          "sourceRGB": [
+            187,
+            152,
+            132
+          ],
+          "candidateRGB": [
+            187,
+            152,
+            132
+          ]
+        }
+      ],
+      "source": {
+        "postRenderRestoredNonBodyMeshes": [
+          "NATIVE_CLEAR_SHORT_CROP_R08"
+        ],
+        "nonBodyDraws": 0,
+        "bodyOnlyEnforcedAfterOriginalHooks": true,
+        "nativeSelf": [
+          {
+            "attempt": 1,
+            "differentBytes": 0,
+            "maximum": 0,
+            "layers": [
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              }
+            ]
+          },
+          {
+            "attempt": 2,
+            "differentBytes": 0,
+            "maximum": 0,
+            "layers": [
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              },
+              {
+                "differentValues": 0,
+                "maximum": 0
+              }
+            ]
+          }
+        ],
+        "nativeSubpixelBits": 4,
+        "error": 0,
+        "sourceDrawRange": {
+          "start": 0,
+          "count": null
+        },
+        "activeGroups": [
+          {
+            "start": 0,
+            "count": 0,
+            "materialIndex": 0
+          },
+          {
+            "start": 234912,
+            "count": 55248,
+            "materialIndex": 1
+          }
+        ],
+        "activeMaterial": "HEAD-PROCEDURAL-R01-NO-SKIN-TEXTURES",
+        "toneMapping": 7,
+        "exposure": 0.7,
+        "actualDiffusion": {
+          "source": "own 25-tap normalized RGB mixture over native render targets",
+          "radiusMM": 1.3,
+          "strength": 0.65,
+          "profileScalesMM": [
+            [
+              0.25,
+              1,
+              2.6
+            ],
+            [
+              0.1,
+              0.35,
+              0.8
+            ],
+            [
+              0.06,
+              0.18,
+              0.35
+            ]
+          ],
+          "specularBlurred": false,
+          "pigmentSplit": true,
+          "depthBounded": true,
+          "bodyDiffusion": true,
+          "fullVolumeScattering": false
+        },
+        "cameraUp": [
+          0,
+          1,
+          0
+        ],
+        "cameraPosition": [
+          2.59501134462068e-16,
+          -0.09331379013091702,
+          -2.1189875696628837
+        ]
+      },
+      "fullFrame": {
+        "common": 98340,
+        "sourceOnly": 4,
+        "candidateOnly": 1,
+        "RGBMaximum": 4,
+        "interior": {
+          "count": 90208,
+          "maximum": 3,
+          "rms": 0.17103979526526725
+        },
+        "edge": {
+          "count": 8132,
+          "maximum": 4,
+          "rms": 0.22914756810518289
+        },
+        "worst": [
+          {
+            "x": 214,
+            "y": 710,
+            "max": 4,
+            "interior": false,
+            "sourceRGB": [
+              165,
+              95,
+              60
+            ],
+            "candidateRGB": [
+              169,
+              98,
+              62
+            ]
+          },
+          {
+            "x": 426,
+            "y": 710,
+            "max": 3,
+            "interior": false,
+            "sourceRGB": [
+              156,
+              127,
+              108
+            ],
+            "candidateRGB": [
+              159,
+              129,
+              110
+            ]
+          },
+          {
+            "x": 407,
+            "y": 616,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              122,
+              95,
+              79
+            ],
+            "candidateRGB": [
+              121,
+              94,
+              76
+            ]
+          },
+          {
+            "x": 395,
+            "y": 540,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              132,
+              102,
+              85
+            ],
+            "candidateRGB": [
+              130,
+              100,
+              82
+            ]
+          },
+          {
+            "x": 405,
+            "y": 498,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              170,
+              136,
+              116
+            ],
+            "candidateRGB": [
+              168,
+              133,
+              113
+            ]
+          },
+          {
+            "x": 396,
+            "y": 460,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              152,
+              122,
+              103
+            ],
+            "candidateRGB": [
+              150,
+              119,
+              100
+            ]
+          },
+          {
+            "x": 336,
+            "y": 360,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              85,
+              61,
+              44
+            ],
+            "candidateRGB": [
+              84,
+              59,
+              41
+            ]
+          },
+          {
+            "x": 320,
+            "y": 333,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              134,
+              106,
+              89
+            ],
+            "candidateRGB": [
+              132,
+              103,
+              86
+            ]
+          },
+          {
+            "x": 259,
+            "y": 332,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              185,
+              120,
+              90
+            ],
+            "candidateRGB": [
+              182,
+              118,
+              88
+            ]
+          },
+          {
+            "x": 320,
+            "y": 283,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              126,
+              98,
+              81
+            ],
+            "candidateRGB": [
+              127,
+              100,
+              84
+            ]
+          },
+          {
+            "x": 270,
+            "y": 195,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              108,
+              81,
+              64
+            ],
+            "candidateRGB": [
+              106,
+              79,
+              61
+            ]
+          },
+          {
+            "x": 175,
+            "y": 180,
+            "max": 3,
+            "interior": false,
+            "sourceRGB": [
+              191,
+              133,
+              106
+            ],
+            "candidateRGB": [
+              188,
+              132,
+              107
+            ]
+          },
+          {
+            "x": 234,
+            "y": 179,
+            "max": 3,
+            "interior": false,
+            "sourceRGB": [
+              61,
+              31,
+              7
+            ],
+            "candidateRGB": [
+              64,
+              31,
+              7
+            ]
+          },
+          {
+            "x": 233,
+            "y": 178,
+            "max": 3,
+            "interior": false,
+            "sourceRGB": [
+              35,
+              18,
+              3
+            ],
+            "candidateRGB": [
+              32,
+              15,
+              2
+            ]
+          },
+          {
+            "x": 346,
+            "y": 172,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              124,
+              97,
+              80
+            ],
+            "candidateRGB": [
+              122,
+              94,
+              77
+            ]
+          },
+          {
+            "x": 332,
+            "y": 107,
+            "max": 3,
+            "interior": true,
+            "sourceRGB": [
+              140,
+              112,
+              95
+            ],
+            "candidateRGB": [
+              139,
+              110,
+              92
+            ]
+          }
+        ],
+        "sourceMaskCorner": 0,
+        "candidateMaskCorner": 0,
+        "linearLayers": [
+          {
+            "count": 98340,
+            "maximum": 0.03662109375,
+            "rms": 0.0004025723831016538
+          },
+          {
+            "count": 98340,
+            "maximum": 0.05810546875,
+            "rms": 0.00042118881996290673
+          },
+          {
+            "count": 98340,
+            "maximum": 0.021484375,
+            "rms": 0.0004936770425016707
+          }
+        ],
+        "RGBRMS": 0.17657164915390533
+      }
+    }
+  ],
+  "errors": [],
+  "sourceAttributes": {
+    "baseline": {
+      "shadowFields": [
+        {
+          "name": "RESTORED_EB1_KEY",
+          "sha256": "8563c54e95a2f04cd87fa3002ba9045c297eba1986819ccaf973e67475434720",
+          "error": 0
+        },
+        {
+          "name": "RESTORED_EB1_RIM",
+          "sha256": "7f852f83c39bb3a2bc74dabc6aef857ee8d11d9eb8c7e3fd64b9142f8359a26c",
+          "error": 0
+        }
+      ],
+      "shadowMatrices": [
+        [
+          -0.32099787367827387,
+          0.021789097096448537,
+          0.05494999353453757,
+          0,
+          0,
+          0.35366716740770365,
+          -0.017616848222793087,
+          0,
+          0.15656112385324183,
+          0.04467426948139275,
+          0.11266418283861993,
+          0,
+          0.49528858139701026,
+          0.24523482110767508,
+          0.4396315921278908,
+          1
+        ],
+        [
+          0.11627434087755596,
+          -0.06622551467047466,
+          -0.11736167661691244,
+          0,
+          -1.2390881971262908e-17,
+          0.35020738475479674,
+          -0.02482482620577604,
+          0,
+          -0.3376852055711846,
+          -0.022803273405364262,
+          -0.04041086600117497,
+          0,
+          0.5101247046385602,
+          0.24972995794325747,
+          0.44937165595472706,
+          1
+        ]
+      ],
+      "bodyColourAllOne": false,
+      "colourChannels": 3,
+      "bodyCount": 9253
+    }
+  },
+  "referenceShadowVisibilityPreserved": true,
+  "forcedFreshShadowRebuild": false,
+  "originalShadowUpdatePolicyReplayAccepted": true,
+  "shadowParity": {
+    "baseline": [
+      {
+        "name": "RESTORED_EB1_KEY",
+        "expected": "8563c54e95a2f04cd87fa3002ba9045c297eba1986819ccaf973e67475434720",
+        "actual": "8563c54e95a2f04cd87fa3002ba9045c297eba1986819ccaf973e67475434720",
+        "matched": true,
+        "error": 0,
+        "matrixMatched": true
+      },
+      {
+        "name": "RESTORED_EB1_RIM",
+        "expected": "7f852f83c39bb3a2bc74dabc6aef857ee8d11d9eb8c7e3fd64b9142f8359a26c",
+        "actual": "7f852f83c39bb3a2bc74dabc6aef857ee8d11d9eb8c7e3fd64b9142f8359a26c",
+        "matched": true,
+        "error": 0,
+        "matrixMatched": true
+      }
+    ]
+  },
+  "diagnosticCompleted": true,
+  "nativeSelfStable": true,
+  "nativeSelfScope": "Actual original baseline body renderer, three matched views, two explicit diagnostic self-redraws, unchanged shadow history; not a production warmup or current-function fidelity certificate",
+  "artifactStable": true,
+  "finishedUTC": "2026-10-25T10:59:44.153Z"
+}

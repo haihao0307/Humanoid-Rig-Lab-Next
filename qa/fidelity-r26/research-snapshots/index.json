@@ -20,6 +20,62 @@
       "compressedBytes": 276546,
       "selectedByDefault": false,
       "scope": "Historical complete HTML snapshot; requires retained runtime assets; not current release source acceptance"
+    },
+    {
+      "name": "highp-vertex",
+      "rawSHA256": "0dd9188015f3b3eef8bd3fcccbff73ff7ca56f9edd2d7bf6e8e75af27f7b3a65",
+      "rawBytes": 878265,
+      "file": "qa/fidelity-r26/research-snapshots/highp-vertex-0dd9188015f3.html.gz",
+      "compressedSHA256": "28c44839858d340c02b057d715e32d56b2172c65c779d6b42f694af7708138e6",
+      "compressedBytes": 276712,
+      "selectedByDefault": false,
+      "scope": "Declare ownWorld vertex texture sampler highp explicitly; fragment sampler already highp. Original material/function equations unchanged.",
+      "baselineSHA256": "faeb6268cc49572b87415538a1e3d17ff8fc79f41e2ab37bacaf342dc06e3d7f"
+    },
+    {
+      "name": "helper-blend",
+      "rawSHA256": "8dba4261d384b9ccb704bb99d1122256a87b0a9ef6fc7856ea33a53b24bce2b9",
+      "rawBytes": 878399,
+      "file": "qa/fidelity-r26/research-snapshots/helper-blend-8dba4261d384.html.gz",
+      "compressedSHA256": "97e7b6ca1a2b07163b4aca176271c92dcb4828cd2329478ebb39efc5ed332386",
+      "compressedBytes": 276765,
+      "selectedByDefault": false,
+      "scope": "Replace post-material helper discard with zero-alpha blend and helper depth=1 under LESS. Original equations retained; pipeline change unaccepted.",
+      "baselineSHA256": "faeb6268cc49572b87415538a1e3d17ff8fc79f41e2ab37bacaf342dc06e3d7f",
+      "trialSource": {
+        "file": "src/research/r26/BodyOriginalSkinHelperBlendR26.js",
+        "sha256": "851422269481acf909930b3f3bfa4afadcb22e48552ae0cbb37dd92441ca13ac"
+      }
+    },
+    {
+      "name": "native-depth",
+      "rawSHA256": "6b00caffc8649809c1f32aa7f6194327e67541f97bd28eb4a3fc52fa0b2910cb",
+      "rawBytes": 878259,
+      "file": "qa/fidelity-r26/research-snapshots/native-depth-6b00caffc864.html.gz",
+      "compressedSHA256": "e1c8a98d60aabace9e8a2f6de42d7022a92218fb6fcf03549ef43b038adec872",
+      "compressedBytes": 276710,
+      "selectedByDefault": false,
+      "scope": "Use native LEQUAL depth state instead of ALWAYS; unchanged fragment/material/function code.",
+      "baselineSHA256": "faeb6268cc49572b87415538a1e3d17ff8fc79f41e2ab37bacaf342dc06e3d7f",
+      "trialSource": {
+        "file": "src/research/r26/BodyOriginalSkinNativeDepthR26.js",
+        "sha256": "6ee1862b61d09a8a780de52b0cfe9d50af1f280379b7a90f1d97970f2fd0fa45"
+      }
+    },
+    {
+      "name": "invariant-material",
+      "rawSHA256": "2cd238d74833ab577eb7d3dee450157ddaf4866c750a6f41a8ec3b696f59548b",
+      "rawBytes": 878305,
+      "file": "qa/fidelity-r26/research-snapshots/invariant-material-2cd238d74833.html.gz",
+      "compressedSHA256": "5a0df7aafd5f89ee23cb33c932719fcc00b6a1e089c61c423d70ed4184ef7786",
+      "compressedBytes": 276725,
+      "selectedByDefault": false,
+      "scope": "Declare invariant gl_Position and gl_FragDepth without changing original equations or adding redraws.",
+      "baselineSHA256": "faeb6268cc49572b87415538a1e3d17ff8fc79f41e2ab37bacaf342dc06e3d7f",
+      "trialSource": {
+        "file": "src/research/r26/BodyOriginalSkinInvariantR26.js",
+        "sha256": "d32d44450b36a78b518f25a95740b4b9028ccc04cb5c8b72d6e5e7c94992aadf"
+      }
     }
   ]
 }

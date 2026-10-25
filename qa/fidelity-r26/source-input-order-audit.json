@@ -1,0 +1,111 @@
+{
+  "checkedUTC": "2026-10-25T11:24:40.145Z",
+  "scope": "Historical captured native vertex shader versus current function material adapter input construction; not a fresh native vertex export or a cause certificate",
+  "capturedSourceReferenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+  "capturedVertexSHA256": "4cfc3754c2ce1d86a8456c127f593fe1946857c53df8bee429bc208dca1bded2",
+  "capturedFragmentSHA256": "27c846dc419b218d93db3057cf8bd452f088a337dfa057ff1abccda0e1d6f9c7",
+  "currentOriginalFragmentSHA256": "27c846dc419b218d93db3057cf8bd452f088a337dfa057ff1abccda0e1d6f9c7",
+  "capturedFragmentMatchesCurrentOriginalFragment": true,
+  "currentAdapter": {
+    "file": "src/BodyOriginalSkinR26.js",
+    "sha256": "74784291df3979e51b3c759e6cd06ff9ec24fdcfabdd944b704c99682120a3ec"
+  },
+  "sourceFidelityAccepted": false,
+  "acceptanceTolerance": null,
+  "shaderOrderingParityCertified": false,
+  "rootCauseEstablished": false,
+  "runtimeChanged": false,
+  "newImageFiles": 0,
+  "observedNativeVertexStatements": {
+    "normalMatrixBeforeNormalize": true,
+    "viewPositionBeforeRasterInterpolation": true,
+    "activeGPUDeformationDefines": []
+  },
+  "observedAdapterStatements": {
+    "normalFromWorldFunctionThenViewMatrix": true,
+    "viewPositionFromFunctionWorldPoint": true
+  },
+  "originalInputNormalLengths": [
+    {
+      "id": "baseline",
+      "caseSHA256": "3d3df0a9c7f4f0dae2041ccae7cac320c8c71109aa13c2aecd4c4869722fb383",
+      "count": 9253,
+      "minimum": 0.9999999564382923,
+      "maximum": 1.0000000406348752,
+      "maximumDeviation": 4.356170768549106e-8
+    },
+    {
+      "id": "lean",
+      "caseSHA256": "30d7e3ff91bc1d36fee0f2a2b7a49fe33ab8fc8907cde90fb2f752740979bbfd",
+      "count": 9253,
+      "minimum": 0.9999999565131031,
+      "maximum": 1.0000000396567552,
+      "maximumDeviation": 4.3486896861288926e-8
+    },
+    {
+      "id": "fuller",
+      "caseSHA256": "274feaa059abe5779ff15e6ba0560a7642c6bc995da4c05356526058dc0dcab7",
+      "count": 9253,
+      "minimum": 0.9999999525730477,
+      "maximum": 1.0000000420426174,
+      "maximumDeviation": 4.742695225434801e-8
+    },
+    {
+      "id": "muscular",
+      "caseSHA256": "039ccecc68e5377d7da2a8a679130de4c8795c65fba07d4763dfc62327ab716b",
+      "count": 9253,
+      "minimum": 0.9999999550030897,
+      "maximum": 1.000000045742255,
+      "maximumDeviation": 4.5742255094793904e-8
+    },
+    {
+      "id": "female",
+      "caseSHA256": "bd90be9482e710966ccbf752bd9c56779ce0889c63db1258bdf204646add01f1",
+      "count": 9253,
+      "minimum": 0.999999957297338,
+      "maximum": 1.000000040647419,
+      "maximumDeviation": 4.2702661962046307e-8
+    },
+    {
+      "id": "A-reach",
+      "caseSHA256": "f328ebb5e385bc0699b514c4a46b9aa0d3d788591a951655d372b8fe5bfc9f8b",
+      "count": 9253,
+      "minimum": 0.9999999582671193,
+      "maximum": 1.000000040572123,
+      "maximumDeviation": 4.17328807067463e-8
+    },
+    {
+      "id": "A-joints",
+      "caseSHA256": "32407ed5a2731a42c97b0ef7f44b038397f93cf0d3e38250b5db4c0ef3b20650",
+      "count": 9253,
+      "minimum": 0.9999999550040578,
+      "maximum": 1.0000000406348752,
+      "maximumDeviation": 4.499594219442571e-8
+    },
+    {
+      "id": "B-neutral",
+      "caseSHA256": "b9f7fd3e4efc9008ba3241be5cd583bdde66aeca08b017aabea8692bbf475654",
+      "count": 9253,
+      "minimum": 0.9999999564382923,
+      "maximum": 1.0000000406348752,
+      "maximumDeviation": 4.356170768549106e-8
+    },
+    {
+      "id": "B-bend",
+      "caseSHA256": "d79192b07855d185b24ff2670835f0cc8595d2a4ea67ded96d3456874aef2343",
+      "count": 9253,
+      "minimum": 0.9999999589231761,
+      "maximum": 1.000000041119253,
+      "maximumDeviation": 4.111925289151941e-8
+    },
+    {
+      "id": "calibration-soft",
+      "caseSHA256": "1b09ebf265eeb888b2bbf5674675be9de3001a297d7f6058521cbacc450ef7c3",
+      "count": 9253,
+      "minimum": 0.9999999588315225,
+      "maximum": 1.0000000409039533,
+      "maximumDeviation": 4.116847751589603e-8
+    }
+  ],
+  "nextUnacceptedQuestion": "Native view-space normalization occurs per vertex before raster interpolation; the adapter reconstructs attributes in world space then transforms at the fragment. Mathematical identities and small source normal-length residuals do not prove identical GPU operation ordering. Investigate view-dependent input reconstruction without modifying source surfaces, and separate it from the still unresolved self-redraw variation."
+}
