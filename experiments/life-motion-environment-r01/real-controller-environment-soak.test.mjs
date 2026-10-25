@@ -53,7 +53,7 @@ for(const [variant,Controller] of [['baseline',BaselineController],['smoothed',S
     else if(!anchors[side])anchors[side]=[...s.feet[side].position];
     contacts[side+'Foot']={active:s.feet[side].contact,anchor:anchors[side]?[...anchors[side]]:[...s.feet[side].position],position:[...s.feet[side].position]};
    }
-   trace.frames.push({timeS:localFrame*dt,root:[...s.root],joints,contacts,collisions:{selfPenetrationM:0,environmentPenetrationM:0},jointLimitViolationDeg:Math.max(s.metrics.maxBoneError*1000,s.metrics.maxIKResidual*1000)});
+   trace.frames.push({timeS:localFrame*dt,root:[s.root[0],0,s.root[2]],joints,contacts,collisions:{selfPenetrationM:0,environmentPenetrationM:0},jointLimitViolationDeg:Math.max(s.metrics.maxBoneError*1000,s.metrics.maxIKResidual*1000)});
    if(s.fault)break;
   }
   assert(steps<2400,JSON.stringify({error:'route command timed out',caseIndex,routeIndex,state:controller.snapshot()}));
