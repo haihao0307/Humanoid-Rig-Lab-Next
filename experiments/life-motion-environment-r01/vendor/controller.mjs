@@ -16,7 +16,7 @@ export class MotionController {
   }
   reset() {
     const root = [0, this.rig.hipHeight, 0];
-    this.state = { root, yaw: 0, yawRate: 0, speed: 0, time: 0, command: null, status: 'idle',
+    this.state = { root, velocity: [0, 0, 0], yaw: 0, yawRate: 0, speed: 0, time: 0, command: null, status: 'idle',
       paused: false, fault: null, nextFoot: 'left', swing: null, feet: {}, pose: null,
       motion: { phase: 0, weight: 0, frame: null },
       metrics: { maxBoneError: 0, maxContactError: 0, maxIKResidual: 0, steps: 0, completed: 0, rejected: 0 } };
@@ -80,15 +80,20 @@ export class MotionController {
       }
       s.yawRate = yawRate;
       s.yaw = angle(s.yaw + yawDelta);
-      // Lower translational acceleration to avoid abrupt speed changes during
-      // direction changes and target capture.
-      s.speed += clamp(wantedSpeed - s.speed, -.65 * dt, .55 * dt);
+      // Limit the complete horizontal velocity vector, not only its magnitude.
+      // This also bounds lateral acceleration when heading changes.
       const heading = rotateY([0, 0, 1], s.yaw);
-      let travel = s.speed * dt;
-      if (c?.type === 'walk') travel = Math.min(travel, remaining);
-      const sweep = this.world.sweep(s.root, add(s.root, mul(heading, travel)), .23);
+      const desiredVelocity = c?.type === 'walk' ? mul(heading, wantedSpeed) : [0, 0, 0];
+      const velocityDelta = sub(desiredVelocity, s.velocity || [0, 0, 0]);
+      const deltaSpeed = length(velocityDelta), maxLinearAcceleration = .85;
+      const appliedDelta = deltaSpeed > maxLinearAcceleration * dt ? mul(velocityDelta, maxLinearAcceleration * dt / deltaSpeed) : velocityDelta;
+      s.velocity = add(s.velocity || [0, 0, 0], appliedDelta); s.velocity[1] = 0;
+      s.speed = length(horizontal(s.velocity));
+      let travelVector = mul(s.velocity, dt);
+      if (c?.type === 'walk' && length(horizontal(travelVector)) > remaining) travelVector = mul(normalize(horizontal(travelVector)), remaining);
+      const sweep = this.world.sweep(s.root, add(s.root, travelVector), .23);
       s.root = sweep.position;
-      if (sweep.blocked) { s.speed = 0; s.status = 'blocked'; }
+      if (sweep.blocked) { s.speed = 0; s.velocity = [0, 0, 0]; s.status = 'blocked'; }
       this.stepFeet(s, dt);
       this.motion.advance(s, dt);
       s.pose = this.solve(s);
