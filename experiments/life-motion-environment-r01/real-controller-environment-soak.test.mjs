@@ -18,7 +18,7 @@ const routes=[
  [[0,0,.7],[-.5,0,.8],[-.5,0,1.8],[.1,0,1.0]]
 ];
 const dt=1/120, trace={schema:TRACE_SCHEMA,frames:[]}, results=[];
-let globalFrame=0;
+let globalFrame=0;const anchors={left:null,right:null};
 function quatYaw(yaw){return[0,Math.sin(yaw/2),0,Math.cos(yaw/2)];}
 for(let caseIndex=0;caseIndex<routes.length;caseIndex++){
  const world=new FlatWorld(obstacles),controller=new MotionController(rig,world);
@@ -39,12 +39,16 @@ for(let caseIndex=0;caseIndex<routes.length;caseIndex++){
    const s=controller.snapshot(),joints={};
    for(const side of ['left','right']){
     const leg=s.pose.legs[side];
-    joints[side+'_femur']={p:[...leg.hip],q:quatYaw(s.yaw)};
+    joints[side+'_femur']={p:[...leg.root],q:quatYaw(s.yaw)};
     joints[side+'_tibia']={p:[...leg.knee],q:quatYaw(s.yaw)};
     joints[side+'_foot']={p:[...leg.end],q:quatYaw(s.feet[side].yaw)};
    }
    const contacts={};
-   for(const side of ['left','right'])contacts[side+'Foot']={active:s.feet[side].contact,anchor:[...s.feet[side].position],position:[...s.feet[side].position]};
+   for(const side of ['left','right']){
+    if(!s.feet[side].contact)anchors[side]=null;
+    else if(!anchors[side])anchors[side]=[...s.feet[side].position];
+    contacts[side+'Foot']={active:s.feet[side].contact,anchor:anchors[side]?[...anchors[side]]:[...s.feet[side].position],position:[...s.feet[side].position]};
+   }
    trace.frames.push({timeS:globalFrame*dt,root:[...s.root],joints,contacts,collisions:{selfPenetrationM:0,environmentPenetrationM:0},jointLimitViolationDeg:Math.max(s.metrics.maxBoneError*1000,s.metrics.maxIKResidual*1000)});
    if(s.fault)break;
   }
