@@ -28,5 +28,12 @@ try{
  check('R24 selection and companion reproduce',selected.selectedVersion==='R24'&&selected.sha256===source.sha256&&selected.companionBuild==='BUILD-R24.json'&&selected.companionWorkbench==='BUILD-R24.json');
  const assets=[...source.activeSkin.assets,...source.coefficientAssets,{file:workbench.bytePacket.file,bytes:workbench.bytePacket.compressedBytes,sha256:workbench.bytePacket.compressedSHA256}];
  for(const a of assets){const bytes=fs.readFileSync(path.join(folder,a.file));check('committed runtime asset '+a.file,bytes.length===a.bytes&&H(bytes)===a.sha256);}
+ if(fs.existsSync(path.join(folder,'tools/research/r24/build-soft-research.cjs'))){
+  q.researchBuildOutput=cp.execFileSync(process.execPath,['tools/research/r24/build-soft-research.cjs'],{cwd:folder,encoding:'utf8',timeout:180000});
+  const research=JSON.parse(fs.readFileSync(path.join(folder,'qa/fidelity-r24/soft-research-build.json'))),expected=JSON.parse(fs.readFileSync(path.join(root,'qa/fidelity-r24/soft-research-build.json'))),selectedAfter=JSON.parse(fs.readFileSync(path.join(folder,'BUILD.json')));
+  check('isolated research also rebuilds from committed data only',research.sha256===expected.sha256&&H(fs.readFileSync(path.join(folder,research.file)))===expected.sha256&&research.defaultBuildSelected===false&&research.sourceFidelityAccepted===false);
+  check('research build leaves production selection and artifacts unchanged',selectedAfter.sha256===source.sha256&&H(fs.readFileSync(path.join(folder,source.file)))===source.sha256&&H(fs.readFileSync(path.join(folder,workbench.file)))===workbench.sha256);
+  q.researchSHA256=research.sha256;
+ }
  q.assetCount=assets.length;q.assetCompressedBytes=assets.reduce((n,a)=>n+a.bytes,0);q.ignoredReferenceInputsRead=false;q.externalRuntimeDownloads=0;q.sourceSHA256=source.sha256;q.workbenchSHA256=workbench.sha256;q.passed=true;
 }catch(e){q.failure=e.stack;q.passed=false;process.exitCode=1;console.error(e);}finally{q.finishedUTC=new Date().toISOString();fs.writeFileSync(path.join(root,'qa/fidelity-r24/git-tree-rebuild.json'),JSON.stringify(q,null,2)+'\n');console.log(JSON.stringify({passed:q.passed,commit,checks:q.checks.length,assets:q.assetCount,failure:q.failure}));}

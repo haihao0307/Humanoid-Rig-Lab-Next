@@ -1,6 +1,6 @@
 {
   "schema": "body-function-delivery/9",
-  "reviewedUTC": "2026-10-25T03:59:23.614Z",
+  "reviewedUTC": "2026-10-25T04:37:24.518Z",
   "selectedVersion": "R24",
   "status": "checked working candidate; source fidelity and full body reconstruction incomplete",
   "artifact": "delivery/身体_R24_原貌与原函数皮纹.html",
@@ -143,7 +143,7 @@
     {
       "priority": 1,
       "status": "partial",
-      "task": "已建立独立原参数体量校准档与A/B连续绑定参照；胸肩带、腰腹及骨盆大体积和骨架/软组织响应分离仍未完成，校准档不是已验收的成人母体。"
+      "task": "已建立原参数校准档、A/B当前绑定参照和隔离的数值/三维软组织响应候选；候选极端体型仍有局部形态问题，默认版未采用。胸肩腰腹骨盆体量、完整骨架/软组织分离仍未完成，校准档不是已验收母体。"
     },
     {
       "priority": 2,
@@ -169,8 +169,8 @@
   "evidence": [
     {
       "file": "qa/fidelity-r24/release-integrity.json",
-      "sha256": "c8a75cd54863bc31bdaeb73f583c7e0893b4d218367613afe08f4b7df4ce5fa4",
-      "checks": 289,
+      "sha256": "85c94e6dc727da62b9c65963e9c785982e64f34710da59ffe2f168c7bcd717e5",
+      "checks": 314,
       "passed": true
     },
     {
@@ -262,6 +262,18 @@
       "sha256": "71439b0a519b65f9e1b40c127a61be543fc06e81d6b9bd25820d294e6c6cbaf3",
       "checks": 101,
       "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/source-functions-browser.json",
+      "sha256": "804fda93a8083f8e0ae06c5666dc6a3b47fe6fff5dfcebd744a8523974c34c21",
+      "checks": 5,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/git-tree-rebuild.json",
+      "sha256": "cb654ffd09d3a0f85097450f7c650d339952ed92f61c166ef36791cf3ee63b24",
+      "checks": 86,
+      "passed": true
     }
   ],
   "comparisonEvidence": [
@@ -282,6 +294,211 @@
     "coefficientArrays": 57
   },
   "newUserFacingImageGallery": false,
-  "newInternalLayoutScreenshots": 1,
-  "notes": "Full runtime assets remain alongside the small HTML files. Git synchronization is not public web deployment. Never infer source acceptance from data identity, runtime checks or source-derived fixed states."
+  "newInternalLayoutScreenshots": 2,
+  "notes": "Full runtime assets remain alongside the small HTML files. Git synchronization is not public web deployment. Never infer source acceptance from data identity, runtime checks or source-derived fixed states.",
+  "wholePatchCoefficientBounds": {
+    "profiles": 10,
+    "sourceFunctions": 184160,
+    "arithmetic": "exact rational evaluation of stored Float64 coefficients in real arithmetic; not floating runtime execution",
+    "maximumPositionBoundMetresUpper": 2.7463874343079033e-16,
+    "maximumNormalizedNormalBoundUpper": 9.092817855592478e-12,
+    "attributeBounds": {
+      "restX": 2.844047677876558e-16,
+      "restY": 7.547439794865631e-16,
+      "restZ": 3.5754134702639246e-16,
+      "dry": 7.663180770432356e-16,
+      "palm": 2.3485387761054344e-14
+    },
+    "finitePrecisionRayAndDomainOwnershipProven": false,
+    "nonlinearMaterialOrNativePixelsAccepted": false,
+    "formalAcceptance": false
+  },
+  "exactSplitAreaConservation": {
+    "profiles": 10,
+    "exactSplits": 2716867,
+    "nonemptyPieces": 5433734,
+    "scope": "Offline exact rational split area conservation before Float64 line encoding; not a global finite-precision ray or boundary-ownership proof",
+    "formalAcceptance": false
+  },
+  "isolatedSoftResponseResearch": {
+    "defaultBuildSelected": false,
+    "sourceDefaultFieldBuffersByteExact": true,
+    "referenceSoftParameters": {
+      "weight": 0.66,
+      "muscle": 0.96
+    },
+    "namedBodyLocalSoftControls": 20,
+    "completeSoftSkeletonDecoupling": false,
+    "numericCases": 150,
+    "numericChecks": 647,
+    "viewerChecks": 36,
+    "wholeAndHalfBodyFrames": 48,
+    "maximumRawSampleCorrectionMetres": 0.06328663630669387,
+    "localShapeDiagnosticCases": 150,
+    "maximumSourceRelativeNormalTurnCells": 9,
+    "minimumSourceRelativeNormalDot": -0.9993962853923509,
+    "originalSourceConnectivityOnlyUsedOffline": true,
+    "displayReady": false,
+    "visualAccepted": false,
+    "sourceFidelityAccepted": false,
+    "formalPersonArchiveOffered": false,
+    "productionPageHandoffConsumed": false,
+    "artifactSHA256": "5ef9a1cc221f8ecde04bf9f2b77ab20c9e488ac0eaf96a7dda107dc2429b80e8",
+    "buildEntry": "tools/research/r24/build-soft-research.cjs",
+    "remaining": [
+      "source-faithful continuous surface",
+      "chest/shoulder/abdomen/pelvis form",
+      "extreme and combined motion local shape",
+      "normals",
+      "current neck boundary",
+      "material coordinates",
+      "measured independent skeleton"
+    ]
+  },
+  "researchAndProofEvidence": [
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-baseline.json",
+      "sha256": "a9228235fa0d6049adb224e8bd78c9dbd5a8899280dc48fc7a6c2159026dbad3",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-baseline.json",
+      "sha256": "fef15e3d0032f85cf6a6ab97029593edc62618101ed2cd8245cff395c363f1de",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-lean.json",
+      "sha256": "6c2ec975c52e1c84b6c009011960bf7b12535726c931f0c5fb8296b321a31b39",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-lean.json",
+      "sha256": "bfa37ca48b661a5e25d82819c2185af9b1c77e7c000387e3ce7df98329152b0b",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-fuller.json",
+      "sha256": "a1e0d074ef5972166d336dcc2b6bf9162e4092e9fb08e6398e9e8effee4cbc98",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-fuller.json",
+      "sha256": "c903de8f368e9012ae9c797f38dea96b62ff3e10bec4ebe4d337f1018e8caeff",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-muscular.json",
+      "sha256": "e9d5f3bdcf9958fabb8a350e0ed4b9dbacab004fdc3b84fb056c11d9bc40b934",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-muscular.json",
+      "sha256": "01cb5a0d46f05ec5ed267c3daeae4eec314ab7cb578ed32a01531b45ecd9cf07",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-female.json",
+      "sha256": "360d2e878248c2d31e34fa831cb27faf97edecb6211bca4c771e4da2969ce525",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-female.json",
+      "sha256": "e4cbdfbebbd3d88fd7e43fd82769878740626317f9af1eec43c21da3bc6094d2",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-A-reach.json",
+      "sha256": "a904ea658bbaa5d941eed6051411ab77341478e2b8fbb841feba014a71017478",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-A-reach.json",
+      "sha256": "84147439af736c4ff24d01e5a254bcefe5460883642c243054d7fbf8acb707b0",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-A-joints.json",
+      "sha256": "1fb033cd43a88738da53d4cad578cf6c90c8195e46cd7346447b9efc374982ce",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-A-joints.json",
+      "sha256": "8c778067583760dc9e3ebcfff391751b72d44fbd86de47605da14f868267c474",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-B-neutral.json",
+      "sha256": "78e99f99d86343ce3b6af32a6d73c31c7b4e622f09c213fc89c1c008386d7675",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-B-neutral.json",
+      "sha256": "95fb105b63df264c5e38f9e0902e33ceaf0819d71a1a9178e1fc4a65919a4fdc",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-B-bend.json",
+      "sha256": "c0eebb8ee8cf471e36fbd014262691de16928ae5b2c08de7accb36bba6a2b1b8",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-B-bend.json",
+      "sha256": "75d822140f5d4f47cb0fbd818e6a58bbb1796682d9e3eabf820139a6df6a1001",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-calibration-soft.json",
+      "sha256": "5ef92fcf7038ab314592ff6faa3f3d844720b59da7e2819af23e090690cb77fd",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-calibration-soft.json",
+      "sha256": "a0b1ea5bebb13690983058dc1fe69897ee97c4f79b0f20fcdf9a875f3a32c9b0",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/soft-response-research.json",
+      "sha256": "5a3799781cc21d7e7b8a44fb755faf7e4f45f0069797a114d21514acfa1f2223",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/soft-response-viewer.json",
+      "sha256": "007823931b71d5a5a61607a3282e0c4e7d2ba71a01c8e56051438fc80ed050c7",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/soft-research-build.json",
+      "sha256": "69e31231bc2696087252adf2d1374177d3c53e6d4d2626dd8a1fa38615c023c5",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/soft-local-shape-diagnostic.json",
+      "sha256": "243d1e6fb5ab167c32539458a6ea02f66c93e5a0bf07840d3b3428495e113a07",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    }
+  ]
 }
