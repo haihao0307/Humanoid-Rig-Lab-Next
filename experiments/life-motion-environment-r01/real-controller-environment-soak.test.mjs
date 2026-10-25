@@ -55,9 +55,27 @@ for(const [variant,Controller] of [['baseline',BaselineController],['smoothed',S
    const s=controller.snapshot(),joints={};
    for(const side of ['left','right']){
     const leg=s.pose.legs[side];
-    joints[side+'_femur']={p:[...leg.root],q:quatYaw(s.yaw)};
-    joints[side+'_tibia']={p:[...leg.knee],q:quatYaw(s.yaw)};
+    joints[side+'_femur']={p:[...leg.root],q:[0,0,0,1]};
+    joints[side+'_tibia']={p:[...leg.knee],q:[0,0,0,1]};
     joints[side+'_foot']={p:[...leg.end],q:quatYaw(s.feet[side].yaw)};
+   }
+   joints.root_heading={p:[0,0,0],q:quatYaw(s.yaw)};
+   /* no measured skin collision or anatomical joint-angle data in this proxy */
+   const unavailable={selfPenetrationM:null,environmentPenetrationM:null};
+   const contacts={};
+   for(const side of ['left','right']){
+    if(!s.feet[side].contact)anchors[side]=null;
+    else if(!anchors[side])anchors[side]=[...s.feet[side].position];
+    contacts[side+'Foot']={active:s.feet[side].contact,anchor:anchors[side]?[...anchors[side]]:[...s.feet[side].position],position:[...s.feet[side].position]};
+   }
+   trace.frames.push({timeS:localFrame*dt,root:[s.root[0],0,s.root[2]],joints,contacts,collisions:unavailable,jointLimitViolationDeg:null});
+   if(s.fault)break;
+  }
+  assert(steps<2400,JSON.stringify({error:'route command timed out',caseIndex,routeIndex,state:controller.snapshot()}));
+  assert.equal(controller.state.fault,null,'controller must not fault during route');
+  assert.notEqual(controller.state.status,'blocked','route unexpectedly blocked by world sweep');
+  assert.equal(controller.state.command,null,'route command should finish');
+  results.push({variant,caseIndex,routeIndex,status:'completed',steps,root:[...controller.state.root],footSlipMaxM:controller.state.metrics.maxContactError,ikResidualM:controller.state.metrics.maxIKResidual});
    }
    const contacts={};
    for(const side of ['left','right']){
