@@ -32,10 +32,12 @@ jobs:
           node --check experiments/life-motion-environment-r01/routine-engine.test.mjs
           node --check experiments/life-motion-environment-r01/motion-trace-audit.mjs
           node --check experiments/life-motion-environment-r01/motion-trace-audit.test.mjs
+          node --check experiments/life-motion-environment-r01/real-controller-environment-soak.test.mjs
       - name: Run long-horizon contract soak
         run: |
           node experiments/life-motion-environment-r01/routine-engine.test.mjs
           node experiments/life-motion-environment-r01/motion-trace-audit.test.mjs
+          node experiments/life-motion-environment-r01/real-controller-environment-soak.test.mjs
           # Read-only regression probes against the existing character motion core.
           node tools/test-motion-phase-continuity.mjs
           node tools/test-motion-support-continuity.mjs
