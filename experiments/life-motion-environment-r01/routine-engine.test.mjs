@@ -12,7 +12,7 @@ class FakeAdapter{
  hasFacts(){return false;}
 }
 assert(RESIDENT_ROUTINE_R01.length>=50,'routine must be materially longer than a single action demo');
-assert(RESIDENT_ROUTINE_R01.some(t=>t.skill==='climb-stairs')&&RESIDENT_ROUTINE_R01.some(t=>t.skill==='operate-door')&&RESIDENT_ROUTINE_R01.some(t=>t.skill==='operate-window'));
+assert(RESIDENT_ROUTINE_R01.some(t=>t.skill==='climb-stairs')&&RESIDENT_ROUTINE_R01.some(t=>t.skill==='operate-door')&&RESIDENT_ROUTINE_R01.some(t=>t.skill==='operate-window'));assert(RESIDENT_ROUTINE_R01.every(t=>t.requires.length&&t.produces.length&&t.gates.length));
 const adapter=new FakeAdapter(),runner=new LifeRoutineRunner(adapter);runner.start({repeatCount:2});let ticks=0;
 while(runner.state==='running'&&ticks<5000){runner.tick(1/60);ticks++;}
 assert.equal(runner.state,'completed');assert.equal(runner.cycle,2);assert.equal(runner.snapshot().journal.filter(e=>e.type==='task-verified').length,RESIDENT_ROUTINE_R01.length*2);assert.equal(adapter.holdingObject,null);assert.equal(adapter.started,RESIDENT_ROUTINE_R01.length*2);assert.equal(runner.facts.has('holding-crate'),false);assert.equal(runner.facts.has('holding-book'),false);
@@ -25,5 +25,8 @@ const bad=validateObservation({gates:['contactStable']},{contactStable:true,noPe
 assert.equal(bad.ok,false);assert(bad.failures.includes('penetration-out-of-range'));
 class BadGripAdapter extends FakeAdapter{stepTask(){if(this.active?.id==='grasp-crate')return{status:'succeeded',progress:1};return super.stepTask();}}
 const gripAdapter=new BadGripAdapter(),gripRunner=new LifeRoutineRunner(gripAdapter,{routine:[RESIDENT_ROUTINE_R01.find(t=>t.id==='grasp-crate')],maxRetriesPerTask:1});gripRunner.start({initialFacts:['hands-contact-crate']});let gripGuard=0;while(gripRunner.state==='running'&&gripGuard++<10)gripRunner.tick(1/60);assert.equal(gripRunner.state,'failed');assert(gripRunner.snapshot().journal.some(e=>e.detail?.reason==='held-object-state-mismatch'));assert.equal(gripRunner.snapshot().journal.filter(e=>e.type==='task-verified').length,0);
+class RegressingProgressAdapter extends FakeAdapter{constructor(){super();this.calls=0;}stepTask(){return{status:'running',progress:this.calls++===0?.8:.4};}}
+const progressAdapter=new RegressingProgressAdapter(),progressRunner=new LifeRoutineRunner(progressAdapter,{routine:one});progressRunner.start();assert.equal(progressRunner.tick(1/60).progress,.8);const regression=progressRunner.tick(1/60);assert.equal(regression.retryScheduled,true);assert(progressRunner.snapshot().journal.some(e=>e.detail?.reason==='progress-regressed'));
+const missingMetric=validateObservation({gates:[]},{selfCollisionFree:true,environmentCollisionFree:true,metrics:{}});assert.equal(missingMetric.ok,false);assert(missingMetric.failures.includes('pose-velocity-out-of-range'));
 const cancelAdapter=new FakeAdapter(),cancelRunner=new LifeRoutineRunner(cancelAdapter,{routine:one});cancelRunner.start();cancelAdapter.forceRunning=true;cancelRunner.tick(1/60);cancelAdapter.holdingObject='crate-01';assert.equal(cancelRunner.cancel(),false);assert.equal(cancelRunner.state,'paused');assert.equal(cancelRunner.snapshot().journal.at(-1).detail.requiresSafeRelease,true);
 console.log(JSON.stringify({suite:'life-motion-environment-r01',routineTasksPerCycle:RESIDENT_ROUTINE_R01.length,cycles:2,verifiedTaskCount:RESIDENT_ROUTINE_R01.length*2,ticks,retryRecovery:'passed',failedGateRejected:'passed',heldObjectCancellationGuard:'passed',live3DAdapterIntegrated:false,visualAcceptance:false},null,2));
