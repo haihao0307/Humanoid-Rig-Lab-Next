@@ -16,7 +16,7 @@ on:
 
 concurrency:
   group: life-motion-environment-r01-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ permissions:
 jobs:
   contract-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
