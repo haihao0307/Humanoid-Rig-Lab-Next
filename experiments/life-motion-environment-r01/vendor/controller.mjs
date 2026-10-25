@@ -74,8 +74,11 @@ export class MotionController {
       let wantedYawRate = Math.sign(yawError) * Math.min(maxYawSpeed, Math.sqrt(2 * maxYawAcceleration * Math.abs(yawError)));
       if (Math.abs(yawError) < .002) wantedYawRate = 0;
       let yawRate = s.yawRate + clamp(wantedYawRate - s.yawRate, -maxYawAcceleration * dt, maxYawAcceleration * dt);
-      let yawDelta = yawRate * dt;
-      if (Math.abs(yawDelta) > Math.abs(yawError)) { yawDelta = yawError; yawRate = 0; }
+      // Do not snap the final heading to the target while angular velocity is
+      // still nonzero. That one-frame position correction creates an apparent
+      // angular-acceleration impulse in the measured root trajectory. Let the
+      // rate controller brake and converge continuously instead.
+      const yawDelta = yawRate * dt;
       for (const foot of Object.values(s.feet)) if (foot.contact) {
         const twist = angle(s.yaw + yawDelta - foot.yaw);
         if (Math.abs(twist) > .28 && Math.sign(twist) === Math.sign(yawDelta)) { yawDelta = 0; yawRate += clamp(-yawRate, -maxYawAcceleration * dt, maxYawAcceleration * dt); }
@@ -114,7 +117,7 @@ export class MotionController {
       const feetAligned = SIDES.every(side => distance(s.feet[side].position, this.stance(s, side)) < .055 && Math.abs(angle(s.yaw - s.feet[side].yaw)) < .08);
       const remainingAfterMove = c?.type === 'walk' ? length(horizontal(sub(c.target, s.root))) : 0;
       const atGoal = c?.type === 'walk' ? remainingAfterMove <= .015 : c?.type === 'turn' ? Math.abs(angle(c.yaw - s.yaw)) < .015 : true;
-      if (s.speed < .005 && !s.swing && feetAligned && atGoal) {
+      if (s.speed < .005 && Math.abs(s.yawRate) < .02 && !s.swing && feetAligned && atGoal) {
         s.speed = 0; s.velocity = [0, 0, 0];
         if (c && c.type !== 'stop') s.metrics.completed++;
         s.command = null; s.status = 'idle';
