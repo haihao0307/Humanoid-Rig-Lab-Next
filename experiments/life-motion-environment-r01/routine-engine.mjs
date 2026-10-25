@@ -54,7 +54,16 @@ const rows=[
 ['withdraw-book-table','withdraw-hands','book-01','book-settled-on-table hands-free','clear-of-table','supportStable noPenetration jointLimits'],
 ['return-idle','walk-to-region','room-idle-mark','clear-of-table','standing routine-cycle-complete','supportStable noPenetration jointLimits'],
 ];
-export const RESIDENT_ROUTINE_R01=Object.freeze(rows.map(([id,skill,target,requires,produces,gates])=>Object.freeze({id,skill,target,requires:requires.split(' '),produces:produces.split(' '),gates:gates.split(' ')})));
+const consumesByTask=Object.freeze({
+ 'grasp-crate':['hands-free','hands-contact-crate'],'release-crate':['holding-crate'],
+ 'close-window':['window-open','window-inspected'],'close-door':['door-open'],
+ 'climb-stairs':['at-stairs'],'turn-landing':['at-landing'],'descend-stairs':['facing-descent'],
+ 'grasp-book':['hands-free','hand-contact-book'],'release-book':['holding-book'],
+ 'grasp-stored-crate':['hands-free','hands-contact-stored-crate','crate-settled'],
+ 'release-crate-table':['holding-crate'],'grasp-book-shelf':['hands-free','hand-contact-book-on-shelf','book-settled'],
+ 'release-book-table':['holding-book']
+});
+export const RESIDENT_ROUTINE_R01=Object.freeze(rows.map(([id,skill,target,requires,produces,gates])=>Object.freeze({id,skill,target,requires:requires.split(' '),produces:produces.split(' '),consumes:[...(consumesByTask[id]||[])],gates:gates.split(' ')})));
 const clone=x=>x==null?x:structuredClone(x), nonnegative=x=>Number.isFinite(x)&&x>=0, terminal=new Set(['completed','failed','cancelled']);
 export function validateObservation(task,o,limits=LIMITS){
  const failures=[];if(!o||typeof o!=='object')return{ok:false,failures:['missing-observation'],metrics:{}};const m=o.metrics||{};
@@ -82,6 +91,10 @@ export class LifeRoutineRunner{
   let r;try{r=this.a.stepTask(dt,this.context());}catch(e){return this.failCurrent(e?.message||String(e));}if(!r||!['running','succeeded','failed'].includes(r.status))return this.failCurrent('invalid-adapter-status');
   if(Number.isFinite(r.progress)){if(r.progress+1e-8<this.progress)return this.failCurrent('progress-regressed');this.progress=Math.max(this.progress,Math.min(1,r.progress));}if(r.status==='running')return{state:this.state,taskId:this.current.id,progress:this.progress};if(r.status==='failed')return this.failCurrent(r.reason||'skill-failed');
   let o;try{o=this.a.observe(this.current,this.context());}catch(e){return this.failCurrent('observation-error:'+(e?.message||e));}const v=validateObservation(this.current,o,this.limits);if(!v.ok)return this.failCurrent('acceptance-gate-failed',{failures:v.failures,metrics:v.metrics});
+  const held=this.current.produces.includes('holding-crate')?'crate-01':this.current.produces.includes('holding-book')?'book-01':null;
+  if(held&&o.holdingObject!==held)return this.failCurrent('held-object-state-mismatch',{expected:held,actual:o.holdingObject??null});
+  if((this.current.consumes||[]).some(f=>f.startsWith('holding-'))&&!held&&(o.holdingObject??null)!==null)return this.failCurrent('release-did-not-clear-object-ownership',{actual:o.holdingObject});
+  for(const f of this.current.consumes||[])this.facts.delete(f);
   for(const f of this.current.produces)this.facts.add(f);this.record('task-verified',{metrics:v.metrics,produces:[...this.current.produces]});this.current=null;this.saved=null;this.retries=0;this.progress=0;this.index++;
   if(this.index===this.routine.length){this.cycle++;this.record('cycle-complete',{cycle:this.cycle});if(this.cycle===this.repeatCount){this.state='completed';this.record('routine-complete',{cycles:this.cycle,verifiedTasks:this.cycle*this.routine.length});return{state:this.state,cycle:this.cycle};}this.index=0;this.facts=new Set(['standing','hands-free']);}
   return{state:this.state,cycle:this.cycle,nextTaskId:this.routine[this.index]?.id??null};
