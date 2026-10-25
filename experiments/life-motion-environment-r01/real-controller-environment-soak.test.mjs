@@ -18,7 +18,7 @@ const routes=[
  [[0,0,1.0],[.35,0,.45],[.15,0,1.7],[-.2,0,.8]],
  [[0,0,.7],[-.5,0,.8],[-.5,0,1.8],[.1,0,1.0]]
 ];
-const dt=1/120, results=[];
+const dt=1/120, results=[], traces=[];
 let globalFrame=0;
 function quatYaw(yaw){return[0,Math.sin(yaw/2),0,Math.cos(yaw/2)];}
 for(let caseIndex=0;caseIndex<routes.length;caseIndex++){
