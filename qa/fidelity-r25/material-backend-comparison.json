@@ -1,0 +1,105 @@
+{
+  "checkedUTC": "2026-10-25T07:57:41.400Z",
+  "scope": "Same source program and uploaded geometry/material inputs; repeated-draw observations across two local backends. Does not distinguish shader derivative behavior from driver/compiler behavior.",
+  "artifactSHA256": "22e86e2b6d1fe5d500a552a08e038236bf12e52da090ad9fe689e9bb3acac13a",
+  "evidence": [
+    {
+      "file": "qa/fidelity-r25/material-hardware-inputs-diagnostic.json",
+      "sha256": "78e88b7a60e45363e92e314ce6d176f899dd57f7733f36d4cafd5ae9260d056d"
+    },
+    {
+      "file": "qa/fidelity-r25/material-software-inputs-diagnostic.json",
+      "sha256": "be504ec160acd8032d5a1c624344dd515687ef5b4cc2754786f54b96459e29db"
+    }
+  ],
+  "hardware": [
+    {
+      "renderer": "WebKit WebGL",
+      "vendor": "WebKit",
+      "unmaskedRenderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Ti SUPER (0x00002689) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  ],
+  "software": [
+    {
+      "renderer": "WebKit WebGL",
+      "vendor": "WebKit",
+      "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  ],
+  "views": [
+    {
+      "view": "side",
+      "inputBytesAndCameraIdentical": true,
+      "queriedUniformsSamplerBindingsAndStatesUnchanged": true,
+      "hardwareRedrawDifferentBytes": [
+        0,
+        0
+      ],
+      "softwareRedrawDifferentBytes": [
+        0,
+        0
+      ],
+      "inputs": [
+        {
+          "width": 641,
+          "height": 826,
+          "bytes": 8471456,
+          "sha256": "de0a2a758b3d6eeea1959677b56dac7921d39dcfc4cff7af6baf9f0fc11c8877"
+        },
+        {
+          "width": 641,
+          "height": 826,
+          "bytes": 8471456,
+          "sha256": "aa33af9fbc3b148db6de07595b5ba0935f1222b4cd48f2a5d07f83028dd67ca5"
+        },
+        {
+          "width": 641,
+          "height": 826,
+          "bytes": 8471456,
+          "sha256": "3eb95ae6c07a2d17d7c71a92f128bcf9645e843c23aee44abc9af2db2d2cefc5"
+        }
+      ]
+    },
+    {
+      "view": "back",
+      "inputBytesAndCameraIdentical": true,
+      "queriedUniformsSamplerBindingsAndStatesUnchanged": true,
+      "hardwareRedrawDifferentBytes": [
+        1958,
+        0
+      ],
+      "softwareRedrawDifferentBytes": [
+        0,
+        0
+      ],
+      "inputs": [
+        {
+          "width": 641,
+          "height": 826,
+          "bytes": 8471456,
+          "sha256": "cec05cc05cb6911eedd0c91e1fdba0adef27dc2247e5e300802c1cfc577a207c"
+        },
+        {
+          "width": 641,
+          "height": 826,
+          "bytes": 8471456,
+          "sha256": "2bdf437f532c079dc6a9070efee9e0d38658a88b3494078742ee32db6750d8e0"
+        },
+        {
+          "width": 641,
+          "height": 826,
+          "bytes": 8471456,
+          "sha256": "e2902a82fc20b7c44663092cf47c2b8a2094518a0e909fc9a62475db4900bcf8"
+        }
+      ]
+    }
+  ],
+  "rootCauseEstablished": false,
+  "productionMaterialChanged": false,
+  "asynchronousUploadHashBookkeepingExcludedFromDrawState": true,
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "newImageFiles": 0,
+  "diagnosticValidityPassed": true,
+  "passed": true
+}

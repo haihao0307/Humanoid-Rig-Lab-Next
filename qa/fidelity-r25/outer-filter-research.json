@@ -1,0 +1,277 @@
+{
+  "startedUTC": "2026-10-25T07:35:02.113Z",
+  "scope": "Paired Node CPU microbenchmark with identical rays; not browser frame rate or native/source acceptance",
+  "sourceFiles": [
+    {
+      "file": "src/BodyExactDomainR25.js",
+      "sha256": "b50161c0867cb913bdc6117971fcb7046a6bdec7c493f5b364b2f2f35481f295"
+    },
+    {
+      "file": "src/BodyFilteredDomainR25.js",
+      "sha256": "d495228a5f56cf390fd7b22bea9c218d7fcf763c0bfa596e1bf7d87c479fc393"
+    },
+    {
+      "file": "src/research/r25/BodyFilteredBoxR25.js",
+      "sha256": "c38eae2c96e8f3182c0acbd539a8c4154c562955872d1f1167f660f2907510dc"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "baseline",
+      "rays": 30603,
+      "differences": 0,
+      "rounds": [
+        {
+          "original": {
+            "milliseconds": 771.6652999999997,
+            "hits": 3291
+          },
+          "candidate": {
+            "milliseconds": 693.1698000000001,
+            "hits": 3291
+          }
+        },
+        {
+          "candidate": {
+            "milliseconds": 733.7332999999999,
+            "hits": 3291
+          },
+          "original": {
+            "milliseconds": 762.6641,
+            "hits": 3291
+          }
+        },
+        {
+          "original": {
+            "milliseconds": 748.3523999999998,
+            "hits": 3291
+          },
+          "candidate": {
+            "milliseconds": 758.9021000000002,
+            "hits": 3291
+          }
+        }
+      ],
+      "candidate": {
+        "rays": 122412,
+        "fallbacks": 16,
+        "visits": 35961556,
+        "outerRejected": 71720,
+        "outerBounds": [
+          [
+            -0.6030793786048889,
+            0.603073000907898
+          ],
+          [
+            -0.9635570049285889,
+            0.6073199510574341
+          ],
+          [
+            -0.12817618250846863,
+            0.3446625769138336
+          ]
+        ],
+        "exactRootRounding": true,
+        "filter": "outward Number intervals; ambiguous => integer traversal",
+        "arithmeticErrorBound": 7.105427357601002e-15,
+        "geometricExpansion": 0,
+        "characterFaces": 0,
+        "sourceFacetPartitionInformationRetained": true
+      }
+    },
+    {
+      "id": "A-joints",
+      "rays": 30603,
+      "differences": 0,
+      "rounds": [
+        {
+          "original": {
+            "milliseconds": 892.4318999999996,
+            "hits": 3382
+          },
+          "candidate": {
+            "milliseconds": 892.0272999999997,
+            "hits": 3382
+          }
+        },
+        {
+          "candidate": {
+            "milliseconds": 880.994200000001,
+            "hits": 3382
+          },
+          "original": {
+            "milliseconds": 1789.3323,
+            "hits": 3382
+          }
+        },
+        {
+          "original": {
+            "milliseconds": 2422.198599999998,
+            "hits": 3382
+          },
+          "candidate": {
+            "milliseconds": 1713.7837,
+            "hits": 3382
+          }
+        }
+      ],
+      "candidate": {
+        "rays": 122412,
+        "fallbacks": 12,
+        "visits": 38554908,
+        "outerRejected": 69048,
+        "outerBounds": [
+          [
+            -0.6030793786048889,
+            0.6423249840736389
+          ],
+          [
+            -0.9635570049285889,
+            0.6073199510574341
+          ],
+          [
+            -0.12817618250846863,
+            0.35898059606552124
+          ]
+        ],
+        "exactRootRounding": true,
+        "filter": "outward Number intervals; ambiguous => integer traversal",
+        "arithmeticErrorBound": 7.105427357601002e-15,
+        "geometricExpansion": 0,
+        "characterFaces": 0,
+        "sourceFacetPartitionInformationRetained": true
+      }
+    },
+    {
+      "id": "B-bend",
+      "rays": 30603,
+      "differences": 0,
+      "rounds": [
+        {
+          "original": {
+            "milliseconds": 3523.0566,
+            "hits": 3112
+          },
+          "candidate": {
+            "milliseconds": 2362.638899999998,
+            "hits": 3112
+          }
+        },
+        {
+          "candidate": {
+            "milliseconds": 3018.440699999999,
+            "hits": 3112
+          },
+          "original": {
+            "milliseconds": 2796.3002000000015,
+            "hits": 3112
+          }
+        },
+        {
+          "original": {
+            "milliseconds": 1630.0332999999955,
+            "hits": 3112
+          },
+          "candidate": {
+            "milliseconds": 3373.3236000000034,
+            "hits": 3112
+          }
+        }
+      ],
+      "candidate": {
+        "rays": 122412,
+        "fallbacks": 12,
+        "visits": 40952828,
+        "outerRejected": 67368,
+        "outerBounds": [
+          [
+            -0.5746829509735107,
+            0.5746777057647705
+          ],
+          [
+            -0.8664619326591492,
+            0.6035228371620178
+          ],
+          [
+            -0.0954165980219841,
+            0.5757501125335693
+          ]
+        ],
+        "exactRootRounding": true,
+        "filter": "outward Number intervals; ambiguous => integer traversal",
+        "arithmeticErrorBound": 7.105427357601002e-15,
+        "geometricExpansion": 0,
+        "characterFaces": 0,
+        "sourceFacetPartitionInformationRetained": true
+      }
+    },
+    {
+      "id": "calibration-soft",
+      "rays": 30603,
+      "differences": 0,
+      "rounds": [
+        {
+          "original": {
+            "milliseconds": 2887.7167000000045,
+            "hits": 3069
+          },
+          "candidate": {
+            "milliseconds": 2733.4651000000013,
+            "hits": 3069
+          }
+        },
+        {
+          "candidate": {
+            "milliseconds": 2689.656599999995,
+            "hits": 3069
+          },
+          "original": {
+            "milliseconds": 1319.0214999999953,
+            "hits": 3069
+          }
+        },
+        {
+          "original": {
+            "milliseconds": 1210.863400000002,
+            "hits": 3069
+          },
+          "candidate": {
+            "milliseconds": 912.3788999999961,
+            "hits": 3069
+          }
+        }
+      ],
+      "candidate": {
+        "rays": 122412,
+        "fallbacks": 32,
+        "visits": 34859168,
+        "outerRejected": 73648,
+        "outerBounds": [
+          [
+            -0.5936041474342346,
+            0.5936041474342346
+          ],
+          [
+            -0.9561412930488586,
+            0.5966387987136841
+          ],
+          [
+            -0.12010599672794342,
+            0.336551696062088
+          ]
+        ],
+        "exactRootRounding": true,
+        "filter": "outward Number intervals; ambiguous => integer traversal",
+        "arithmeticErrorBound": 7.105427357601002e-15,
+        "geometricExpansion": 0,
+        "characterFaces": 0,
+        "sourceFacetPartitionInformationRetained": true
+      }
+    }
+  ],
+  "selectedByDefault": false,
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "passed": true,
+  "finishedUTC": "2026-10-25T07:35:58.626Z"
+}

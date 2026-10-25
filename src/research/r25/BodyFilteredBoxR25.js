@@ -1,0 +1,51 @@
+/* Isolated R25 research candidate; not selected until complete parity checks.
+ * Number interval routing is a conservative filter only. Ambiguity restarts
+ * the exact integer traversal; a selected function's t is rounded from its
+ * exact rational root. No residual band, surface expansion or missing budget.
+ * Source-derived facet partitions remain; this is not an autonomous mother. */
+(()=>{'use strict';
+function createTracer(program){
+ const exact=BodyExactDomainR25.createTracer(program),planes=program.functionPlanes.map(p=>p.map(Number)),lines=new Float64Array(program.nodeLinks.length*3),links=Int32Array.from(program.nodeLinks.flat()),ids=Uint32Array.from(program.leafFunctionIds),roots=Int32Array.from(program.chartRoots),rectangles=program.chartRects,bounds=program.bounds;for(const[k,p]of Object.entries(program.decisionPlanes))lines.set(p.map(Number),+k*3);
+ const outer=Array.from({length:3},()=>[Infinity,-Infinity]);for(let chart=0;chart<6;chart++){if(roots[chart]<0)continue;const axis=chart>>1,u=(axis+1)%3,v=(axis+2)%3,rect=rectangles[chart];for(const[k,a,b]of[[u,rect[0],rect[1]],[v,rect[2],rect[3]],[axis,...bounds[axis]]]){outer[k][0]=Math.min(outer[k][0],a);outer[k][1]=Math.max(outer[k][1],b);}}
+ const E=32*Number.EPSILON,MIN=2**-1022,view=new DataView(new ArrayBuffer(8));let rays=0,fallbacks=0,visits=0,outerRejected=0;
+ function adjacent(x,up){if(!Number.isFinite(x))return x;if(!x)return up?Number.MIN_VALUE:-Number.MIN_VALUE;view.setFloat64(0,x,false);let high=view.getUint32(0,false),low=view.getUint32(4,false);if((x>0)===up){if(low===4294967295){low=0;high++;}else low++;}else if(low===0){low=4294967295;high--;}else low--;view.setUint32(0,high,false);view.setUint32(4,low,false);return view.getFloat64(0,false);}
+ // Four terms need < 8*epsilon of summed magnitude, including conversion of
+ // the exact integer coefficients. 32*epsilon also covers the rounded error
+ // accumulation and rounded interval endpoints. Tiny arithmetic is enclosed
+ // by 32 minimum subnormals; nonfinite arithmetic restarts integer traversal.
+ function affine(p,x){let sum=0,magnitude=0;for(let k=0;k<x.length;k++){const product=p[k]*x[k];if(!Number.isFinite(product))return null;sum+=product;magnitude+=Math.abs(product);}if(p.length>x.length){sum+=p[x.length];magnitude+=Math.abs(p[x.length]);}const radius=magnitude*E+Number.MIN_VALUE*32;if(!Number.isFinite(radius)||!Number.isFinite(sum))return null;return[sum-radius,sum+radius];}
+ function affine2(a,b,c,x,y){const ax=a*x,by=b*y,sum=ax+by+c,magnitude=Math.abs(ax)+Math.abs(by)+Math.abs(c),radius=magnitude*E+Number.MIN_VALUE*32;return Number.isFinite(sum)&&Number.isFinite(radius)?[sum-radius,sum+radius]:null;}
+ function quotient(a,b){if(!a||!b||b[0]<=0&&b[1]>=0)return null;const v=[a[0]/b[0],a[0]/b[1],a[1]/b[0],a[1]/b[1]];if(v.some(x=>!Number.isFinite(x)))return null;return[adjacent(Math.min(...v),false),adjacent(Math.max(...v),true)];}
+ const max=(a,b)=>[Math.max(a[0],b[0]),Math.max(a[1],b[1])],min=(a,b)=>[Math.min(a[0],b[0]),Math.min(a[1],b[1])],neg=a=>a&&[-a[1],-a[0]];
+ // Each original chart's exact box is contained in this union envelope.
+ // Only provably disjoint outward ray intervals are rejected. Ambiguity
+ // retains the original traversal; no surface or domain boundary moves.
+ function outsideOuter(origin,direction){let near=0,far=Infinity;for(let k=0;k<3;k++){const[a,b]=outer[k],d=direction[k];if(!Number.isFinite(a)||!Number.isFinite(b))return false;if(d===0){if(origin[k]<a||origin[k]>b)return true;continue;}const A=quotient(affine([1,-origin[k]],[a]),[d,d]),B=quotient(affine([1,-origin[k]],[b]),[d,d]);if(!A||!B)return false;near=Math.max(near,(d>0?A:B)[0]);far=Math.min(far,(d>0?B:A)[1]);if(near>far)return true;}return false;}
+ function filtered(origin,direction,detailed=true){let best=null,bestField=-1;
+  for(let chart=0;chart<6;chart++){
+   const root=roots[chart];if(root<0)continue;const axis=chart>>1,u=(axis+1)%3,v=(axis+2)%3,rect=rectangles[chart];let lo=[0,0],hi=best||[Infinity,Infinity],out=false;
+   for(const[k,a,b]of[[u,rect[0],rect[1]],[v,rect[2],rect[3]],[axis,...bounds[axis]]]){
+    if(direction[k]===0){if(origin[k]<a||origin[k]>b){out=true;break;}continue;}
+    const A=quotient(affine([1,-origin[k]],[a]),[direction[k],direction[k]]),B=quotient(affine([1,-origin[k]],[b]),[direction[k],direction[k]]);if(!A||!B)return undefined;lo=max(lo,direction[k]>0?A:B);hi=min(hi,direction[k]>0?B:A);if(lo[0]>hi[1]){out=true;break;}
+   }
+   if(out)continue;const stack=[[root,lo,hi]];
+   while(stack.length){const[index,a,b]=stack.pop();visits++;if(a[0]>b[1]||best&&a[0]>best[1])continue;const offset=index*5;
+    if(links[offset]===1){for(let at=links[offset+3];at<links[offset+3]+links[offset+4];at++){
+     const field=ids[at],p=planes[field],rate=affine(p.slice(0,3),direction);if(!rate)return undefined;if(rate[0]>=0)continue;if(rate[1]>=0)return undefined;
+     const t=quotient(neg(affine(p,origin)),rate);if(!t)return undefined;if(t[1]<=0||t[1]<a[0]||t[0]>b[1]||best&&t[0]>best[1])continue;
+     if(t[0]<=0||t[0]<=a[1]||t[1]>=b[0])return undefined;
+     if(!best||t[1]<best[0]){best=t;bestField=field;}else if(field!==bestField)return undefined;
+    }}else{
+     const at=index*3,A=lines[at],B=lines[at+1],C=lines[at+2],rate=affine2(A,B,0,direction[u],direction[v]),s=affine2(A,B,C,origin[u],origin[v]),split=quotient(neg(s),rate);if(!split)return undefined;
+     const near=rate[1]<0?links[offset+1]:links[offset+2],far=rate[1]<0?links[offset+2]:links[offset+1];
+     if(split[1]<a[0])stack.push([far,a,b]);else if(split[0]>b[1])stack.push([near,a,b]);else{stack.push([far,max(a,split),b]);stack.push([near,a,min(b,split)]);}
+    }
+   }
+  }
+  return bestField<0?null:exact.rayField(origin,direction,bestField,detailed);
+ }
+ function ray(origin,direction,detailed=true){if(origin.length!==3||direction.length!==3||direction.every(x=>x===0)||[...origin,...direction].some(x=>!Number.isFinite(x)||x!==0&&Math.abs(x)<MIN))return exact.ray(origin,direction,detailed);rays++;if(outsideOuter(origin,direction)){outerRejected++;return null;}const result=filtered(origin,direction,detailed);if(result!==undefined)return result;fallbacks++;return exact.ray(origin,direction,detailed);}
+ return{ray,report:()=>({rays,fallbacks,visits,outerRejected,outerBounds:outer,exactRootRounding:true,filter:'outward Number intervals; ambiguous => integer traversal',arithmeticErrorBound:E,geometricExpansion:0,characterFaces:0,sourceFacetPartitionInformationRetained:true})};
+}
+globalThis.BodyFilteredDomainR25={createTracer};
+})();
