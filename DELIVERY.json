@@ -1,25 +1,26 @@
 {
-  "schema": "body-delivery-r26/1",
-  "version": "R26",
-  "updatedUTC": "2026-10-25T11:30:23.810Z",
+  "schema": "body-delivery-r27/1",
+  "version": "R27",
+  "updatedUTC": "2026-10-25T13:26:02.264Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
-    "file": "delivery/身体_R26_原形体与参数衔接.html",
-    "sha256": "faeb6268cc49572b87415538a1e3d17ff8fc79f41e2ab37bacaf342dc06e3d7f",
-    "bytes": 878259,
-    "url": "http://127.0.0.1:8914/?v=R26-faeb6268"
+    "file": "delivery/身体_R27_原形体与参数衔接.html",
+    "sha256": "262e20fefdb5a07c20b57fd6881d5deb53c1864bee84ef39bad941e0b4a43abc",
+    "bytes": 878256,
+    "url": "http://127.0.0.1:8914/?v=R27-262e20fe"
   },
   "workbench": {
-    "file": "delivery/人物身体_R26_原形体与参数工作页.html",
-    "sha256": "2b6c457cc9b896afcaec65ae243288c8f76e21f9b43a18ab5464b64967486890",
-    "bytes": 1756449,
-    "url": "http://127.0.0.1:8914/workbench?v=R26-2b6c457c"
+    "file": "delivery/人物身体_R27_连续计算与原形体.html",
+    "sha256": "f882545dd3e9ead610ac38f9364421c44ecdcd4e69f2e6db6a0c8dd8fe101ee0",
+    "bytes": 1779092,
+    "url": "http://127.0.0.1:8914/workbench?v=R27-f882545d"
   },
   "runtimeCharacterTriangleFaces": 0,
   "characterVertexBuffers": 0,
   "sourceFacetPartitionInformationRetained": true,
   "completedMotherConversion": false,
+  "wholeBodySourceIndependent": false,
   "sourceFidelityAccepted": false,
   "visualAccepted": false,
   "bodyReconstructionComplete": false,
@@ -35,19 +36,188 @@
   ],
   "completePersonArchivesRetained": true,
   "newImageFiles": 0,
-  "exactBoundary": {
-    "fixedSourceStates": 10,
-    "equivalentKnownPositiveZeroSpellings": true,
-    "parameterQuantization": false,
-    "unknownOrHeadStateIgnored": false,
-    "loggedOriginalRationalCases": 420,
-    "expandedRays": 1771740,
-    "expandedDisagreements": 0,
-    "proofFile": "qa/fidelity-r25/exact-filter-parity.json",
-    "proofScope": "Unchanged exact and filter implementation hashes verified again for R26",
-    "exactAfterInteraction": true,
-    "interactivePreviewPrecision": "Float32",
-    "sharedTieAttributes": "lowest original function ID; native raster equivalence not certified"
+  "sourceImplementation": {
+    "inheritedFrom": "BUILD-SOURCE-R26.json",
+    "geometryNormalsMaterialAndExactKernelsUnchanged": true,
+    "HTMLDifference": "title, version stamp and companion workbench link only",
+    "exactKernelProof": {
+      "fixedSourceStates": 10,
+      "equivalentKnownPositiveZeroSpellings": true,
+      "parameterQuantization": false,
+      "unknownOrHeadStateIgnored": false,
+      "loggedOriginalRationalCases": 420,
+      "expandedRays": 1771740,
+      "expandedDisagreements": 0,
+      "proofFile": "qa/fidelity-r25/exact-filter-parity.json",
+      "proofScope": "Unchanged exact and filter implementation hashes verified again for R26",
+      "exactAfterInteraction": true,
+      "interactivePreviewPrecision": "Float32",
+      "sharedTieAttributes": "lowest original function ID; native raster equivalence not certified"
+    },
+    "independentPhysicalComparison": {
+      "file": "qa/fidelity-r26/original-functions-native-rays.json",
+      "sha256": "6441e39bdf6a11c1a431acfbcf2f945c0a7b93131326f90f654de0c6424eb16a",
+      "diagnosticCompleted": true,
+      "states": 10,
+      "views": 40,
+      "fullResolutionViews": 40,
+      "verificationExecution": "native Node globals; same source hashes as production",
+      "rays": 21178640,
+      "coverageDisagreements": 0,
+      "maximumPositionMetres": 1.554312234475219e-14,
+      "maximumNormalVectorDifference": 4.870548409030562e-13,
+      "maximumMaterialCoordinateMetres": 1.391421700080997e-14,
+      "scope": "Independent watertight offline original-triangle BVH against current exact integer/rational source functions; physical rays and original interpolated attributes. Native raster, material, arbitrary continuous states and autonomous mother remain separate.",
+      "offlineOriginalTrianglesOnly": true,
+      "acceptanceTolerance": null,
+      "sourceFidelityAccepted": false
+    },
+    "nativeRasterComparison": {
+      "inheritedFrom": "DELIVERY-R26.json",
+      "originalArtifactSHA256": "faeb6268cc49572b87415538a1e3d17ff8fc79f41e2ab37bacaf342dc06e3d7f",
+      "newCompleteNativeRasterComparisonRun": false,
+      "maximumRGBCodeDifference": 129,
+      "sourceFidelityAccepted": false,
+      "rootCauseEstablished": false
+    }
+  },
+  "sourceDependencySlice": {
+    "sourcePacket": "data/body-program-packet-r23.json",
+    "proofPacket": "data/body-program-packet-r27.json",
+    "originalRawBytes": 90490457,
+    "fullProofRawBytes": 67709003,
+    "originalCompressedBytes": 44950878,
+    "fullProofCompressedBytes": 33557113,
+    "bodySamples": 9253,
+    "bodySamplesRemoved": 0,
+    "Anny": {
+      "originalOutputs": 13718,
+      "retainedOutputs": 9209,
+      "retainedOriginalIdsSHA256": "3ba288a4d62a2f300c028c8f4fa9655f058d6551b301345cd7c85b34fed4cd16",
+      "allSourceShapeRowsRetained": true,
+      "sourceShapeRows": 1104,
+      "allBoneHeadsAndOrientationsRetained": true
+    },
+    "MHR": {
+      "originalOutputs": 18439,
+      "retainedOutputs": 11068,
+      "retainedOriginalIdsSHA256": "ff6582758868efbee8d890e9a66551feef02aa5cacb8ce5b5d6b87e0c1fcf8e2",
+      "all127JointsRetained": true,
+      "identityControls": 45,
+      "expressionControls": 72,
+      "poseControls": 204,
+      "hiddenCorrectiveRowsRetained": true
+    },
+    "allOriginalControlsRetained": true,
+    "independentOriginalBodyCases": 1219,
+    "allComputedOutputsByteExact": true,
+    "completedMotherConversion": false
+  },
+  "lazySourceFields": {
+    "descriptor": "data/body-lazy-packet-r27.json",
+    "coreCompressedBytes": 2857503,
+    "coreRawBytes": 11913288,
+    "allLazyCompressedBytes": 35016740,
+    "allBodyNumericCompressedBytes": 37874243,
+    "initialBodyNumericCompressedBytes": 4729991,
+    "initialBodyAssets": 43,
+    "initialScope": "body numeric core and demanded fields only; excludes skin, source atlas, shadows, environment, HTML and other resources",
+    "uniqueFieldAssets": 575,
+    "sourceShapeRows": 1104,
+    "emptyRows": 241,
+    "allSourceCoefficientAssemblyByteExact": true,
+    "actualAsyncOriginalBodyCases": 1222,
+    "rowCacheBudgetBytes": 16777216,
+    "currentRequiredRowsNeverEvicted": true,
+    "overBudgetRequiredRowsReported": true,
+    "permanentMHRGroups": "loaded before first use; retained until page close",
+    "compressedAndRawHashesVerified": true,
+    "transportRetries": 1,
+    "HTTPOrHashFailure": "reject and retain prior complete person; retry remains possible",
+    "partialRequestsDrainedBeforeFailure": true
+  },
+  "numericStorage": {
+    "perPacketSharedBacking": true,
+    "originalTypedArrayBitsPreserved": true,
+    "originalDistinctRangesNotAliased": true,
+    "inPlaceAlignedRelocation": true,
+    "legacyCopyFallback": true,
+    "doesNotClaimOneBufferForEntireScene": true
+  },
+  "parallelFieldComputation": {
+    "maximumAuxiliaryWorkers": 3,
+    "lowCoreDefault": "serial",
+    "independentZSlabs": true,
+    "originalPerPointArithmeticOrderPreserved": true,
+    "originalConstraintReductionOrderPreserved": true,
+    "standardStates": 2,
+    "fineStates": 1,
+    "buffersComparedPerState": 30,
+    "wholeFieldAndNormalBuffersByteExact": true,
+    "actualFourViewsComparedPerState": true,
+    "workerFailureFallbackByteExact": true,
+    "workerLifetime": "one build; terminated on completion or error",
+    "maximumResultSlabBytes": 8388608,
+    "workerInputPayloadEstimateBytes": 8771844,
+    "payloadEstimateExcludesObjectsRuntimeAndDrivers": true,
+    "fieldMemoryAndGPUPerformanceAreNotGloballyCertified": true
+  },
+  "nativeUpdateLatency": {
+    "file": "qa/fidelity-r27/native-update-latency.json",
+    "sha256": "ab36663444ccf2c69bbfff4859c0d38217923b0e3a6f32aa50419e0f4760e8fa",
+    "referenceSHA256": "2b6c457cc9b896afcaec65ae243288c8f76e21f9b43a18ab5464b64967486890",
+    "currentSHA256": "f882545dd3e9ead610ac38f9364421c44ecdcd4e69f2e6db6a0c8dd8fe101ee0",
+    "runs": 8,
+    "summary": {
+      "referenceWallMS": {
+        "count": 4,
+        "minimum": 14457.400000095367,
+        "median": 14988.850000023842,
+        "maximum": 24927.100000023842,
+        "all": [
+          24927.100000023842,
+          14457.400000095367,
+          14510.100000023842,
+          15467.600000023842
+        ]
+      },
+      "currentWallMS": {
+        "count": 4,
+        "minimum": 6927.100000023842,
+        "median": 7394.700000047684,
+        "maximum": 8314.700000047684,
+        "all": [
+          8314.700000047684,
+          7337.900000095367,
+          6927.100000023842,
+          7451.5
+        ]
+      }
+    },
+    "scope": "Sequential fresh native browser updates; wall time until the editor is ready after field/render submission; GPU completion and presentation are not measured. These are update latencies, not GPU/FPS or source-fidelity results.",
+    "allRoundsRetained": true,
+    "measurementsAreNotFPSOrGPUCompletion": true
+  },
+  "archiveContinuity": {
+    "equivalentKnownPositiveZeroBoundarySpellings": true,
+    "rawPersonStatePreserved": true,
+    "unknownOrHeadFieldsNotIgnored": true,
+    "genuinelyDifferentStateRejected": true,
+    "allOriginalHeadSupportAndMatricesRetained": true,
+    "unavailableOriginalMaterialControlsExplained": true,
+    "settingsRetainedUntilApplicable": true
+  },
+  "sameCameraGeometryReuse": {
+    "enabled": true,
+    "requiresCompletedExactFrame": true,
+    "requiresIdenticalProfileProgramCameraAndDimensions": true,
+    "originalMaterialReevaluated": true,
+    "extraCPUSurfaceCache": true,
+    "cachedFrames": 1,
+    "bytesPerPixel": 48,
+    "maximumBytes": 134217728,
+    "quantization": false,
+    "overLimit": "original solver path"
   },
   "originalMaterialControls": {
     "enabled": true,
@@ -72,18 +242,6 @@
     "changedLightDirections": "same source geometry, explicitly gray structure shading without skin texture or projected shadows",
     "legacyContinuousMaterialControlsRetained": true
   },
-  "sameCameraGeometryReuse": {
-    "enabled": true,
-    "requiresCompletedExactFrame": true,
-    "requiresIdenticalProfileProgramCameraAndDimensions": true,
-    "originalMaterialReevaluated": true,
-    "extraCPUSurfaceCache": true,
-    "cachedFrames": 1,
-    "bytesPerPixel": 48,
-    "maximumBytes": 134217728,
-    "quantization": false,
-    "overLimit": "original solver path"
-  },
   "lazyBoundaryInputs": {
     "states": 10,
     "defaultRequests": 0,
@@ -93,156 +251,139 @@
     "completeOriginalPacketGate": true,
     "headSurfaceGenerated": false
   },
-  "continuousFieldConsistency": {
-    "originalNormalReferenceFixedBeforeArchive": true,
-    "referencePreparationDeferredUntilNeeded": true,
-    "sessionCacheSemanticsVersion": "BODY-IMPLICIT-R26",
-    "independentEditVersusLoadCases": 2,
-    "comparedFieldBuffersPerCase": 30,
-    "continuousSourceSurfaceAccepted": false
-  },
-  "sourceComparison": {
-    "evidenceFile": "qa/fidelity-r26/native-source-pixels.json",
-    "evidenceSHA256": "15689ca400b2c5019471543291f28106197f9bb3705a3f13e02de12f35b07245",
-    "repeatDiagnosticFile": "qa/fidelity-r26/material-repeat-current.json",
-    "repeatDiagnosticSHA256": "e850cd71ad76a5fe67223dfe13837742043531688fd0b1a4949b20426705ab54",
-    "materialRootCauseEstablished": false,
-    "currentArtifactCompared": true,
-    "comparedFunctionArtifactSHA256": "faeb6268cc49572b87415538a1e3d17ff8fc79f41e2ab37bacaf342dc06e3d7f",
-    "scope": "Current selected function viewer versus original native renderer with matched views and original shadow history; diagnostic, not source acceptance",
-    "views": 30,
-    "maximumRGBCodeDifference": 129,
+  "researchDefaultSelection": {
+    "selectedByDefault": false,
     "sourceFidelityAccepted": false,
-    "supplementary": [
-      {
-        "file": "qa/fidelity-r26/native-original-self.json",
-        "sha256": "c2f70441e4bbad376d9fa5bd2db6fd94f113e78b2e4810952047118475e8666c",
-        "sourceFidelityAccepted": false
-      },
-      {
-        "file": "qa/fidelity-r26/gpu-input-readback.json",
-        "sha256": "85408f9878394c2bf6aee6143a44c38841b51060ce553cf53502b1ecbc20a8ab",
-        "sourceFidelityAccepted": false
-      },
-      {
-        "file": "qa/fidelity-r26/uninstrumented-redraw.json",
-        "sha256": "bfc9a12e180ff6caf8c2463086a6782fcde2bd3f1c2b4eab3425d200721151a1",
-        "sourceFidelityAccepted": false
+    "materialPath": "unchanged R26 original three-pass adapter",
+    "staticQuadTrial": {
+      "diagnosticCompleted": true,
+      "selfStable": false,
+      "matchesStableOriginal": false,
+      "adopted": false,
+      "reason": "Compile-time quad modes did not eliminate the redraw difference and did not exactly preserve stable original output.",
+      "snapshot": {
+        "file": "qa/fidelity-r27/research-snapshots/static-quad-material.html.gz",
+        "compressedSHA256": "47150902ad7ca636d7d604d6e48971b5e6a5a3af920392ea4911735fd49979d3",
+        "rawSHA256": "a12873bca35c31c8818600d21d7d06accd1d3a6db491da796f543eea04f1b3e0"
       }
-    ],
-    "originalBaselineSelf": {
-      "views": 3,
-      "repeatsPerView": 2,
-      "stable": true,
-      "scope": "Actual original baseline only, not all native states"
     },
-    "actualGPUInputStudy": {
-      "cases": 9,
-      "sixGeometryAndAttributeTexturesStable": true,
-      "allShadingInputsCertified": false
-    },
-    "uninstrumentedFunctionRedrawStable": false
+    "sourceMaterialRootCauseEstablished": false,
+    "newImageFiles": 0
   },
   "evidence": [
     {
-      "file": "qa/fidelity-r26/release-integrity.json",
-      "sha256": "d1031dec12c37305bf6fa549c9dcca57b4c1a706cb439ed9a99b3eafb03caabb",
-      "checks": 201,
+      "file": "qa/fidelity-r27/program-storage-numeric.json",
+      "sha256": "67afb3122ee8e11973ae54426d1fc6e6565b513ade1955cc583ad571db91d073",
+      "checks": 20,
       "passed": true
     },
     {
-      "file": "qa/fidelity-r26/source-browser.json",
-      "sha256": "dcc7ee09e1d704c90814dab9dd8d9acc69909ee2013264f68565f60248326e60",
-      "checks": 30,
+      "file": "qa/fidelity-r27/dependency-slice-numeric.json",
+      "sha256": "e87ab3876798d3e53979a5c72eaabd6eca52f62229270418da9a5114fbcfe006",
+      "checks": 22,
       "passed": true
     },
     {
-      "file": "qa/fidelity-r26/workbench-browser.json",
-      "sha256": "fc5aaa2dd79ba537d788eae3ef818ec5cb855573d7cc43352915b4f7f18bf80f",
+      "file": "qa/fidelity-r27/lazy-assembly-numeric.json",
+      "sha256": "4e563507afa69682b003bf50c5c721520f23733c9fefcf7d6d55dcc7d60514ca",
+      "checks": 580,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r27/lazy-fields-numeric.json",
+      "sha256": "c7afba6cb4c0903bd858d62b8a317a1151781192427c2e14e0cb7b5f69ad7f7a",
+      "checks": 23,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r27/lazy-fields-browser.json",
+      "sha256": "a91fb49427ea90ac4bd7e3f3ba80ab42a3c663935d97db2c4441a5bf09e3d62c",
+      "checks": 18,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r27/editor-continuity-browser.json",
+      "sha256": "ae63c3d68e0bdca537b9367c9c1b8168326e2a9b54587c68c261d84675eec61c",
+      "checks": 16,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r27/field-pool-browser.json",
+      "sha256": "aa2d0ddad1c4f4a79602f84453aec44883c4ffbcede14a34f86621bbbeca6d3d",
+      "checks": 22,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r27/field-pool-fine-browser.json",
+      "sha256": "8c394fc867ac8c0a88bc1a49dd74aeafc9857b77dd841675f3043c014854ee74",
+      "checks": 13,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r27/workbench-browser.json",
+      "sha256": "9ebf16fb9c9b4ca98074f1e4057356137939e16edf1128e303678225a9de8a2a",
       "checks": 45,
       "passed": true
     },
     {
-      "file": "qa/fidelity-r26/state-identity-numeric.json",
-      "sha256": "00950b088e826776ad1e32f4f830d2520623ac01d7c373971db4eb08c4193fba",
-      "checks": 28,
-      "passed": true
-    },
-    {
-      "file": "qa/fidelity-r26/boundary-input.json",
-      "sha256": "fa36aefe758bf72a8408ca9126039e6d8742c1c63c3b6006b0676d152fc53dfb",
-      "checks": 31,
-      "passed": true
-    },
-    {
-      "file": "qa/fidelity-r26/boundary-package.json",
-      "sha256": "56f556f30d38a2e1e5f1ae87794835a3a6c9fa7327b268926c8fef111b922cf1",
-      "checks": 21,
-      "passed": true
-    },
-    {
-      "file": "qa/fidelity-r26/head-archive-browser.json",
-      "sha256": "a2178f2e26389fa87f565a0d3bfcdece8689ba002ca4e1867601338a925cb708",
+      "file": "qa/fidelity-r27/head-archive-browser.json",
+      "sha256": "1b194f47d6607ff1d65e1528c742d600819fc0644cc7493aca20494e6d22e11a",
       "checks": 10,
       "passed": true
     },
     {
-      "file": "qa/fidelity-r26/look-browser.json",
-      "sha256": "2d618b5caf35626eb18c8bb80b1f3cc963c30ab16e1af3f2d458de6a9105e3c4",
-      "checks": 35,
-      "passed": true
-    },
-    {
-      "file": "qa/fidelity-r26/neutral-route-browser.json",
-      "sha256": "e4482d1d9d4841fdfc2df4ef7a4d3ec022bb57f2c25ea665eaecb6c8954636f5",
-      "checks": 12,
-      "passed": true
-    },
-    {
-      "file": "qa/fidelity-r26/page-roundtrip-browser.json",
-      "sha256": "0931ae99c846462492daa5169d26c820d0cefb1100951e9339033c06f9ad8b95",
+      "file": "qa/fidelity-r27/page-roundtrip-browser.json",
+      "sha256": "d77d35709ead8967008cf7b4c84c8236738ee9abb859e59027f00dfccdbf3619",
       "checks": 7,
       "passed": true
     },
     {
-      "file": "qa/fidelity-r26/inspection-cache-browser.json",
-      "sha256": "51f7f45b0c153b2a153afce97c0944fe00ebc0b1a67aa7e0b909dfd80993dec8",
+      "file": "qa/fidelity-r27/inspection-cache-browser.json",
+      "sha256": "8cd863e7e3741cb910d0c14067a8fa03ce7df098caf50b644b26f7959d28e334",
       "checks": 25,
       "passed": true
     },
     {
-      "file": "qa/fidelity-r26/field-history-browser.json",
-      "sha256": "65410164c507230bdddc468548836084a7ab04e58bd32dbb89930a088feb239c",
+      "file": "qa/fidelity-r27/field-history-browser.json",
+      "sha256": "1ce6afffda103259ed1e638f813c26677b24d3eeadc686f69f27d5f3285cc5db",
       "checks": 19,
       "passed": true
     },
     {
-      "file": "qa/fidelity-r26/http-viewer.json",
-      "sha256": "bb01a21a57b69a3b0f056ddc58483804946a420c02ade7097cda834d433feca6",
-      "checks": 109,
+      "file": "qa/fidelity-r27/native-update-latency.json",
+      "sha256": "ab36663444ccf2c69bbfff4859c0d38217923b0e3a6f32aa50419e0f4760e8fa",
+      "checks": null,
       "passed": true
     },
     {
-      "file": "qa/fidelity-r26/git-tree-rebuild.json",
-      "sha256": "f65fcee433a8960c35a2eacabb91800ef1ab75006a84b033a8d994e22446e4d0",
-      "checks": 8,
+      "file": "qa/fidelity-r27/source-browser.json",
+      "sha256": "5caadcc09b6b1b6420cd165dcfdaaa096be3d12541a510872b198de55500f795",
+      "checks": 30,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r27/http-viewer.json",
+      "sha256": "c6e7661e6e4390ff32acecbedc4a7562991e58d3b72d7dfa7a9ee3d18b4029b1",
+      "checks": 684,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r27/release-integrity.json",
+      "sha256": "d1705937219f738017b4402d136c0b16ca4eaef58b37912d93da4f1d9d1f02a1",
+      "checks": 784,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r27/git-tree-rebuild.json",
+      "sha256": "2ffd365be33b51c0b545db9ca2318b468c1b6329c721cba37209baf75ba51fe9",
+      "checks": 10,
       "passed": true
     }
   ],
   "assets": {
-    "count": 102,
-    "compressedBytes": 226659865
-  },
-  "researchDefaultSelection": {
-    "MRTMaterial": false,
-    "skipFractionFormatting": false,
-    "selectionFile": "qa/fidelity-r26/research-selection.json",
-    "snapshots": "qa/fidelity-r26/research-snapshots/index.json",
-    "sourceAcceptance": false,
-    "highpVertexSampler": false,
-    "helperBlendInsteadOfDiscard": false,
-    "nativeDepthState": false,
-    "invariantOutputs": false
+    "count": 677,
+    "compressedBytes": 219583230,
+    "lazyFieldAssets": 575
   },
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
@@ -253,50 +394,32 @@
     {
       "priority": 0,
       "status": "partial",
-      "task": "十档来源状态及已证明等价的零值动作保留原形体；任意连续状态的原表面、法线、分层、边界和首交仍未完成。原生局部像素差异、函数显示中原材质适配路径的首次/重绘颜色及深度差异未解决，正式容差仍为 null。"
+      "task": "任意连续体型与动作的原表面、法线、分层、边界和首交仍未完成；原材质首次/重绘及原生局部像素差异仍未解决。正式来源与视觉验收仍未通过。"
     },
     {
       "priority": 1,
       "status": "partial",
-      "task": "原貌、原皮肤控制与完整参数页已衔接；胸肩、腰腹、骨盆整体体量及完整骨架/软组织分离仍未完成，不采用未经来源验收的改形候选。"
+      "task": "胸肩、腰腹、骨盆整体体量及完整骨架/软组织分离未完成。保留原参数响应，原耦合未被这次存储与并行改动修复。"
     },
     {
       "priority": 2,
       "status": "incomplete",
-      "task": "肩髋连接、肘膝腕踝、手足细轮廓与连续组合动作仍待来源保真及变形验收。连续字段的编辑/读档法线参照已修复，但不等于连续形体复刻通过。"
+      "task": "肩髋、肘膝腕踝、手足细轮廓及全范围连续组合动作仍待来源保真和变形验收。"
     },
     {
       "priority": 3,
       "status": "incomplete",
-      "task": "自主母体及形态、绑定数据逐区替换未完成；来源分面分区信息仍明确保留。"
+      "task": "自主母体及形态、绑定数据逐区替换未完成。来源分区、对应关系和校准来源仍明确保留。"
     },
     {
       "priority": 4,
       "status": "partial",
-      "task": "同人物机位下原皮肤、法线及结构光复用一帧精确几何；128 MiB CPU 缓存上限、按需边界输入已接通。全系统局部更新、精细模式内存、动态阴影和完整体积散射仍未完成。MRT 及分数格式提速试验未采用。"
+      "task": "身体按需系数、无损解码和相同结果的并行计算已接通；全系统局部更新、全部图形内存优化、动态阴影、完整体积散射和跨场景验收未完成。"
     },
     {
       "priority": 5,
       "status": "partial",
-      "task": "完整人物存档及显式原头侧边界往返保留；任意当前头侧提供方、头部附件和总平台联调未完成。独立头部项目未修改。"
+      "task": "完整人物与头侧输入往返保留；任意当前头侧提供方、附件和总平台整合未完成，独立头部项目未修改。"
     }
-  ],
-  "independentPhysicalSourceComparison": {
-    "file": "qa/fidelity-r26/original-functions-native-rays.json",
-    "sha256": "6441e39bdf6a11c1a431acfbcf2f945c0a7b93131326f90f654de0c6424eb16a",
-    "diagnosticCompleted": true,
-    "states": 10,
-    "views": 40,
-    "fullResolutionViews": 40,
-    "verificationExecution": "native Node globals; same source hashes as production",
-    "rays": 21178640,
-    "coverageDisagreements": 0,
-    "maximumPositionMetres": 1.554312234475219e-14,
-    "maximumNormalVectorDifference": 4.870548409030562e-13,
-    "maximumMaterialCoordinateMetres": 1.391421700080997e-14,
-    "scope": "Independent watertight offline original-triangle BVH against current exact integer/rational source functions; physical rays and original interpolated attributes. Native raster, material, arbitrary continuous states and autonomous mother remain separate.",
-    "offlineOriginalTrianglesOnly": true,
-    "acceptanceTolerance": null,
-    "sourceFidelityAccepted": false
-  }
+  ]
 }
