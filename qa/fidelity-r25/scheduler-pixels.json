@@ -1,0 +1,212 @@
+{
+  "startedUTC": "2026-10-25T06:02:16.235Z",
+  "artifactSHA256": "e2ee5e6be6aa7037ee2ac2952c671f12ac4dda9bcba51327d69e2fff170da679",
+  "referenceArtifactSHA256": "d2450b5c8d05e4cc6904721e0049aba39ee03183c43f039cb3d7b3ca8b3b0a8e",
+  "checks": [
+    {
+      "name": "compiled original shaders are byte identical",
+      "passed": true
+    },
+    {
+      "name": "intersection formula and attributes unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline/front every row computed exactly once",
+      "passed": true
+    },
+    {
+      "name": "baseline/front complete colour and mask unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline/side every row computed exactly once",
+      "passed": true
+    },
+    {
+      "name": "baseline/side complete colour and mask unchanged",
+      "passed": false
+    }
+  ],
+  "frames": [
+    {
+      "id": "baseline",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differentBytes": 0,
+      "maximumCodeDifference": 0,
+      "maskIdentical": true,
+      "referencePixelSHA256": "76b3761f5bed8a2bb5264cb15d4069724097013b20936b76967c4b5034a24654",
+      "candidatePixelSHA256": "76b3761f5bed8a2bb5264cb15d4069724097013b20936b76967c4b5034a24654",
+      "jobs": 26,
+      "tiles": [
+        {
+          "first": 0,
+          "last": 32,
+          "worker": 0,
+          "ms": 185.70000004768372
+        },
+        {
+          "first": 32,
+          "last": 64,
+          "worker": 1,
+          "ms": 1108.7999999523163
+        },
+        {
+          "first": 96,
+          "last": 128,
+          "worker": 3,
+          "ms": 1264.7000000476837
+        },
+        {
+          "first": 64,
+          "last": 96,
+          "worker": 2,
+          "ms": 2368.100000023842
+        },
+        {
+          "first": 160,
+          "last": 192,
+          "worker": 5,
+          "ms": 3541.2000000476837
+        },
+        {
+          "first": 128,
+          "last": 160,
+          "worker": 4,
+          "ms": 3719.7999999523163
+        },
+        {
+          "first": 192,
+          "last": 224,
+          "worker": 0,
+          "ms": 4179.699999928474
+        },
+        {
+          "first": 256,
+          "last": 288,
+          "worker": 3,
+          "ms": 4031.6999999284744
+        },
+        {
+          "first": 224,
+          "last": 256,
+          "worker": 1,
+          "ms": 5448.899999976158
+        },
+        {
+          "first": 352,
+          "last": 384,
+          "worker": 4,
+          "ms": 3593.7999999523163
+        },
+        {
+          "first": 384,
+          "last": 416,
+          "worker": 0,
+          "ms": 2980.5
+        },
+        {
+          "first": 416,
+          "last": 448,
+          "worker": 3,
+          "ms": 2144.600000023842
+        },
+        {
+          "first": 320,
+          "last": 352,
+          "worker": 5,
+          "ms": 4959.199999928474
+        },
+        {
+          "first": 544,
+          "last": 576,
+          "worker": 3,
+          "ms": 2247
+        },
+        {
+          "first": 448,
+          "last": 480,
+          "worker": 1,
+          "ms": 3723
+        },
+        {
+          "first": 512,
+          "last": 544,
+          "worker": 0,
+          "ms": 3074.2999999523163
+        },
+        {
+          "first": 480,
+          "last": 512,
+          "worker": 4,
+          "ms": 3746.100000023842
+        },
+        {
+          "first": 288,
+          "last": 320,
+          "worker": 2,
+          "ms": 8734.199999928474
+        },
+        {
+          "first": 576,
+          "last": 608,
+          "worker": 5,
+          "ms": 2786.5
+        },
+        {
+          "first": 608,
+          "last": 640,
+          "worker": 3,
+          "ms": 2039.5999999046326
+        },
+        {
+          "first": 800,
+          "last": 826,
+          "worker": 3,
+          "ms": 140.20000004768372
+        },
+        {
+          "first": 768,
+          "last": 800,
+          "worker": 5,
+          "ms": 728.6000000238419
+        },
+        {
+          "first": 672,
+          "last": 704,
+          "worker": 0,
+          "ms": 2544.9000000953674
+        },
+        {
+          "first": 640,
+          "last": 672,
+          "worker": 1,
+          "ms": 3452.5
+        },
+        {
+          "first": 704,
+          "last": 736,
+          "worker": 4,
+          "ms": 3366
+        },
+        {
+          "first": 736,
+          "last": 768,
+          "worker": 2,
+          "ms": 4020.3000000715256
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "sourceFacetPartitionInformationRetained": true,
+  "performanceComparison": false,
+  "newImageFiles": 0,
+  "failure": "Error: baseline/side complete colour and mask unchanged\n    at check (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-scheduler-r25.cjs:6:97)\n    at G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-scheduler-r25.cjs:11:701",
+  "passed": false,
+  "finishedUTC": "2026-10-25T06:03:16.016Z"
+}

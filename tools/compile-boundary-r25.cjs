@@ -1,0 +1,3 @@
+'use strict';
+const fs=require('fs'),vm=require('vm'),crypto=require('crypto'),H=b=>crypto.createHash('sha256').update(b).digest('hex'),source='data/body-neck-operator-r24.json',neck=JSON.parse(fs.readFileSync(source)),space={};vm.runInNewContext(fs.readFileSync('src/BodySourceBoundaryR25.js','utf8'),space);
+const metadata={schema:'body-source-boundary-fingerprints/1',source:{file:source,sha256:H(fs.readFileSync(source))},sourceDerived:true,headGenerated:false,profiles:neck.referencePackets.map(p=>({id:p.id,packetSHA256:H(Buffer.from(space.BodySourceBoundaryR25.stateKey(p.packet)))}))};fs.writeFileSync('data/body-source-boundary-r25.json',JSON.stringify(metadata,null,2)+'\n');console.log(JSON.stringify({boundaryStates:metadata.profiles.length,headGenerated:false}));

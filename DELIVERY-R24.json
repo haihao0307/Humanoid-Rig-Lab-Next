@@ -1,0 +1,694 @@
+{
+  "schema": "body-function-delivery/9",
+  "reviewedUTC": "2026-10-25T05:13:01.804Z",
+  "selectedVersion": "R24",
+  "status": "checked working candidate; source fidelity and full body reconstruction incomplete",
+  "artifact": "delivery/身体_R24_原貌与原函数皮纹.html",
+  "sha256": "fae69985802be4c2e1523bcf0a435c88ceb9885f06d499b8d7484ceb025a02ca",
+  "bytes": 824151,
+  "companionWorkbench": {
+    "file": "delivery/人物身体_R24_完整参数与人物衔接.html",
+    "sha256": "52e413b9b04cd8a93566acc08941d05918638c9a3de3d0842f8c6da060739a3c",
+    "bytes": 1680099
+  },
+  "prior": {
+    "version": "R23",
+    "file": "delivery/身体_R23_原貌与按需细节.html",
+    "sha256": "db26e1dcf1c8accd4f6be0306f2d9a2202c34eb0137068fd35efa8dceebac859",
+    "delivery": "DELIVERY-R23.json",
+    "status": "retained unchanged fallback"
+  },
+  "scope": "BODY ONLY",
+  "characterTriangleFaces": 0,
+  "characterVertexBuffers": 0,
+  "rasterPrimitive": "POINTS",
+  "headGenerated": false,
+  "headBoardModified": false,
+  "sourceDerivedCalibration": true,
+  "sourceFacetPartitionInformationRetained": true,
+  "wholeBodySourceIndependent": false,
+  "completedMotherConversion": false,
+  "bodyReconstructionComplete": false,
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "acceptanceTolerance": null,
+  "allOriginalControlCombinationsCertified": false,
+  "geometryParameterVariationOnSourceCandidate": false,
+  "fixedOriginalStates": 10,
+  "controls": {
+    "originalCatalog": 1916,
+    "bodyControls": 965,
+    "symmetricPairs": 34,
+    "independentDegreesDeleted": 0
+  },
+  "originalBodySurfaceControls": [
+    "bodyVariation",
+    "bodyPores",
+    "jointTone",
+    "neckCreases"
+  ],
+  "originalBodySurfaceControlsImplemented": true,
+  "fullControlsRetainedInCompanion": true,
+  "continuousHeadProviderImplemented": false,
+  "originalNeckNumericStagesImplemented": true,
+  "headBoundaryReferenceStates": 10,
+  "headSupportSamples": 1398,
+  "calibration": {
+    "profile": "calibration-soft",
+    "sourceParametersOnly": true,
+    "muscle": 0.5,
+    "weight": 0.5,
+    "bodyLocalControlsZeroed": 127,
+    "bodyLocalValueChanges": 18,
+    "headOnlyFieldsPreserved": true,
+    "originalAgeHeightAndProportionsPreserved": true,
+    "sourceDefaultReplaced": false,
+    "acceptedMother": false
+  },
+  "bindingInspection": {
+    "fixedAndCurrentBothRigs": true,
+    "joints": 12,
+    "measuredAnatomicalBoneLengths": false,
+    "skeletonSoftTissueDecoupled": false,
+    "archiveOrShapeChangedByInspection": false
+  },
+  "originalSkin": {
+    "fullRGBAFieldsRegenerated": 4,
+    "mipLevelsPerField": 12,
+    "rawBytes": 178956960,
+    "allRawFieldsByteExact": true,
+    "downloadedFieldsOptionalAccelerationCache": true,
+    "verifiedLocalCache": true,
+    "cacheCorruptionFallbackToOriginalFunctions": true,
+    "headGeometryGenerated": false,
+    "sourceOwnSkinReproduced": false
+  },
+  "gpuStorage": {
+    "standard": {
+      "denseBaselineBytes": 352871712,
+      "residentBaselineBytes": 258899608,
+      "expandedDenseField": false,
+      "allAuditedWords": 106686702,
+      "differentWords": 0
+    },
+    "precision": {
+      "originalDenseFloat32Path": true,
+      "roundingDifferenceInDirectPagedExperiment": {
+        "differentBytes": 2,
+        "maximumRGBCodeDifference": 1,
+        "adopted": false
+      }
+    },
+    "densitySwitchDisposesPreviousResources": true
+  },
+  "sourceComparison": {
+    "views": 40,
+    "rays": 21178640,
+    "coverageDisagreements": 0,
+    "maximumPositionDifferenceMetres": 2.4868995751603507e-14,
+    "maximumNormalVectorDifference": 1.308703145852519e-12,
+    "method": "independent watertight projected original-triangle BVH against direct analytic BSP intersections; same camera, projection, rays and original attributes",
+    "formalAcceptance": false
+  },
+  "nativeAppearanceComparison": {
+    "views": 30,
+    "maximumRGBCodeDifference": 129,
+    "interiorMaximumRGBCodeDifference": 97,
+    "maximumCoverageDisagreementsPerView": 7,
+    "allRecordedShadowMapsAndMatricesMatch": true,
+    "shadowScope": "20 fixed source maps under recorded original update history; arbitrary histories and continuous dynamic shadows incomplete",
+    "formalAcceptance": false
+  },
+  "sourceOwnSkinReproduced": false,
+  "fullVolumeScattering": false,
+  "mainPlatformMigrated": false,
+  "publicWebDeployment": false,
+  "githubSyncRequested": true,
+  "githubRepository": "haihao0307/Humanoid-Rig-Lab-Next",
+  "githubBranch": "body/reconstruction-r18-20261023",
+  "implemented": [
+    "exact projective-integer source domain compilation and rate-sign ray traversal without changing original surface/material coefficients",
+    "separate source-parameter calibration and matching original neck input; sparse archive key presence preserved",
+    "live original binding references for both original rigs; explicitly not measured anatomy or decoupling",
+    "all four original RGBA procedural fields reconstructed exactly, with verified persistent cache and function fallback",
+    "lossless GPU address maps for standard mode; original dense shader retained for precision mode",
+    "complete original control catalog, both rigs, head and unknown archive fields, both page directions and failure restoration retained"
+  ],
+  "remaining": [
+    {
+      "priority": 0,
+      "status": "incomplete",
+      "task": "先完成连续原表面、边界、分层、法线及首交复刻；旧连续隐式面已测得轮廓和遮挡差异，不能当作来源通过。原貌页共享边界漏命中已由精确参照证实，整数函数核已补齐十档420例、尚未接入显示；30组材质仍有像素差异，正式容差仍为null。"
+    },
+    {
+      "priority": 1,
+      "status": "partial",
+      "task": "已建立原参数校准档、A/B当前绑定参照和隔离的数值/三维软组织响应候选；候选极端体型仍有局部形态问题，默认版未采用。胸肩腰腹骨盆体量、完整骨架/软组织分离仍未完成，校准档不是已验收母体。"
+    },
+    {
+      "priority": 2,
+      "status": "incomplete",
+      "task": "完成肩髋连接、肘膝腕踝、手足细轮廓及连续组合动作的来源保真和后续变形；原貌页仍只支持10个固定状态。"
+    },
+    {
+      "priority": 3,
+      "status": "incomplete",
+      "task": "建立自主结构函数母体，逐区替换来源分面分区、形态和绑定数据；连续参数页的旧隐式表面仍未通过来源复刻验收。"
+    },
+    {
+      "priority": 4,
+      "status": "partial",
+      "task": "四组原皮纹完整函数重建、持久校验缓存和标准模式无损GPU寻址已完成；全系统局部计算、精细模式显存、动态阴影、完整体积散射仍未完成。"
+    },
+    {
+      "priority": 5,
+      "status": "incomplete",
+      "task": "接通任意连续状态的真实头侧边界提供方，并完成头部、附件、坐标跟随与总平台联调；独立头部项目未修改。"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "qa/fidelity-r24/release-integrity.json",
+      "sha256": "580e4bf2a4cc2a55c1b4efef978d971870833e2a960e832186f209a3f598b4d6",
+      "checks": 319,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/product-browser.json",
+      "sha256": "0b831167a312c3f9e5aaf5ed8b3c66b3734d396c403bb8bcbcfc3d20691edda5",
+      "checks": 34,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/source-lifecycle-browser.json",
+      "sha256": "fb0c233e2662441a84bad0d0a8d01436d77665674ca018ce9945f3ed3d0e5840",
+      "checks": 17,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/page-handoff-browser.json",
+      "sha256": "679b2700ad558adebca40468fb9de78309a3c7bd08e300b0df9d2cac23083dc0",
+      "checks": 23,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/workbench-lifecycle.json",
+      "sha256": "d4b008c2c5a51920c24c1bca73b0ac665ebef21051b50107dc501371f5c0e60b",
+      "checks": 21,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/live-support-browser.json",
+      "sha256": "42c03f9af20b87e282d4912bdd35cef4d1b89548623cd89952bdeb518b54b52d",
+      "checks": 11,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/gpu-selected-standard-browser.json",
+      "sha256": "b51cba71b76a07bef1813d46176f4b77547862928b5cdc787e890546353aeed4",
+      "checks": 55,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/gpu-adaptive-quality-browser.json",
+      "sha256": "f0370175784f670d5ecd32025eddc844482a527c1c812977c4a9e2af0ecafff2",
+      "checks": 10,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/gpu-word-audit.json",
+      "sha256": "6243be465ece39824bfa027d8deefbe2a0edf2df18ca5cc8cfd06d35d0b1ad28",
+      "checks": 0,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/renderer-switch-browser.json",
+      "sha256": "f36e78c6b98350ce1ce6e8dea3def70c6eec77b1406b97cdb95371d39e79e4da",
+      "checks": 14,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/skin-loader.json",
+      "sha256": "31ef2775fe2fe9cdbf7132dc246617b4f7c7fb074b44171b08e0ac396ecec42e",
+      "checks": 26,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/browser-skin-worker.json",
+      "sha256": "6dc3b6d2ee51499b87c586669f343f66531276b56196e7622f7d5c879b63c5bd",
+      "checks": null,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/full-skin-regeneration.json",
+      "sha256": "61953f3c4bc973dcbfacf45af11fb925b4d0df2762ecb9cb77390a17b35b2b4e",
+      "checks": null,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/calibration-export.json",
+      "sha256": "ab53effea9c97e3f5304235ee235d381cd19cc4838be9d0179f9ae3a92eb6565",
+      "checks": 20,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/calibration-neck.json",
+      "sha256": "99395455412d049afc1eed5c0fe1c4f57b0bad06674f6edb81cd07515ea7d095",
+      "checks": null,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/http-viewer.json",
+      "sha256": "71439b0a519b65f9e1b40c127a61be543fc06e81d6b9bd25820d294e6c6cbaf3",
+      "checks": 101,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/source-functions-browser.json",
+      "sha256": "804fda93a8083f8e0ae06c5666dc6a3b47fe6fff5dfcebd744a8523974c34c21",
+      "checks": 5,
+      "passed": true
+    },
+    {
+      "file": "qa/fidelity-r24/git-tree-rebuild.json",
+      "sha256": "273c4d71e3e1deaac7cad4f3456e86ac3d3ffcaffbd7669874ce6f4b7cbf159d",
+      "checks": 89,
+      "passed": true
+    }
+  ],
+  "comparisonEvidence": [
+    {
+      "file": "qa/fidelity-r24/exact-domain-verified-rays.json",
+      "sha256": "525126833fc6a59061def0af38d2394b592f8d476d76005351ac9448cbeed5f9",
+      "sourceFidelityAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/active-profiles-pixels-browser.json",
+      "sha256": "77cb3811e3d51dbe00c26f08839bc8c17baf698387bda0ca0489c836adf8d5ee",
+      "sourceFidelityAccepted": false
+    }
+  ],
+  "runtimeAssets": {
+    "count": 82,
+    "compressedBytes": 198754116,
+    "coefficientArrays": 57
+  },
+  "newUserFacingImageGallery": false,
+  "newInternalLayoutScreenshots": 2,
+  "notes": "Full runtime assets remain alongside the small HTML files. Git synchronization is not public web deployment. Never infer source acceptance from data identity, runtime checks or source-derived fixed states.",
+  "wholePatchCoefficientBounds": {
+    "profiles": 10,
+    "sourceFunctions": 184160,
+    "arithmetic": "exact rational evaluation of stored Float64 coefficients in real arithmetic; not floating runtime execution",
+    "maximumPositionBoundMetresUpper": 2.7463874343079033e-16,
+    "maximumNormalizedNormalBoundUpper": 9.092817855592478e-12,
+    "attributeBounds": {
+      "restX": 2.844047677876558e-16,
+      "restY": 7.547439794865631e-16,
+      "restZ": 3.5754134702639246e-16,
+      "dry": 7.663180770432356e-16,
+      "palm": 2.3485387761054344e-14
+    },
+    "finitePrecisionRayAndDomainOwnershipProven": false,
+    "nonlinearMaterialOrNativePixelsAccepted": false,
+    "formalAcceptance": false
+  },
+  "exactSplitAreaConservation": {
+    "profiles": 10,
+    "exactSplits": 2716867,
+    "nonemptyPieces": 5433734,
+    "scope": "Offline exact rational split area conservation before Float64 line encoding; not a global finite-precision ray or boundary-ownership proof",
+    "formalAcceptance": false
+  },
+  "isolatedSoftResponseResearch": {
+    "defaultBuildSelected": false,
+    "sourceDefaultFieldBuffersByteExact": true,
+    "referenceSoftParameters": {
+      "weight": 0.66,
+      "muscle": 0.96
+    },
+    "namedBodyLocalSoftControls": 20,
+    "completeSoftSkeletonDecoupling": false,
+    "numericCases": 150,
+    "numericChecks": 647,
+    "viewerChecks": 36,
+    "wholeAndHalfBodyFrames": 48,
+    "maximumRawSampleCorrectionMetres": 0.06328663630669387,
+    "localShapeDiagnosticCases": 150,
+    "maximumSourceRelativeNormalTurnCells": 9,
+    "minimumSourceRelativeNormalDot": -0.9993962853923509,
+    "originalSourceConnectivityOnlyUsedOffline": true,
+    "displayReady": false,
+    "visualAccepted": false,
+    "sourceFidelityAccepted": false,
+    "formalPersonArchiveOffered": false,
+    "productionPageHandoffConsumed": false,
+    "artifactSHA256": "5ef9a1cc221f8ecde04bf9f2b77ab20c9e488ac0eaf96a7dda107dc2429b80e8",
+    "buildEntry": "tools/research/r24/build-soft-research.cjs",
+    "remaining": [
+      "source-faithful continuous surface",
+      "chest/shoulder/abdomen/pelvis form",
+      "extreme and combined motion local shape",
+      "normals",
+      "current neck boundary",
+      "material coordinates",
+      "measured independent skeleton"
+    ]
+  },
+  "continuousSourceFailureComparison": {
+    "views": 16,
+    "rays": 4933136,
+    "sourceOnlyRays": 591,
+    "continuousOnlyRays": 13796,
+    "maximumFirstHitDistanceDifferenceMetres": 0.7352923410977121,
+    "largeDistanceCanBeDifferentOccludingLayers": true,
+    "notActualSoftTissueDisplacement": true,
+    "sourceSamplesProbed": 37012,
+    "maximumAbsoluteRawScalarAtSourceSamples": 0.0049507306787590615,
+    "rawScalarIsCertifiedDistance": false,
+    "sourceFidelityAccepted": false,
+    "visualAccepted": false,
+    "acceptanceTolerance": null
+  },
+  "sourceDefaultPreservationScope": "Original person parameters and original pre-surface control samples are preserved; this does not establish continuous rendered-source-surface equivalence.",
+  "sourceBoundaryResearch": {
+    "directedProfiles": 10,
+    "directedRays": 1660110,
+    "floatOracleCoverageDisagreements": 2552,
+    "loggedCasesTriagedByExactOriginal": 420,
+    "currentCandidateCoverageDisagreementsWithExactOriginal": 314,
+    "floatOracleCoverageDisagreementsWithExactOriginal": 6,
+    "currentCandidateWrongFirstSourceCells": 51,
+    "simpleClosedIntervalTrialAdopted": false,
+    "integerFunctionKernel": {
+      "exactLoggedCases": 420,
+      "checks": 51,
+      "actualBrowserAndNode": true,
+      "exactParameterAndFloat64RoundingMatch": true,
+      "data": {
+        "schema": "body-rational-domain-research-data/1",
+        "file": "data/body-rational-domains-research-r24.json.gz",
+        "compressedBytes": 27454400,
+        "compressedSHA256": "19798376b9e537d6f74fbf420ec4d511c62396caaa26e4e5830835d5acc1780d",
+        "rawBytes": 109477964,
+        "rawSHA256": "a9666aebd240ea06938531f39c8f5674b97b5799599be825afc363dee185ce09",
+        "profiles": [
+          "baseline",
+          "lean",
+          "fuller",
+          "muscular",
+          "female",
+          "A-joints",
+          "A-reach",
+          "B-neutral",
+          "B-bend",
+          "calibration-soft"
+        ],
+        "referenceFile": "qa/fidelity-r24/source-boundary-rational-all.json",
+        "referenceSHA256": "ab1ad12e33522cedc4f13a1c4f64684693e441588da711ec78d6b81e39ed43bf",
+        "exactRationalCases": 420,
+        "runtimeCharacterFaces": 0,
+        "sourceFacetPartitionInformationRetained": true,
+        "completedMotherConversion": false,
+        "selectedByDefault": false,
+        "displayIntegrationComplete": false,
+        "sourceFidelityAccepted": false,
+        "visualAccepted": false
+      },
+      "selectedByDefault": false,
+      "displayIntegrationComplete": false,
+      "allTenFixedProfilesImplemented": true,
+      "allContinuousRaysProven": false,
+      "sourceFacetPartitionInformationRetained": true,
+      "completedMotherConversion": false,
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    }
+  },
+  "researchAndProofEvidence": [
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-baseline.json",
+      "sha256": "a9228235fa0d6049adb224e8bd78c9dbd5a8899280dc48fc7a6c2159026dbad3",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-baseline.json",
+      "sha256": "fef15e3d0032f85cf6a6ab97029593edc62618101ed2cd8245cff395c363f1de",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-lean.json",
+      "sha256": "6c2ec975c52e1c84b6c009011960bf7b12535726c931f0c5fb8296b321a31b39",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-lean.json",
+      "sha256": "bfa37ca48b661a5e25d82819c2185af9b1c77e7c000387e3ce7df98329152b0b",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-fuller.json",
+      "sha256": "a1e0d074ef5972166d336dcc2b6bf9162e4092e9fb08e6398e9e8effee4cbc98",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-fuller.json",
+      "sha256": "c903de8f368e9012ae9c797f38dea96b62ff3e10bec4ebe4d337f1018e8caeff",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-muscular.json",
+      "sha256": "e9d5f3bdcf9958fabb8a350e0ed4b9dbacab004fdc3b84fb056c11d9bc40b934",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-muscular.json",
+      "sha256": "01cb5a0d46f05ec5ed267c3daeae4eec314ab7cb578ed32a01531b45ecd9cf07",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-female.json",
+      "sha256": "360d2e878248c2d31e34fa831cb27faf97edecb6211bca4c771e4da2969ce525",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-female.json",
+      "sha256": "e4cbdfbebbd3d88fd7e43fd82769878740626317f9af1eec43c21da3bc6094d2",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-A-reach.json",
+      "sha256": "a904ea658bbaa5d941eed6051411ab77341478e2b8fbb841feba014a71017478",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-A-reach.json",
+      "sha256": "84147439af736c4ff24d01e5a254bcefe5460883642c243054d7fbf8acb707b0",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-A-joints.json",
+      "sha256": "1fb033cd43a88738da53d4cad578cf6c90c8195e46cd7346447b9efc374982ce",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-A-joints.json",
+      "sha256": "8c778067583760dc9e3ebcfff391751b72d44fbd86de47605da14f868267c474",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-B-neutral.json",
+      "sha256": "78e99f99d86343ce3b6af32a6d73c31c7b4e622f09c213fc89c1c008386d7675",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-B-neutral.json",
+      "sha256": "95fb105b63df264c5e38f9e0902e33ceaf0819d71a1a9178e1fc4a65919a4fdc",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-B-bend.json",
+      "sha256": "c0eebb8ee8cf471e36fbd014262691de16928ae5b2c08de7accb36bba6a2b1b8",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-B-bend.json",
+      "sha256": "75d822140f5d4f47cb0fbd818e6a58bbb1796682d9e3eabf820139a6df6a1001",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/exact-area-proof-calibration-soft.json",
+      "sha256": "5ef92fcf7038ab314592ff6faa3f3d844720b59da7e2819af23e090690cb77fd",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/affine-source-bound-calibration-soft.json",
+      "sha256": "a0b1ea5bebb13690983058dc1fe69897ee97c4f79b0f20fcdf9a875f3a32c9b0",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/soft-response-research.json",
+      "sha256": "5a3799781cc21d7e7b8a44fb755faf7e4f45f0069797a114d21514acfa1f2223",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/soft-response-viewer.json",
+      "sha256": "007823931b71d5a5a61607a3282e0c4e7d2ba71a01c8e56051438fc80ed050c7",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/soft-research-build.json",
+      "sha256": "b435d82679082b4d0602a765701d21461fca76aee7b80d4bc6171709907fba08",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/soft-local-shape-diagnostic.json",
+      "sha256": "243d1e6fb5ab167c32539458a6ea02f66c93e5a0bf07840d3b3428495e113a07",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/continuous-source-first-hit.json",
+      "sha256": "2c2861f05d6a2d533468a6d570c6b859f35fcd9439c2a649f9639ab31881da3f",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/continuous-source-field-probes.json",
+      "sha256": "668893f283074c934b3270af3b286b003daee1d84a117b0c2773f76675f8d057",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-rays.json",
+      "sha256": "c32072fe4e079f938c56e063ebf1ce21a6b06a692e79b88d82de1d226f41d5d7",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-rational-triage.json",
+      "sha256": "21010816313f565c1731d1f3ec501772f5d156fc8343aaa32954d0775eee6da2",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-closed-rays.json",
+      "sha256": "cfb40fb36e0b7ce4416de2547ff0a9651532b71e4f6c50e2ace71f98db5c8972",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-closed-rational-triage.json",
+      "sha256": "be4ba1e3ad0552993477b840adade5a3c45728970a2c95bc78ab602784e9cd95",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-data.json",
+      "sha256": "cad27a4623fb4518435d8449b70132945a015e039ad9966f3f28a04b9b7f4910",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-kernel.json",
+      "sha256": "ebfb7de1b1ffe2774c02ea1c7458949a6ce7ef5d7f61daa5d8e028ac0746d582",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-rays-all.json",
+      "sha256": "d8a8b0bac86d425b3b59c3d186e51b051977b5419a68f68aed0769b8d8723664",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-rational-all.json",
+      "sha256": "ab1ad12e33522cedc4f13a1c4f64684693e441588da711ec78d6b81e39ed43bf",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-baseline.json",
+      "sha256": "1d4760b1b8e6d9ece41e768e7bde26d0758287e9d6ab5c156a3bcc78a8e3c9f9",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-lean.json",
+      "sha256": "f76c10f5a958c6bd356939075ac0d6ec1dfa7e9d3eade42bc525d360c1cbe72d",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-fuller.json",
+      "sha256": "5d161599382ed19d525417fb98f3a090b6946a240507354cca303719ad169983",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-muscular.json",
+      "sha256": "662cbb3f513830cbf79e3673d828b87a84834a5733b9876771a674f548f951ac",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-female.json",
+      "sha256": "38b0db54aee2067771871dfc0bd5f178e306d1cc3b6071b0f4e5e63994b5a6b6",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-A-joints.json",
+      "sha256": "f9f6dcfebeda9c499a0ba6ccb6b71c46b9e9e5bdbf9290674de88866de7907a2",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-A-reach.json",
+      "sha256": "0820f154a6b8813a5aab76d93407f9dd8d2b1345cfff98d56df632ab788d81bf",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-B-neutral.json",
+      "sha256": "cf4949029065324095261a14922ae1b448adc1fcb479c76ff35bfb913a398e36",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-B-bend.json",
+      "sha256": "4bcdbe9cb4ebe4b583d04d4c1525ff9f28f18587664e7cb7a43f58c97635c3b5",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-calibration-soft.json",
+      "sha256": "31d692dcef71ba6cc1fd45ffa65e25c06c1da45642ad6126cd7dfaacade1ddd4",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    }
+  ]
+}

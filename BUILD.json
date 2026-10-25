@@ -137,10 +137,10 @@
   },
   "originalEB1LightsAndEnvironmentRestored": true,
   "schema": "body-source-atlas-viewer/2",
-  "builtUTC": "2026-10-25T04:49:08.124Z",
-  "file": "delivery/身体_R24_原貌与原函数皮纹.html",
-  "sha256": "fae69985802be4c2e1523bcf0a435c88ceb9885f06d499b8d7484ceb025a02ca",
-  "bytes": 824151,
+  "builtUTC": "2026-10-25T06:52:15.447Z",
+  "file": "delivery/身体_R25_精确原表面边界.html",
+  "sha256": "c0b4357d7a0389e5d8d79d988f9bd4ca6127f76c298a88e7988cd8f6aff94955",
+  "bytes": 846150,
   "data": {
     "file": "data/body-source-atlas-r24.json",
     "sha256": "172a19de2613102f037dafa79ac370547824f84da0d4c52ac29c10b04f06f97d",
@@ -481,6 +481,50 @@
     {
       "file": "tools/build-source-r24.cjs",
       "sha256": "dabc3c5bbcd247007ed6183f24f2a0ca9de6783d5d6789ef1aa1cee561e80532"
+    },
+    {
+      "file": "src/BodyExactDomainR25.js",
+      "sha256": "b50161c0867cb913bdc6117971fcb7046a6bdec7c493f5b364b2f2f35481f295"
+    },
+    {
+      "file": "src/BodyFilteredDomainR25.js",
+      "sha256": "d495228a5f56cf390fd7b22bea9c218d7fcf763c0bfa596e1bf7d87c479fc393"
+    },
+    {
+      "file": "src/BodyAtlasCpuR25.js",
+      "sha256": "42e3f9a57d2f30428e8242702df03098caef4d9a0fd549d27591b4df1add27c4"
+    },
+    {
+      "file": "src/BodyAtlasPackageR25.js",
+      "sha256": "25ffd65fb2738e765593524879fa6cc0d04aac46bd36657a8e309eb26d7afcec"
+    },
+    {
+      "file": "src/BodyAtlasPrecisionR25.js",
+      "sha256": "56ac9f42388ffc8f1f3ab8a4d03085b0262169d1414793fd7187d8aefbf330dd"
+    },
+    {
+      "file": "tools/build-source-r25.cjs",
+      "sha256": "f8473121bc1493474776d4281bf72fa004df715d47d8da5dddba4f326aa4aa51"
+    },
+    {
+      "file": "tools/pack-exact-r25.cjs",
+      "sha256": "dd9bfff32e8470bf7a3e45b410e34d4838a5376d6210a11ed355bab53fd79cad"
+    },
+    {
+      "file": "data/body-exact-domains-r25.json",
+      "sha256": "181ddba04e78f613932499ac1a764686f900e173c3090ad62bbd26c9fe64ce34"
+    },
+    {
+      "file": "data/body-source-boundary-r25.json",
+      "sha256": "ae4f5b689f5f33ac92bcecd0b4ffd9a4c4838a0a829a2b94e9f526dbfe3a79a3"
+    },
+    {
+      "file": "src/BodySourceBoundaryR25.js",
+      "sha256": "5c7e81771c96b7c0c97613c6d7e7441ae5e7a4bf3e13e85af0b40113c19bbd8f"
+    },
+    {
+      "file": "tools/compile-boundary-r25.cjs",
+      "sha256": "53664c9fe6f064254dc260a97b41ec3ba0f2a1f723f783d48f0bcec71fa2d64d"
     }
   ],
   "characterTriangleFaces": 0,
@@ -876,8 +920,71 @@
     "referenceOnly": true,
     "measuredAnatomicalBoneLengths": false
   },
-  "selectedVersion": "R24",
-  "companionBuild": "BUILD-R24.json",
-  "companionWorkbench": "BUILD-R24.json",
-  "selection": "original source-state comparison with separate calibration and exact procedural skin; continuous workbench retains every control and remains unaccepted"
+  "canonicalFile": "delivery/身体_R25_精确原表面边界.html",
+  "version": "R25",
+  "exactDomainAssets": [
+    {
+      "file": "delivery/assets/body-exact-r25/2e9bf28a922ddfd1d85b236ca3e2919108e6d3182219de499b53c0efc2328ba2.gz",
+      "sha256": "2e9bf28a922ddfd1d85b236ca3e2919108e6d3182219de499b53c0efc2328ba2",
+      "bytes": 2805899
+    },
+    {
+      "file": "delivery/assets/body-exact-r25/c0f99a3e8815f6b72611c688237e6cf7ea4ccc45cebaf583bba6077263150db4.gz",
+      "sha256": "c0f99a3e8815f6b72611c688237e6cf7ea4ccc45cebaf583bba6077263150db4",
+      "bytes": 2790597
+    },
+    {
+      "file": "delivery/assets/body-exact-r25/9f8e6b860ac9f0a4bf08b5d00d75eb98db042eda5d07fe857bf19399cbc7b33d.gz",
+      "sha256": "9f8e6b860ac9f0a4bf08b5d00d75eb98db042eda5d07fe857bf19399cbc7b33d",
+      "bytes": 2821432
+    },
+    {
+      "file": "delivery/assets/body-exact-r25/3405361b3c0995b259bfd097569b706845e536777f6cc510ed04a6215c8e3dc0.gz",
+      "sha256": "3405361b3c0995b259bfd097569b706845e536777f6cc510ed04a6215c8e3dc0",
+      "bytes": 2773139
+    },
+    {
+      "file": "delivery/assets/body-exact-r25/69d93870e45a4f503edef1a3659c6489f9b6f9df336fd2b5bd11e7c60bb54f0e.gz",
+      "sha256": "69d93870e45a4f503edef1a3659c6489f9b6f9df336fd2b5bd11e7c60bb54f0e",
+      "bytes": 2764981
+    },
+    {
+      "file": "delivery/assets/body-exact-r25/5ca40a3c6ccbb9cc9b1183a1d2c6986506041fb5eb4fd6c74b551a4ff5532f8b.gz",
+      "sha256": "5ca40a3c6ccbb9cc9b1183a1d2c6986506041fb5eb4fd6c74b551a4ff5532f8b",
+      "bytes": 2489075
+    },
+    {
+      "file": "delivery/assets/body-exact-r25/718b7787f06e1fad3b0666bcbe92d05d42ff8dcf8a579b967d7c471b568ef4ad.gz",
+      "sha256": "718b7787f06e1fad3b0666bcbe92d05d42ff8dcf8a579b967d7c471b568ef4ad",
+      "bytes": 2620942
+    },
+    {
+      "file": "delivery/assets/body-exact-r25/30bd94f2fa8ce2b95a4999e7f932cdb2887a65f6cec3a25d5972cc338a76b2c9.gz",
+      "sha256": "30bd94f2fa8ce2b95a4999e7f932cdb2887a65f6cec3a25d5972cc338a76b2c9",
+      "bytes": 2805884
+    },
+    {
+      "file": "delivery/assets/body-exact-r25/6a4cd2a174207efc4a09925c36c92fd50135a3cd503d21ca7c31b2562afc6f23.gz",
+      "sha256": "6a4cd2a174207efc4a09925c36c92fd50135a3cd503d21ca7c31b2562afc6f23",
+      "bytes": 2812932
+    },
+    {
+      "file": "delivery/assets/body-exact-r25/70f2b6667f45b45bb4f386f22d7d1d9c412687a547acd3c631f4c8657dde0aed.gz",
+      "sha256": "70f2b6667f45b45bb4f386f22d7d1d9c412687a547acd3c631f4c8657dde0aed",
+      "bytes": 2795935
+    }
+  ],
+  "exactDomainData": {
+    "file": "data/body-exact-domains-r25.json",
+    "sha256": "181ddba04e78f613932499ac1a764686f900e173c3090ad62bbd26c9fe64ce34"
+  },
+  "exactGeometryAfterIdle": true,
+  "interactivePreviewPrecision": "Float32",
+  "exactSharedBoundaryTiesRetained": true,
+  "attributeBoundaryOwnership": "lowest original source function ID; native raster equivalence not certified",
+  "sourceBoundaryInputsVerified": true,
+  "selectedVersion": "R25",
+  "companionBuild": "BUILD-R25.json",
+  "companionWorkbench": "BUILD-R25.json",
+  "selection": "exact original fixed-state function intersections after interaction; original detail integrated into complete parameter workbench; arbitrary continuous surface and full source fidelity remain unaccepted"
 }

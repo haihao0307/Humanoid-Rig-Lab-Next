@@ -1,0 +1,529 @@
+{
+  "startedUTC": "2026-10-25T06:17:00.989Z",
+  "artifactSHA256": "e2ee5e6be6aa7037ee2ac2952c671f12ac4dda9bcba51327d69e2fff170da679",
+  "referenceArtifactSHA256": "d2450b5c8d05e4cc6904721e0049aba39ee03183c43f039cb3d7b3ca8b3b0a8e",
+  "checks": [
+    {
+      "name": "compiled original shaders are byte identical",
+      "passed": true
+    },
+    {
+      "name": "intersection formula and attributes unchanged",
+      "passed": true
+    },
+    {
+      "name": "baseline/front complete colour and mask unchanged",
+      "passed": true,
+      "details": {
+        "id": "baseline",
+        "view": "front",
+        "width": 641,
+        "height": 826,
+        "differentBytes": 0,
+        "maximumCodeDifference": 0,
+        "examples": [],
+        "maskIdentical": true,
+        "inputHashes": [
+          [
+            "c0db06c7c386302483c4eb4cad7c4e5f3d10ac002053e14a5ce3acfef2bbd3ea",
+            "d6d8b94a7da8561d6fb6866ecea70b7381792dae938afea45eab667609c2f092",
+            "c50170a47a27f20bdc708d0b3ebbf94867e7dff1278540f987a004edc7ccc121"
+          ],
+          [
+            "c0db06c7c386302483c4eb4cad7c4e5f3d10ac002053e14a5ce3acfef2bbd3ea",
+            "d6d8b94a7da8561d6fb6866ecea70b7381792dae938afea45eab667609c2f092",
+            "c50170a47a27f20bdc708d0b3ebbf94867e7dff1278540f987a004edc7ccc121"
+          ]
+        ],
+        "referencePixelSHA256": "76b3761f5bed8a2bb5264cb15d4069724097013b20936b76967c4b5034a24654",
+        "candidatePixelSHA256": "76b3761f5bed8a2bb5264cb15d4069724097013b20936b76967c4b5034a24654"
+      }
+    },
+    {
+      "name": "baseline/side complete colour and mask unchanged",
+      "passed": false,
+      "details": {
+        "id": "baseline",
+        "view": "side",
+        "width": 641,
+        "height": 826,
+        "differentBytes": 1346,
+        "maximumCodeDifference": 3,
+        "examples": [
+          {
+            "x": 265,
+            "y": 52,
+            "channel": 0,
+            "reference": 153,
+            "candidate": 152
+          },
+          {
+            "x": 265,
+            "y": 52,
+            "channel": 1,
+            "reference": 79,
+            "candidate": 78
+          },
+          {
+            "x": 273,
+            "y": 52,
+            "channel": 0,
+            "reference": 170,
+            "candidate": 171
+          },
+          {
+            "x": 261,
+            "y": 53,
+            "channel": 1,
+            "reference": 87,
+            "candidate": 86
+          },
+          {
+            "x": 262,
+            "y": 53,
+            "channel": 1,
+            "reference": 84,
+            "candidate": 83
+          },
+          {
+            "x": 263,
+            "y": 53,
+            "channel": 0,
+            "reference": 158,
+            "candidate": 157
+          },
+          {
+            "x": 263,
+            "y": 53,
+            "channel": 2,
+            "reference": 42,
+            "candidate": 41
+          },
+          {
+            "x": 262,
+            "y": 54,
+            "channel": 2,
+            "reference": 56,
+            "candidate": 55
+          },
+          {
+            "x": 263,
+            "y": 54,
+            "channel": 1,
+            "reference": 93,
+            "candidate": 92
+          },
+          {
+            "x": 280,
+            "y": 54,
+            "channel": 0,
+            "reference": 177,
+            "candidate": 176
+          },
+          {
+            "x": 298,
+            "y": 54,
+            "channel": 0,
+            "reference": 135,
+            "candidate": 136
+          },
+          {
+            "x": 279,
+            "y": 55,
+            "channel": 0,
+            "reference": 188,
+            "candidate": 187
+          }
+        ],
+        "maskIdentical": true,
+        "inputHashes": [
+          [
+            "de0a2a758b3d6eeea1959677b56dac7921d39dcfc4cff7af6baf9f0fc11c8877",
+            "aa33af9fbc3b148db6de07595b5ba0935f1222b4cd48f2a5d07f83028dd67ca5",
+            "3eb95ae6c07a2d17d7c71a92f128bcf9645e843c23aee44abc9af2db2d2cefc5"
+          ],
+          [
+            "de0a2a758b3d6eeea1959677b56dac7921d39dcfc4cff7af6baf9f0fc11c8877",
+            "aa33af9fbc3b148db6de07595b5ba0935f1222b4cd48f2a5d07f83028dd67ca5",
+            "3eb95ae6c07a2d17d7c71a92f128bcf9645e843c23aee44abc9af2db2d2cefc5"
+          ]
+        ],
+        "referencePixelSHA256": "0c27c130d3c94c2833f387fa7ece3f3d1e2ee4de06f02298ac6e753dd90122af",
+        "candidatePixelSHA256": "87a72db799ea52be58441d73e7337d400cf804ef3914656e73755267dc9b261e"
+      }
+    },
+    {
+      "name": "baseline/back complete colour and mask unchanged",
+      "passed": false,
+      "details": {
+        "id": "baseline",
+        "view": "back",
+        "width": 641,
+        "height": 826,
+        "differentBytes": 1958,
+        "maximumCodeDifference": 3,
+        "examples": [
+          {
+            "x": 237,
+            "y": 91,
+            "channel": 0,
+            "reference": 124,
+            "candidate": 125
+          },
+          {
+            "x": 222,
+            "y": 92,
+            "channel": 2,
+            "reference": 39,
+            "candidate": 40
+          },
+          {
+            "x": 227,
+            "y": 92,
+            "channel": 0,
+            "reference": 97,
+            "candidate": 98
+          },
+          {
+            "x": 227,
+            "y": 92,
+            "channel": 1,
+            "reference": 71,
+            "candidate": 72
+          },
+          {
+            "x": 227,
+            "y": 92,
+            "channel": 2,
+            "reference": 54,
+            "candidate": 55
+          },
+          {
+            "x": 228,
+            "y": 92,
+            "channel": 0,
+            "reference": 102,
+            "candidate": 103
+          },
+          {
+            "x": 228,
+            "y": 92,
+            "channel": 1,
+            "reference": 76,
+            "candidate": 78
+          },
+          {
+            "x": 228,
+            "y": 92,
+            "channel": 2,
+            "reference": 59,
+            "candidate": 61
+          },
+          {
+            "x": 229,
+            "y": 92,
+            "channel": 2,
+            "reference": 63,
+            "candidate": 64
+          },
+          {
+            "x": 230,
+            "y": 92,
+            "channel": 2,
+            "reference": 67,
+            "candidate": 68
+          },
+          {
+            "x": 399,
+            "y": 92,
+            "channel": 1,
+            "reference": 64,
+            "candidate": 65
+          },
+          {
+            "x": 416,
+            "y": 92,
+            "channel": 1,
+            "reference": 106,
+            "candidate": 107
+          }
+        ],
+        "maskIdentical": true,
+        "inputHashes": [
+          [
+            "cec05cc05cb6911eedd0c91e1fdba0adef27dc2247e5e300802c1cfc577a207c",
+            "2bdf437f532c079dc6a9070efee9e0d38658a88b3494078742ee32db6750d8e0",
+            "e2902a82fc20b7c44663092cf47c2b8a2094518a0e909fc9a62475db4900bcf8"
+          ],
+          [
+            "cec05cc05cb6911eedd0c91e1fdba0adef27dc2247e5e300802c1cfc577a207c",
+            "2bdf437f532c079dc6a9070efee9e0d38658a88b3494078742ee32db6750d8e0",
+            "e2902a82fc20b7c44663092cf47c2b8a2094518a0e909fc9a62475db4900bcf8"
+          ]
+        ],
+        "referencePixelSHA256": "b37b2a7d4ba53628d999d37f7a49002682280ff8841b5b4a1582e1690c53027c",
+        "candidatePixelSHA256": "0fd71fea10590de5d36af6a4743f6afca62d406e36c1246d5b65c7f0265f4a86"
+      }
+    },
+    {
+      "name": "no browser errors",
+      "passed": true
+    }
+  ],
+  "frames": [
+    {
+      "id": "baseline",
+      "view": "front",
+      "width": 641,
+      "height": 826,
+      "differentBytes": 0,
+      "maximumCodeDifference": 0,
+      "examples": [],
+      "maskIdentical": true,
+      "inputHashes": [
+        [
+          "c0db06c7c386302483c4eb4cad7c4e5f3d10ac002053e14a5ce3acfef2bbd3ea",
+          "d6d8b94a7da8561d6fb6866ecea70b7381792dae938afea45eab667609c2f092",
+          "c50170a47a27f20bdc708d0b3ebbf94867e7dff1278540f987a004edc7ccc121"
+        ],
+        [
+          "c0db06c7c386302483c4eb4cad7c4e5f3d10ac002053e14a5ce3acfef2bbd3ea",
+          "d6d8b94a7da8561d6fb6866ecea70b7381792dae938afea45eab667609c2f092",
+          "c50170a47a27f20bdc708d0b3ebbf94867e7dff1278540f987a004edc7ccc121"
+        ]
+      ],
+      "referencePixelSHA256": "76b3761f5bed8a2bb5264cb15d4069724097013b20936b76967c4b5034a24654",
+      "candidatePixelSHA256": "76b3761f5bed8a2bb5264cb15d4069724097013b20936b76967c4b5034a24654"
+    },
+    {
+      "id": "baseline",
+      "view": "side",
+      "width": 641,
+      "height": 826,
+      "differentBytes": 1346,
+      "maximumCodeDifference": 3,
+      "examples": [
+        {
+          "x": 265,
+          "y": 52,
+          "channel": 0,
+          "reference": 153,
+          "candidate": 152
+        },
+        {
+          "x": 265,
+          "y": 52,
+          "channel": 1,
+          "reference": 79,
+          "candidate": 78
+        },
+        {
+          "x": 273,
+          "y": 52,
+          "channel": 0,
+          "reference": 170,
+          "candidate": 171
+        },
+        {
+          "x": 261,
+          "y": 53,
+          "channel": 1,
+          "reference": 87,
+          "candidate": 86
+        },
+        {
+          "x": 262,
+          "y": 53,
+          "channel": 1,
+          "reference": 84,
+          "candidate": 83
+        },
+        {
+          "x": 263,
+          "y": 53,
+          "channel": 0,
+          "reference": 158,
+          "candidate": 157
+        },
+        {
+          "x": 263,
+          "y": 53,
+          "channel": 2,
+          "reference": 42,
+          "candidate": 41
+        },
+        {
+          "x": 262,
+          "y": 54,
+          "channel": 2,
+          "reference": 56,
+          "candidate": 55
+        },
+        {
+          "x": 263,
+          "y": 54,
+          "channel": 1,
+          "reference": 93,
+          "candidate": 92
+        },
+        {
+          "x": 280,
+          "y": 54,
+          "channel": 0,
+          "reference": 177,
+          "candidate": 176
+        },
+        {
+          "x": 298,
+          "y": 54,
+          "channel": 0,
+          "reference": 135,
+          "candidate": 136
+        },
+        {
+          "x": 279,
+          "y": 55,
+          "channel": 0,
+          "reference": 188,
+          "candidate": 187
+        }
+      ],
+      "maskIdentical": true,
+      "inputHashes": [
+        [
+          "de0a2a758b3d6eeea1959677b56dac7921d39dcfc4cff7af6baf9f0fc11c8877",
+          "aa33af9fbc3b148db6de07595b5ba0935f1222b4cd48f2a5d07f83028dd67ca5",
+          "3eb95ae6c07a2d17d7c71a92f128bcf9645e843c23aee44abc9af2db2d2cefc5"
+        ],
+        [
+          "de0a2a758b3d6eeea1959677b56dac7921d39dcfc4cff7af6baf9f0fc11c8877",
+          "aa33af9fbc3b148db6de07595b5ba0935f1222b4cd48f2a5d07f83028dd67ca5",
+          "3eb95ae6c07a2d17d7c71a92f128bcf9645e843c23aee44abc9af2db2d2cefc5"
+        ]
+      ],
+      "referencePixelSHA256": "0c27c130d3c94c2833f387fa7ece3f3d1e2ee4de06f02298ac6e753dd90122af",
+      "candidatePixelSHA256": "87a72db799ea52be58441d73e7337d400cf804ef3914656e73755267dc9b261e"
+    },
+    {
+      "id": "baseline",
+      "view": "back",
+      "width": 641,
+      "height": 826,
+      "differentBytes": 1958,
+      "maximumCodeDifference": 3,
+      "examples": [
+        {
+          "x": 237,
+          "y": 91,
+          "channel": 0,
+          "reference": 124,
+          "candidate": 125
+        },
+        {
+          "x": 222,
+          "y": 92,
+          "channel": 2,
+          "reference": 39,
+          "candidate": 40
+        },
+        {
+          "x": 227,
+          "y": 92,
+          "channel": 0,
+          "reference": 97,
+          "candidate": 98
+        },
+        {
+          "x": 227,
+          "y": 92,
+          "channel": 1,
+          "reference": 71,
+          "candidate": 72
+        },
+        {
+          "x": 227,
+          "y": 92,
+          "channel": 2,
+          "reference": 54,
+          "candidate": 55
+        },
+        {
+          "x": 228,
+          "y": 92,
+          "channel": 0,
+          "reference": 102,
+          "candidate": 103
+        },
+        {
+          "x": 228,
+          "y": 92,
+          "channel": 1,
+          "reference": 76,
+          "candidate": 78
+        },
+        {
+          "x": 228,
+          "y": 92,
+          "channel": 2,
+          "reference": 59,
+          "candidate": 61
+        },
+        {
+          "x": 229,
+          "y": 92,
+          "channel": 2,
+          "reference": 63,
+          "candidate": 64
+        },
+        {
+          "x": 230,
+          "y": 92,
+          "channel": 2,
+          "reference": 67,
+          "candidate": 68
+        },
+        {
+          "x": 399,
+          "y": 92,
+          "channel": 1,
+          "reference": 64,
+          "candidate": 65
+        },
+        {
+          "x": 416,
+          "y": 92,
+          "channel": 1,
+          "reference": 106,
+          "candidate": 107
+        }
+      ],
+      "maskIdentical": true,
+      "inputHashes": [
+        [
+          "cec05cc05cb6911eedd0c91e1fdba0adef27dc2247e5e300802c1cfc577a207c",
+          "2bdf437f532c079dc6a9070efee9e0d38658a88b3494078742ee32db6750d8e0",
+          "e2902a82fc20b7c44663092cf47c2b8a2094518a0e909fc9a62475db4900bcf8"
+        ],
+        [
+          "cec05cc05cb6911eedd0c91e1fdba0adef27dc2247e5e300802c1cfc577a207c",
+          "2bdf437f532c079dc6a9070efee9e0d38658a88b3494078742ee32db6750d8e0",
+          "e2902a82fc20b7c44663092cf47c2b8a2094518a0e909fc9a62475db4900bcf8"
+        ]
+      ],
+      "referencePixelSHA256": "b37b2a7d4ba53628d999d37f7a49002682280ff8841b5b4a1582e1690c53027c",
+      "candidatePixelSHA256": "0fd71fea10590de5d36af6a4743f6afca62d406e36c1246d5b65c7f0265f4a86"
+    }
+  ],
+  "errors": [],
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "sourceFacetPartitionInformationRetained": true,
+  "performanceComparison": false,
+  "newImageFiles": 0,
+  "variants": [
+    "reference-a",
+    "reference-b"
+  ],
+  "passed": false,
+  "finishedUTC": "2026-10-25T06:17:49.248Z"
+}
