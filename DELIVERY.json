@@ -1,6 +1,6 @@
 {
   "schema": "body-function-delivery/9",
-  "reviewedUTC": "2026-10-25T04:49:35.174Z",
+  "reviewedUTC": "2026-10-25T05:05:18.201Z",
   "selectedVersion": "R24",
   "status": "checked working candidate; source fidelity and full body reconstruction incomplete",
   "artifact": "delivery/身体_R24_原貌与原函数皮纹.html",
@@ -138,7 +138,7 @@
     {
       "priority": 0,
       "status": "incomplete",
-      "task": "先完成连续原表面、边界、分层、法线及首交复刻；旧连续隐式面已测得轮廓和遮挡差异，不能当作来源通过。原貌页30组材质对照仍有像素差异，正式容差仍为null。"
+      "task": "先完成连续原表面、边界、分层、法线及首交复刻；旧连续隐式面已测得轮廓和遮挡差异，不能当作来源通过。原貌页共享边界漏命中已由精确参照证实，整数函数核仅四档168例通过、尚未接入显示；30组材质仍有像素差异，正式容差仍为null。"
     },
     {
       "priority": 1,
@@ -169,8 +169,8 @@
   "evidence": [
     {
       "file": "qa/fidelity-r24/release-integrity.json",
-      "sha256": "ddae0cb1cc3b9007d6636bcc14c39dd104acac621728aa6f79bd61ad4f2d2d5c",
-      "checks": 316,
+      "sha256": "6d9f010d1611a6881b940fcf4b3018d859cabacf40361f8014af9d9b3cd181f8",
+      "checks": 319,
       "passed": true
     },
     {
@@ -271,7 +271,7 @@
     },
     {
       "file": "qa/fidelity-r24/git-tree-rebuild.json",
-      "sha256": "8983dbf652b58a198fee0e1ecabc2bb36a14aef6e70f8bb8f173cd874efbd00e",
+      "sha256": "aee4dfcb33e03734dacf6f182a85c66c47fc0d9470bed47c05088e46dd39d774",
       "checks": 88,
       "passed": true
     }
@@ -371,6 +371,51 @@
     "acceptanceTolerance": null
   },
   "sourceDefaultPreservationScope": "Original person parameters and original pre-surface control samples are preserved; this does not establish continuous rendered-source-surface equivalence.",
+  "sourceBoundaryResearch": {
+    "directedProfiles": 4,
+    "directedRays": 664044,
+    "floatOracleCoverageDisagreements": 1037,
+    "loggedCasesTriagedByExactOriginal": 168,
+    "currentCandidateCoverageDisagreementsWithExactOriginal": 126,
+    "floatOracleCoverageDisagreementsWithExactOriginal": 2,
+    "currentCandidateWrongFirstSourceCells": 21,
+    "simpleClosedIntervalTrialAdopted": false,
+    "integerFunctionKernel": {
+      "exactLoggedCases": 168,
+      "checks": 21,
+      "actualBrowserAndNode": true,
+      "exactParameterAndFloat64RoundingMatch": true,
+      "data": {
+        "schema": "body-rational-domain-research-data/1",
+        "file": "data/body-rational-domains-research-r24.json.gz",
+        "compressedBytes": 10888957,
+        "compressedSHA256": "49fdc7c45bcf9b9ca48cc64e31aac8b131ed7686f4e629a73dc779b4475361fe",
+        "rawBytes": 42902319,
+        "rawSHA256": "d665d48b03c9f0559a0d3a15d0f3569ab72d650a6b8718fb6cd417154317f858",
+        "profiles": [
+          "baseline",
+          "calibration-soft",
+          "A-joints",
+          "B-bend"
+        ],
+        "runtimeCharacterFaces": 0,
+        "sourceFacetPartitionInformationRetained": true,
+        "completedMotherConversion": false,
+        "selectedByDefault": false,
+        "displayIntegrationComplete": false,
+        "sourceFidelityAccepted": false,
+        "visualAccepted": false
+      },
+      "selectedByDefault": false,
+      "displayIntegrationComplete": false,
+      "otherSixProfilesImplemented": false,
+      "allContinuousRaysProven": false,
+      "sourceFacetPartitionInformationRetained": true,
+      "completedMotherConversion": false,
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    }
+  },
   "researchAndProofEvidence": [
     {
       "file": "qa/fidelity-r24/exact-area-proof-baseline.json",
@@ -525,6 +570,66 @@
     {
       "file": "qa/fidelity-r24/continuous-source-field-probes.json",
       "sha256": "668893f283074c934b3270af3b286b003daee1d84a117b0c2773f76675f8d057",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-rays.json",
+      "sha256": "c32072fe4e079f938c56e063ebf1ce21a6b06a692e79b88d82de1d226f41d5d7",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-rational-triage.json",
+      "sha256": "21010816313f565c1731d1f3ec501772f5d156fc8343aaa32954d0775eee6da2",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-closed-rays.json",
+      "sha256": "cfb40fb36e0b7ce4416de2547ff0a9651532b71e4f6c50e2ace71f98db5c8972",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/source-boundary-closed-rational-triage.json",
+      "sha256": "be4ba1e3ad0552993477b840adade5a3c45728970a2c95bc78ab602784e9cd95",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-data.json",
+      "sha256": "0c3d203e22901555fadae64978b2eadc4b2ae74aac05bb5b4013c3f77c417801",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-kernel.json",
+      "sha256": "859dc8e187dafddd4e8a5b994084d9381ab900317bf04f7497d3dd24d0b36870",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-baseline.json",
+      "sha256": "1d4760b1b8e6d9ece41e768e7bde26d0758287e9d6ab5c156a3bcc78a8e3c9f9",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-calibration-soft.json",
+      "sha256": "31d692dcef71ba6cc1fd45ffa65e25c06c1da45642ad6126cd7dfaacade1ddd4",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-A-joints.json",
+      "sha256": "f9f6dcfebeda9c499a0ba6ccb6b71c46b9e9e5bdbf9290674de88866de7907a2",
+      "sourceFidelityAccepted": false,
+      "visualAccepted": false
+    },
+    {
+      "file": "qa/fidelity-r24/rational-domain-prototype-B-bend.json",
+      "sha256": "4bcdbe9cb4ebe4b583d04d4c1525ff9f28f18587664e7cb7a43f58c97635c3b5",
       "sourceFidelityAccepted": false,
       "visualAccepted": false
     }

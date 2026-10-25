@@ -35,5 +35,10 @@ try{
   check('research build leaves production selection and artifacts unchanged',selectedAfter.sha256===source.sha256&&H(fs.readFileSync(path.join(folder,source.file)))===source.sha256&&H(fs.readFileSync(path.join(folder,workbench.file)))===workbench.sha256);
   q.researchSHA256=research.sha256;
  }
+ if(fs.existsSync(path.join(folder,'qa/fidelity-r24/rational-domain-data.json'))){
+  const report=JSON.parse(cp.execFileSync(process.execPath,['tools/research/r24/check-rational-bundle.cjs'],{cwd:folder,encoding:'utf8',timeout:120000}));
+  check('committed exact source-function research needs no offline original',report.passed&&report.exactRationalCases===168&&report.offlineOriginalInputsRead===false&&report.defaultBuildSelected===false&&report.displayIntegrationComplete===false);
+  q.rationalFunctionResearch=report;
+ }
  q.assetCount=assets.length;q.assetCompressedBytes=assets.reduce((n,a)=>n+a.bytes,0);q.ignoredReferenceInputsRead=false;q.externalRuntimeDownloads=0;q.sourceSHA256=source.sha256;q.workbenchSHA256=workbench.sha256;q.passed=true;
 }catch(e){q.failure=e.stack;q.passed=false;process.exitCode=1;console.error(e);}finally{q.finishedUTC=new Date().toISOString();fs.writeFileSync(path.join(root,'qa/fidelity-r24/git-tree-rebuild.json'),JSON.stringify(q,null,2)+'\n');console.log(JSON.stringify({passed:q.passed,commit,checks:q.checks.length,assets:q.assetCount,failure:q.failure}));}
