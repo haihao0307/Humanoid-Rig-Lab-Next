@@ -14,6 +14,10 @@ on:
       - 'experiments/life-motion-environment-r01/**'
       - '.github/workflows/life-motion-environment-r01.yml'
 
+concurrency:
+  group: life-motion-environment-r01-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
