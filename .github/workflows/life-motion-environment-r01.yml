@@ -36,3 +36,9 @@ jobs:
         run: |
           node experiments/life-motion-environment-r01/routine-engine.test.mjs
           node experiments/life-motion-environment-r01/motion-trace-audit.test.mjs
+          # Read-only regression probes against the existing character motion core.
+          node tools/test-motion-phase-continuity.mjs
+          node tools/test-motion-support-continuity.mjs
+          node tools/test-motion-transition-range.mjs
+          node tools/test-motion-skin-attachment.mjs
+          node tools/test-release-motion.mjs
