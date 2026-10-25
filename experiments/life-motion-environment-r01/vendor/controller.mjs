@@ -1,6 +1,6 @@
 import { add, sub, mul, length, distance, normalize, rotateY, angle, clamp, mix, smooth, finiteVector, solveTwoBone } from '../../../motion/vendor/math.mjs';
 import { FlatWorld } from '../../../motion/vendor/world.mjs';
-import { FullBodyMotion } from '../../../motion/vendor/full-body.mjs';
+import { FullBodyMotion } from './full-body.mjs';
 
 export const CAPABILITIES = Object.freeze({ walk: true, turn: true, stop: true, pause: true,
   carry: false, push: false, salute: false, sit: false, lie: false });
