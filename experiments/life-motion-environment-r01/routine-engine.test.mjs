@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {LifeRoutineRunner,RESIDENT_ROUTINE_R01,validateObservation} from './routine-engine.mjs';
+import {LifeRoutineRunner,RESIDENT_ROUTINE_R01,validateObservation,validateRoutineGraph} from './routine-engine.mjs';
 const goodMetrics={footSlipM:.002,contactErrorM:.004,jointLimitViolationDeg:0,maxPenetrationM:0,maxPoseDeltaMps:.4,maxPoseAccelerationMps2:1.2};
 class FakeAdapter{
  constructor({failFirstObservation=false}={}){this.active=null;this.holdingObject=null;this.started=0;this.completed=0;this.restoreCount=0;this.failFirstObservation=failFirstObservation;this.observations=0;this.forceRunning=false;}
@@ -13,6 +13,9 @@ class FakeAdapter{
 }
 assert(RESIDENT_ROUTINE_R01.length>=50,'routine must be materially longer than a single action demo');
 assert(RESIDENT_ROUTINE_R01.some(t=>t.skill==='climb-stairs')&&RESIDENT_ROUTINE_R01.some(t=>t.skill==='operate-door')&&RESIDENT_ROUTINE_R01.some(t=>t.skill==='operate-window'));assert(RESIDENT_ROUTINE_R01.every(t=>t.requires.length&&t.produces.length&&t.gates.length));
+const graph=validateRoutineGraph();assert.equal(graph.ok,true,JSON.stringify(graph.errors));assert.equal(graph.taskCount,51);assert.equal(graph.uniqueTaskCount,51);
+const brokenGraph=validateRoutineGraph([{id:'first',requires:['missing-state'],produces:['done'],gates:['supportStable']}]);assert.equal(brokenGraph.ok,false);assert.equal(brokenGraph.errors[0].code,'unsatisfied-precondition');
+const duplicateGraph=validateRoutineGraph([{id:'same',requires:['standing'],produces:['a'],gates:['supportStable']},{id:'same',requires:['a'],produces:['b'],gates:['supportStable']}]);assert.equal(duplicateGraph.ok,false);assert(duplicateGraph.errors.some(e=>e.code==='duplicate-task-id'));
 const adapter=new FakeAdapter(),runner=new LifeRoutineRunner(adapter);runner.start({repeatCount:50});let ticks=0;const dtSequence=[1/120,1/60,1/30,1/15];
 while(runner.state==='running'&&ticks<10000){runner.tick(dtSequence[ticks%dtSequence.length]);ticks++;}
 assert.equal(runner.state,'completed');assert.equal(runner.cycle,50);assert.equal(runner.snapshot().journal.filter(e=>e.type==='task-verified').length,RESIDENT_ROUTINE_R01.length*50);assert.equal(adapter.holdingObject,null);assert.equal(adapter.started,RESIDENT_ROUTINE_R01.length*50);assert.equal(runner.facts.has('holding-crate'),false);assert.equal(runner.facts.has('holding-book'),false);
@@ -29,4 +32,4 @@ class RegressingProgressAdapter extends FakeAdapter{constructor(){super();this.c
 const progressAdapter=new RegressingProgressAdapter(),progressRunner=new LifeRoutineRunner(progressAdapter,{routine:one});progressRunner.start();assert.equal(progressRunner.tick(1/60).progress,.8);const regression=progressRunner.tick(1/60);assert.equal(regression.retryScheduled,true);assert(progressRunner.snapshot().journal.some(e=>e.detail?.reason==='progress-regressed'));
 const missingMetric=validateObservation({gates:[]},{selfCollisionFree:true,environmentCollisionFree:true,metrics:{}});assert.equal(missingMetric.ok,false);assert(missingMetric.failures.includes('pose-velocity-out-of-range'));
 const cancelAdapter=new FakeAdapter(),cancelRunner=new LifeRoutineRunner(cancelAdapter,{routine:one});cancelRunner.start();cancelAdapter.forceRunning=true;cancelRunner.tick(1/60);cancelAdapter.holdingObject='crate-01';assert.equal(cancelRunner.cancel(),false);assert.equal(cancelRunner.state,'paused');assert.equal(cancelRunner.snapshot().journal.at(-1).detail.requiresSafeRelease,true);
-console.log(JSON.stringify({suite:'life-motion-environment-r01',routineTasksPerCycle:RESIDENT_ROUTINE_R01.length,cycles:50,verifiedTaskCount:RESIDENT_ROUTINE_R01.length*50,ticks,retryRecovery:'passed',failedGateRejected:'passed',heldObjectCancellationGuard:'passed',live3DAdapterIntegrated:false,visualAcceptance:false},null,2));
+console.log(JSON.stringify({suite:'life-motion-environment-r01',routineTasksPerCycle:RESIDENT_ROUTINE_R01.length,graphValidation:'passed',cycles:50,verifiedTaskCount:RESIDENT_ROUTINE_R01.length*50,ticks,retryRecovery:'passed',failedGateRejected:'passed',heldObjectCancellationGuard:'passed',live3DAdapterIntegrated:false,visualAcceptance:false},null,2));
