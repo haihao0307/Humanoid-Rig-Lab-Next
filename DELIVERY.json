@@ -1,7 +1,7 @@
 {
   "schema": "body-delivery-r26/1",
   "version": "R26",
-  "updatedUTC": "2026-10-25T10:45:57.481Z",
+  "updatedUTC": "2026-10-25T11:30:23.810Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
@@ -112,7 +112,36 @@
     "scope": "Current selected function viewer versus original native renderer with matched views and original shadow history; diagnostic, not source acceptance",
     "views": 30,
     "maximumRGBCodeDifference": 129,
-    "sourceFidelityAccepted": false
+    "sourceFidelityAccepted": false,
+    "supplementary": [
+      {
+        "file": "qa/fidelity-r26/native-original-self.json",
+        "sha256": "c2f70441e4bbad376d9fa5bd2db6fd94f113e78b2e4810952047118475e8666c",
+        "sourceFidelityAccepted": false
+      },
+      {
+        "file": "qa/fidelity-r26/gpu-input-readback.json",
+        "sha256": "85408f9878394c2bf6aee6143a44c38841b51060ce553cf53502b1ecbc20a8ab",
+        "sourceFidelityAccepted": false
+      },
+      {
+        "file": "qa/fidelity-r26/uninstrumented-redraw.json",
+        "sha256": "bfc9a12e180ff6caf8c2463086a6782fcde2bd3f1c2b4eab3425d200721151a1",
+        "sourceFidelityAccepted": false
+      }
+    ],
+    "originalBaselineSelf": {
+      "views": 3,
+      "repeatsPerView": 2,
+      "stable": true,
+      "scope": "Actual original baseline only, not all native states"
+    },
+    "actualGPUInputStudy": {
+      "cases": 9,
+      "sixGeometryAndAttributeTexturesStable": true,
+      "allShadingInputsCertified": false
+    },
+    "uninstrumentedFunctionRedrawStable": false
   },
   "evidence": [
     {
@@ -195,7 +224,7 @@
     },
     {
       "file": "qa/fidelity-r26/git-tree-rebuild.json",
-      "sha256": "87ed3ecb6ced68d9cae5b344226a16c946c052e6ea8ccb9696df3ea8b68a916a",
+      "sha256": "f65fcee433a8960c35a2eacabb91800ef1ab75006a84b033a8d994e22446e4d0",
       "checks": 8,
       "passed": true
     }
@@ -209,7 +238,11 @@
     "skipFractionFormatting": false,
     "selectionFile": "qa/fidelity-r26/research-selection.json",
     "snapshots": "qa/fidelity-r26/research-snapshots/index.json",
-    "sourceAcceptance": false
+    "sourceAcceptance": false,
+    "highpVertexSampler": false,
+    "helperBlendInsteadOfDiscard": false,
+    "nativeDepthState": false,
+    "invariantOutputs": false
   },
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
@@ -220,7 +253,7 @@
     {
       "priority": 0,
       "status": "partial",
-      "task": "十档来源状态及已证明等价的零值动作保留原形体；任意连续状态的原表面、法线、分层、边界和首交仍未完成。原生局部像素差异、原材质首次/重绘颜色及深度差异未解决，正式容差仍为 null。"
+      "task": "十档来源状态及已证明等价的零值动作保留原形体；任意连续状态的原表面、法线、分层、边界和首交仍未完成。原生局部像素差异、函数显示中原材质适配路径的首次/重绘颜色及深度差异未解决，正式容差仍为 null。"
     },
     {
       "priority": 1,
@@ -247,5 +280,23 @@
       "status": "partial",
       "task": "完整人物存档及显式原头侧边界往返保留；任意当前头侧提供方、头部附件和总平台联调未完成。独立头部项目未修改。"
     }
-  ]
+  ],
+  "independentPhysicalSourceComparison": {
+    "file": "qa/fidelity-r26/original-functions-native-rays.json",
+    "sha256": "6441e39bdf6a11c1a431acfbcf2f945c0a7b93131326f90f654de0c6424eb16a",
+    "diagnosticCompleted": true,
+    "states": 10,
+    "views": 40,
+    "fullResolutionViews": 40,
+    "verificationExecution": "native Node globals; same source hashes as production",
+    "rays": 21178640,
+    "coverageDisagreements": 0,
+    "maximumPositionMetres": 1.554312234475219e-14,
+    "maximumNormalVectorDifference": 4.870548409030562e-13,
+    "maximumMaterialCoordinateMetres": 1.391421700080997e-14,
+    "scope": "Independent watertight offline original-triangle BVH against current exact integer/rational source functions; physical rays and original interpolated attributes. Native raster, material, arbitrary continuous states and autonomous mother remain separate.",
+    "offlineOriginalTrianglesOnly": true,
+    "acceptanceTolerance": null,
+    "sourceFidelityAccepted": false
+  }
 }
