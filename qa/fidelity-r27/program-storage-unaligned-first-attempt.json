@@ -1,0 +1,71 @@
+{
+  "startedUTC": "2026-10-25T12:04:11.376Z",
+  "sourceFiles": [
+    {
+      "file": "src/BodyProgramStorageR27.js",
+      "sha256": "5576b34f631cabfbfbe64fa67102e9f3e2ec2cc26bd9f328e965b53c7daf50ed"
+    }
+  ],
+  "packetSHA256": "2e2419f37d1fbcfce7c40b221e907ae14b9e746baa81cf4e90fa81f59bc82f0e",
+  "sourceFidelityAccepted": false,
+  "checks": [
+    {
+      "name": "original transport remains exactly the verified R17 packet",
+      "passed": true
+    },
+    {
+      "name": "all coefficient arrays and original alias identities match",
+      "passed": true
+    },
+    {
+      "name": "all 2256 logical array aliases are preserved",
+      "passed": true
+    },
+    {
+      "name": "one backing buffer replaces 1522 separate copies",
+      "passed": false
+    }
+  ],
+  "newImageFiles": 0,
+  "reference": {
+    "version": "BODY-PROGRAM-STORAGE-R27",
+    "transportRawBytes": 90490457,
+    "payloadBytes": 86971626,
+    "logicalArrays": 2256,
+    "uniqueArrays": 1522,
+    "allocatedCoefficientBytes": 86971626,
+    "sharedCoefficientBacking": false,
+    "coefficientBackingBuffers": 1522,
+    "retainedCoefficientBackingBytes": 86971626,
+    "extraCoefficientAllocationBytes": 86971626,
+    "payloadRelocatedInPlace": false,
+    "relocatedBytes": 0,
+    "unusedHeaderTailReleased": false,
+    "sharedFallbackReason": "unaligned source directory",
+    "originalDuplicateViewsPreserved": true,
+    "distinctViewOverlapIntroduced": false,
+    "bitExactStorage": true
+  },
+  "current": {
+    "version": "BODY-PROGRAM-STORAGE-R27",
+    "transportRawBytes": 90490457,
+    "payloadBytes": 86971626,
+    "logicalArrays": 2256,
+    "uniqueArrays": 1522,
+    "allocatedCoefficientBytes": 86971626,
+    "sharedCoefficientBacking": false,
+    "coefficientBackingBuffers": 1522,
+    "retainedCoefficientBackingBytes": 86971626,
+    "extraCoefficientAllocationBytes": 86971626,
+    "payloadRelocatedInPlace": false,
+    "relocatedBytes": 0,
+    "unusedHeaderTailReleased": false,
+    "sharedFallbackReason": "unaligned source directory",
+    "originalDuplicateViewsPreserved": true,
+    "distinctViewOverlapIntroduced": false,
+    "bitExactStorage": true
+  },
+  "passed": false,
+  "failure": "Error: one backing buffer replaces 1522 separate copies\n    at check (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-program-storage-r27.cjs:3:97)\n    at Object.<anonymous> (G:\\Three.js\\Human\\Human-Body-Reconstruction-R01-20261023\\tools\\qa-program-storage-r27.cjs:6:592)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Object..js (node:internal/modules/cjs/loader:1943:10)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47",
+  "finishedUTC": "2026-10-25T12:04:11.627Z"
+}

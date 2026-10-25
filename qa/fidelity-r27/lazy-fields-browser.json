@@ -1,0 +1,213 @@
+{
+  "startedUTC": "2026-10-25T12:56:17.223Z",
+  "workbenchSHA256": "f882545dd3e9ead610ac38f9364421c44ecdcd4e69f2e6db6a0c8dd8fe101ee0",
+  "sourceFidelityAccepted": false,
+  "newImageFiles": 0,
+  "checks": [
+    {
+      "name": "baseline actually loads only a subset of source fields",
+      "passed": true
+    },
+    {
+      "name": "inactive MHR identity/corrective data not loaded by default",
+      "passed": true
+    },
+    {
+      "name": "default body retains original source detail",
+      "passed": true
+    },
+    {
+      "name": "http failure really reaches the coefficient loader",
+      "passed": true
+    },
+    {
+      "name": "http failure keeps actual person/head/archive state and camera",
+      "passed": true
+    },
+    {
+      "name": "http failure keeps original display",
+      "passed": true
+    },
+    {
+      "name": "http retry computes the requested actual continuous body",
+      "passed": true
+    },
+    {
+      "name": "corrupt failure really reaches the coefficient loader",
+      "passed": true
+    },
+    {
+      "name": "corrupt failure keeps actual person/head/archive state and camera",
+      "passed": true
+    },
+    {
+      "name": "corrupt failure keeps original display",
+      "passed": true
+    },
+    {
+      "name": "corrupt retry computes the requested actual continuous body",
+      "passed": true
+    },
+    {
+      "name": "transient transport reset retries once and yields a valid body",
+      "passed": true
+    },
+    {
+      "name": "active B pose loads original corrective coefficients",
+      "passed": true
+    },
+    {
+      "name": "active identity loads the full original identity operator",
+      "passed": true
+    },
+    {
+      "name": "head variables and all body controls survive lazy operations",
+      "passed": true
+    },
+    {
+      "name": "body still draws without character triangles",
+      "passed": true
+    },
+    {
+      "name": "no page errors",
+      "passed": true
+    },
+    {
+      "name": "checked current workbench identity",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "stages": [
+    {
+      "kind": "http",
+      "failed": "Error: 身体按需数据未能载入：503\n    at blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:259:585\n    at async read (blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:259:1339)\n    at async row (blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:260:263)\n    at async blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:265:870\n    at async Promise.all (index 1)\n    at async Object.ensure (blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:265:738)\n    at async handleMessageR27 (blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:415:2460)",
+      "recoveredFields": {
+        "enabled": true,
+        "logicalProgramRawSHA256": "e15c3d78e4e63d37b6ce72fabbe75dc7480d2ab44ae1b120ba340fa440873cad",
+        "sourceShapeRows": 1104,
+        "availableRows": 349,
+        "loadedNonemptyRows": 108,
+        "lastRequiredRows": 120,
+        "requests": 68,
+        "transportRetries": 0,
+        "downloadedCompressedBytes": 4116495,
+        "pending": 0,
+        "coefficientCacheHits": 173,
+        "evictions": 0,
+        "rowCoefficientBackingBytes": 7987304,
+        "permanentMHRBackingBytes": 0,
+        "rowCacheBudgetBytes": 16777216,
+        "rowCacheOverBudgetBecauseRequiredRows": false,
+        "currentRequiredRowsNeverEvicted": true,
+        "lastEnsureMS": 91.80000007152557,
+        "bodySamplesRemoved": 0,
+        "sourceFidelityAccepted": false
+      }
+    },
+    {
+      "kind": "corrupt",
+      "failed": "Error: 身体按需压缩数据校验失败\n    at blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:259:864\n    at async read (blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:259:1339)\n    at async row (blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:260:263)\n    at async blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:265:870\n    at async Promise.all (index 0)\n    at async Object.ensure (blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:265:738)\n    at async handleMessageR27 (blob:http://127.0.0.1:8914/8394ce84-29d4-49e6-87c9-4e466fb27752:415:2460)",
+      "recoveredFields": {
+        "enabled": true,
+        "logicalProgramRawSHA256": "e15c3d78e4e63d37b6ce72fabbe75dc7480d2ab44ae1b120ba340fa440873cad",
+        "sourceShapeRows": 1104,
+        "availableRows": 421,
+        "loadedNonemptyRows": 180,
+        "lastRequiredRows": 104,
+        "requests": 104,
+        "transportRetries": 0,
+        "downloadedCompressedBytes": 7421200,
+        "pending": 0,
+        "coefficientCacheHits": 283,
+        "evictions": 0,
+        "rowCoefficientBackingBytes": 13948904,
+        "permanentMHRBackingBytes": 0,
+        "rowCacheBudgetBytes": 16777216,
+        "rowCacheOverBudgetBecauseRequiredRows": false,
+        "currentRequiredRowsNeverEvicted": true,
+        "lastEnsureMS": 172.59999990463257,
+        "bodySamplesRemoved": 0,
+        "sourceFidelityAccepted": false
+      }
+    }
+  ],
+  "initial": {
+    "storage": {
+      "transport": "verified gzip byte packet",
+      "bytePacketVerified": true,
+      "compressedSHA256": "490209550ab81efee08520be393f10c84b01818d01f4df939a6af1704d0d2a7a",
+      "rawSHA256": "14f7e93dec864f6940e734a710f6e358b61c2fc541ac4f1463afc4c480a4385a",
+      "compressedBytes": 2857503,
+      "rawBytes": 11913288,
+      "version": "BODY-PROGRAM-STORAGE-R27",
+      "transportRawBytes": 11913288,
+      "payloadBytes": 8447478,
+      "alignedPayloadBytes": 8447532,
+      "logicalArrays": 526,
+      "uniqueArrays": 43,
+      "allocatedCoefficientBytes": 8447478,
+      "sharedCoefficientBacking": true,
+      "coefficientBackingBuffers": 1,
+      "retainedCoefficientBackingBytes": 8447532,
+      "extraCoefficientAllocationBytes": 0,
+      "payloadRelocatedInPlace": true,
+      "relocatedBytes": 8447478,
+      "unusedHeaderTailReleased": true,
+      "sharedFallbackReason": null,
+      "originalDuplicateViewsPreserved": true,
+      "distinctViewOverlapIntroduced": false,
+      "bitExactStorage": true,
+      "transportHashVerifiedBeforeRelocation": true,
+      "decodeMS": 99.59999990463257
+    },
+    "fields": {
+      "enabled": true,
+      "logicalProgramRawSHA256": "e15c3d78e4e63d37b6ce72fabbe75dc7480d2ab44ae1b120ba340fa440873cad",
+      "sourceShapeRows": 1104,
+      "availableRows": 305,
+      "loadedNonemptyRows": 64,
+      "lastRequiredRows": 74,
+      "requests": 42,
+      "transportRetries": 0,
+      "downloadedCompressedBytes": 1872488,
+      "pending": 0,
+      "coefficientCacheHits": 10,
+      "evictions": 0,
+      "rowCoefficientBackingBytes": 3643980,
+      "permanentMHRBackingBytes": 0,
+      "rowCacheBudgetBytes": 16777216,
+      "rowCacheOverBudgetBecauseRequiredRows": false,
+      "currentRequiredRowsNeverEvicted": true,
+      "lastEnsureMS": 110.79999995231628,
+      "bodySamplesRemoved": 0,
+      "sourceFidelityAccepted": false
+    }
+  },
+  "initialBodyCompressedBytes": 4729991,
+  "initialBodyAssets": 43,
+  "finalFields": {
+    "enabled": true,
+    "logicalProgramRawSHA256": "e15c3d78e4e63d37b6ce72fabbe75dc7480d2ab44ae1b120ba340fa440873cad",
+    "sourceShapeRows": 1104,
+    "availableRows": 453,
+    "loadedNonemptyRows": 212,
+    "lastRequiredRows": 74,
+    "requests": 116,
+    "transportRetries": 1,
+    "downloadedCompressedBytes": 24664831,
+    "pending": 0,
+    "coefficientCacheHits": 651,
+    "evictions": 0,
+    "rowCoefficientBackingBytes": 14851896,
+    "permanentMHRBackingBytes": 28799912,
+    "rowCacheBudgetBytes": 16777216,
+    "rowCacheOverBudgetBecauseRequiredRows": false,
+    "currentRequiredRowsNeverEvicted": true,
+    "lastEnsureMS": 108.39999997615814,
+    "bodySamplesRemoved": 0,
+    "sourceFidelityAccepted": false
+  },
+  "passed": true,
+  "finishedUTC": "2026-10-25T12:57:12.782Z"
+}

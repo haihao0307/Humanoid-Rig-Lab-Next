@@ -9,5 +9,4 @@ require('./compile-state-identity-r26.cjs');
 require('./pack-boundary-inputs-r26.cjs');
 require('./build-source-r26.cjs');
 require('./build-workbench-r26.cjs');
-const fs=require('fs'),selected=JSON.parse(fs.readFileSync('BUILD-SOURCE-R26.json'));
-selected.selectedVersion='R26';selected.companionBuild='BUILD-R26.json';selected.companionWorkbench='BUILD-R26.json';selected.selection='original fixed-state geometry with conservative equivalent input identity, actual original material controls and explicit structure lighting; consistent continuous-field edit/archive reference; arbitrary continuous source fidelity and autonomous mother remain unaccepted';fs.writeFileSync('BUILD.json.building',JSON.stringify(selected,null,2));fs.renameSync('BUILD.json.building','BUILD.json');
+require('./build-r27.cjs');

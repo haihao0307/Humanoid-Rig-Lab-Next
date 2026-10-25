@@ -1,0 +1,5 @@
+'use strict';
+const fs=require('fs'),Module=require('module'),path=require('path');let s=fs.readFileSync('tools/qa-git-rebuild-r26.cjs','utf8').replaceAll('qa/fidelity-r26/','qa/fidelity-r27/').replaceAll('tools/check-release-r26.cjs','tools/check-release-r27.cjs').replaceAll('q.assetCount===102','q.assetCount===677').replaceAll('assets:q.assetCount','assets:q.assetCount');
+s=s.replace("['BUILD-SOURCE-R26.json','BUILD-R26.json'","['BUILD-SOURCE-R27.json','BUILD-R27.json','BUILD-SOURCE-R26.json','BUILD-R26.json'");
+s=s.replace("report.artifactSHA256=JSON.parse(fs.readFileSync(path.join(root,'BUILD-SOURCE-R26.json'))).sha256;report.workbenchSHA256=JSON.parse(fs.readFileSync(path.join(root,'BUILD-R26.json'))).sha256;","report.artifactSHA256=JSON.parse(fs.readFileSync(path.join(root,'BUILD-SOURCE-R27.json'))).sha256;report.workbenchSHA256=JSON.parse(fs.readFileSync(path.join(root,'BUILD-R27.json'))).sha256;");
+const file=path.resolve('tools/qa-git-rebuild-r26.cjs'),m=new Module(file,module);m.filename=file;m.paths=module.paths;m._compile(s,file);

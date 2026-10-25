@@ -1,0 +1,178 @@
+{
+  "startedUTC": "2026-10-25T12:26:35.294Z",
+  "sourceFiles": [
+    {
+      "file": "src/BodyProgramStorageR27.js",
+      "sha256": "98493598ef909ad26122df362dcaf95234f4ecd71bdc4f53e7408b38dd82b04e"
+    }
+  ],
+  "packetSHA256": "2e2419f37d1fbcfce7c40b221e907ae14b9e746baa81cf4e90fa81f59bc82f0e",
+  "sourceFidelityAccepted": false,
+  "checks": [
+    {
+      "name": "original transport remains exactly the verified R17 packet",
+      "passed": true
+    },
+    {
+      "name": "all coefficient arrays and original alias identities match",
+      "passed": true
+    },
+    {
+      "name": "all 2256 logical array aliases are preserved",
+      "passed": true
+    },
+    {
+      "name": "one backing buffer replaces 1522 separate copies",
+      "passed": true
+    },
+    {
+      "name": "source compressed packet was not changed",
+      "passed": true
+    },
+    {
+      "name": "overlapping distinct source views keep separate original copies",
+      "passed": true
+    },
+    {
+      "name": "unaligned source bytes relocate without changing their values",
+      "passed": true
+    },
+    {
+      "name": "truncated packet rejected before unsafe view",
+      "passed": true
+    },
+    {
+      "name": "outside packet rejected before unsafe view",
+      "passed": true
+    },
+    {
+      "name": "unknown type packet rejected before unsafe view",
+      "passed": true
+    },
+    {
+      "name": "baseline actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    },
+    {
+      "name": "lean actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    },
+    {
+      "name": "fuller actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    },
+    {
+      "name": "muscular actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    },
+    {
+      "name": "female actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    },
+    {
+      "name": "A-reach actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    },
+    {
+      "name": "A-joints actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    },
+    {
+      "name": "B-neutral actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    },
+    {
+      "name": "B-bend actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    },
+    {
+      "name": "calibration-soft actual original A/B driver output unchanged by shared storage",
+      "passed": true
+    }
+  ],
+  "newImageFiles": 0,
+  "reference": {
+    "version": "BODY-PROGRAM-STORAGE-R27",
+    "transportRawBytes": 90490457,
+    "payloadBytes": 86971626,
+    "alignedPayloadBytes": 86972500,
+    "logicalArrays": 2256,
+    "uniqueArrays": 1522,
+    "allocatedCoefficientBytes": 86971626,
+    "sharedCoefficientBacking": false,
+    "coefficientBackingBuffers": 1522,
+    "retainedCoefficientBackingBytes": 86971626,
+    "extraCoefficientAllocationBytes": 86971626,
+    "payloadRelocatedInPlace": false,
+    "relocatedBytes": 0,
+    "unusedHeaderTailReleased": false,
+    "sharedFallbackReason": null,
+    "originalDuplicateViewsPreserved": true,
+    "distinctViewOverlapIntroduced": false,
+    "bitExactStorage": true
+  },
+  "current": {
+    "version": "BODY-PROGRAM-STORAGE-R27",
+    "transportRawBytes": 90490457,
+    "payloadBytes": 86971626,
+    "alignedPayloadBytes": 86972500,
+    "logicalArrays": 2256,
+    "uniqueArrays": 1522,
+    "allocatedCoefficientBytes": 86971626,
+    "sharedCoefficientBacking": true,
+    "coefficientBackingBuffers": 1,
+    "retainedCoefficientBackingBytes": 86972500,
+    "extraCoefficientAllocationBytes": 0,
+    "payloadRelocatedInPlace": true,
+    "relocatedBytes": 86971626,
+    "unusedHeaderTailReleased": true,
+    "sharedFallbackReason": null,
+    "originalDuplicateViewsPreserved": true,
+    "distinctViewOverlapIntroduced": false,
+    "bitExactStorage": true
+  },
+  "profiles": [
+    {
+      "id": "baseline",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    },
+    {
+      "id": "lean",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    },
+    {
+      "id": "fuller",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    },
+    {
+      "id": "muscular",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    },
+    {
+      "id": "female",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    },
+    {
+      "id": "A-reach",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    },
+    {
+      "id": "A-joints",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    },
+    {
+      "id": "B-neutral",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    },
+    {
+      "id": "B-bend",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    },
+    {
+      "id": "calibration-soft",
+      "same9253PositionsAndAllRigMatricesAndRestInfluences": true
+    }
+  ],
+  "passed": true,
+  "finishedUTC": "2026-10-25T12:26:36.382Z"
+}
