@@ -3,7 +3,7 @@ export const TRACE_SCHEMA='human/life-motion-trace@1';
 const finite=n=>Number.isFinite(n), vec=v=>Array.isArray(v)&&v.length===3&&v.every(finite), clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]], dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2], norm=v=>Math.hypot(...v);
 function validQuat(q){return Array.isArray(q)&&q.length===4&&q.every(finite)&&Math.abs(Math.hypot(...q)-1)<.02;}
-function quatAngle(a,b){const d=clamp(Math.abs(dot(a,b)),-1,1);return 2*Math.acos(d);}
+function quatAngle(a,b){const d=clamp(Math.abs(a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3]),-1,1);return 2*Math.acos(d);}
 function fail(code,frameIndex,detail={}){return{code,frameIndex,...detail};}
 export const TRACE_LIMITS=Object.freeze({maxRootSpeedMps:1.2,maxRootAccelerationMps2:5,maxJointSpeedMps:2.5,maxJointAccelerationMps2:20,maxAngularSpeedRadS:8,maxAngularAccelerationRadS2:40,maxFootSlipM:.012,maxHandContactErrorM:.025,maxPenetrationM:.001,maxJointLimitViolationDeg:.5,minFrameDtS:1/240,maxFrameDtS:1/15});
 export function auditMotionTrace(trace,limits=TRACE_LIMITS){
