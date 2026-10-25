@@ -73,6 +73,18 @@ export class MotionController {
       const maxYawSpeed = 1.0, maxYawAcceleration = 2.2;
       let wantedYawRate = Math.sign(yawError) * Math.min(maxYawSpeed, Math.sqrt(2 * maxYawAcceleration * Math.abs(yawError)));
       if (Math.abs(yawError) < .002) wantedYawRate = 0;
+      // Start braking before a planted foot reaches its twist limit. Without
+      // this envelope, the hard contact guard can zero a non-zero root rate in
+      // one frame, producing a visible turn hitch and a false acceleration spike.
+      for (const foot of Object.values(s.feet)) {
+        if (!foot.contact) continue;
+        const twist = angle(s.yaw - foot.yaw);
+        if (Math.abs(twist) > .07 && Math.sign(twist) === Math.sign(wantedYawRate)) {
+          const angularClearance = Math.max(0, .28 - Math.abs(twist));
+          const contactLimitedRate = Math.sqrt(2 * maxYawAcceleration * angularClearance);
+          wantedYawRate = Math.sign(wantedYawRate) * Math.min(Math.abs(wantedYawRate), contactLimitedRate);
+        }
+      }
       let yawRate = s.yawRate + clamp(wantedYawRate - s.yawRate, -maxYawAcceleration * dt, maxYawAcceleration * dt);
       // Do not snap the final heading to the target while angular velocity is
       // still nonzero. That one-frame position correction creates an apparent
