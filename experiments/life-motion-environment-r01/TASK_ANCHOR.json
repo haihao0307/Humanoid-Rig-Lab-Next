@@ -1,0 +1,34 @@
+{
+  "taskId": "LIFE-MOTION-ENV-R01",
+  "mode": "isolated-experiment",
+  "baseSha": "fda12bf2fe0262e4d02f1b08508128d17959e0c8",
+  "target": "Long-horizon environment-conditioned resident routine orchestration",
+  "acceptedBaseline": "Current life-room R05 is a visual/behavior baseline only; no claim of production integration.",
+  "primaryDefect": "Short single-task demos do not test a continuous multi-step resident routine with state handoff, object return, recovery, and measurable acceptance gates.",
+  "protectedInvariants": [
+    "No changes to production body, rig, skin, animation, physics or assembly entry points",
+    "No direct bone writes from this experiment",
+    "Object ownership must survive rollback; cancellation while holding an object is deferred",
+    "Task success requires observation gates and finite motion/collision metrics",
+    "Original main branch remains unchanged"
+  ],
+  "forbiddenRoutes": [
+    "Claiming fake-adapter tests are live 3D or visual validation",
+    "Counting task completion without contact, support, collision and continuity checks",
+    "Silently dropping held objects on cancellation"
+  ],
+  "acceptanceGates": [
+    "Node syntax checks pass",
+    "51-task routine can run two full cycles with 102 verified task results in deterministic contract test",
+    "A failed contact gate triggers bounded recovery and does not count as success",
+    "Penetration above threshold is rejected",
+    "Cancellation while holding an object pauses and requests safe release"
+  ],
+  "status": {
+    "sourceChecks": "passed",
+    "contractTests": "passed",
+    "live3DAdapter": "not integrated",
+    "browserVisualQA": "not run",
+    "productionReady": false
+  }
+}
