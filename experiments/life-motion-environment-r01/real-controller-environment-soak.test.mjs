@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {MotionController} from '../../motion/vendor/controller.mjs';
+import {MotionController as BaselineController} from '../../motion/vendor/controller.mjs';
+import {MotionController as SmoothedController} from './vendor/controller.mjs';
 import {rigFromSource} from '../../motion/vendor/rig.mjs';
 import {FlatWorld} from '../../motion/vendor/world.mjs';
 import {auditMotionTrace,TRACE_SCHEMA} from './motion-trace-audit.mjs';
