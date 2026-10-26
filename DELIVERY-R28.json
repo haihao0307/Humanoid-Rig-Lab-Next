@@ -1,0 +1,187 @@
+{
+  "schema": "body-delivery-r28/1",
+  "version": "R28",
+  "updatedUTC": "2026-10-26T16:47:02.389Z",
+  "scope": "BODY ONLY",
+  "selectedBuild": "BUILD.json",
+  "source": {
+    "file": "delivery/身体_R28_原形体与参数衔接.html",
+    "sha256": "3bd2513b71d1a07f3b59e528126cb9bbc107d2e66f9c92c3f051c3c7a7176698",
+    "bytes": 878256,
+    "url": "http://127.0.0.1:8914/?v=R28-3bd2513b"
+  },
+  "workbench": {
+    "file": "delivery/人物身体_R28_连续关节与原形体.html",
+    "sha256": "15cc7e900d3d975f74b57fb28646588196fe6cb8135c17f5cc2b33a0a5a67659",
+    "bytes": 1822702,
+    "url": "http://127.0.0.1:8914/workbench?v=R28-15cc7e90"
+  },
+  "continuousSourceCandidate": {
+    "file": "delivery/身体_R28_连续关节原轮廓候选.html",
+    "sha256": "a8cbe94930d3d7a42fbbf9d3ca3044df9d74b4e8724c560bd0bfe4cb9137da1f",
+    "bytes": 143438,
+    "url": "http://127.0.0.1:8914/joint-functions?v=R28-a8cbe949"
+  },
+  "runtimeCharacterTriangleFaces": 0,
+  "characterVertexBuffers": 0,
+  "sourceFacetPartitionInformationRetained": true,
+  "sourceBoundarySupportRelationsRetained": true,
+  "completedMotherConversion": false,
+  "wholeBodySourceIndependent": false,
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "bodyReconstructionComplete": false,
+  "projectComplete": false,
+  "acceptanceTolerance": null,
+  "headProjectModified": false,
+  "originalParameterCatalog": 1916,
+  "bodyControls": 965,
+  "pairedControls": 34,
+  "rigs": [
+    "A",
+    "B"
+  ],
+  "completePersonArchivesRetained": true,
+  "newImageFiles": 0,
+  "sourceImplementation": {
+    "fixedSourceStates": 10,
+    "sourceGeometryAndMaterialCodeUnchangedFromR27": true,
+    "sourceDifference": "title, version stamp and companion link only",
+    "previousMaterialDifferencesUnresolved": true
+  },
+  "continuousSourceFunctions": {
+    "AnnyFixedShapeTemplates": 6,
+    "explicitBCorrectivesFalseTemplates": 1,
+    "functionsPerTemplate": 18416,
+    "continuousLimbPoseImplemented": true,
+    "arbitraryContinuousBodyShapeImplemented": false,
+    "BCorrectivesTrueImplemented": false,
+    "BCorrectivesDefaultChanged": false,
+    "originalPositionArithmeticReplayed": true,
+    "sourceNormalAreaResponseImplemented": true,
+    "originalFullNormalOperatorImplemented": false,
+    "originalContinuousSkinImplemented": false,
+    "headSurfaceGenerated": false,
+    "defaultSourceBodyShapeChanged": false,
+    "sourceCouplingBetweenFatAndSkeletonChanged": false
+  },
+  "observedPositionChecks": {
+    "states": 293,
+    "scalarObservationsIncludingSharedDomainExtrema": 48562992,
+    "differentOriginalFloat32Values": 0,
+    "notIndependentVertexCount": true
+  },
+  "nativeOriginalRayChecks": {
+    "states": 28,
+    "views": 112,
+    "rays": 4075232,
+    "coverageDisagreements": 0,
+    "maximumFirstHitDifferenceMetres": 1.0658141036401503e-14,
+    "maximumNormalAngleDifferenceDegrees": 1.2857539055465907,
+    "sourceFidelityAccepted": false
+  },
+  "actualPrecisionDisplayChecks": {
+    "completeFrames": 9,
+    "coverageDisagreements": 0,
+    "differentDisplayPositionFloat32Components": 0,
+    "scope": "tested headless actual full-frame integer/rational function renderer and GPU presentation; no full visual/source acceptance"
+  },
+  "resources": {
+    "runtimeAssets": 691,
+    "allCompressedRuntimeAssetBytes": 443415735,
+    "oneVisibleBodyRenderer": true,
+    "steadyStateBodyRenderers": 1,
+    "maximumBodyRenderersDuringHandoff": 2,
+    "sourceScalarCacheMaximumKeyValuePayloadBytes": 67108864,
+    "scalarCacheEngineOverheadExcluded": true,
+    "maximumPrecisionWorkers": 3,
+    "allMemoryOptimizationComplete": false
+  },
+  "remaining": [
+    {
+      "priority": 0,
+      "status": "partial",
+      "task": "任意连续体型、躯干/颈头主链和 B 开启原姿态修正的原响应未完成；原法线、原皮肤及完整来源与视觉验收仍未通过。"
+    },
+    {
+      "priority": 1,
+      "status": "partial",
+      "task": "胸肩、腰腹、骨盆整体体量、中性校准及完整骨架/软组织分离未完成；原参数耦合仍保留。"
+    },
+    {
+      "priority": 2,
+      "status": "partial",
+      "task": "已推进七种严格模板下的连续四肢原轮廓、原位置取整与整帧求交；全范围关节、手足细节及全部组合变形仍未验收。"
+    },
+    {
+      "priority": 3,
+      "status": "incomplete",
+      "task": "自主母体及形态、绑定逐区替换未完成；来源分区、函数校准和颈口支撑关系仍保留。"
+    },
+    {
+      "priority": 4,
+      "status": "partial",
+      "task": "后台整帧核对与有限静态函数缓存已接通；全系统局部更新、全部显存优化、原动态阴影、完整散射和跨场景验收未完成。"
+    },
+    {
+      "priority": 5,
+      "status": "partial",
+      "task": "原人物与头侧输入往返保留；任意当前头侧提供方、显示细分法线边界、附件与总平台整合未完成，独立头部项目未修改。"
+    }
+  ],
+  "nextPriority": "任意连续体型、躯干/颈头主链和 B 开启原姿态修正的原响应未完成；原法线、原皮肤及完整来源与视觉验收仍未通过。",
+  "verification": [
+    {
+      "file": "qa/fidelity-r28/rounded-functions-numeric.json",
+      "sha256": "5090449e75e614780807fa782be36d062e87125a8522a107aaeb29eb4c1a91c2"
+    },
+    {
+      "file": "qa/fidelity-r28/native-pose-rays.json",
+      "sha256": "f30cb2b176588a8fbe13539ea9e365308fb6f05b5cd8c78db436f39b81ed4041"
+    },
+    {
+      "file": "qa/fidelity-r28/pose-browser.json",
+      "sha256": "fbd8f5a7fb5a7b933ba5c912ab22db1a636360c00923b7d830bec19aa7efc8d8"
+    },
+    {
+      "file": "qa/fidelity-r28/pose-precision-browser.json",
+      "sha256": "edc4761b3c892d70fe9477eeddafc4c4b965967152e56e3a55829e72eb51f51c"
+    },
+    {
+      "file": "qa/fidelity-r28/workbench-browser.json",
+      "sha256": "b3874178cfb1d9a6280bdef6115c0a7974c130249afcce3bbe81888922bb1bcc"
+    },
+    {
+      "file": "qa/fidelity-r28/b-corrective-gate-browser.json",
+      "sha256": "824fa43eb8cbef875430feee6cb8e036ba08203ab20ad8086757e06d869ef5e9"
+    },
+    {
+      "file": "qa/fidelity-r28/normal-support-audit.json",
+      "sha256": "3118aab98ac0eedea7515b13fa92b5bc3abd9617437eab70c0a4e16016e804ea"
+    },
+    {
+      "file": "qa/fidelity-r28/release-integrity.json",
+      "sha256": "098c194bd1bf399d560a53a33422fb3f2deefa29d8e866e3d47477e8c1d28794"
+    },
+    {
+      "file": "qa/fidelity-r28/http-integrity.json",
+      "sha256": "561b1faa0aa94b39f40280613bb8436f4a88aa28130901895303fedf2733f2b2"
+    },
+    {
+      "file": "qa/fidelity-r28/git-tree-rebuild.json",
+      "sha256": "5e03e0e432c148f95585df638bed8a07a87faa10ea82c1026b4f03a88e5e3a9d"
+    }
+  ],
+  "github": {
+    "repository": "haihao0307/Humanoid-Rig-Lab-Next",
+    "branch": "body/reconstruction-r18-20261023",
+    "mainBranchModified": false,
+    "codeSyncStatus": "verified",
+    "websiteDeploymentPerformed": false,
+    "verifiedCodeCommit": "8941f13456ae06a79883f6d51db287b46e295ee2",
+    "gitTreeRebuild": "qa/fidelity-r28/git-tree-rebuild.json",
+    "mainBefore": "fda12bf2fe0262e4d02f1b08508128d17959e0c8",
+    "mainAfterCodePush": "fda12bf2fe0262e4d02f1b08508128d17959e0c8",
+    "finalLocalAndRemoteHeadReceipt": "GITHUB-SYNC.json (local receipt; final actual commit and full remote delivery content comparison)"
+  }
+}

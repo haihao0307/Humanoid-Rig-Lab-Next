@@ -13,3 +13,4 @@ global.__BODY_DEFER_R28_SELECTION__=true;
 require('./build-r27.cjs');
 delete global.__BODY_DEFER_R28_SELECTION__;
 require('./build-r28.cjs');
+require('./build-r29.cjs');

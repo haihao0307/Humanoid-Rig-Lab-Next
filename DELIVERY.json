@@ -1,26 +1,26 @@
 {
-  "schema": "body-delivery-r28/1",
-  "version": "R28",
-  "updatedUTC": "2026-10-26T16:47:02.389Z",
+  "schema": "body-delivery-r29/1",
+  "version": "R29",
+  "updatedUTC": "2026-10-26T18:55:31.219Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
-    "file": "delivery/身体_R28_原形体与参数衔接.html",
-    "sha256": "3bd2513b71d1a07f3b59e528126cb9bbc107d2e66f9c92c3f051c3c7a7176698",
+    "file": "delivery/身体_R29_原形体与参数衔接.html",
+    "sha256": "7a6a8cef23a81a5ed583f7285d89f2cc3cde7f588f165728b8e82586bff0b6fd",
     "bytes": 878256,
-    "url": "http://127.0.0.1:8914/?v=R28-3bd2513b"
+    "url": "http://127.0.0.1:8914/?v=R29-7a6a8cef"
   },
   "workbench": {
-    "file": "delivery/人物身体_R28_连续关节与原形体.html",
-    "sha256": "15cc7e900d3d975f74b57fb28646588196fe6cb8135c17f5cc2b33a0a5a67659",
-    "bytes": 1822702,
-    "url": "http://127.0.0.1:8914/workbench?v=R28-15cc7e90"
+    "file": "delivery/人物身体_R29_连续关节与原形体.html",
+    "sha256": "1dbe67f34dd3bb85375037b5bba691edbb7daf7d73c29302758d8552f1a8620c",
+    "bytes": 1856114,
+    "url": "http://127.0.0.1:8914/workbench?v=R29-1dbe67f3"
   },
   "continuousSourceCandidate": {
-    "file": "delivery/身体_R28_连续关节原轮廓候选.html",
-    "sha256": "a8cbe94930d3d7a42fbbf9d3ca3044df9d74b4e8724c560bd0bfe4cb9137da1f",
-    "bytes": 143438,
-    "url": "http://127.0.0.1:8914/joint-functions?v=R28-a8cbe949"
+    "file": "delivery/身体_R29_连续关节原轮廓候选.html",
+    "sha256": "ff9d0b93e0c8a0516d525c50e3d3516256f0df034ecdc802600b5d97fe3ac1fd",
+    "bytes": 188226,
+    "url": "http://127.0.0.1:8914/joint-functions?v=R29-ff9d0b93"
   },
   "runtimeCharacterTriangleFaces": 0,
   "characterVertexBuffers": 0,
@@ -45,50 +45,68 @@
   "newImageFiles": 0,
   "sourceImplementation": {
     "fixedSourceStates": 10,
-    "sourceGeometryAndMaterialCodeUnchangedFromR27": true,
+    "sourceGeometryAndMaterialCodeUnchangedFromR28": true,
     "sourceDifference": "title, version stamp and companion link only",
     "previousMaterialDifferencesUnresolved": true
   },
   "continuousSourceFunctions": {
     "AnnyFixedShapeTemplates": 6,
+    "AnnyContinuousJointsPerTemplate": 98,
     "explicitBCorrectivesFalseTemplates": 1,
+    "BCorrectivesFalsePoseScalars": 191,
     "functionsPerTemplate": 18416,
     "continuousLimbPoseImplemented": true,
+    "continuousRootAndFiveSpineJointsImplemented": true,
+    "originalRotationAndTranslationImplemented": true,
+    "dynamicSourceHeadBoundaryImplemented": true,
+    "originalPositionArithmeticReplayed": true,
+    "originalDisplayNormalOperatorImplementedForStrictTemplates": true,
+    "originalHeadLandmarkFrameEvaluated": true,
+    "constantHeadWorldBiasUsed": false,
+    "knownHeadEnvelopeMismatchExplicitlyExcluded": true,
     "arbitraryContinuousBodyShapeImplemented": false,
+    "arbitraryHeadVariablesImplemented": false,
     "BCorrectivesTrueImplemented": false,
     "BCorrectivesDefaultChanged": false,
-    "originalPositionArithmeticReplayed": true,
-    "sourceNormalAreaResponseImplemented": true,
-    "originalFullNormalOperatorImplemented": false,
     "originalContinuousSkinImplemented": false,
+    "continuousAppearance": "grey structure lighting",
     "headSurfaceGenerated": false,
     "defaultSourceBodyShapeChanged": false,
     "sourceCouplingBetweenFatAndSkeletonChanged": false
   },
-  "observedPositionChecks": {
-    "states": 293,
-    "scalarObservationsIncludingSharedDomainExtrema": 48562992,
-    "differentOriginalFloat32Values": 0,
-    "notIndependentVertexCount": true
+  "observedSourceChecks": {
+    "states": 102,
+    "scalarObservationsIncludingSharedDomainExtrema": 16905888,
+    "notIndependentVertexCount": true,
+    "differentOriginalPositionFloat32Components": 0,
+    "differentOriginalNormalFloat32Components": 0,
+    "headBoundaryFloat32ComponentsChecked": 310356,
+    "differentRequiredHeadBoundaryFloat32Components": 0
   },
   "nativeOriginalRayChecks": {
-    "states": 28,
-    "views": 112,
-    "rays": 4075232,
+    "states": 102,
+    "views": 408,
+    "rays": 14845488,
     "coverageDisagreements": 0,
-    "maximumFirstHitDifferenceMetres": 1.0658141036401503e-14,
-    "maximumNormalAngleDifferenceDegrees": 1.2857539055465907,
+    "maximumFirstHitDifferenceMetres": 1.1546319456101628e-14,
+    "maximumNormalAngleDifferenceDegrees": 0.0000019090959104164224,
     "sourceFidelityAccepted": false
   },
   "actualPrecisionDisplayChecks": {
-    "completeFrames": 9,
+    "completeFrames": 21,
     "coverageDisagreements": 0,
     "differentDisplayPositionFloat32Components": 0,
-    "scope": "tested headless actual full-frame integer/rational function renderer and GPU presentation; no full visual/source acceptance"
+    "scope": "tested actual headless full-frame function intersections and GPU presentation; not full source/visual acceptance"
   },
   "resources": {
-    "runtimeAssets": 691,
-    "allCompressedRuntimeAssetBytes": 443415735,
+    "runtimeAssets": 719,
+    "allHistoricalAndCurrentCompressedRuntimeAssetBytes": 582078858,
+    "activeContinuousTemplateTotalMegabytesApprox": [
+      19,
+      20
+    ],
+    "coreCompressedMegabytesApprox": 1,
+    "previousCoreCompressedMegabytesApprox": 24,
     "oneVisibleBodyRenderer": true,
     "steadyStateBodyRenderers": 1,
     "maximumBodyRenderersDuringHandoff": 2,
@@ -101,87 +119,78 @@
     {
       "priority": 0,
       "status": "partial",
-      "task": "任意连续体型、躯干/颈头主链和 B 开启原姿态修正的原响应未完成；原法线、原皮肤及完整来源与视觉验收仍未通过。"
+      "task": "任意连续体型、颈头变量和 B 开启原姿态修正的连续响应未完成；原连续皮肤、动态阴影及完整来源/视觉验收未完成。"
     },
     {
       "priority": 1,
       "status": "partial",
-      "task": "胸肩、腰腹、骨盆整体体量、中性校准及完整骨架/软组织分离未完成；原参数耦合仍保留。"
+      "task": "胸肩、腰腹、骨盆整体体量、中性校准和骨架/软组织分离未完成；原胖瘦与骨架参数耦合仍保留。"
     },
     {
       "priority": 2,
       "status": "partial",
-      "task": "已推进七种严格模板下的连续四肢原轮廓、原位置取整与整帧求交；全范围关节、手足细节及全部组合变形仍未验收。"
+      "task": "严格模板的四肢及根关节/脊柱连续原响应已接入；全范围关节、手足细节及全部极端和组合变形仍未验收。"
     },
     {
       "priority": 3,
       "status": "incomplete",
-      "task": "自主母体及形态、绑定逐区替换未完成；来源分区、函数校准和颈口支撑关系仍保留。"
+      "task": "自主母体及形态、绑定逐区替换未完成；来源分区、函数校准和边界支撑关系仍保留。"
     },
     {
       "priority": 4,
       "status": "partial",
-      "task": "后台整帧核对与有限静态函数缓存已接通；全系统局部更新、全部显存优化、原动态阴影、完整散射和跨场景验收未完成。"
+      "task": "已缩减新路径核心系数、接通后台整帧核对；全系统局部更新、全部显存/缓存优化、完整散射与跨场景验收未完成。"
     },
     {
       "priority": 5,
       "status": "partial",
-      "task": "原人物与头侧输入往返保留；任意当前头侧提供方、显示细分法线边界、附件与总平台整合未完成，独立头部项目未修改。"
+      "task": "完整人物和未知字段保留，已知头侧不匹配状态明确退出严格路径；任意头部提供方、附件与总平台整合未完成。独立头部项目未修改。"
     }
   ],
-  "nextPriority": "任意连续体型、躯干/颈头主链和 B 开启原姿态修正的原响应未完成；原法线、原皮肤及完整来源与视觉验收仍未通过。",
+  "nextPriority": "任意连续体型、颈头变量和 B 开启原姿态修正的连续响应未完成；原连续皮肤、动态阴影及完整来源/视觉验收未完成。",
   "verification": [
     {
-      "file": "qa/fidelity-r28/rounded-functions-numeric.json",
-      "sha256": "5090449e75e614780807fa782be36d062e87125a8522a107aaeb29eb4c1a91c2"
+      "file": "qa/fidelity-r29/source-functions-numeric.json",
+      "sha256": "fefdb8b180ec7b9270f15ccba040c9b41a71633acc0b7bafde1223d235d00d98"
     },
     {
-      "file": "qa/fidelity-r28/native-pose-rays.json",
-      "sha256": "f30cb2b176588a8fbe13539ea9e365308fb6f05b5cd8c78db436f39b81ed4041"
+      "file": "qa/fidelity-r29/native-pose-rays.json",
+      "sha256": "4643fc80f7fb932bdf2eaef6d56380552cc164ef822467086eccd0c1f2e3ecdc"
     },
     {
-      "file": "qa/fidelity-r28/pose-browser.json",
-      "sha256": "fbd8f5a7fb5a7b933ba5c912ab22db1a636360c00923b7d830bec19aa7efc8d8"
+      "file": "qa/fidelity-r29/pose-browser.json",
+      "sha256": "873127f140bd75207b8b1eb2c4a2bfdd1caafd19c2ecafcdda63b9a9cf753998"
     },
     {
-      "file": "qa/fidelity-r28/pose-precision-browser.json",
-      "sha256": "edc4761b3c892d70fe9477eeddafc4c4b965967152e56e3a55829e72eb51f51c"
+      "file": "qa/fidelity-r29/pose-precision-browser.json",
+      "sha256": "836375c26de81343ad910f3e4e80a15671cb0c1da1429b36673d41d81f36d384"
     },
     {
-      "file": "qa/fidelity-r28/workbench-browser.json",
-      "sha256": "b3874178cfb1d9a6280bdef6115c0a7974c130249afcce3bbe81888922bb1bcc"
+      "file": "qa/fidelity-r29/workbench-browser.json",
+      "sha256": "c38307e1156d54de1f83228fa2a9ce4d7edcb33d38532afca7c3119f68f87188"
     },
     {
-      "file": "qa/fidelity-r28/b-corrective-gate-browser.json",
-      "sha256": "824fa43eb8cbef875430feee6cb8e036ba08203ab20ad8086757e06d869ef5e9"
+      "file": "qa/fidelity-r29/head-envelope-browser.json",
+      "sha256": "5c2889dcd9c2b7927f0405a6f607abf530b76baa11d5334a29e5301c67ea2bc4"
     },
     {
-      "file": "qa/fidelity-r28/normal-support-audit.json",
-      "sha256": "3118aab98ac0eedea7515b13fa92b5bc3abd9617437eab70c0a4e16016e804ea"
+      "file": "qa/fidelity-r29/b-corrective-gate-browser.json",
+      "sha256": "44f72a98b8146854ce30de3a227c85a654444c931aced381f8204f347343224c"
     },
     {
-      "file": "qa/fidelity-r28/release-integrity.json",
-      "sha256": "098c194bd1bf399d560a53a33422fb3f2deefa29d8e866e3d47477e8c1d28794"
+      "file": "qa/fidelity-r29/release-integrity.json",
+      "sha256": "88d6302d069d8ab84aedfee73345157dece90b3f0ee08b0c38ff539110718b78"
     },
     {
-      "file": "qa/fidelity-r28/http-integrity.json",
-      "sha256": "561b1faa0aa94b39f40280613bb8436f4a88aa28130901895303fedf2733f2b2"
-    },
-    {
-      "file": "qa/fidelity-r28/git-tree-rebuild.json",
-      "sha256": "5e03e0e432c148f95585df638bed8a07a87faa10ea82c1026b4f03a88e5e3a9d"
+      "file": "qa/fidelity-r29/http-integrity.json",
+      "sha256": "a5fe8301cb07d422eac4562a9c8ab185e8d601750e9e13092be1b7461d316004"
     }
   ],
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
     "branch": "body/reconstruction-r18-20261023",
     "mainBranchModified": false,
-    "codeSyncStatus": "verified",
-    "websiteDeploymentPerformed": false,
-    "verifiedCodeCommit": "8941f13456ae06a79883f6d51db287b46e295ee2",
-    "gitTreeRebuild": "qa/fidelity-r28/git-tree-rebuild.json",
-    "mainBefore": "fda12bf2fe0262e4d02f1b08508128d17959e0c8",
-    "mainAfterCodePush": "fda12bf2fe0262e4d02f1b08508128d17959e0c8",
-    "finalLocalAndRemoteHeadReceipt": "GITHUB-SYNC.json (local receipt; final actual commit and full remote delivery content comparison)"
+    "codeSyncStatus": "pending committed-files rebuild and verified normal push",
+    "websiteDeploymentPerformed": false
   }
 }
