@@ -9,4 +9,7 @@ require('./compile-state-identity-r26.cjs');
 require('./pack-boundary-inputs-r26.cjs');
 require('./build-source-r26.cjs');
 require('./build-workbench-r26.cjs');
+global.__BODY_DEFER_R28_SELECTION__=true;
 require('./build-r27.cjs');
+delete global.__BODY_DEFER_R28_SELECTION__;
+require('./build-r28.cjs');

@@ -1,0 +1,418 @@
+{
+  "startedUTC": "2026-10-26T16:16:35.101Z",
+  "artifactSHA256": "a8cbe94930d3d7a42fbbf9d3ca3044df9d74b4e8724c560bd0bfe4cb9137da1f",
+  "scope": "Actual background full-frame integer/rational function renderer, GPU presentation, cancellation, camera/pose changes, context restore and explicit worker-error retry; no files containing rendered images",
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "acceptanceTolerance": null,
+  "newImageFiles": 0,
+  "checks": [
+    {
+      "name": "baseline/front complete exact function frame matches native coverage",
+      "pass": true
+    },
+    {
+      "name": "baseline/side complete exact function frame matches native coverage",
+      "pass": true
+    },
+    {
+      "name": "baseline/back complete exact function frame matches native coverage",
+      "pass": true
+    },
+    {
+      "name": "female/front complete exact function frame matches native coverage",
+      "pass": true
+    },
+    {
+      "name": "female/side complete exact function frame matches native coverage",
+      "pass": true
+    },
+    {
+      "name": "female/back complete exact function frame matches native coverage",
+      "pass": true
+    },
+    {
+      "name": "B-no-correctives/front complete exact function frame matches native coverage",
+      "pass": true
+    },
+    {
+      "name": "B-no-correctives/side complete exact function frame matches native coverage",
+      "pass": true
+    },
+    {
+      "name": "B-no-correctives/back complete exact function frame matches native coverage",
+      "pass": true
+    },
+    {
+      "name": "rapid camera updates present only the final camera",
+      "pass": true
+    },
+    {
+      "name": "appearance changes reuse the exact current geometry result",
+      "pass": true
+    },
+    {
+      "name": "context loss rebuilds exact frame and retains complete person/camera",
+      "pass": true
+    },
+    {
+      "name": "worker failure retains interactive body and complete state",
+      "pass": true
+    },
+    {
+      "name": "explicit retry recovers exact frame without changing person",
+      "pass": true
+    },
+    {
+      "name": "no unexpected page errors",
+      "pass": true
+    }
+  ],
+  "frames": [
+    {
+      "template": "baseline",
+      "view": "front",
+      "width": 321,
+      "height": 426,
+      "hits": 26511,
+      "key": "2/321/426/{\"yaw\":0,\"pitch\":0.04,\"distance\":2.121182379126549,\"target\":[0,-0.17810174822807312,0]}",
+      "camera": {
+        "yaw": 0,
+        "pitch": 0.04,
+        "distance": 2.121182379126549,
+        "target": [
+          0,
+          -0.17810174822807312,
+          0
+        ]
+      },
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "working": false,
+        "lastError": null,
+        "workers": 3,
+        "completed": 1,
+        "cancelled": 5,
+        "lastMS": 380.7999999523163,
+        "characterTriangleFaces": 0,
+        "integerPredicates": true,
+        "rationalFirstHitOrdering": true,
+        "geometryTolerance": null,
+        "scope": "complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate"
+      },
+      "webglError": 0,
+      "rays": 136746,
+      "coverageDisagreements": 0,
+      "positionFloat32ComponentsDifferent": 0,
+      "maximumDisplayPositionMetres": 2.9801549672470173e-8
+    },
+    {
+      "template": "baseline",
+      "view": "side",
+      "width": 321,
+      "height": 426,
+      "hits": 19230,
+      "key": "2/321/426/{\"yaw\":1.5707963267948966,\"pitch\":0.04,\"distance\":2.121182379126549,\"target\":[0,-0.17810174822807312,0]}",
+      "camera": {
+        "yaw": 1.5707963267948966,
+        "pitch": 0.04,
+        "distance": 2.121182379126549,
+        "target": [
+          0,
+          -0.17810174822807312,
+          0
+        ]
+      },
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "working": false,
+        "lastError": null,
+        "workers": 3,
+        "completed": 2,
+        "cancelled": 5,
+        "lastMS": 213.69999992847443,
+        "characterTriangleFaces": 0,
+        "integerPredicates": true,
+        "rationalFirstHitOrdering": true,
+        "geometryTolerance": null,
+        "scope": "complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate"
+      },
+      "webglError": 0,
+      "rays": 136746,
+      "coverageDisagreements": 0,
+      "positionFloat32ComponentsDifferent": 0,
+      "maximumDisplayPositionMetres": 2.9796093481415653e-8
+    },
+    {
+      "template": "baseline",
+      "view": "back",
+      "width": 321,
+      "height": 426,
+      "hits": 26656,
+      "key": "2/321/426/{\"yaw\":3.141592653589793,\"pitch\":0.04,\"distance\":2.121182379126549,\"target\":[0,-0.17810174822807312,0]}",
+      "camera": {
+        "yaw": 3.141592653589793,
+        "pitch": 0.04,
+        "distance": 2.121182379126549,
+        "target": [
+          0,
+          -0.17810174822807312,
+          0
+        ]
+      },
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "working": false,
+        "lastError": null,
+        "workers": 3,
+        "completed": 3,
+        "cancelled": 5,
+        "lastMS": 346.89999997615814,
+        "characterTriangleFaces": 0,
+        "integerPredicates": true,
+        "rationalFirstHitOrdering": true,
+        "geometryTolerance": null,
+        "scope": "complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate"
+      },
+      "webglError": 0,
+      "rays": 136746,
+      "coverageDisagreements": 0,
+      "positionFloat32ComponentsDifferent": 0,
+      "maximumDisplayPositionMetres": 2.9798881695519697e-8
+    },
+    {
+      "template": "female",
+      "view": "front",
+      "width": 321,
+      "height": 426,
+      "hits": 25200,
+      "key": "4/321/426/{\"yaw\":0,\"pitch\":0.04,\"distance\":1.9802509367465975,\"target\":[0,-0.16308629512786865,0]}",
+      "camera": {
+        "yaw": 0,
+        "pitch": 0.04,
+        "distance": 1.9802509367465975,
+        "target": [
+          0,
+          -0.16308629512786865,
+          0
+        ]
+      },
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "working": false,
+        "lastError": null,
+        "workers": 3,
+        "completed": 4,
+        "cancelled": 8,
+        "lastMS": 495.60000002384186,
+        "characterTriangleFaces": 0,
+        "integerPredicates": true,
+        "rationalFirstHitOrdering": true,
+        "geometryTolerance": null,
+        "scope": "complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate"
+      },
+      "webglError": 0,
+      "rays": 136746,
+      "coverageDisagreements": 0,
+      "positionFloat32ComponentsDifferent": 0,
+      "maximumDisplayPositionMetres": 2.9798704503924967e-8
+    },
+    {
+      "template": "female",
+      "view": "side",
+      "width": 321,
+      "height": 426,
+      "hits": 17654,
+      "key": "4/321/426/{\"yaw\":1.5707963267948966,\"pitch\":0.04,\"distance\":1.9802509367465975,\"target\":[0,-0.16308629512786865,0]}",
+      "camera": {
+        "yaw": 1.5707963267948966,
+        "pitch": 0.04,
+        "distance": 1.9802509367465975,
+        "target": [
+          0,
+          -0.16308629512786865,
+          0
+        ]
+      },
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "working": false,
+        "lastError": null,
+        "workers": 3,
+        "completed": 5,
+        "cancelled": 8,
+        "lastMS": 221.80000007152557,
+        "characterTriangleFaces": 0,
+        "integerPredicates": true,
+        "rationalFirstHitOrdering": true,
+        "geometryTolerance": null,
+        "scope": "complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate"
+      },
+      "webglError": 0,
+      "rays": 136746,
+      "coverageDisagreements": 0,
+      "positionFloat32ComponentsDifferent": 0,
+      "maximumDisplayPositionMetres": 2.9789497313359448e-8
+    },
+    {
+      "template": "female",
+      "view": "back",
+      "width": 321,
+      "height": 426,
+      "hits": 24470,
+      "key": "4/321/426/{\"yaw\":3.141592653589793,\"pitch\":0.04,\"distance\":1.9802509367465975,\"target\":[0,-0.16308629512786865,0]}",
+      "camera": {
+        "yaw": 3.141592653589793,
+        "pitch": 0.04,
+        "distance": 1.9802509367465975,
+        "target": [
+          0,
+          -0.16308629512786865,
+          0
+        ]
+      },
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "working": false,
+        "lastError": null,
+        "workers": 3,
+        "completed": 6,
+        "cancelled": 8,
+        "lastMS": 395.60000002384186,
+        "characterTriangleFaces": 0,
+        "integerPredicates": true,
+        "rationalFirstHitOrdering": true,
+        "geometryTolerance": null,
+        "scope": "complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate"
+      },
+      "webglError": 0,
+      "rays": 136746,
+      "coverageDisagreements": 0,
+      "positionFloat32ComponentsDifferent": 0,
+      "maximumDisplayPositionMetres": 2.9789024358350957e-8
+    },
+    {
+      "template": "B-no-correctives",
+      "view": "front",
+      "width": 321,
+      "height": 426,
+      "hits": 28408,
+      "key": "6/321/426/{\"yaw\":0,\"pitch\":0.04,\"distance\":2.0680430173873905,\"target\":[0,-0.1586197018623352,0]}",
+      "camera": {
+        "yaw": 0,
+        "pitch": 0.04,
+        "distance": 2.0680430173873905,
+        "target": [
+          0,
+          -0.1586197018623352,
+          0
+        ]
+      },
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "working": false,
+        "lastError": null,
+        "workers": 3,
+        "completed": 7,
+        "cancelled": 11,
+        "lastMS": 420.5,
+        "characterTriangleFaces": 0,
+        "integerPredicates": true,
+        "rationalFirstHitOrdering": true,
+        "geometryTolerance": null,
+        "scope": "complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate"
+      },
+      "webglError": 0,
+      "rays": 136746,
+      "coverageDisagreements": 0,
+      "positionFloat32ComponentsDifferent": 0,
+      "maximumDisplayPositionMetres": 2.9801470957657727e-8
+    },
+    {
+      "template": "B-no-correctives",
+      "view": "side",
+      "width": 321,
+      "height": 426,
+      "hits": 18480,
+      "key": "6/321/426/{\"yaw\":1.5707963267948966,\"pitch\":0.04,\"distance\":2.0680430173873905,\"target\":[0,-0.1586197018623352,0]}",
+      "camera": {
+        "yaw": 1.5707963267948966,
+        "pitch": 0.04,
+        "distance": 2.0680430173873905,
+        "target": [
+          0,
+          -0.1586197018623352,
+          0
+        ]
+      },
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "working": false,
+        "lastError": null,
+        "workers": 3,
+        "completed": 8,
+        "cancelled": 11,
+        "lastMS": 239.30000007152557,
+        "characterTriangleFaces": 0,
+        "integerPredicates": true,
+        "rationalFirstHitOrdering": true,
+        "geometryTolerance": null,
+        "scope": "complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate"
+      },
+      "webglError": 0,
+      "rays": 136746,
+      "coverageDisagreements": 0,
+      "positionFloat32ComponentsDifferent": 0,
+      "maximumDisplayPositionMetres": 2.9796064171527803e-8
+    },
+    {
+      "template": "B-no-correctives",
+      "view": "back",
+      "width": 321,
+      "height": 426,
+      "hits": 24191,
+      "key": "6/321/426/{\"yaw\":3.141592653589793,\"pitch\":0.04,\"distance\":2.0680430173873905,\"target\":[0,-0.1586197018623352,0]}",
+      "camera": {
+        "yaw": 3.141592653589793,
+        "pitch": 0.04,
+        "distance": 2.0680430173873905,
+        "target": [
+          0,
+          -0.1586197018623352,
+          0
+        ]
+      },
+      "precision": {
+        "enabled": true,
+        "ready": true,
+        "working": false,
+        "lastError": null,
+        "workers": 3,
+        "completed": 9,
+        "cancelled": 11,
+        "lastMS": 326.7000000476837,
+        "characterTriangleFaces": 0,
+        "integerPredicates": true,
+        "rationalFirstHitOrdering": true,
+        "geometryTolerance": null,
+        "scope": "complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate"
+      },
+      "webglError": 0,
+      "rays": 136746,
+      "coverageDisagreements": 0,
+      "positionFloat32ComponentsDifferent": 0,
+      "maximumDisplayPositionMetres": 2.980185609402497e-8
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "finishedUTC": "2026-10-26T16:16:51.885Z"
+}
