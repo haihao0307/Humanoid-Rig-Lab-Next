@@ -1,26 +1,52 @@
 {
-  "schema": "body-delivery-r29/1",
-  "version": "R29",
-  "updatedUTC": "2026-10-26T18:59:03.185Z",
+  "schema": "body-delivery-r30/1",
+  "version": "R30",
+  "updatedUTC": "2026-10-27T04:16:27.949Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
-    "file": "delivery/身体_R29_原形体与参数衔接.html",
-    "sha256": "7a6a8cef23a81a5ed583f7285d89f2cc3cde7f588f165728b8e82586bff0b6fd",
-    "bytes": 878256,
-    "url": "http://127.0.0.1:8914/?v=R29-7a6a8cef"
+    "file": "delivery/身体_R30_原形体与校准.html",
+    "sha256": "0c6994120e4f725b8b46e26b1b0f454780d39c1d040fbd9ff6bba63a9d7ecb2c",
+    "bytes": 878253,
+    "url": "http://127.0.0.1:8914/?v=R30-0c699412",
+    "inheritedGeometryAndMaterialFrom": "BUILD-SOURCE-R29.json"
   },
   "workbench": {
-    "file": "delivery/人物身体_R29_连续关节与原形体.html",
-    "sha256": "1dbe67f34dd3bb85375037b5bba691edbb7daf7d73c29302758d8552f1a8620c",
-    "bytes": 1856114,
-    "url": "http://127.0.0.1:8914/workbench?v=R29-1dbe67f3"
+    "file": "delivery/人物身体_R30_可回退体量校准.html",
+    "sha256": "6b7830e422842a9b5c73d30799e3701ee73ad51cc02019a3fe6280b0bb7f18c0",
+    "bytes": 1864565,
+    "url": "http://127.0.0.1:8914/workbench?v=R30-6b7830e4"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
     "sha256": "ff9d0b93e0c8a0516d525c50e3d3516256f0df034ecdc802600b5d97fe3ac1fd",
     "bytes": 188226,
     "url": "http://127.0.0.1:8914/joint-functions?v=R29-ff9d0b93"
+  },
+  "supportStudy": {
+    "file": "delivery/身体_P1_参考支撑隔离研究.html",
+    "sha256": "caab31d4e537e5d5ef94c692dc3a9e9ec4a84ae0d42ff5d1e5978782be6334db",
+    "bytes": 208936,
+    "url": "http://127.0.0.1:8914/support-study?v=R30-caab31d4",
+    "selectedByDefault": false,
+    "archiveExportEnabled": false,
+    "reference": "original baseline person, not an accepted neutral adult",
+    "supportedProfiles": [
+      "baseline",
+      "lean",
+      "fuller",
+      "muscular"
+    ]
+  },
+  "continuousJointSupport": {
+    "file": "data/body-support-rig-p1.gz",
+    "compressedSHA256": "2c93aeb16342cf140b6d2c171ef0721ffaf3c0f085a393abdb758dea3423f568",
+    "compressedBytes": 437770,
+    "driver": "A",
+    "selectedByDefault": false,
+    "characterVertexArrays": false,
+    "characterFaces": false,
+    "measuredBoneLengths": false
   },
   "runtimeCharacterTriangleFaces": 0,
   "characterVertexBuffers": 0,
@@ -42,163 +68,80 @@
     "B"
   ],
   "completePersonArchivesRetained": true,
-  "newImageFiles": 0,
-  "sourceImplementation": {
-    "fixedSourceStates": 10,
-    "sourceGeometryAndMaterialCodeUnchangedFromR28": true,
-    "sourceDifference": "title, version stamp and companion link only",
-    "previousMaterialDifferencesUnresolved": true
+  "newDeliveredImageFiles": 0,
+  "calibration": {
+    "status": "partial_not_accepted",
+    "preCalibrationPersonRestorable": true,
+    "archiveRoundTripVerified": true,
+    "preCalibrationBodyStateStored": true,
+    "poseRetainedDuringCalibration": true,
+    "unsupportedOriginalContourCombinationsRejected": true,
+    "driverBCalibrationAvailable": false,
+    "neutralAdultAccepted": false,
+    "skeletonSoftTissueSeparated": false
   },
-  "continuousSourceFunctions": {
-    "AnnyFixedShapeTemplates": 6,
-    "AnnyContinuousJointsPerTemplate": 98,
-    "explicitBCorrectivesFalseTemplates": 1,
-    "BCorrectivesFalsePoseScalars": 191,
-    "functionsPerTemplate": 18416,
-    "continuousLimbPoseImplemented": true,
-    "continuousRootAndFiveSpineJointsImplemented": true,
-    "originalRotationAndTranslationImplemented": true,
-    "dynamicSourceHeadBoundaryImplemented": true,
-    "originalPositionArithmeticReplayed": true,
-    "originalDisplayNormalOperatorImplementedForStrictTemplates": true,
-    "originalHeadLandmarkFrameEvaluated": true,
-    "constantHeadWorldBiasUsed": false,
-    "knownHeadEnvelopeMismatchExplicitlyExcluded": true,
-    "arbitraryContinuousBodyShapeImplemented": false,
-    "arbitraryHeadVariablesImplemented": false,
-    "BCorrectivesTrueImplemented": false,
-    "BCorrectivesDefaultChanged": false,
-    "originalContinuousSkinImplemented": false,
-    "continuousAppearance": "grey structure lighting",
-    "headSurfaceGenerated": false,
-    "defaultSourceBodyShapeChanged": false,
-    "sourceCouplingBetweenFatAndSkeletonChanged": false
+  "evidence": {
+    "originalMatchedViews": "qa/p1-torso/matched-native-baselines.json",
+    "localizedWitnesses": "qa/p1-torso/torso-difference-localization.json",
+    "coverageHypotheses": "qa/p1-torso/raster-coverage-hypotheses.json",
+    "rejectedShadingCandidate": "qa/p1-torso/vertex-order-decision.json",
+    "calibration": "qa/p1-torso/calibration-session-browser.json",
+    "supportStaticAndMotion": "qa/p1-torso/relative-support-probe.json",
+    "supportStudy": "qa/p1-torso/locked-preview-browser.json",
+    "continuousSupportNative": "qa/p1-torso/continuous-support-native.json",
+    "additionalShaderInputs": "qa/p1-torso/shader-input-probe-2.json",
+    "continuousShapeFeasibility": "qa/p1-torso/continuous-shape-source-feasibility.json",
+    "continuousShapeSixSamples": "qa/p1-torso/continuous-shape-six-samples.json",
+    "supportCouplingSweep": "qa/p1-torso/support-coupling-sweep.json",
+    "sourceOrderRotation": "qa/p1-torso/proper-rotation-source-order.json"
   },
-  "observedSourceChecks": {
-    "states": 102,
-    "scalarObservationsIncludingSharedDomainExtrema": 16905888,
-    "notIndependentVertexCount": true,
-    "differentOriginalPositionFloat32Components": 0,
-    "differentOriginalNormalFloat32Components": 0,
-    "headBoundaryFloat32ComponentsChecked": 310356,
-    "differentRequiredHeadBoundaryFloat32Components": 0
-  },
-  "nativeOriginalRayChecks": {
-    "states": 102,
-    "views": 408,
-    "rays": 14845488,
-    "coverageDisagreements": 0,
-    "maximumFirstHitDifferenceMetres": 1.1546319456101628e-14,
-    "maximumNormalAngleDifferenceDegrees": 0.0000019090959104164224,
-    "sourceFidelityAccepted": false
-  },
-  "actualPrecisionDisplayChecks": {
-    "completeFrames": 21,
-    "coverageDisagreements": 0,
-    "differentDisplayPositionFloat32Components": 0,
-    "scope": "tested actual headless full-frame function intersections and GPU presentation; not full source/visual acceptance"
-  },
-  "resources": {
-    "runtimeAssets": 719,
-    "allHistoricalAndCurrentCompressedRuntimeAssetBytes": 582078858,
-    "activeContinuousTemplateTotalMegabytesApprox": [
-      19,
-      20
-    ],
-    "coreCompressedMegabytesApprox": 1,
-    "previousCoreCompressedMegabytesApprox": 24,
-    "oneVisibleBodyRenderer": true,
-    "steadyStateBodyRenderers": 1,
-    "maximumBodyRenderersDuringHandoff": 2,
-    "sourceScalarCacheMaximumKeyValuePayloadBytes": 67108864,
-    "scalarCacheEngineOverheadExcluded": true,
-    "maximumPrecisionWorkers": 3,
-    "allMemoryOptimizationComplete": false
-  },
+  "route": "EXECUTION-ROUTE.md",
+  "roadmap": "BODY-ROADMAP.json",
+  "currentMainTask": "P1",
+  "currentSubtask": "P1.1",
+  "mainTasksAccepted": 0,
   "remaining": [
     {
-      "priority": 0,
-      "status": "partial",
-      "task": "任意连续体型、颈头变量和 B 开启原姿态修正的连续响应未完成；原连续皮肤、动态阴影及完整来源/视觉验收未完成。"
+      "id": "P1",
+      "status": "partial_not_accepted",
+      "task": "整体校准、胸肩腰腹骨盆体量、骨架与软组织关系"
     },
     {
-      "priority": 1,
-      "status": "partial",
-      "task": "胸肩、腰腹、骨盆整体体量、中性校准和骨架/软组织分离未完成；原胖瘦与骨架参数耦合仍保留。"
+      "id": "P2",
+      "status": "partial_not_accepted",
+      "task": "轮廓、连接与变形"
     },
     {
-      "priority": 2,
-      "status": "partial",
-      "task": "严格模板的四肢及根关节/脊柱连续原响应已接入；全范围关节、手足细节及全部极端和组合变形仍未验收。"
+      "id": "P3",
+      "status": "not_accepted",
+      "task": "自主母体、形态和绑定逐区替换"
     },
     {
-      "priority": 3,
-      "status": "incomplete",
-      "task": "自主母体及形态、绑定逐区替换未完成；来源分区、函数校准和边界支撑关系仍保留。"
+      "id": "P4",
+      "status": "partial_not_accepted",
+      "task": "局部计算、缓存压缩与表面肌理"
     },
     {
-      "priority": 4,
-      "status": "partial",
-      "task": "已缩减新路径核心系数、接通后台整帧核对；全系统局部更新、全部显存/缓存优化、完整散射与跨场景验收未完成。"
-    },
-    {
-      "priority": 5,
-      "status": "partial",
-      "task": "完整人物和未知字段保留，已知头侧不匹配状态明确退出严格路径；任意头部提供方、附件与总平台整合未完成。独立头部项目未修改。"
+      "id": "P5",
+      "status": "partial_not_accepted",
+      "task": "头部、附件与总平台整合"
     }
   ],
-  "nextPriority": "任意连续体型、颈头变量和 B 开启原姿态修正的连续响应未完成；原连续皮肤、动态阴影及完整来源/视觉验收未完成。",
-  "verification": [
-    {
-      "file": "qa/fidelity-r29/source-functions-numeric.json",
-      "sha256": "fefdb8b180ec7b9270f15ccba040c9b41a71633acc0b7bafde1223d235d00d98"
-    },
-    {
-      "file": "qa/fidelity-r29/native-pose-rays.json",
-      "sha256": "4643fc80f7fb932bdf2eaef6d56380552cc164ef822467086eccd0c1f2e3ecdc"
-    },
-    {
-      "file": "qa/fidelity-r29/pose-browser.json",
-      "sha256": "873127f140bd75207b8b1eb2c4a2bfdd1caafd19c2ecafcdda63b9a9cf753998"
-    },
-    {
-      "file": "qa/fidelity-r29/pose-precision-browser.json",
-      "sha256": "836375c26de81343ad910f3e4e80a15671cb0c1da1429b36673d41d81f36d384"
-    },
-    {
-      "file": "qa/fidelity-r29/workbench-browser.json",
-      "sha256": "c38307e1156d54de1f83228fa2a9ce4d7edcb33d38532afca7c3119f68f87188"
-    },
-    {
-      "file": "qa/fidelity-r29/head-envelope-browser.json",
-      "sha256": "5c2889dcd9c2b7927f0405a6f607abf530b76baa11d5334a29e5301c67ea2bc4"
-    },
-    {
-      "file": "qa/fidelity-r29/b-corrective-gate-browser.json",
-      "sha256": "44f72a98b8146854ce30de3a227c85a654444c931aced381f8204f347343224c"
-    },
-    {
-      "file": "qa/fidelity-r29/release-integrity.json",
-      "sha256": "88d6302d069d8ab84aedfee73345157dece90b3f0ee08b0c38ff539110718b78"
-    },
-    {
-      "file": "qa/fidelity-r29/http-integrity.json",
-      "sha256": "a5fe8301cb07d422eac4562a9c8ab185e8d601750e9e13092be1b7461d316004"
-    },
-    {
-      "file": "qa/fidelity-r29/git-tree-rebuild.json",
-      "sha256": "9a10fae99b64bf1b3456dcb3a9831bb203aa5bec47df658ea5fc4790497cdbc5"
-    }
-  ],
+  "previousDelivery": "DELIVERY-R29.json",
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
-    "branch": "body/reconstruction-r18-20261023",
-    "mainBranchModified": false,
-    "codeSyncStatus": "verified implementation commit; delivery records recorded separately",
-    "websiteDeploymentPerformed": false,
-    "verifiedCodeCommit": "3ccb66bbef3ad0ce5df466b3cf7efc27ab6844c2",
-    "committedFilesRebuildPassed": true,
-    "mainCommitVerifiedUnchanged": "fda12bf2fe0262e4d02f1b08508128d17959e0c8",
-    "verifiedUTC": "2026-10-26T18:59:03.185Z"
+    "branch": "body/reconstruction-r18-20261023"
+  },
+  "automaticSourceMode": {
+    "unsupportedShapeTransitionRefused": true,
+    "previousPersonRetained": true,
+    "explicitResearchCandidateAvailable": true,
+    "existingResearchArchivesLoadable": true
+  },
+  "sourceArithmetic": {
+    "phenotypeMaskAndProperRotationSourceOrderReplayed": true,
+    "sixStaticSamplesBitExactBeforeNeck": true,
+    "jointMatricesBitExactForTwoSampledPoses": true,
+    "allParametersOrSurfaceAccepted": false
   }
 }

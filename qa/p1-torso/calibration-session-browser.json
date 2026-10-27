@@ -1,0 +1,127 @@
+{
+  "startedUTC": "2026-10-27T04:14:35.483Z",
+  "artifactSHA256": "6b7830e422842a9b5c73d30799e3701ee73ad51cc02019a3fe6280b0bb7f18c0",
+  "testFileSHA256": "6ef01a1a71c4584934fb81938fb8f5821e7a07cfce134875947e9e1b7ca7afd1",
+  "scope": "P1.2 actual calibration switch, state recovery, archive round trip, and error rollback; this does not certify body shape or skeleton/soft-tissue separation",
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "newImageFiles": 0,
+  "checks": [
+    {
+      "name": "automatic source mode refuses an unsupported shape without replacing the person or surface",
+      "passed": true
+    },
+    {
+      "name": "unsupported body adjustment explains the research option and restores visible control values",
+      "passed": true
+    },
+    {
+      "name": "an existing original shape profile remains usable in automatic source mode",
+      "passed": true
+    },
+    {
+      "name": "the original entry profile can be restored through its existing control",
+      "passed": true
+    },
+    {
+      "name": "custom original motion is present before comparison",
+      "passed": true
+    },
+    {
+      "name": "calibration is explicit and retains prior complete state",
+      "passed": true
+    },
+    {
+      "name": "calibration preserves original person and unknown fields",
+      "passed": true
+    },
+    {
+      "name": "calibration uses recorded comparison controls and keeps the original motion",
+      "passed": true
+    },
+    {
+      "name": "calibration keeps the current height, proportions, age, sex and driver",
+      "passed": true
+    },
+    {
+      "name": "camera and visible recovery action preserved",
+      "passed": true
+    },
+    {
+      "name": "restore returns the person as adjusted before calibration",
+      "passed": true,
+      "details": {
+        "differences": [],
+        "active": false,
+        "surface": "pose-functions"
+      }
+    },
+    {
+      "name": "restore retains view and removes consumed session only",
+      "passed": true
+    },
+    {
+      "name": "calibration session survives a complete-person archive reload",
+      "passed": true
+    },
+    {
+      "name": "failed recovery rolls back both the calibration and its saved person",
+      "passed": true
+    },
+    {
+      "name": "recovery after archive reload restores pre-calibration state",
+      "passed": true
+    },
+    {
+      "name": "malformed calibration snapshot is rejected without replacing the person",
+      "passed": true
+    },
+    {
+      "name": "unknown archive extension with the same field name is preserved",
+      "passed": true
+    },
+    {
+      "name": "calibration session does not overwrite a pre-existing unknown field",
+      "passed": true
+    },
+    {
+      "name": "colliding extension survives calibration archive reload and recovery",
+      "passed": true
+    },
+    {
+      "name": "head and neck edits made during comparison survive restoration of the prior body",
+      "passed": true
+    },
+    {
+      "name": "unsupported B calibration is refused without changing the person or driver",
+      "passed": true
+    },
+    {
+      "name": "source-page handoff retains the calibration recovery session",
+      "passed": true
+    },
+    {
+      "name": "return after source-page handoff restores original person state",
+      "passed": true
+    },
+    {
+      "name": "explicit research mode retains access to the original body parameter controls",
+      "passed": true
+    },
+    {
+      "name": "existing unsupported research archive still loads without discarding its state",
+      "passed": true
+    },
+    {
+      "name": "original person can be restored after an explicit research edit",
+      "passed": true
+    },
+    {
+      "name": "body remains a direct-function display without character triangles",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "finishedUTC": "2026-10-27T04:16:09.704Z"
+}

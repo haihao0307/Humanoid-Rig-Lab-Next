@@ -12,6 +12,9 @@ http.createServer((req,res)=>{
   else if(pathname==='/source')manifest='BUILD.json';
   else if(pathname==='/workbench')manifest=companion;
   else if(pathname==='/joint-functions')manifest=selected.researchBuild||'BUILD-POSE-R28.json';
+  else if(pathname==='/support-study'||pathname==='/身体_P1_参考支撑隔离研究.html')manifest='BUILD-SUPPORT-P1.json';
+  else if(pathname==='/身体_R30_原形体与校准.html')manifest='BUILD-SOURCE-R30.json';
+  else if(pathname==='/人物身体_R30_可回退体量校准.html')manifest='BUILD-R30.json';
   else if(pathname==='/身体_R29_连续关节原轮廓候选.html')manifest='BUILD-POSE-R29.json';
   else if(pathname==='/身体_R28_连续关节原轮廓候选.html')manifest='BUILD-POSE-R28.json';
   else if(pathname==='/身体_R29_原形体与参数衔接.html')manifest='BUILD-SOURCE-R29.json';

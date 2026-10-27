@@ -1,0 +1,117 @@
+{
+  "schema": "body-p1-vertex-input-order-decision/1",
+  "checkedUTC": "2026-10-27T03:08:56.784Z",
+  "scope": "Original vertex-input ordering applied to existing scalar trim functions; isolated RGB comparisons on original person and calibration candidate",
+  "selected": false,
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "acceptanceTolerance": null,
+  "conclusion": "Rejected: full-frame maximum RGB difference did not improve in any of eight matched views and worsened in one; some interior maxima decreased while others increased. Coverage mismatches remained unchanged. The cause of remaining differences is not established.",
+  "preservedSnapshot": {
+    "file": "qa/p1-torso/research-snapshots/vertex-order-trial-ea71d61a9ceb.html.gz",
+    "rawSHA256": "ea71d61a9cebcdb0e64b17a692ff6ba5d64a15958c6b61d49e6613d8c29b709a",
+    "compressedSHA256": "9abe540baec8afbe4f35b88a367d0e1adcbbd2866a7685c56e7a3baaf89f79f2",
+    "rawBytes": 3237733,
+    "compressedBytes": 1327805
+  },
+  "baseReportSHA256": "51468435b1415820baede4cbdcdc9d6e6730671ee6c865a02e292ffa60fe1e3c",
+  "trialReportSHA256": "f040bda623b7fa2634d46f7a9bcc197071c2b02e5c81bbd3fcd74860eb2bc5d5",
+  "cases": [
+    {
+      "id": "baseline",
+      "view": "front",
+      "baseMaximumRGB": 23,
+      "trialMaximumRGB": 23,
+      "baseInteriorMaximum": 2,
+      "trialInteriorMaximum": 3,
+      "baseSourceOnly": 0,
+      "trialSourceOnly": 0,
+      "baseCandidateOnly": 0,
+      "trialCandidateOnly": 0
+    },
+    {
+      "id": "baseline",
+      "view": "side",
+      "baseMaximumRGB": 12,
+      "trialMaximumRGB": 12,
+      "baseInteriorMaximum": 5,
+      "trialInteriorMaximum": 2,
+      "baseSourceOnly": 1,
+      "trialSourceOnly": 1,
+      "baseCandidateOnly": 1,
+      "trialCandidateOnly": 1
+    },
+    {
+      "id": "baseline",
+      "view": "back",
+      "baseMaximumRGB": 6,
+      "trialMaximumRGB": 6,
+      "baseInteriorMaximum": 3,
+      "trialInteriorMaximum": 3,
+      "baseSourceOnly": 2,
+      "trialSourceOnly": 2,
+      "baseCandidateOnly": 0,
+      "trialCandidateOnly": 0
+    },
+    {
+      "id": "baseline",
+      "view": "half",
+      "baseMaximumRGB": 9,
+      "trialMaximumRGB": 9,
+      "baseInteriorMaximum": 4,
+      "trialInteriorMaximum": 3,
+      "baseSourceOnly": 0,
+      "trialSourceOnly": 0,
+      "baseCandidateOnly": 3,
+      "trialCandidateOnly": 3
+    },
+    {
+      "id": "calibration-soft",
+      "view": "front",
+      "baseMaximumRGB": 10,
+      "trialMaximumRGB": 10,
+      "baseInteriorMaximum": 4,
+      "trialInteriorMaximum": 4,
+      "baseSourceOnly": 2,
+      "trialSourceOnly": 2,
+      "baseCandidateOnly": 2,
+      "trialCandidateOnly": 2
+    },
+    {
+      "id": "calibration-soft",
+      "view": "side",
+      "baseMaximumRGB": 10,
+      "trialMaximumRGB": 10,
+      "baseInteriorMaximum": 9,
+      "trialInteriorMaximum": 9,
+      "baseSourceOnly": 0,
+      "trialSourceOnly": 0,
+      "baseCandidateOnly": 0,
+      "trialCandidateOnly": 0
+    },
+    {
+      "id": "calibration-soft",
+      "view": "back",
+      "baseMaximumRGB": 3,
+      "trialMaximumRGB": 4,
+      "baseInteriorMaximum": 3,
+      "trialInteriorMaximum": 4,
+      "baseSourceOnly": 0,
+      "trialSourceOnly": 0,
+      "baseCandidateOnly": 0,
+      "trialCandidateOnly": 0
+    },
+    {
+      "id": "calibration-soft",
+      "view": "half",
+      "baseMaximumRGB": 10,
+      "trialMaximumRGB": 10,
+      "baseInteriorMaximum": 5,
+      "trialInteriorMaximum": 5,
+      "baseSourceOnly": 4,
+      "trialSourceOnly": 4,
+      "baseCandidateOnly": 0,
+      "trialCandidateOnly": 0
+    }
+  ]
+}

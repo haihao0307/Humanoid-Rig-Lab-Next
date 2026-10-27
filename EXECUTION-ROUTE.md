@@ -4,9 +4,9 @@
 
 ## 当前事实
 
-产品仍为 R29，当前主任务 **P1**，当前子任务 **P1.1**。五项主任务均未整体通过。R29 的限定位置、法线和躯干动作检查是局部证据，不能替代整体体量、骨软分离和自主母体验收。
+产品为 R30，当前主任务 **P1**，当前子任务 **P1.1**。五项主任务均未整体通过。R30 在保留 R29 原始形体与材质的基础上接入可恢复校准；参考支撑和连续关节系数仍是隔离研究。限定位置、法线、躯干动作与存档检查是局部证据，不能替代整体体量、骨软分离和自主母体验收。
 
-本次只是复盘和记录修正，不是 R30 模型迭代，不计为形体进展。历史交付清单保留当时状态。
+两档同机位原版对照仍有局部边界和颜色差异。R30 没有宣称修复这些形体差异，也没有进入 P2；具体工作与证据见 [P1 躯干记录](docs/P1-TORSO-RECONSTRUCTION.md)。历史交付清单保留当时状态。
 
 ## 固定五项主任务
 
@@ -40,6 +40,6 @@ P1 四个子项达到各自通过条件后才标 P1 完成。没有完成直接�
 
 任务编号；实际修改；通过证据；仍欠条件；当前主任务及是否进入下一项。历史六项 remaining 是当时快照，不再每次改写为新路线。
 
-先读 AGENTS.md、BODY-ROADMAP.json、TASK_ANCHOR.json、BUILD.json、DELIVERY.json。产品事实见 docs/SOURCE-FIDELITY-R29.md，构建仍为 tools/build.cjs。本次未改运行时、HTML、数据、材质或模型。
+先读 AGENTS.md、BODY-ROADMAP.json、TASK_ANCHOR.json、BUILD.json、DELIVERY.json。当前 P1 事实见 docs/P1-TORSO-RECONSTRUCTION.md，R29 实现细节保留在 docs/SOURCE-FIDELITY-R29.md，构建仍为 tools/build.cjs。
 
 历史路线原文保存在 [截至 R29 的历史记录](docs/EXECUTION-ROUTE-HISTORY-THROUGH-R29.md)。其中“当前”“下一轮”和时限都属于历史；后续用户任务继续遵守单任务三小时上限，候选切换不重置。

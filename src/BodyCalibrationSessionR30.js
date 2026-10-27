@@ -1,0 +1,13 @@
+/* A reversible calibration comparison stores state, never geometry. Unknown
+ * person/archive fields remain owned by the original archive. */
+(()=>{'use strict';
+const schema='body-calibration-session-r30/1',key='calibrationSessionR30';
+function validState(s){return !!s&&typeof s==='object'&&!Array.isArray(s)&&!!s.anny&&typeof s.anny==='object'&&!!s.mhr&&typeof s.mhr==='object'&&!!s.owners&&['anny','mhr'].includes(s.owners.rig);}
+function read(value){if(value==null||value.schema!==schema)return null;if(!validState(value.previousState)||!validState(value.calibrationState)||value.profile!=='calibration-soft')throw Error('校准前人物状态损坏，已保留当前人物');return structuredClone(value);}
+function capture(state,calibrationState){if(!validState(state)||!validState(calibrationState))throw Error('校准前人物状态不完整');return{schema,profile:'calibration-soft',previousState:structuredClone(state),calibrationState:structuredClone(calibrationState)};}
+function comparison(state,operation,controls){if(!validState(state)||!operation||typeof operation!=='object'||Array.isArray(operation)||!Array.isArray(controls))throw Error('身体校准参数不完整');const next=structuredClone(state),catalog=new Map(controls.map(c=>[c.id,c]));for(const[id,value]of Object.entries(operation)){const c=catalog.get(id);if(!c||!['anny.phenotypes','anny.localChanges'].includes(c.group)||c.activeRig!=='both'||!Array.isArray(c.path)||typeof value!=='number'||!Number.isFinite(value)||c.bounds&&(value<c.bounds[0]||value>c.bounds[1]))throw Error('身体校准参数不适用：'+id);let o=next;for(let i=0;i<c.path.length-1;i++){const k=c.path[i];if(!o[k]||typeof o[k]!=='object')throw Error('身体校准状态缺少：'+id);o=o[k];}const k=c.path.at(-1);if(value!==0||Object.hasOwn(o,k))o[k]=value;}return next;}
+function slots(owner){const valid=[],invalid=[];for(const k of Object.keys(owner||{})){if(!/^calibrationSessionR30(?:_\d+)?$/.test(k)||owner[k]?.schema!==schema)continue;try{valid.push({key:k,value:read(owner[k])});}catch(e){invalid.push({key:k,error:e});}}if(valid.length>1)throw Error('人物档案包含多个校准前状态，已保留当前人物');return{valid,invalid};}
+function readFrom(owner){const s=slots(owner);if(s.valid.length)return s.valid[0].value;if(s.invalid.length)throw s.invalid[0].error;return null;}
+function write(archive,session){const owner=archive.person.bodyFunctionSystem,s=slots(owner);if(session){let name=s.valid[0]?.key||key;for(let i=1;Object.hasOwn(owner,name)&&name!==s.valid[0]?.key;i++)name=key+'_'+i;owner[name]=structuredClone(session);}else for(const row of s.valid)delete owner[row.key];return archive;}
+globalThis.BodyCalibrationSessionR30={schema,key,read,readFrom,capture,comparison,write};
+})();

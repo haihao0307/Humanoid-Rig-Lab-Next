@@ -1,0 +1,517 @@
+{
+  "startedUTC": "2026-10-27T04:06:45.300Z",
+  "testFileSHA256": "a716a826a3f63bfb88a421ec37c0a84b1a203956e2538de7783143caaef5834c",
+  "sourceFiles": [
+    {
+      "file": "src/BodyShapeR01.js",
+      "sha256": "caa3a88baf971d3bbd40047e9e1b0157e216693d3ba09593c1afe01a972af977"
+    },
+    {
+      "file": "src/BodyShapeR30.js",
+      "sha256": "29d97b6a9d1e5668939bbb571c859bf4562498739934bf3a5858b543f767fcbf"
+    },
+    {
+      "file": "src/research/p1/BodyProperRotationP1.js",
+      "sha256": "641627bff91cdc56f5ff15e8c12fd3a1b96c6e952bd13a25d0c24d92e9b2fb42"
+    }
+  ],
+  "scope": "Offline feasibility: source shape arithmetic at arbitrary weight/muscle, before neck and display; original points stay offline",
+  "selected": false,
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "completedMotherConversion": false,
+  "acceptanceTolerance": null,
+  "cases": [
+    {
+      "weight": 0.12,
+      "muscle": 0.17,
+      "nativeResultKeys": [
+        "vertices",
+        "vertices64",
+        "restVertices",
+        "bonePoses",
+        "boneHeads",
+        "restBonePoses",
+        "restBoneHeads",
+        "boneTransforms",
+        "coefficients"
+      ],
+      "omittedFacialCoefficientCount": 52,
+      "omittedFacialCoefficientsAllZero": true,
+      "before": {
+        "coefficients": {
+          "available": true,
+          "components": 1136,
+          "differingComponents": 34,
+          "maximumAbsoluteDifference": 5.551115123125783e-17,
+          "worst": {
+            "component": 30,
+            "original": 0.2015520120134361,
+            "reproduced": 0.20155201201343614
+          }
+        },
+        "rest": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 19830,
+          "maximumAbsoluteDifference": 5.551115123125783e-16,
+          "worst": {
+            "component": 407,
+            "original": 0.8350263324615159,
+            "reproduced": 0.8350263324615165
+          }
+        },
+        "positions": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 39,
+          "maximumAbsoluteDifference": 1.4346718190206084e-18,
+          "worst": {
+            "component": 13062,
+            "original": 1.5204161787080733e-18,
+            "reproduced": 8.574435968746484e-20
+          }
+        },
+        "restJointFrames": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 720,
+          "maximumAbsoluteDifference": 1.6653345369377348e-15,
+          "worst": {
+            "component": 1142,
+            "original": 0.20869063785186276,
+            "reproduced": 0.20869063785186442
+          }
+        },
+        "skinMatrices": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 890,
+          "maximumAbsoluteDifference": 1.6930901125533637e-15,
+          "worst": {
+            "component": 1137,
+            "original": -0.0024189627266579528,
+            "reproduced": -0.002418962726659646
+          }
+        }
+      },
+      "grouping": {
+        "coefficients": {
+          "available": true,
+          "components": 1136,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "rest": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "positions": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 26,
+          "maximumAbsoluteDifference": 1.085888586959347e-19,
+          "worst": {
+            "component": 13074,
+            "original": 1.0469384096730265e-18,
+            "reproduced": 1.1555272683689612e-18
+          }
+        },
+        "restJointFrames": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 200,
+          "maximumAbsoluteDifference": 5.551115123125783e-16,
+          "worst": {
+            "component": 1461,
+            "original": -0.5072603019377131,
+            "reproduced": -0.5072603019377137
+          }
+        },
+        "skinMatrices": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 547,
+          "maximumAbsoluteDifference": 4.440892098500626e-16,
+          "worst": {
+            "component": 235,
+            "original": -0.147784974355182,
+            "reproduced": -0.14778497435518245
+          }
+        }
+      },
+      "after": {
+        "coefficients": {
+          "available": true,
+          "components": 1136,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "rest": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "positions": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "restJointFrames": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "skinMatrices": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        }
+      }
+    },
+    {
+      "weight": 0.34,
+      "muscle": 0.62,
+      "nativeResultKeys": [
+        "vertices",
+        "vertices64",
+        "restVertices",
+        "bonePoses",
+        "boneHeads",
+        "restBonePoses",
+        "restBoneHeads",
+        "boneTransforms",
+        "coefficients"
+      ],
+      "omittedFacialCoefficientCount": 52,
+      "omittedFacialCoefficientsAllZero": true,
+      "before": {
+        "coefficients": {
+          "available": true,
+          "components": 1136,
+          "differingComponents": 38,
+          "maximumAbsoluteDifference": 8.326672684688674e-17,
+          "worst": {
+            "component": 30,
+            "original": 0.18969601130676336,
+            "reproduced": 0.18969601130676328
+          }
+        },
+        "rest": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 20709,
+          "maximumAbsoluteDifference": 6.661338147750939e-16,
+          "worst": {
+            "component": 227,
+            "original": 0.8379139671090241,
+            "reproduced": 0.8379139671090248
+          }
+        },
+        "positions": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 39,
+          "maximumAbsoluteDifference": 1.329014637049578e-18,
+          "worst": {
+            "component": 13062,
+            "original": -1.3545476733816498e-19,
+            "reproduced": -1.464469404387743e-18
+          }
+        },
+        "restJointFrames": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 803,
+          "maximumAbsoluteDifference": 1.5543122344752192e-15,
+          "worst": {
+            "component": 816,
+            "original": -0.7397949005170765,
+            "reproduced": -0.7397949005170781
+          }
+        },
+        "skinMatrices": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 949,
+          "maximumAbsoluteDifference": 1.4432899320127035e-15,
+          "worst": {
+            "component": 824,
+            "original": 0.011833336323499477,
+            "reproduced": 0.01183333632350092
+          }
+        }
+      },
+      "grouping": {
+        "coefficients": {
+          "available": true,
+          "components": 1136,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "rest": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "positions": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 37,
+          "maximumAbsoluteDifference": 7.085807487948817e-19,
+          "worst": {
+            "component": 12648,
+            "original": -1.150506385448341e-19,
+            "reproduced": -8.236313873397158e-19
+          }
+        },
+        "restJointFrames": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 181,
+          "maximumAbsoluteDifference": 4.440892098500626e-16,
+          "worst": {
+            "component": 133,
+            "original": -0.9294910526070896,
+            "reproduced": -0.9294910526070901
+          }
+        },
+        "skinMatrices": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 528,
+          "maximumAbsoluteDifference": 8.881784197001252e-16,
+          "worst": {
+            "component": 1363,
+            "original": 0.008286298721399854,
+            "reproduced": 0.008286298721400742
+          }
+        }
+      },
+      "after": {
+        "coefficients": {
+          "available": true,
+          "components": 1136,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "rest": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "positions": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "restJointFrames": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "skinMatrices": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        }
+      }
+    },
+    {
+      "weight": 0.83,
+      "muscle": 0.94,
+      "nativeResultKeys": [
+        "vertices",
+        "vertices64",
+        "restVertices",
+        "bonePoses",
+        "boneHeads",
+        "restBonePoses",
+        "restBoneHeads",
+        "boneTransforms",
+        "coefficients"
+      ],
+      "omittedFacialCoefficientCount": 52,
+      "omittedFacialCoefficientsAllZero": true,
+      "before": {
+        "coefficients": {
+          "available": true,
+          "components": 1136,
+          "differingComponents": 34,
+          "maximumAbsoluteDifference": 5.551115123125783e-17,
+          "worst": {
+            "component": 190,
+            "original": 0.276344656471425,
+            "reproduced": 0.2763446564714249
+          }
+        },
+        "rest": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 18080,
+          "maximumAbsoluteDifference": 5.551115123125783e-16,
+          "worst": {
+            "component": 4571,
+            "original": 0.6571689247322638,
+            "reproduced": 0.6571689247322644
+          }
+        },
+        "positions": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 20,
+          "maximumAbsoluteDifference": 9.03215054458902e-19,
+          "worst": {
+            "component": 12621,
+            "original": -9.155297885463464e-17,
+            "reproduced": -9.245619390909355e-17
+          }
+        },
+        "restJointFrames": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 693,
+          "maximumAbsoluteDifference": 1.0547118733938987e-15,
+          "worst": {
+            "component": 954,
+            "original": -0.4683496736841517,
+            "reproduced": -0.46834967368415276
+          }
+        },
+        "skinMatrices": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 882,
+          "maximumAbsoluteDifference": 9.992007221626409e-16,
+          "worst": {
+            "component": 946,
+            "original": 0.0003736582808473998,
+            "reproduced": 0.000373658280848399
+          }
+        }
+      },
+      "grouping": {
+        "coefficients": {
+          "available": true,
+          "components": 1136,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "rest": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "positions": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 15,
+          "maximumAbsoluteDifference": 5.047502109720148e-19,
+          "worst": {
+            "component": 12993,
+            "original": 5.350089947670874e-19,
+            "reproduced": 3.02587837950726e-20
+          }
+        },
+        "restJointFrames": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 217,
+          "maximumAbsoluteDifference": 5.551115123125783e-16,
+          "worst": {
+            "component": 138,
+            "original": -0.9261516607665361,
+            "reproduced": -0.9261516607665367
+          }
+        },
+        "skinMatrices": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 635,
+          "maximumAbsoluteDifference": 5.551115123125783e-16,
+          "worst": {
+            "component": 123,
+            "original": -0.16494356423624323,
+            "reproduced": -0.16494356423624268
+          }
+        }
+      },
+      "after": {
+        "coefficients": {
+          "available": true,
+          "components": 1136,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "rest": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "positions": {
+          "available": true,
+          "components": 41154,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "restJointFrames": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        },
+        "skinMatrices": {
+          "available": true,
+          "components": 1664,
+          "differingComponents": 0,
+          "maximumAbsoluteDifference": 0,
+          "worst": null
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "nativeMethodNames": [
+    "constructor",
+    "attachFacial",
+    "coefficients",
+    "parsePose",
+    "forward",
+    "compute"
+  ],
+  "diagnosticCompleted": true,
+  "finishedUTC": "2026-10-27T04:09:48.575Z"
+}
