@@ -1,0 +1,109 @@
+{
+  "checkedUTC": "2026-10-27T05:22:00.788Z",
+  "scope": "Original neck adapter boundary inputs at four captured body profiles; no head surface, geometry or visual acceptance",
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "completedMotherConversion": false,
+  "acceptanceTolerance": null,
+  "originalHeadPointsEmitted": false,
+  "requiredBoundarySamples": 1398,
+  "reference": {
+    "id": "baseline",
+    "weight": 0.66,
+    "muscle": 0.96,
+    "headScale": 1.0009533065447414
+  },
+  "cases": [
+    {
+      "id": "lean",
+      "weight": 0.28,
+      "muscle": 0.96,
+      "otherPersonFieldsUnchanged": true,
+      "headScale": 0.9966978949220842,
+      "headScaleDifference": -0.00425541162265719,
+      "boundaryComponentsChanged": 4194,
+      "maximumBoundaryComponentDifferenceMetres": 0.018243420603480498,
+      "rootMatrix": {
+        "changedComponents": 0,
+        "maximumAbsoluteDifference": 0
+      },
+      "neckSkinMatrix": {
+        "changedComponents": 3,
+        "maximumAbsoluteDifference": 2.5087842914217617e-10
+      }
+    },
+    {
+      "id": "fuller",
+      "weight": 0.86,
+      "muscle": 0.96,
+      "otherPersonFieldsUnchanged": true,
+      "headScale": 1.006272954559953,
+      "headScaleDifference": 0.005319648015211564,
+      "boundaryComponentsChanged": 4194,
+      "maximumBoundaryComponentDifferenceMetres": 0.020605451666858232,
+      "rootMatrix": {
+        "changedComponents": 0,
+        "maximumAbsoluteDifference": 0
+      },
+      "neckSkinMatrix": {
+        "changedComponents": 3,
+        "maximumAbsoluteDifference": 3.1652881357646656e-10
+      }
+    },
+    {
+      "id": "muscular",
+      "weight": 0.5,
+      "muscle": 0.9,
+      "otherPersonFieldsUnchanged": true,
+      "headScale": 0.9966978878666933,
+      "headScaleDifference": -0.004255418678048017,
+      "boundaryComponentsChanged": 4194,
+      "maximumBoundaryComponentDifferenceMetres": 0.01583037524899311,
+      "rootMatrix": {
+        "changedComponents": 0,
+        "maximumAbsoluteDifference": 0
+      },
+      "neckSkinMatrix": {
+        "changedComponents": 3,
+        "maximumAbsoluteDifference": 2.72730307088187e-10
+      }
+    }
+  ],
+  "sourceFiles": [
+    {
+      "file": "tools/research/p1/qa-neck-boundary-variation.cjs",
+      "sha256": "1a6c1190f60b946279c3f22e5df5c688324a15df175a52b0f2b1a8a04103c558"
+    }
+  ],
+  "offlineSourceSnapshots": [
+    {
+      "id": "baseline",
+      "file": "qa/fidelity-r29/offline/display-baseline.json",
+      "sha256": "483620253cdf698f709486906fcc3ad324cbf25339012e3bf91aa9ec013d9f3d",
+      "containsOriginalPoints": true,
+      "excludedFromDelivery": true
+    },
+    {
+      "id": "lean",
+      "file": "qa/fidelity-r29/offline/display-lean.json",
+      "sha256": "6df5febe40c871d02301366c98e26c8cb2d6e245574af4a50a7530141f89e08a",
+      "containsOriginalPoints": true,
+      "excludedFromDelivery": true
+    },
+    {
+      "id": "fuller",
+      "file": "qa/fidelity-r29/offline/display-fuller.json",
+      "sha256": "a1142024ea4a79e126da9036da34d352bbeba60b724b9f942c8bdff8b7d3ccaf",
+      "containsOriginalPoints": true,
+      "excludedFromDelivery": true
+    },
+    {
+      "id": "muscular",
+      "file": "qa/fidelity-r29/offline/display-muscular.json",
+      "sha256": "e885a619c4703947eaf476ec26f753129131f8990fd5b7c7f86ffd0ecd0c8fde",
+      "containsOriginalPoints": true,
+      "excludedFromDelivery": true
+    }
+  ],
+  "diagnosticCompleted": true
+}
