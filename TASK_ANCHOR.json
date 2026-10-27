@@ -14,7 +14,7 @@
   "projectComplete": false,
   "latestAuditUTC": "2026-10-26T18:59:03.185Z",
   "latestAudit": "DELIVERY.json",
-  "nextPriority": "任意连续体型、颈头变量和 B 开启原姿态修正的连续响应未完成；原连续皮肤、动态阴影及完整来源/视觉验收未完成。",
+  "nextPriority": "P1.1：限定胸肩、腰腹、骨盆原数据基准核对和具体差异修复；不扩大为全系统皮肤、阴影、头部与优化前置。",
   "latestAuditChangedProduct": true,
   "previousPhaseHardStopUTC": "2026-10-23T08:21:00Z",
   "stageStartedUTC": "2026-10-26T17:17:52Z",
@@ -35,34 +35,29 @@
   "companionBuild": "BUILD-R29.json",
   "remaining": [
     {
-      "priority": 0,
-      "status": "partial",
-      "task": "任意连续体型、颈头变量和 B 开启原姿态修正的连续响应未完成；原连续皮肤、动态阴影及完整来源/视觉验收未完成。"
+      "id": "P1",
+      "status": "partial_not_accepted",
+      "task": "整体校准、胸肩腰腹骨盆体量、骨架与软组织关系"
     },
     {
-      "priority": 1,
-      "status": "partial",
-      "task": "胸肩、腰腹、骨盆整体体量、中性校准和骨架/软组织分离未完成；原胖瘦与骨架参数耦合仍保留。"
+      "id": "P2",
+      "status": "partial_not_accepted",
+      "task": "轮廓、连接与变形"
     },
     {
-      "priority": 2,
-      "status": "partial",
-      "task": "严格模板的四肢及根关节/脊柱连续原响应已接入；全范围关节、手足细节及全部极端和组合变形仍未验收。"
+      "id": "P3",
+      "status": "not_accepted",
+      "task": "自主母体、形态和绑定逐区替换"
     },
     {
-      "priority": 3,
-      "status": "incomplete",
-      "task": "自主母体及形态、绑定逐区替换未完成；来源分区、函数校准和边界支撑关系仍保留。"
+      "id": "P4",
+      "status": "partial_not_accepted",
+      "task": "局部计算、缓存压缩与表面肌理"
     },
     {
-      "priority": 4,
-      "status": "partial",
-      "task": "已缩减新路径核心系数、接通后台整帧核对；全系统局部更新、全部显存/缓存优化、完整散射与跨场景验收未完成。"
-    },
-    {
-      "priority": 5,
-      "status": "partial",
-      "task": "完整人物和未知字段保留，已知头侧不匹配状态明确退出严格路径；任意头部提供方、附件与总平台整合未完成。独立头部项目未修改。"
+      "id": "P5",
+      "status": "partial_not_accepted",
+      "task": "头部、附件与总平台整合"
     }
   ],
   "previousSelectedBuild": "BUILD-SOURCE-R22.json",
@@ -95,5 +90,47 @@
     "synchronizedCommit": "eded232b066e7d410b518641e3ff9517a2152434",
     "projectComplete": false
   },
-  "closedImplementationUTC": "2026-10-26T18:59:03.185Z"
+  "closedImplementationUTC": "2026-10-26T18:59:03.185Z",
+  "historicalDeliveryRemainingR29": [
+    {
+      "priority": 0,
+      "status": "partial",
+      "task": "任意连续体型、颈头变量和 B 开启原姿态修正的连续响应未完成；原连续皮肤、动态阴影及完整来源/视觉验收未完成。"
+    },
+    {
+      "priority": 1,
+      "status": "partial",
+      "task": "胸肩、腰腹、骨盆整体体量、中性校准和骨架/软组织分离未完成；原胖瘦与骨架参数耦合仍保留。"
+    },
+    {
+      "priority": 2,
+      "status": "partial",
+      "task": "严格模板的四肢及根关节/脊柱连续原响应已接入；全范围关节、手足细节及全部极端和组合变形仍未验收。"
+    },
+    {
+      "priority": 3,
+      "status": "incomplete",
+      "task": "自主母体及形态、绑定逐区替换未完成；来源分区、函数校准和边界支撑关系仍保留。"
+    },
+    {
+      "priority": 4,
+      "status": "partial",
+      "task": "已缩减新路径核心系数、接通后台整帧核对；全系统局部更新、全部显存/缓存优化、完整散射与跨场景验收未完成。"
+    },
+    {
+      "priority": 5,
+      "status": "partial",
+      "task": "完整人物和未知字段保留，已知头侧不匹配状态明确退出严格路径；任意头部提供方、附件与总平台整合未完成。独立头部项目未修改。"
+    }
+  ],
+  "roadmap": "BODY-ROADMAP.json",
+  "currentMainTask": "P1",
+  "currentSubtask": "P1.1",
+  "routeReview": {
+    "date": "2026-10-27",
+    "file": "docs/ROUTE-REVIEW-R29.md",
+    "documentationOnly": true,
+    "productVersionUnchanged": "R29",
+    "mainTasksAccepted": 0
+  }
 }
