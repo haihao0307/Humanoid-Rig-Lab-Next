@@ -1,0 +1,34 @@
+{
+  "startedUTC": "2026-10-27T09:27:26.705Z",
+  "artifactSHA256": "257f3a6b632b1543fbf297491b5b3b475f233cd71e0f8072ada859288d138229",
+  "scope": "Repeated complete-person body states in a hidden browser; no source or visual acceptance",
+  "sourceFidelityAccepted": false,
+  "visualAccepted": false,
+  "checks": [
+    {
+      "name": "two-body-state cache used when returning to a prior state",
+      "passed": true,
+      "detail": {
+        "before": {
+          "entries": 2,
+          "maximum": 2,
+          "hits": 0,
+          "misses": 3
+        },
+        "after": {
+          "entries": 2,
+          "maximum": 2,
+          "hits": 1,
+          "misses": 3
+        }
+      }
+    },
+    {
+      "name": "complete original body state and matching neck boundary restored",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "finishedUTC": "2026-10-27T09:28:25.610Z"
+}
