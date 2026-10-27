@@ -1,7 +1,7 @@
 {
   "schema": "body-delivery-r30/1",
   "version": "R30",
-  "updatedUTC": "2026-10-27T04:19:18.405Z",
+  "updatedUTC": "2026-10-27T04:44:23.305Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
@@ -94,7 +94,9 @@
     "continuousShapeSixSamples": "qa/p1-torso/continuous-shape-six-samples.json",
     "supportCouplingSweep": "qa/p1-torso/support-coupling-sweep.json",
     "sourceOrderRotation": "qa/p1-torso/proper-rotation-source-order.json",
-    "committedTreeRebuild": "qa/p1-torso/git-tree-rebuild.json"
+    "continuousTorsoSamples": "qa/p1-torso/torso-continuous-samples.json",
+    "continuousTorsoNormals": "qa/p1-torso/torso-display-normals.json",
+    "continuousTorsoBrowser": "qa/p1-torso/torso-study-browser.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
@@ -144,5 +146,38 @@
     "sixStaticSamplesBitExactBeforeNeck": true,
     "jointMatricesBitExactForTwoSampledPoses": true,
     "allParametersOrSurfaceAccepted": false
+  },
+  "continuousTorsoStudy": {
+    "file": "delivery/身体_P1_连续躯干隔离研究.html",
+    "sha256": "0c34ac30a25e9b34dbabe75bea18d8fa752d148623d53fff4354f450ff48c98f",
+    "bytes": 81381,
+    "url": "http://127.0.0.1:8914/torso-study?v=P1-0c34ac30",
+    "sourceDerived": true,
+    "displayDomains": 3980,
+    "normalSupportDomains": 206,
+    "selectionBounds": {
+      "minY": -0.4,
+      "maxY": 0.45,
+      "maxAbsX": 0.32
+    },
+    "continuousFields": [
+      "weight",
+      "muscle"
+    ],
+    "otherPersonFieldsFixed": true,
+    "originalDisplayNormalsImplemented": true,
+    "displayNormalSampleScope": "four fixed source profiles only",
+    "sourceFacetPartitionInformationRetained": true,
+    "characterPointTable": false,
+    "characterFaceTable": false,
+    "characterTriangleFaces": 0,
+    "neckStagesImplemented": false,
+    "wholeBodyImplemented": false,
+    "selectedByDefault": false,
+    "archiveExportEnabled": false,
+    "sourceFidelityAccepted": false,
+    "visualAccepted": false,
+    "completedMotherConversion": false,
+    "knownBoundaryIssue": "Selection bounds visibly clip shoulder and lower edges."
   }
 }
