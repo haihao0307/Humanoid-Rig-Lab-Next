@@ -1,13 +1,13 @@
 {
   "schema": "body-torso-study-build-p1/1",
   "file": "delivery/身体_P1_连续躯干隔离研究.html",
-  "sha256": "12e702fda83c9398ebd326b954ae03547636ede158f1c6f7761c4cf39815f483",
-  "bytes": 82787,
-  "builtUTC": "2026-10-27T05:14:38.457Z",
+  "sha256": "02cd7c36cea7d6e1ca5d25b1ca63bceb3cc64e17643be764ebe3334935a2eb51",
+  "bytes": 150572,
+  "builtUTC": "2026-10-27T08:21:18.877Z",
   "sources": [
     {
       "file": "src/research/p1/TorsoStudyTemplateP1.html",
-      "sha256": "56385a2f5fd496f9a01ad30838ad21defb474c23fd30d8242f704611c97f517f"
+      "sha256": "9706fdc9cc1867c2aa01289c9ee9587f0dc859fc3d0fa5ebe6f8833f81d121d4"
     },
     {
       "file": "src/BodyMathR01.js",
@@ -22,8 +22,12 @@
       "sha256": "e7fdb0bdd0ec77809203d5c415d74a992cb8bd4e982e2f4585490b982c3efbac"
     },
     {
-      "file": "src/research/r29/BodyDisplayNormalsR29.js",
-      "sha256": "8b65c8ebee16e8b14c818163689538c51e49d59411fad61745c0727bc213e049"
+      "file": "src/research/r29/BodyNeckSourceR29.js",
+      "sha256": "50f91669f8ac2ecda4d1ff85d407449410a3fda2d369bd1b5f094fb1848e536b"
+    },
+    {
+      "file": "src/research/p1/BodyDisplayNormalsDynamicP1.js",
+      "sha256": "b27defcf9d418b1bc167e827fc242134ec326443151c4ec8abc8982c2287bb97"
     },
     {
       "file": "src/research/p1/BodyProperRotationP1.js",
@@ -34,12 +38,16 @@
       "sha256": "b47b2fc00803943ffb0d7755bcd8fe702d63468acf656127eef1e4bfdab1eae2"
     },
     {
-      "file": "src/research/p1/BodyDynamicTorsoP1.js",
-      "sha256": "c4f0f161bfb95109cd14090c8623d0cff003df0ea48d2d93d79e8a0646b04c3e"
+      "file": "src/research/p1/BodyDynamicNeckHeadP1.js",
+      "sha256": "e734982c49c790c68080013d089f6fc0490453a4a5ebd95500e332c934ba109e"
     },
     {
-      "file": "src/research/p1/TorsoStudyWorkerP1.js",
-      "sha256": "f4418ddd944849cfea7d49b09a91ca219e358b8d7bf4c40e7f6a04fa9db96e65"
+      "file": "src/research/p1/BodyDynamicFullP1.js",
+      "sha256": "413675cfaedbbec23b2073bbed0b91c4283735f2065bc6567a76fdbd64daab20"
+    },
+    {
+      "file": "src/research/p1/FullBodyStudyWorkerP1.js",
+      "sha256": "c82c119ffd182303444914984d8aea47e517f8aca5b7400ebbc7c578bf2a81d7"
     },
     {
       "file": "src/research/r28/BodyMovingDomainR28.js",
@@ -50,31 +58,51 @@
       "sha256": "91c3e20f7f27dd77cb9ca851226fc5a64b237e5dd1429ee4ac95a977f99084b6"
     },
     {
-      "file": "src/research/r29/BodyPoseRayR29.js",
-      "sha256": "306df0af1ac1cb314580a17dc3f92243dc684846bd3f30fe4459993ed7a09db3"
+      "file": "src/BodyAtlasMaterialR21.js",
+      "sha256": "8bc4f5042ea64eaf7c13b5be73d5316be22264a3909e7d8e4901154c07bf16dc"
+    },
+    {
+      "file": "src/research/p1/BodyPoseRaySkinP1.js",
+      "sha256": "0a7ecc65fb54ba0fd157a637e50c384bf0c2fc044934ced58e525833fc94d5e4"
+    },
+    {
+      "file": "src/BodyHeadEnvelopeR29.js",
+      "sha256": "bbd184eedd314847590f7915dc70fcbea4b7a5997117364bb3e2a57ef8dd9b29"
     },
     {
       "file": "src/research/p1/TorsoStudyAppP1.js",
-      "sha256": "61f7d94c50441a8740e537a7de428f5b27bda132c4eb822d3508d237d530ebd4"
+      "sha256": "ca72447dcb0933088fadc9760712d8c11bda44e794363a21284d4c23ca86081b"
     },
     {
       "file": "data/body-torso-continuous-p1.json",
-      "sha256": "66b456407737f2e9370ed2b5bc8eb1c172026ca35d9448b01436d4dd06d6bced"
+      "sha256": "657d52dc8a86a024839395017eaf157341bc64f63b92aab5735e349b32be864b"
+    },
+    {
+      "file": "src/BodySourceAlbedoR21.glsl",
+      "sha256": "4bce431810a25e357d542e0042421fb345ab40c0088484790a5fb4de237a0549"
+    },
+    {
+      "file": "src/BodySourceSkinR21.glsl",
+      "sha256": "9f25bd6a543cd341e30944d9269324e2a007fe01b367476e47cf2897ce5302a1"
+    },
+    {
+      "file": "qa/original-person-archive.json",
+      "sha256": "b70d2831c95408c6a5a2d0d8584a5f2c04bd9de25d23638828329f7419b2b62b"
     },
     {
       "file": "tools/build-torso-study.cjs",
-      "sha256": "cb83474ec73322a11389a961ca9a622b5e2b04d6669d094e9246848f7d77ea08"
+      "sha256": "f99d22f12e426c008a30b7e4618c9f97035965dba6849e43d01125521398eb32"
     }
   ],
   "assets": [
     {
-      "file": "delivery/assets/body-dynamic-p1/32647e7f0f9391d6db1b379ce4350970ebe8784cf6c04dc2d61984bf653b2af2.gz",
-      "url": "assets/body-dynamic-p1/32647e7f0f9391d6db1b379ce4350970ebe8784cf6c04dc2d61984bf653b2af2.gz",
-      "compressedSHA256": "32647e7f0f9391d6db1b379ce4350970ebe8784cf6c04dc2d61984bf653b2af2",
-      "compressedBytes": 36106688,
-      "rawSHA256": "3d3a52f2bdce7fa8b4cc57f62ddf153c66d6b79f03e144ec942788d8dd95ae44",
-      "rawBytes": 267437408,
-      "encoding": "gzip-json-source-fields"
+      "file": "delivery/assets/body-dynamic-p1/f8651ef2e8db75fdd21dc31d7de6e44b0bd3a9bb9d4cb95ba1053404bc21588f.gz",
+      "url": "assets/body-dynamic-p1/f8651ef2e8db75fdd21dc31d7de6e44b0bd3a9bb9d4cb95ba1053404bc21588f.gz",
+      "encoding": "gzip-json-source-fields",
+      "compressedBytes": 39422282,
+      "compressedSHA256": "f8651ef2e8db75fdd21dc31d7de6e44b0bd3a9bb9d4cb95ba1053404bc21588f",
+      "rawBytes": 283943717,
+      "rawSHA256": "af947ff03eebecbfa507f6aa70b58c6a7374779373ad0089e0568002b7ccf419"
     },
     {
       "file": "delivery/assets/body-dynamic-p1/2c93aeb16342cf140b6d2c171ef0721ffaf3c0f085a393abdb758dea3423f568.gz",
@@ -86,21 +114,54 @@
       "encoding": "gzip-typed-function-packet-r28"
     },
     {
-      "file": "delivery/assets/body-dynamic-p1/4ea0ebb3db89e366e6b5cd247d2417c7e5a51ae73ad5291ce26dda6205c5bce8.gz",
-      "url": "assets/body-dynamic-p1/4ea0ebb3db89e366e6b5cd247d2417c7e5a51ae73ad5291ce26dda6205c5bce8.gz",
-      "compressedSHA256": "4ea0ebb3db89e366e6b5cd247d2417c7e5a51ae73ad5291ce26dda6205c5bce8",
-      "compressedBytes": 2562369,
-      "rawSHA256": "e212bd77a18896797f3821aa65c5b3a7eacc322a15e9c9c0938ec2e364fe35ec",
-      "rawBytes": 15222215,
-      "encoding": "gzip-typed-function-packet-r28"
+      "file": "delivery/assets/body-dynamic-p1/78da5722073af4e16e6d91d7ed88a622b33b51aa269852cd9634e6e843a09b01.gz",
+      "url": "assets/body-dynamic-p1/78da5722073af4e16e6d91d7ed88a622b33b51aa269852cd9634e6e843a09b01.gz",
+      "encoding": "gzip-typed-function-packet-r28",
+      "compressedBytes": 10411975,
+      "compressedSHA256": "78da5722073af4e16e6d91d7ed88a622b33b51aa269852cd9634e6e843a09b01",
+      "rawBytes": 52337036,
+      "rawSHA256": "ea170ecdefc0520bf9c430d533f7ab6dd08708da721b79cda25da5e7b61b9f6b"
+    },
+    {
+      "file": "delivery/assets/body-dynamic-p1/82922b3ffd131624f600066db4dcd17dc7072b4fc20f8b304bfe380642b45c29.gz",
+      "url": "assets/body-dynamic-p1/82922b3ffd131624f600066db4dcd17dc7072b4fc20f8b304bfe380642b45c29.gz",
+      "encoding": "gzip-typed-function-packet-r28",
+      "compressedBytes": 666044,
+      "compressedSHA256": "82922b3ffd131624f600066db4dcd17dc7072b4fc20f8b304bfe380642b45c29",
+      "rawBytes": 1834256,
+      "rawSHA256": "248886eec459f3fce17933f04ae1161ef488dfeb90724d2666e4dea2362d4af9"
+    },
+    {
+      "file": "delivery/assets/body-dynamic-p1/df031b503dcc4e9d68d0d46bb3da6b167e75ec02a57ca3c3f9585a5f4e1dbe00.gz",
+      "url": "assets/body-dynamic-p1/df031b503dcc4e9d68d0d46bb3da6b167e75ec02a57ca3c3f9585a5f4e1dbe00.gz",
+      "encoding": "gzip-typed-function-packet-r28",
+      "compressedBytes": 6899122,
+      "compressedSHA256": "df031b503dcc4e9d68d0d46bb3da6b167e75ec02a57ca3c3f9585a5f4e1dbe00",
+      "rawBytes": 42655894,
+      "rawSHA256": "d14c36d6adb746500924751cf9a7b3b019f46eb2b0c839e360af19f10fe6543c"
+    },
+    {
+      "file": "delivery/assets/body-dynamic-p1/bbb13c151bd9e70324e7de3a54512f4116edbda09f49848a7df7bf23489365db.gz",
+      "url": "assets/body-dynamic-p1/bbb13c151bd9e70324e7de3a54512f4116edbda09f49848a7df7bf23489365db.gz",
+      "encoding": "gzip-typed-function-packet-r28",
+      "compressedBytes": 801355,
+      "compressedSHA256": "bbb13c151bd9e70324e7de3a54512f4116edbda09f49848a7df7bf23489365db",
+      "rawBytes": 1188551,
+      "rawSHA256": "c19e8ed8ba3d38dc994d299a8735afe0b704ddbbe4b67a694bc9fc3a7719b5f4"
     }
   ],
-  "domains": 17542,
+  "domains": 18416,
+  "unresolvedNeckHeadDomains": 0,
+  "sourcePoseJointCount": 98,
   "selectedByDefault": false,
-  "archiveExportEnabled": false,
+  "archiveExportEnabled": true,
   "originalDisplayNormalsImplemented": true,
-  "originalDisplayNormalSampleScope": "four fixed source profiles; other values unaccepted",
-  "neckStagesImplemented": false,
+  "originalDisplayNormalSampleScope": "original A shape and joint samples including six phenotype combinations; continuous range unaccepted",
+  "neckStagesImplemented": true,
+  "dynamicHeadSideBoundary": true,
+  "sourceSkinInspection": true,
+  "fullOriginalOptics": false,
+  "headSurfaceGenerated": false,
   "wholeBodyImplemented": false,
   "characterTriangleFaces": 0,
   "sourceFidelityAccepted": false,

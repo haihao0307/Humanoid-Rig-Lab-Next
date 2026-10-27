@@ -18,3 +18,4 @@ require('./build-r30.cjs');
 require('./research/p1/compile-support-rig.cjs');
 require('./research/p1/build-locked-preview.cjs');
 require('./build-torso-study.cjs');
+require('./build-r31.cjs');

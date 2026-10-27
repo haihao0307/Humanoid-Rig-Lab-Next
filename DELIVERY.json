@@ -1,21 +1,21 @@
 {
-  "schema": "body-delivery-r30/1",
-  "version": "R30",
-  "updatedUTC": "2026-10-27T05:24:14.136Z",
+  "schema": "body-delivery-r31/1",
+  "version": "R31",
+  "updatedUTC": "2026-10-27T08:26:13.314Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
-    "file": "delivery/身体_R30_原形体与校准.html",
-    "sha256": "0c6994120e4f725b8b46e26b1b0f454780d39c1d040fbd9ff6bba63a9d7ecb2c",
-    "bytes": 878253,
-    "url": "http://127.0.0.1:8914/?v=R30-0c699412",
-    "inheritedGeometryAndMaterialFrom": "BUILD-SOURCE-R29.json"
+    "file": "delivery/身体_R31_原形体与连续体型.html",
+    "sha256": "1868a8a0e6d71c56ff94d122e904ec9bb121b5e551a5fc0f1b864458a58483fb",
+    "bytes": 878220,
+    "url": "http://127.0.0.1:8914/?v=R31-1868a8a0",
+    "inheritedGeometryAndMaterialFrom": "BUILD-SOURCE-R30.json"
   },
   "workbench": {
-    "file": "delivery/人物身体_R30_可回退体量校准.html",
-    "sha256": "25425403576be6573f5aafc1781b46babc46987974dc4ff0e2ea4b372a186945",
-    "bytes": 1864691,
-    "url": "http://127.0.0.1:8914/workbench?v=R30-25425403"
+    "file": "delivery/人物身体_R31_连续体型与颈口.html",
+    "sha256": "13fe7c26e5cf59caa002881f6e625a47c002fb51f8e64631a0d5c6fe49edbe06",
+    "bytes": 1878532,
+    "url": "http://127.0.0.1:8914/workbench?v=R31-13fe7c26"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
@@ -102,7 +102,14 @@
     "continuousTorsoNeckGap": "qa/p1-torso/neck-dependency-gap.json",
     "continuousTorsoNeckVariation": "qa/p1-torso/neck-boundary-variation.json",
     "continuousTorsoBrowser": "qa/p1-torso/torso-study-browser.json",
-    "committedTreeRebuild": "qa/p1-torso/git-tree-rebuild.json"
+    "committedTreeRebuild": "qa/p1-torso/git-tree-rebuild.json",
+    "fullBodySamples": "qa/p1-torso/dynamic-full-body-native.json",
+    "sixPhenotypeSamples": "qa/p1-torso/dynamic-six-shape-native.json",
+    "largePoseSamples": "qa/p1-torso/dynamic-large-pose-native.json",
+    "sampledViewRays": "qa/p1-torso/dynamic-full-view-ray-grids.json",
+    "dynamicNeck": "qa/p1-torso/dynamic-neck-head-native.json",
+    "completeArchive": "qa/p1-torso/full-body-archive-browser.json",
+    "workbench": "qa/p1-torso/workbench-dynamic-body-browser.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
@@ -136,7 +143,7 @@
       "task": "头部、附件与总平台整合"
     }
   ],
-  "previousDelivery": "DELIVERY-R29.json",
+  "previousDelivery": "DELIVERY-R30.json",
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
     "branch": "body/reconstruction-r18-20261023"
@@ -155,50 +162,29 @@
   },
   "continuousTorsoStudy": {
     "file": "delivery/身体_P1_连续躯干隔离研究.html",
-    "sha256": "12e702fda83c9398ebd326b954ae03547636ede158f1c6f7761c4cf39815f483",
-    "bytes": 82787,
-    "url": "http://127.0.0.1:8914/torso-study?v=P1-12e702fd",
-    "sourceDerived": true,
-    "displayDomains": 17542,
-    "normalSupportDomains": 83,
-    "selectionBounds": {
-      "minY": -1,
-      "maxY": 0.5,
-      "maxAbsX": 0.7
-    },
+    "sha256": "02cd7c36cea7d6e1ca5d25b1ca63bceb3cc64e17643be764ebe3334935a2eb51",
+    "bytes": 150572,
+    "displayDomains": 18416,
     "continuousFields": [
       "weight",
-      "muscle"
+      "muscle",
+      "height",
+      "proportions",
+      "cupsize",
+      "firmness"
     ],
-    "sourcePoseControls": [
-      {
-        "joint": "spine03",
-        "axis": "x",
-        "min": -15,
-        "max": 15
-      },
-      {
-        "joint": "upperarm01.L",
-        "axis": "y",
-        "min": -20,
-        "max": 20
-      }
-    ],
-    "sourcePoseSampleScope": "three combined source poses and shapes only",
-    "otherPersonFieldsFixed": true,
-    "originalDisplayNormalsImplemented": true,
-    "displayNormalSampleScope": "four fixed source profiles only",
+    "sourcePoseJointCount": 98,
+    "neckStagesImplemented": true,
+    "dynamicHeadSideBoundary": true,
+    "sourceSkinInspection": true,
+    "fullOriginalOptics": false,
+    "sourceDerived": true,
     "sourceFacetPartitionInformationRetained": true,
-    "characterPointTable": false,
-    "characterFaceTable": false,
     "characterTriangleFaces": 0,
-    "neckStagesImplemented": false,
-    "wholeBodyImplemented": false,
     "selectedByDefault": false,
-    "archiveExportEnabled": false,
+    "archiveExportEnabled": true,
     "sourceFidelityAccepted": false,
     "visualAccepted": false,
-    "completedMotherConversion": false,
-    "knownBoundaryIssue": "Neck and the selection boundary are incomplete; the original appearance has not been accepted."
+    "completedMotherConversion": false
   }
 }
