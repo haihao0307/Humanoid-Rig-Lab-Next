@@ -1,7 +1,7 @@
 {
   "schema": "body-delivery-r30/1",
   "version": "R30",
-  "updatedUTC": "2026-10-27T04:47:15.499Z",
+  "updatedUTC": "2026-10-27T04:56:11.658Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
@@ -96,8 +96,8 @@
     "sourceOrderRotation": "qa/p1-torso/proper-rotation-source-order.json",
     "continuousTorsoSamples": "qa/p1-torso/torso-continuous-samples.json",
     "continuousTorsoNormals": "qa/p1-torso/torso-display-normals.json",
-    "continuousTorsoBrowser": "qa/p1-torso/torso-study-browser.json",
-    "committedTreeRebuild": "qa/p1-torso/git-tree-rebuild.json"
+    "continuousTorsoViewRays": "qa/p1-torso/torso-view-ray-grids.json",
+    "continuousTorsoBrowser": "qa/p1-torso/torso-study-browser.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
@@ -150,16 +150,16 @@
   },
   "continuousTorsoStudy": {
     "file": "delivery/身体_P1_连续躯干隔离研究.html",
-    "sha256": "0c34ac30a25e9b34dbabe75bea18d8fa752d148623d53fff4354f450ff48c98f",
-    "bytes": 81381,
-    "url": "http://127.0.0.1:8914/torso-study?v=P1-0c34ac30",
+    "sha256": "693eb660135a60aaa6a1c1d5b91afecb4420f72e2a84d0a3a8ece19555dcd5d5",
+    "bytes": 81410,
+    "url": "http://127.0.0.1:8914/torso-study?v=P1-693eb660",
     "sourceDerived": true,
-    "displayDomains": 3980,
-    "normalSupportDomains": 206,
+    "displayDomains": 6428,
+    "normalSupportDomains": 246,
     "selectionBounds": {
-      "minY": -0.4,
-      "maxY": 0.45,
-      "maxAbsX": 0.32
+      "minY": -0.5,
+      "maxY": 0.5,
+      "maxAbsX": 0.5
     },
     "continuousFields": [
       "weight",
@@ -179,6 +179,6 @@
     "sourceFidelityAccepted": false,
     "visualAccepted": false,
     "completedMotherConversion": false,
-    "knownBoundaryIssue": "Selection bounds visibly clip shoulder and lower edges."
+    "knownBoundaryIssue": "The selected region still has clipped boundaries; the body is incomplete."
   }
 }

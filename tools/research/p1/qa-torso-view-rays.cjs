@@ -1,0 +1,27 @@
+'use strict';
+// Orthographic view grids against the independent original, restricted to the
+// same isolated source domains. The original surface and per-point evidence
+// stay offline; these results do not certify visual or whole-body fidelity.
+const fs=require('fs'),vm=require('vm'),zlib=require('zlib'),crypto=require('crypto'),H=b=>crypto.createHash('sha256').update(b).digest('hex');
+for(const n of ['BodyMathR01','BodyProgramStorageR27','research/r29/BodyPoseFunctionsR29','research/r29/BodyDisplayNormalsR29','research/r28/BodyMovingDomainR28','research/p1/BodyProperRotationP1','research/p1/BodySupportRigP1','research/p1/BodyDynamicTorsoP1'])vm.runInThisContext(fs.readFileSync('src/'+n+'.js','utf8'));
+const torso=JSON.parse(fs.readFileSync('qa/p1-torso/torso-continuous-compile.json')),normal=JSON.parse(fs.readFileSync('qa/p1-torso/torso-normal-compile.json')),bytes=fs.readFileSync(torso.file),raw=zlib.gunzipSync(bytes);
+if(H(bytes)!==torso.compressedSHA256||H(raw)!==torso.rawSHA256)throw Error('Candidate identity mismatch');
+const program=JSON.parse(raw),read=require('../r28/read-functions.cjs'),candidate=BodyDynamicTorsoP1.create(program,BodySupportRigP1.create(read(JSON.parse(fs.readFileSync('data/body-support-rig-p1.json')))),read(normal)),
+ mapping=JSON.parse(fs.readFileSync('qa/p1-torso/offline/torso-continuous-source-map-p1.json')),reference=JSON.parse(fs.readFileSync('qa/fidelity-r21/offline/original.json')),oracleFactory=require('../r24/original-ray-bvh.cjs');
+const q={startedUTC:new Date().toISOString(),scope:'Same-domain pre-neck original versus candidate; four captured shapes, orthographic front/back/left/right view grids; no whole-body, pixel-raster or visual acceptance',programSHA256:torso.compressedSHA256,normalSHA256:normal.compressedSHA256,sourceFidelityAccepted:false,visualAccepted:false,completedMotherConversion:false,selected:false,acceptanceTolerance:null,cases:[],sourceFiles:['src/research/p1/BodyDynamicTorsoP1.js','src/research/r29/BodyDisplayNormalsR29.js','src/research/r28/BodyMovingDomainR28.js','tools/research/r24/original-ray-bvh.cjs','tools/research/p1/qa-torso-view-rays.cjs'].map(file=>({file,sha256:H(fs.readFileSync(file))}))};
+try{
+ const faces=mapping.slice(0,program.displayCount).flatMap(m=>reference.faces.slice(m.sourceFace*3,m.sourceFace*3+3));
+ for(const id of ['baseline','lean','fuller','muscular']){
+  const original=JSON.parse(fs.readFileSync('qa/fidelity-r29/offline/display-'+id+'.json')),frame=candidate.evaluate(original.state,{}),positions=Float32Array.from(original.bodyPositions),normals=Float32Array.from(original.bodyNormals),zeros=new Float32Array(positions.length),oracle=oracleFactory.create(positions,normals,faces,{rest:zeros,extra:new Float32Array(positions.length/3*4)},new Float32Array(positions.length/3)),tracer=BodyMovingDomainR28.createTracer(frame,{exactParameter:false}),bounds=frame.bounds;
+  for(const view of ['front','back','left','right']){
+   let bothHit=0,bothMiss=0,coverageDisagreements=0,domainDisagreements=0,maxDepthDifference=0,maxNormalDifference=0,worstDepth=null,worstNormal=null;const width=31,height=41,front=view==='front'||view==='back',span=front?bounds[0]:bounds[2],margin=.04;
+   for(let iy=0;iy<height;iy++)for(let ix=0;ix<width;ix++){
+    const x=span[0]-margin+(ix+.5)/width*(span[1]-span[0]+2*margin),y=bounds[1][0]-margin+(iy+.5)/height*(bounds[1][1]-bounds[1][0]+2*margin),origin=front?[x,y,view==='front'?2:-2]:[view==='right'?2:-2,y,x],direction=front?[0,0,view==='front'?-1:1]:[view==='right'?-1:1,0,0],a=oracle.ray(origin,direction),b=tracer.ray(origin,direction);
+    if(!a&&!b){bothMiss++;continue;}if(!a||!b){coverageDisagreements++;continue;}bothHit++;const depth=Math.abs(a.t-b.t);if(depth>maxDepthDifference){maxDepthDifference=depth;worstDepth={ix,iy,originalDomain:a.face,candidateDomains:b.fields,original:a.t,candidate:b.t};}if(!b.fields.includes(a.face))domainDisagreements++;
+    const f=b.fields[0],axis=frame.inverseAxes[f],u=(axis+1)%3,v=(axis+2)%3,p=origin.map((x,k)=>x+direction[k]*b.t),inv=frame.inverse.subarray(f*6,f*6+6),s=inv[0]*p[u]+inv[1]*p[v]+inv[2],t=inv[3]*p[u]+inv[4]*p[v]+inv[5],c=frame.normals.subarray(f*9,f*9+9),nn=[0,1,2].map(k=>c[k*3]*s+c[k*3+1]*t+c[k*3+2]),length=Math.hypot(...nn);if(!(length>0))throw Error('Zero display normal at a sampled hit');for(let k=0;k<3;k++){const value=nn[k]/length,difference=Math.abs(value-a.normal[k]);if(difference>maxNormalDifference){maxNormalDifference=difference;worstNormal={ix,iy,axis:k,originalDomain:a.face,candidateDomains:b.fields,original:a.normal[k],candidate:value};}}
+   }
+   const row={id,view,width,height,rays:width*height,bothHit,bothMiss,coverageDisagreements,domainDisagreements,maxDepthDifferenceMetres:maxDepthDifference,maxNormalComponentDifference:maxNormalDifference,worstDepth,worstNormal};q.cases.push(row);console.log(JSON.stringify(row));
+  }
+ }
+ q.diagnosticCompleted=q.cases.length===16;q.noSampledRayCoverageDisagreements=q.cases.every(c=>c.coverageDisagreements===0);q.noSampledFirstDomainDisagreements=q.cases.every(c=>c.domainDisagreements===0);if(!q.diagnosticCompleted)process.exitCode=1;
+}catch(e){q.failure=e.stack;q.diagnosticCompleted=false;process.exitCode=1;console.error(e);}finally{q.finishedUTC=new Date().toISOString();fs.writeFileSync('qa/p1-torso/torso-view-ray-grids.json',JSON.stringify(q,null,2)+'\n');console.log(JSON.stringify({completed:q.diagnosticCompleted,coverage:q.noSampledRayCoverageDisagreements,domains:q.noSampledFirstDomainDisagreements,cases:q.cases.length,failure:q.failure}));}
