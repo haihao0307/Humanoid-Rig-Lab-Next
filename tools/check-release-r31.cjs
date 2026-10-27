@@ -11,13 +11,13 @@ try{
  // Repeated inherited source entries can legitimately name older build inputs;
  // the final occurrence is the active input recorded for that path.
  for(const [name,x] of [['source',b],['workbench',w],['study',s]]){const sources=new Map(x.sources.map(i=>[i.file,i.sha256]));for(const [file,h] of sources)check(name+' input '+file,hash(fs.readFileSync(file))===h);}
- check('all body domains and dynamic neck included',s.domains===18416&&s.sourcePoseJointCount===98&&s.neckStagesImplemented&&s.dynamicHeadSideBoundary&&s.archiveExportEnabled);
+ check('all body domains and dynamic neck included',s.domains===18416&&s.sourcePoseJointCount===98&&s.supportedLocalControls?.length===22&&s.neckStagesImplemented&&s.dynamicHeadSideBoundary&&s.archiveExportEnabled);
  check('inspection lighting labelled without original optical acceptance',s.sourceSkinInspection&&!s.fullOriginalOptics&&!s.sourceFidelityAccepted&&!s.visualAccepted&&!s.completedMotherConversion&&!s.characterTriangleFaces);
  for(const asset of s.assets){const compressed=fs.readFileSync(asset.file),raw=zlib.gunzipSync(compressed);check('compressed asset '+asset.file,compressed.length===asset.compressedBytes&&hash(compressed)===asset.compressedSHA256);check('decoded asset '+asset.file,raw.length===asset.rawBytes&&hash(raw)===asset.rawSHA256);}
  const q=name=>read('qa/p1-torso/'+name+'.json');
- for(const name of ['dynamic-full-body-native','dynamic-six-shape-native','dynamic-large-pose-native','dynamic-full-body-multijoint']){const x=q(name);check(name,x.diagnosticCompleted&&x.positionsBitExact&&x.normalsBitExact&&x.programSHA256===s.assets[0].compressedSHA256);}
+ for(const name of ['dynamic-full-body-native','dynamic-six-shape-native','dynamic-large-pose-native','dynamic-full-body-multijoint','dynamic-signed-local-native']){const x=q(name);check(name,x.diagnosticCompleted&&x.positionsBitExact&&x.normalsBitExact&&x.programSHA256===s.assets[0].compressedSHA256);}
  const r=q('dynamic-full-view-ray-grids');check('sampled view rays',r.diagnosticCompleted&&r.noSampledRayCoverageDisagreements&&r.noSampledFirstDomainDisagreements&&r.programSHA256===s.assets[0].compressedSHA256);
- check('sampled dynamic neck boundary',q('dynamic-neck-head-native').boundaryBitExact);check('coefficient coverage samples',q('six-shape-coefficient-coverage').diagnosticCompleted&&q('six-shape-coefficient-coverage').uncompiledFields.length===0);
+ check('sampled dynamic neck boundary',q('dynamic-neck-head-native').boundaryBitExact);check('signed local coefficient coverage',q('signed-local-coefficient-coverage').diagnosticCompleted&&q('signed-local-coefficient-coverage').uncompiledFields.length===0&&q('signed-local-coefficient-coverage').programSHA256===s.assets[0].compressedSHA256);check('coefficient coverage samples',q('six-shape-coefficient-coverage').diagnosticCompleted&&q('six-shape-coefficient-coverage').uncompiledFields.length===0);
  for(const [name,h] of [['torso-study-browser',s.sha256],['full-body-archive-browser',s.sha256],['workbench-dynamic-body-browser',w.sha256]]){const x=q(name);check(name,x.passed&&x.artifactSHA256===h&&x.checks.every(c=>c.passed));}
  check('historical R30 build retained',fs.existsSync(read('BUILD-R30.json').file)&&fs.existsSync('DELIVERY-R30.json'));
  report.torsoAssets=s.assets.length;report.passed=true;

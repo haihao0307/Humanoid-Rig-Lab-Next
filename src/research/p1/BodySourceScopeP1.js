@@ -1,0 +1,9 @@
+/* Fixed person with explicitly supported source-derived body variables. */
+(()=>{'use strict';
+const phenotypes=['weight','muscle','height','proportions','cupsize','firmness'];
+const local=['measure-shoulder-dist-incr','measure-waist-circ-incr','torso-scale-depth-incr','hip-scale-horiz-incr','l-upperarm-fat-incr','r-upperarm-fat-incr','l-upperleg-fat-incr','r-upperleg-fat-incr','l-upperarm-shoulder-muscle-incr','r-upperarm-shoulder-muscle-incr','l-upperleg-muscle-incr','r-upperleg-muscle-incr','torso-muscle-dorsi-incr','torso-vshape-incr','torso-muscle-pectoral-incr','torso-scale-horiz-incr','hip-scale-depth-incr','measure-frontchest-dist-incr','measure-hips-circ-incr','hip-waist-up','pelvis-tone-incr','hip-trans-forward'];
+function key(v){if(v===undefined)return'u';if(v===null)return'z';if(typeof v==='number')return'n'+(Object.is(v,-0)?'-0':String(v));if(typeof v==='string')return's'+JSON.stringify(v);if(typeof v==='boolean')return v?'t':'f';if(Array.isArray(v)||ArrayBuffer.isView(v))return'['+Array.from(v,key).join(',')+']';if(typeof v==='object')return'{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+key(v[k])).join(',')+'}';throw Error('Unsupported person state');}
+function family(state){const s=structuredClone(state);if(s?.owners?.rig!=='anny'||!s.anny?.phenotypes)throw Error('Original A body state required');for(const name of phenotypes)delete s.anny.phenotypes[name];for(const name of local)delete s.anny.localChanges?.[name];s.anny.pose={};s.anny.translations={};return key(s);}
+function valid(state){return phenotypes.every(k=>Number.isFinite(state.anny.phenotypes[k])&&state.anny.phenotypes[k]>=0&&state.anny.phenotypes[k]<=1)&&local.every(k=>{const v=state.anny.localChanges?.[k]??0;return Number.isFinite(v)&&v>=-1&&v<=1;});}
+globalThis.BodySourceScopeP1={phenotypes:Object.freeze(phenotypes),local:Object.freeze(local),family,valid};
+})();

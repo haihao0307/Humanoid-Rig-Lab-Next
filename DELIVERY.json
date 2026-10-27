@@ -1,7 +1,7 @@
 {
   "schema": "body-delivery-r31/1",
   "version": "R31",
-  "updatedUTC": "2026-10-27T08:26:13.314Z",
+  "updatedUTC": "2026-10-27T08:47:30.448Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
@@ -13,9 +13,9 @@
   },
   "workbench": {
     "file": "delivery/人物身体_R31_连续体型与颈口.html",
-    "sha256": "13fe7c26e5cf59caa002881f6e625a47c002fb51f8e64631a0d5c6fe49edbe06",
-    "bytes": 1878532,
-    "url": "http://127.0.0.1:8914/workbench?v=R31-13fe7c26"
+    "sha256": "caa4ade76d1c2c589ea51ad3e57423b127da4b032103ee23b0dcf5c476b009aa",
+    "bytes": 1883259,
+    "url": "http://127.0.0.1:8914/workbench?v=R31-caa4ade7"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
@@ -106,6 +106,8 @@
     "fullBodySamples": "qa/p1-torso/dynamic-full-body-native.json",
     "sixPhenotypeSamples": "qa/p1-torso/dynamic-six-shape-native.json",
     "largePoseSamples": "qa/p1-torso/dynamic-large-pose-native.json",
+    "signedLocalSamples": "qa/p1-torso/dynamic-signed-local-native.json",
+    "signedLocalCoverage": "qa/p1-torso/signed-local-coefficient-coverage.json",
     "sampledViewRays": "qa/p1-torso/dynamic-full-view-ray-grids.json",
     "dynamicNeck": "qa/p1-torso/dynamic-neck-head-native.json",
     "completeArchive": "qa/p1-torso/full-body-archive-browser.json",
@@ -162,8 +164,8 @@
   },
   "continuousTorsoStudy": {
     "file": "delivery/身体_P1_连续躯干隔离研究.html",
-    "sha256": "02cd7c36cea7d6e1ca5d25b1ca63bceb3cc64e17643be764ebe3334935a2eb51",
-    "bytes": 150572,
+    "sha256": "78fc4f1b2b61c12a31e5a782f81231ea2cf231d53db7b7416933464f85e6d08a",
+    "bytes": 154033,
     "displayDomains": 18416,
     "continuousFields": [
       "weight",
@@ -172,6 +174,34 @@
       "proportions",
       "cupsize",
       "firmness"
+    ],
+    "supportedLocalControls": [
+      "measure-shoulder-dist-incr",
+      "measure-waist-circ-incr",
+      "torso-scale-depth-incr",
+      "hip-scale-horiz-incr",
+      "l-upperarm-fat-incr",
+      "r-upperarm-fat-incr",
+      "l-upperleg-fat-incr",
+      "r-upperleg-fat-incr",
+      "l-upperarm-shoulder-muscle-incr",
+      "r-upperarm-shoulder-muscle-incr",
+      "l-upperleg-muscle-incr",
+      "r-upperleg-muscle-incr",
+      "torso-muscle-dorsi-incr",
+      "torso-vshape-incr",
+      "torso-muscle-pectoral-incr",
+      "torso-scale-horiz-incr",
+      "hip-scale-depth-incr",
+      "measure-frontchest-dist-incr",
+      "measure-hips-circ-incr",
+      "hip-waist-up",
+      "pelvis-tone-incr",
+      "hip-trans-forward"
+    ],
+    "localControlRange": [
+      -1,
+      1
     ],
     "sourcePoseJointCount": 98,
     "neckStagesImplemented": true,

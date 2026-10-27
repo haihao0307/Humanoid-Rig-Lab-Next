@@ -1,13 +1,13 @@
 {
   "schema": "body-torso-continuous-source-candidate-p1/1",
   "surface": {
-    "file": "delivery/assets/body-dynamic-p1/f8651ef2e8db75fdd21dc31d7de6e44b0bd3a9bb9d4cb95ba1053404bc21588f.gz",
-    "url": "assets/body-dynamic-p1/f8651ef2e8db75fdd21dc31d7de6e44b0bd3a9bb9d4cb95ba1053404bc21588f.gz",
+    "file": "delivery/assets/body-dynamic-p1/c48902e47f82531613ac932d41cb1af018cfb7952e9cdb3378433003aa225dbb.gz",
+    "url": "assets/body-dynamic-p1/c48902e47f82531613ac932d41cb1af018cfb7952e9cdb3378433003aa225dbb.gz",
     "encoding": "gzip-json-source-fields",
-    "compressedBytes": 39422282,
-    "compressedSHA256": "f8651ef2e8db75fdd21dc31d7de6e44b0bd3a9bb9d4cb95ba1053404bc21588f",
-    "rawBytes": 283943717,
-    "rawSHA256": "af947ff03eebecbfa507f6aa70b58c6a7374779373ad0089e0568002b7ccf419"
+    "compressedBytes": 42611170,
+    "compressedSHA256": "c48902e47f82531613ac932d41cb1af018cfb7952e9cdb3378433003aa225dbb",
+    "rawBytes": 301755043,
+    "rawSHA256": "eb19fa40735b7a240090e734f5be95dbb66f9e6f18231b47dc1ea38b2ffdf11d"
   },
   "support": {
     "file": "delivery/assets/body-dynamic-p1/2c93aeb16342cf140b6d2c171ef0721ffaf3c0f085a393abdb758dea3423f568.gz",
@@ -52,9 +52,9 @@
       ]
     }
   ],
-  "sourcePoseSampleScope": "original root, body-joint rotations and translations under sampled body shapes; untested combinations and physiological limits not accepted",
+  "sourcePoseSampleScope": "multiple source A pose and phenotype samples, including signed local body controls; untested ranges and physiological limits not accepted",
   "originalDisplayNormalsImplemented": true,
-  "originalDisplayNormalSampleScope": "original A shape and joint samples including six phenotype combinations; continuous range unaccepted",
+  "originalDisplayNormalSampleScope": "original A phenotype, local body and joint samples; continuous range unaccepted",
   "neckStagesImplemented": true,
   "wholeBodyImplemented": false,
   "characterPointTable": false,
@@ -507,5 +507,33 @@
     "proportions",
     "cupsize",
     "firmness"
+  ],
+  "localControlRange": [
+    -1,
+    1
+  ],
+  "supportedLocalControls": [
+    "measure-shoulder-dist-incr",
+    "measure-waist-circ-incr",
+    "torso-scale-depth-incr",
+    "hip-scale-horiz-incr",
+    "l-upperarm-fat-incr",
+    "r-upperarm-fat-incr",
+    "l-upperleg-fat-incr",
+    "r-upperleg-fat-incr",
+    "l-upperarm-shoulder-muscle-incr",
+    "r-upperarm-shoulder-muscle-incr",
+    "l-upperleg-muscle-incr",
+    "r-upperleg-muscle-incr",
+    "torso-muscle-dorsi-incr",
+    "torso-vshape-incr",
+    "torso-muscle-pectoral-incr",
+    "torso-scale-horiz-incr",
+    "hip-scale-depth-incr",
+    "measure-frontchest-dist-incr",
+    "measure-hips-circ-incr",
+    "hip-waist-up",
+    "pelvis-tone-incr",
+    "hip-trans-forward"
   ]
 }
