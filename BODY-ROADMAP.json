@@ -3,7 +3,7 @@
   "reviewedDate": "2026-10-28",
   "basis": "用户要求核查身体既有效果、参数、动作和人体生成平台实际可用性，并精简无使用价值的旧任务。",
   "review": "docs/EXECUTION-ROUTE-HISTORY-THROUGH-R31.md",
-  "currentProductVersion": "R38",
+  "currentProductVersion": "R39",
   "currentMainTask": "P2",
   "currentSubtask": "P2.4",
   "mainTasksAccepted": 0,
@@ -65,7 +65,7 @@
       "title": "轮廓、连接与动作变形",
       "status": "partial_not_accepted",
       "doneWhen": "肩髋、肘膝腕踝、手足在正常距离无突兀接痕、尖折或异常鼓瘪；轴向和限位明确，只对已测动作及组合作结论。",
-      "existing": "R38 提供 A、B 多关键帧动作库及可关闭的 B 胖体型腰腹屈曲柔化；髋部、其他关节和更多组合仍需改善。",
+      "existing": "R39 提供 A、B 关键帧时间轴、逐关节编辑、分段过渡、动作拼接及 16 个内置动作；连续预览保持所测相邻表面相接。",
       "subtasks": [
         {
           "id": "P2.edge",
@@ -95,8 +95,8 @@
           "id": "P2.4",
           "title": "姿势编辑、连续动作与骨架支持",
           "status": "partial_not_accepted",
-          "stillNeeds": "改进 A、B 极端形体的髋部和其他关节变形；补充脚部接地、步态及更完整动作编辑，并验证更多体型和设备。",
-          "latestEvidence": "十个内置动作、最多十六关键帧、关键帧复制、动作反转及动作库导入导出和本机保存已接入；B 胖体型前屈腰腹横折在限定样本减轻。"
+          "stillNeeds": "继续改善 A、B 极端形体的髋部和其他关节静态及动作形变；补充脚部接地、步态和碰撞，并验证更多体型和设备。",
+          "latestEvidence": "新增时间轴、逐关节控制、分段停顿、动作拼接和撤销重做；两套骨架的胖瘦组合抽样中，相邻函数边界未出现超过 0.1 毫米的播放缝隙。"
         }
       ]
     },
@@ -143,7 +143,7 @@
           "title": "按实际需要优化加载、缓存与更新",
           "status": "partial_not_accepted",
           "stillNeeds": "根据实际等待、卡顿、资源占用和设备需求选择优化，不独立追求重写。",
-          "latestEvidence": "R37 复用相同体型的计算，降低连续姿势更新等待；测试设备数据见 qa/animation-r37。"
+          "latestEvidence": "动作准备时复用重复姿势；本机 R39 多关键帧播放与性能检查见 qa/motion-r39。"
         },
         {
           "id": "P4.2",
@@ -199,6 +199,6 @@
     "P5",
     "P4.1/P4.3"
   ],
-  "priorityChange": "沿用既定 P1～P5 编号；本轮按用户要求推进 P2.4 的多关键帧、动作库及极端体型局部变形。",
-  "capabilityReview": "docs/BODY-R38.md"
+  "priorityChange": "沿用既定 P1～P5 编号；按用户要求继续 P2.4 动作编辑、动作库和极端体型动作变形。",
+  "capabilityReview": "docs/BODY-R39.md"
 }
