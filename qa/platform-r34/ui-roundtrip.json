@@ -1,0 +1,39 @@
+{
+  "startedUTC": "2026-10-28T03:30:16.058Z",
+  "finishedUTC": "2026-10-28T03:30:57.846Z",
+  "scope": "actual visible workbench controls and in-memory JSON download/upload; no desktop interaction or screenshots",
+  "checks": [
+    {
+      "name": "visible pose button renders skin preview and explains its limit",
+      "passed": true,
+      "detail": {
+        "surface": "dynamic-body-p1",
+        "mode": "source-skin",
+        "skinDisabled": true,
+        "note": "身体和姿势已更新；目前为肤色预览，完整皮肤调节及动态阴影尚未接入。"
+      }
+    },
+    {
+      "name": "visible batch controls update body and pose",
+      "passed": true
+    },
+    {
+      "name": "visible save exports the adjusted whole-person archive",
+      "passed": true,
+      "detail": {
+        "bytes": 231191
+      }
+    },
+    {
+      "name": "visible load restores the exported body and head data",
+      "passed": true
+    },
+    {
+      "name": "no unhandled browser errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

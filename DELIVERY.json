@@ -1,7 +1,7 @@
 {
-  "schema": "body-delivery-r33/1",
-  "version": "R33",
-  "updatedUTC": "2026-10-28T03:13:15.143Z",
+  "schema": "body-delivery-r34/1",
+  "version": "R34",
+  "updatedUTC": "2026-10-28T03:33:23.969Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
@@ -12,10 +12,10 @@
     "inheritedGeometryFrom": "BUILD-SOURCE-R32.json"
   },
   "workbench": {
-    "file": "delivery/人物身体_R33_实时轮廓.html",
-    "sha256": "d27ef85f88b43dcf4b46056b085df10f74947feb58bc8ee783341bc61d0a29bb",
-    "bytes": 1897774,
-    "url": "http://127.0.0.1:8914/workbench?v=R33-d27ef85f"
+    "file": "delivery/人物身体_R34_动作肤色预览.html",
+    "sha256": "59f004d50c46a20087cd0f12a4619b9c6ae47f6bf6154f7c121bf34ac2443851",
+    "bytes": 1898516,
+    "url": "http://127.0.0.1:8914/workbench?v=R34-59f004d5"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
@@ -116,41 +116,46 @@
     "workbench": "qa/p1-torso/workbench-dynamic-body-browser.json",
     "edgeAntialiasing": "qa/edges-r32/workbench.json",
     "interactiveEdgeShading": "qa/edges-r33/interactive.json",
-    "interactiveEdgeShadingHighDpi": "qa/edges-r33/high-dpi.json"
+    "interactiveEdgeShadingHighDpi": "qa/edges-r33/high-dpi.json",
+    "platformCapabilities": "qa/platform-r34/capabilities.json",
+    "platformUI": "qa/platform-r34/ui-roundtrip.json",
+    "r20Archive": "qa/platform-r34/legacy-r20.json",
+    "poseGeometry": "qa/platform-r34/pose-depth-comparison.json",
+    "r34EdgeInteraction": "qa/platform-r34/edge-interaction.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
-  "currentMainTask": "P2",
-  "currentSubtask": "P2.edge",
+  "currentMainTask": "P4",
+  "currentSubtask": "P4.2",
   "mainTasksAccepted": 0,
   "remaining": [
     {
       "id": "P1",
       "status": "partial_not_accepted",
-      "task": "整体校准、胸肩腰腹骨盆体量、骨架与软组织关系"
+      "task": "体型、整体形态与身体比例"
     },
     {
       "id": "P2",
       "status": "partial_not_accepted",
-      "task": "轮廓、连接与变形"
+      "task": "轮廓、连接与动作变形"
     },
     {
       "id": "P3",
       "status": "not_accepted",
-      "task": "函数表面、参数和绑定"
+      "task": "身体函数、参数与人物档案"
     },
     {
       "id": "P4",
       "status": "partial_not_accepted",
-      "task": "局部计算、缓存压缩与表面肌理"
+      "task": "皮肤、显示和实际性能"
     },
     {
       "id": "P5",
       "status": "partial_not_accepted",
-      "task": "头部、附件与总平台整合"
+      "task": "头身接口、附件与平台整合"
     }
   ],
-  "previousDelivery": "DELIVERY-R32.json",
+  "previousDelivery": "DELIVERY-R33.json",
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
     "branch": "body/reconstruction-r18-20261023"
@@ -346,5 +351,32 @@
     "normalDpiCheck": "qa/edges-r33/interactive.json",
     "highDpiCheck": "qa/edges-r33/high-dpi.json",
     "userVisualReviewPending": true
+  },
+  "capabilityReview": "docs/PLATFORM-CAPABILITIES-R34.md",
+  "platformCapabilities": {
+    "defaultOriginalBodySkin": true,
+    "defaultSkinControlsSampled": true,
+    "supportedARigPoseSkinPreview": true,
+    "dynamicFullOriginalSkin": false,
+    "dynamicOriginalShadows": false,
+    "dynamicOriginalDiffusion": false,
+    "supportedShapeControls": [
+      "weight",
+      "muscle",
+      "height",
+      "proportions",
+      "cupsize",
+      "firmness"
+    ],
+    "supportedLocalControls": 117,
+    "allControlCombinationsVerified": false,
+    "continuousAgeAndSexOnBodyPath": false,
+    "staticPoseButtons": 6,
+    "continuousAnimation": false,
+    "rigBDefaultAvailable": true,
+    "rigBBendSampleAvailable": false,
+    "completePersonArchiveSampleRoundTrip": true,
+    "legacyR20BodyEffectsApplied": false,
+    "completePersonVisualIntegration": false
   }
 }

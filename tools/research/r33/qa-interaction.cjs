@@ -3,6 +3,7 @@
 const fs=require('fs'),crypto=require('crypto');
 const {chromium}=require('C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 const checks=[],errors=[];
+const version=process.env.BODY_QA_VERSION||'R33';if(!['R33','R34'].includes(version))throw Error('Unsupported workbench version');
 function check(name,ok,detail){checks.push({name,passed:!!ok,detail});if(!ok)throw Error(name);}
 const ready=page=>page.waitForFunction(()=>{if(window.__BODY_IMPLICIT_R02_ERROR__)throw Error(window.__BODY_IMPLICIT_R02_ERROR__);const r=window.bodyImplicitR02?.report();return r?.ready&&!r.busy;},null,{timeout:180000});
 async function dragAndCompare(page,id,api,dx,label){
@@ -19,7 +20,7 @@ async function dragAndCompare(page,id,api,dx,label){
  check(label+' stays consistent after settling',comparison.webglError===0&&comparison.changed<Math.max(200,comparison.pixels*.0005)&&comparison.isolatedBefore<=comparison.isolatedAfter+20,comparison);
 }
 (async()=>{const startedUTC=new Date().toISOString(),browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--enable-gpu','--enable-unsafe-swiftshader']}),viewport={width:Number(process.env.BODY_QA_WIDTH||1440),height:Number(process.env.BODY_QA_HEIGHT||900)},deviceScaleFactor=Number(process.env.BODY_QA_DPR||1);try{
- const page=await browser.newPage({viewport,deviceScaleFactor});page.setDefaultTimeout(180000);page.on('pageerror',e=>errors.push(e.message));await page.goto('http://127.0.0.1:8914/workbench',{waitUntil:'domcontentloaded'});await ready(page);
+ const page=await browser.newPage({viewport,deviceScaleFactor});page.setDefaultTimeout(180000);page.on('pageerror',e=>errors.push(e.message));await page.goto(version==='R33'?'http://127.0.0.1:8914/人物身体_R33_实时轮廓.html':'http://127.0.0.1:8914/workbench',{waitUntil:'domcontentloaded'});await ready(page);
  const original=await page.evaluate(()=>bodyImplicitR02.archive());
  check('initial body uses current display',await page.evaluate(()=>bodyImplicitR02.report().renderer.activeSurface==='source'));
  await dragAndCompare(page,'body-source-embedded-r25','bodySourceAtlasR21',125,'oblique drag');
@@ -31,4 +32,4 @@ async function dragAndCompare(page,id,api,dx,label){
  await page.evaluate(a=>bodyImplicitR02.restore(a),original);await ready(page);
  check('whole person and archive restore',await page.evaluate(a=>JSON.stringify(bodyImplicitR02.state())===JSON.stringify(a.person.state)&&bodyImplicitR02.report().renderer.characterTriangleFaces===0,original));
  check('no page errors',errors.length===0,errors);
-}catch(e){errors.push(e.stack);process.exitCode=1;}finally{await browser.close();const build=JSON.parse(fs.readFileSync('BUILD-R33.json','utf8')),actual=crypto.createHash('sha256').update(fs.readFileSync(build.file)).digest('hex');const report={startedUTC,finishedUTC:new Date().toISOString(),artifactSHA256:build.sha256,viewport,deviceScaleFactor,scope:'actual headless pointer drags, immediate and settled appearance, adjusted body and archive',checks,errors,passed:actual===build.sha256&&checks.length>0&&checks.every(x=>x.passed)&&errors.length===0,newDeliveredImageFiles:0};fs.mkdirSync('qa/edges-r33',{recursive:true});fs.writeFileSync('qa/edges-r33/'+(process.env.BODY_QA_LABEL||'interactive')+'.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));}})();
+}catch(e){errors.push(e.stack);process.exitCode=1;}finally{await browser.close();const build=JSON.parse(fs.readFileSync('BUILD-'+version+'.json','utf8')),actual=crypto.createHash('sha256').update(fs.readFileSync(build.file)).digest('hex');const report={startedUTC,finishedUTC:new Date().toISOString(),artifactSHA256:build.sha256,viewport,deviceScaleFactor,scope:'actual headless pointer drags, immediate and settled appearance, adjusted body and archive',checks,errors,passed:actual===build.sha256&&checks.length>0&&checks.every(x=>x.passed)&&errors.length===0,newDeliveredImageFiles:0};const directory=version==='R33'?'qa/edges-r33':'qa/platform-r34';fs.mkdirSync(directory,{recursive:true});fs.writeFileSync(directory+'/'+(process.env.BODY_QA_LABEL||'interactive')+'.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));if(!report.passed)process.exitCode=1;}})();

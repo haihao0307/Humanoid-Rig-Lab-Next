@@ -1,0 +1,1315 @@
+{
+  "startedUTC": "2026-10-28T03:22:36.693Z",
+  "finishedUTC": "2026-10-28T03:23:03.361Z",
+  "scope": "current workbench, sample controls, pose presets, material availability and archive; no desktop input or screenshots",
+  "artifactSHA256": "d27ef85f88b43dcf4b46056b085df10f74947feb58bc8ee783341bc61d0a29bb",
+  "artifactMatches": true,
+  "checks": [
+    {
+      "name": "default workbench renders the body",
+      "passed": true
+    },
+    {
+      "name": "default skin setting is accepted on the current body",
+      "passed": true,
+      "detail": {
+        "before": 0.47,
+        "after": 0.9,
+        "activeSurface": "source"
+      }
+    },
+    {
+      "name": "body pose preset changes the body state",
+      "passed": true,
+      "detail": {
+        "result": {
+          "applied": true,
+          "value": {
+            "changed": true,
+            "changes": [
+              {
+                "id": "pose.A.upperleg01.L.0",
+                "legacyKey": "anny.pose:upperleg01.L.X",
+                "before": 0,
+                "after": -50
+              },
+              {
+                "id": "pose.A.lowerleg01.L.0",
+                "legacyKey": "anny.pose:lowerleg01.L.X",
+                "before": 0,
+                "after": 65
+              },
+              {
+                "id": "pose.A.upperleg01.R.0",
+                "legacyKey": "anny.pose:upperleg01.R.X",
+                "before": 0,
+                "after": -50
+              },
+              {
+                "id": "pose.A.lowerleg01.R.0",
+                "legacyKey": "anny.pose:lowerleg01.R.X",
+                "before": 0,
+                "after": 65
+              },
+              {
+                "id": "pose.A.spine03.0",
+                "legacyKey": "anny.pose:spine03.X",
+                "before": 0,
+                "after": 12
+              }
+            ],
+            "rig": "A",
+            "rebuilds": 1
+          }
+        },
+        "surface": "pose-functions",
+        "automaticallyMovesAfterSelection": false
+      }
+    },
+    {
+      "name": "sample body shape and local controls apply together",
+      "passed": true,
+      "detail": {
+        "result": {
+          "applied": true,
+          "value": {
+            "changed": true,
+            "changes": [
+              {
+                "id": "shape.weight",
+                "legacyKey": "anny.phenotypes:weight",
+                "before": 0.66,
+                "after": 0.43
+              },
+              {
+                "id": "shape.muscle",
+                "legacyKey": "anny.phenotypes:muscle",
+                "before": 0.96,
+                "after": 0.69
+              },
+              {
+                "id": "local.measure-shoulder-dist-incr",
+                "legacyKey": "anny.localChanges:measure-shoulder-dist-incr",
+                "before": 0.27,
+                "after": 0.24
+              }
+            ],
+            "rig": "A",
+            "rebuilds": 1
+          }
+        },
+        "surface": "dynamic-body-p1"
+      }
+    },
+    {
+      "name": "sample complete-person archive retains other person fields",
+      "passed": true,
+      "detail": {
+        "preservedKeys": [
+          "schema",
+          "topologySha256",
+          "adapterFingerprint",
+          "eyeSurface",
+          "faceSurface",
+          "faceIdentity",
+          "naturalEyes",
+          "lipStructure",
+          "lipAnatomyDNA",
+          "lipPerformance",
+          "lipPerformanceContext",
+          "earStructure",
+          "lifelikeIdle",
+          "cinematicLook",
+          "geometricSkinFolds",
+          "regionalFace",
+          "headMorphology",
+          "skinDNA",
+          "browLash",
+          "surface",
+          "proceduralHeadSurface",
+          "graphSkin",
+          "skinSurfaceFinish",
+          "skinOverallLook",
+          "skinInspection",
+          "eyelidMargin",
+          "surfaceReadability",
+          "skinAppendages",
+          "surfaceReadout",
+          "faceFeatureTone",
+          "fiberLayer",
+          "nasalContents",
+          "surfaceFinish",
+          "tissueReadout",
+          "overallSkin",
+          "nativeCrop",
+          "bodyReconstruction"
+        ]
+      }
+    },
+    {
+      "name": "restore returns to the original whole-person state",
+      "passed": true
+    },
+    {
+      "name": "person can be restored after rig check",
+      "passed": true
+    },
+    {
+      "name": "no unhandled browser errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "snapshots": {
+    "initial": {
+      "ready": true,
+      "busy": false,
+      "lastError": null,
+      "sourceStatus": "当前身体已显示，可直接调整参数。",
+      "operationStatus": "身体已更新。",
+      "rig": "anny",
+      "phenotypes": {
+        "gender": 0,
+        "age": 0.74,
+        "muscle": 0.96,
+        "weight": 0.66,
+        "height": 0.39,
+        "proportions": 0.38,
+        "cupsize": 0.5,
+        "firmness": 0.5,
+        "african": 0.5,
+        "asian": 0.5,
+        "caucasian": 0.5
+      },
+      "skinControls": [
+        {
+          "id": "originalRoughness",
+          "disabled": false
+        },
+        {
+          "id": "originalOil",
+          "disabled": false
+        },
+        {
+          "id": "originalDetail",
+          "disabled": false
+        },
+        {
+          "id": "originalVariation",
+          "disabled": false
+        },
+        {
+          "id": "originalRedness",
+          "disabled": false
+        },
+        {
+          "id": "originalOilFilm",
+          "disabled": false
+        },
+        {
+          "id": "roughness",
+          "disabled": false
+        },
+        {
+          "id": "noise",
+          "disabled": false
+        },
+        {
+          "id": "oil",
+          "disabled": false
+        },
+        {
+          "id": "regionalColor",
+          "disabled": false
+        },
+        {
+          "id": "bodyVariation",
+          "disabled": false
+        },
+        {
+          "id": "bodyPores",
+          "disabled": false
+        },
+        {
+          "id": "jointTone",
+          "disabled": false
+        },
+        {
+          "id": "neckCreases",
+          "disabled": false
+        }
+      ],
+      "surface": {
+        "mode": "source",
+        "materialMode": "original",
+        "sourceSkinInspection": null,
+        "activeInspectionMode": null,
+        "dynamicOriginalShadows": null,
+        "originalDiffusion": null,
+        "fullOriginalOptics": null,
+        "originalActiveSkin": {
+          "motionShading": "boundary-consistent",
+          "edgeAntialiasing": {
+            "enabled": true,
+            "method": "edge-aware colour filter",
+            "frames": 5,
+            "width": 1314,
+            "height": 983
+          },
+          "sourceActiveBodyMaterial": true,
+          "sourceHostMaterialDifferent": true,
+          "sourceShaderSHA256": "27c846dc419b218d93db3057cf8bd452f088a337dfa057ff1abccda0e1d6f9c7",
+          "sourceGraphFieldsByteExact": true,
+          "sharedGraphGPUBytes": 178956960,
+          "currentSourceShadowGPUBytes": 33554432,
+          "materialTargetsGPUBytes": 56833128,
+          "sourceShadows": true,
+          "sourceDiffusion": true,
+          "fullVolumeScattering": false,
+          "sourceFidelityAccepted": false,
+          "bodySurfaceControls": {},
+          "lightingOverrides": {
+            "key": 1.6,
+            "rim": 3.5,
+            "environment": 0.9,
+            "exposure": 0.7,
+            "environmentRotation": -69,
+            "keyColor": "#ffffff",
+            "rimColor": "#efa37e"
+          },
+          "shadowDirectionsUnchanged": true,
+          "draws": 90,
+          "lastMS": 0.5
+        },
+        "characterTriangleFaces": 0,
+        "webglError": 0
+      },
+      "catalogCount": 1916,
+      "bodyCatalogCount": 965,
+      "controlGroups": {
+        "anny.phenotypes": 11,
+        "anny.localChanges": 127,
+        "anny.pose": 294,
+        "anny.translations": 294,
+        "mhr.identity": 45,
+        "mhr.pose": 193,
+        "mhr.correctives": 1
+      },
+      "personKeys": [
+        "adapterFingerprint",
+        "bodyFunctionSystem",
+        "bodyReconstruction",
+        "browLash",
+        "cinematicLook",
+        "earStructure",
+        "eyeSurface",
+        "eyelidMargin",
+        "faceFeatureTone",
+        "faceIdentity",
+        "faceSurface",
+        "fiberLayer",
+        "geometricSkinFolds",
+        "graphSkin",
+        "headMorphology",
+        "lifelikeIdle",
+        "lipAnatomyDNA",
+        "lipPerformance",
+        "lipPerformanceContext",
+        "lipStructure",
+        "nasalContents",
+        "nativeCrop",
+        "naturalEyes",
+        "overallSkin",
+        "proceduralBodySurface",
+        "proceduralHeadSurface",
+        "regionalFace",
+        "restoredLighting",
+        "schema",
+        "skinAppendages",
+        "skinDNA",
+        "skinInspection",
+        "skinOverallLook",
+        "skinSurfaceFinish",
+        "state",
+        "surface",
+        "surfaceFinish",
+        "surfaceReadability",
+        "surfaceReadout",
+        "tissueReadout",
+        "topologySha256"
+      ],
+      "motionButtons": [
+        {
+          "id": "neutral",
+          "disabled": false
+        },
+        {
+          "id": "reach",
+          "disabled": false
+        },
+        {
+          "id": "bend",
+          "disabled": false
+        },
+        {
+          "id": "twist",
+          "disabled": false
+        },
+        {
+          "id": "trunk",
+          "disabled": false
+        },
+        {
+          "id": "arms",
+          "disabled": false
+        }
+      ]
+    },
+    "bend": {
+      "ready": true,
+      "busy": false,
+      "lastError": null,
+      "sourceStatus": "身体动作已联动。",
+      "operationStatus": "身体已更新。",
+      "rig": "anny",
+      "phenotypes": {
+        "gender": 0,
+        "age": 0.74,
+        "muscle": 0.96,
+        "weight": 0.66,
+        "height": 0.39,
+        "proportions": 0.38,
+        "cupsize": 0.5,
+        "firmness": 0.5,
+        "african": 0.5,
+        "asian": 0.5,
+        "caucasian": 0.5
+      },
+      "skinControls": [
+        {
+          "id": "originalRoughness",
+          "disabled": true
+        },
+        {
+          "id": "originalOil",
+          "disabled": true
+        },
+        {
+          "id": "originalDetail",
+          "disabled": true
+        },
+        {
+          "id": "originalVariation",
+          "disabled": true
+        },
+        {
+          "id": "originalRedness",
+          "disabled": true
+        },
+        {
+          "id": "originalOilFilm",
+          "disabled": true
+        },
+        {
+          "id": "roughness",
+          "disabled": true
+        },
+        {
+          "id": "noise",
+          "disabled": true
+        },
+        {
+          "id": "oil",
+          "disabled": true
+        },
+        {
+          "id": "regionalColor",
+          "disabled": true
+        },
+        {
+          "id": "bodyVariation",
+          "disabled": true
+        },
+        {
+          "id": "bodyPores",
+          "disabled": true
+        },
+        {
+          "id": "jointTone",
+          "disabled": true
+        },
+        {
+          "id": "neckCreases",
+          "disabled": true
+        }
+      ],
+      "surface": {
+        "mode": "pose-functions",
+        "materialMode": "structure-light",
+        "sourceSkinInspection": null,
+        "activeInspectionMode": null,
+        "dynamicOriginalShadows": null,
+        "originalDiffusion": null,
+        "fullOriginalOptics": null,
+        "originalActiveSkin": null,
+        "characterTriangleFaces": 0,
+        "webglError": 0
+      },
+      "catalogCount": 1916,
+      "bodyCatalogCount": 965,
+      "controlGroups": {
+        "anny.phenotypes": 11,
+        "anny.localChanges": 127,
+        "anny.pose": 294,
+        "anny.translations": 294,
+        "mhr.identity": 45,
+        "mhr.pose": 193,
+        "mhr.correctives": 1
+      },
+      "personKeys": [
+        "adapterFingerprint",
+        "bodyFunctionSystem",
+        "bodyReconstruction",
+        "browLash",
+        "cinematicLook",
+        "earStructure",
+        "eyeSurface",
+        "eyelidMargin",
+        "faceFeatureTone",
+        "faceIdentity",
+        "faceSurface",
+        "fiberLayer",
+        "geometricSkinFolds",
+        "graphSkin",
+        "headMorphology",
+        "lifelikeIdle",
+        "lipAnatomyDNA",
+        "lipPerformance",
+        "lipPerformanceContext",
+        "lipStructure",
+        "nasalContents",
+        "nativeCrop",
+        "naturalEyes",
+        "overallSkin",
+        "proceduralBodySurface",
+        "proceduralHeadSurface",
+        "regionalFace",
+        "restoredLighting",
+        "schema",
+        "skinAppendages",
+        "skinDNA",
+        "skinInspection",
+        "skinOverallLook",
+        "skinSurfaceFinish",
+        "state",
+        "surface",
+        "surfaceFinish",
+        "surfaceReadability",
+        "surfaceReadout",
+        "tissueReadout",
+        "topologySha256"
+      ],
+      "motionButtons": [
+        {
+          "id": "neutral",
+          "disabled": false
+        },
+        {
+          "id": "reach",
+          "disabled": false
+        },
+        {
+          "id": "bend",
+          "disabled": false
+        },
+        {
+          "id": "twist",
+          "disabled": false
+        },
+        {
+          "id": "trunk",
+          "disabled": false
+        },
+        {
+          "id": "arms",
+          "disabled": false
+        }
+      ]
+    },
+    "adjustedPose": {
+      "ready": true,
+      "busy": false,
+      "lastError": null,
+      "sourceStatus": "身体、四肢与颈口已联动。",
+      "operationStatus": "身体已更新。",
+      "rig": "anny",
+      "phenotypes": {
+        "gender": 0,
+        "age": 0.74,
+        "muscle": 0.69,
+        "weight": 0.43,
+        "height": 0.39,
+        "proportions": 0.38,
+        "cupsize": 0.5,
+        "firmness": 0.5,
+        "african": 0.5,
+        "asian": 0.5,
+        "caucasian": 0.5
+      },
+      "skinControls": [
+        {
+          "id": "originalRoughness",
+          "disabled": true
+        },
+        {
+          "id": "originalOil",
+          "disabled": true
+        },
+        {
+          "id": "originalDetail",
+          "disabled": true
+        },
+        {
+          "id": "originalVariation",
+          "disabled": true
+        },
+        {
+          "id": "originalRedness",
+          "disabled": true
+        },
+        {
+          "id": "originalOilFilm",
+          "disabled": true
+        },
+        {
+          "id": "roughness",
+          "disabled": true
+        },
+        {
+          "id": "noise",
+          "disabled": true
+        },
+        {
+          "id": "oil",
+          "disabled": true
+        },
+        {
+          "id": "regionalColor",
+          "disabled": true
+        },
+        {
+          "id": "bodyVariation",
+          "disabled": true
+        },
+        {
+          "id": "bodyPores",
+          "disabled": true
+        },
+        {
+          "id": "jointTone",
+          "disabled": true
+        },
+        {
+          "id": "neckCreases",
+          "disabled": true
+        }
+      ],
+      "surface": {
+        "mode": "dynamic-body-p1",
+        "materialMode": "structure-light",
+        "sourceSkinInspection": true,
+        "activeInspectionMode": "source-skin",
+        "dynamicOriginalShadows": false,
+        "originalDiffusion": false,
+        "fullOriginalOptics": false,
+        "originalActiveSkin": null,
+        "characterTriangleFaces": 0,
+        "webglError": 0
+      },
+      "catalogCount": 1916,
+      "bodyCatalogCount": 965,
+      "controlGroups": {
+        "anny.phenotypes": 11,
+        "anny.localChanges": 127,
+        "anny.pose": 294,
+        "anny.translations": 294,
+        "mhr.identity": 45,
+        "mhr.pose": 193,
+        "mhr.correctives": 1
+      },
+      "personKeys": [
+        "adapterFingerprint",
+        "bodyFunctionSystem",
+        "bodyReconstruction",
+        "browLash",
+        "cinematicLook",
+        "earStructure",
+        "eyeSurface",
+        "eyelidMargin",
+        "faceFeatureTone",
+        "faceIdentity",
+        "faceSurface",
+        "fiberLayer",
+        "geometricSkinFolds",
+        "graphSkin",
+        "headMorphology",
+        "lifelikeIdle",
+        "lipAnatomyDNA",
+        "lipPerformance",
+        "lipPerformanceContext",
+        "lipStructure",
+        "nasalContents",
+        "nativeCrop",
+        "naturalEyes",
+        "overallSkin",
+        "proceduralBodySurface",
+        "proceduralHeadSurface",
+        "regionalFace",
+        "restoredLighting",
+        "schema",
+        "skinAppendages",
+        "skinDNA",
+        "skinInspection",
+        "skinOverallLook",
+        "skinSurfaceFinish",
+        "state",
+        "surface",
+        "surfaceFinish",
+        "surfaceReadability",
+        "surfaceReadout",
+        "tissueReadout",
+        "topologySha256"
+      ],
+      "motionButtons": [
+        {
+          "id": "neutral",
+          "disabled": false
+        },
+        {
+          "id": "reach",
+          "disabled": false
+        },
+        {
+          "id": "bend",
+          "disabled": false
+        },
+        {
+          "id": "twist",
+          "disabled": false
+        },
+        {
+          "id": "trunk",
+          "disabled": false
+        },
+        {
+          "id": "arms",
+          "disabled": false
+        }
+      ]
+    },
+    "genderAttempt": {
+      "applied": false,
+      "error": "这个参数组合尚未接入原数据轮廓，人物没有改变。若需查看未验收候选，请先选择“连续参数研究候选”。"
+    },
+    "ageAttempt": {
+      "applied": false,
+      "error": "这个参数组合尚未接入原数据轮廓，人物没有改变。若需查看未验收候选，请先选择“连续参数研究候选”。"
+    },
+    "afterUnsupportedAttempts": {
+      "ready": true,
+      "busy": false,
+      "lastError": null,
+      "sourceStatus": "身体、四肢与颈口已联动。",
+      "operationStatus": "身体已更新。",
+      "rig": "anny",
+      "phenotypes": {
+        "gender": 0,
+        "age": 0.74,
+        "muscle": 0.69,
+        "weight": 0.43,
+        "height": 0.39,
+        "proportions": 0.38,
+        "cupsize": 0.5,
+        "firmness": 0.5,
+        "african": 0.5,
+        "asian": 0.5,
+        "caucasian": 0.5
+      },
+      "skinControls": [
+        {
+          "id": "originalRoughness",
+          "disabled": true
+        },
+        {
+          "id": "originalOil",
+          "disabled": true
+        },
+        {
+          "id": "originalDetail",
+          "disabled": true
+        },
+        {
+          "id": "originalVariation",
+          "disabled": true
+        },
+        {
+          "id": "originalRedness",
+          "disabled": true
+        },
+        {
+          "id": "originalOilFilm",
+          "disabled": true
+        },
+        {
+          "id": "roughness",
+          "disabled": true
+        },
+        {
+          "id": "noise",
+          "disabled": true
+        },
+        {
+          "id": "oil",
+          "disabled": true
+        },
+        {
+          "id": "regionalColor",
+          "disabled": true
+        },
+        {
+          "id": "bodyVariation",
+          "disabled": true
+        },
+        {
+          "id": "bodyPores",
+          "disabled": true
+        },
+        {
+          "id": "jointTone",
+          "disabled": true
+        },
+        {
+          "id": "neckCreases",
+          "disabled": true
+        }
+      ],
+      "surface": {
+        "mode": "dynamic-body-p1",
+        "materialMode": "structure-light",
+        "sourceSkinInspection": true,
+        "activeInspectionMode": "source-skin",
+        "dynamicOriginalShadows": false,
+        "originalDiffusion": false,
+        "fullOriginalOptics": false,
+        "originalActiveSkin": null,
+        "characterTriangleFaces": 0,
+        "webglError": 0
+      },
+      "catalogCount": 1916,
+      "bodyCatalogCount": 965,
+      "controlGroups": {
+        "anny.phenotypes": 11,
+        "anny.localChanges": 127,
+        "anny.pose": 294,
+        "anny.translations": 294,
+        "mhr.identity": 45,
+        "mhr.pose": 193,
+        "mhr.correctives": 1
+      },
+      "personKeys": [
+        "adapterFingerprint",
+        "bodyFunctionSystem",
+        "bodyReconstruction",
+        "browLash",
+        "cinematicLook",
+        "earStructure",
+        "eyeSurface",
+        "eyelidMargin",
+        "faceFeatureTone",
+        "faceIdentity",
+        "faceSurface",
+        "fiberLayer",
+        "geometricSkinFolds",
+        "graphSkin",
+        "headMorphology",
+        "lifelikeIdle",
+        "lipAnatomyDNA",
+        "lipPerformance",
+        "lipPerformanceContext",
+        "lipStructure",
+        "nasalContents",
+        "nativeCrop",
+        "naturalEyes",
+        "overallSkin",
+        "proceduralBodySurface",
+        "proceduralHeadSurface",
+        "regionalFace",
+        "restoredLighting",
+        "schema",
+        "skinAppendages",
+        "skinDNA",
+        "skinInspection",
+        "skinOverallLook",
+        "skinSurfaceFinish",
+        "state",
+        "surface",
+        "surfaceFinish",
+        "surfaceReadability",
+        "surfaceReadout",
+        "tissueReadout",
+        "topologySha256"
+      ],
+      "motionButtons": [
+        {
+          "id": "neutral",
+          "disabled": false
+        },
+        {
+          "id": "reach",
+          "disabled": false
+        },
+        {
+          "id": "bend",
+          "disabled": false
+        },
+        {
+          "id": "twist",
+          "disabled": false
+        },
+        {
+          "id": "trunk",
+          "disabled": false
+        },
+        {
+          "id": "arms",
+          "disabled": false
+        }
+      ]
+    },
+    "rigB": {
+      "attempt": {
+        "applied": true,
+        "value": {
+          "changed": true,
+          "changes": [],
+          "rig": "B",
+          "rebuilds": 1
+        }
+      },
+      "after": {
+        "ready": true,
+        "busy": false,
+        "lastError": null,
+        "sourceStatus": "当前身体已显示，可直接调整参数。",
+        "operationStatus": "身体已更新。",
+        "rig": "mhr",
+        "phenotypes": {
+          "gender": 0,
+          "age": 0.74,
+          "muscle": 0.96,
+          "weight": 0.66,
+          "height": 0.39,
+          "proportions": 0.38,
+          "cupsize": 0.5,
+          "firmness": 0.5,
+          "african": 0.5,
+          "asian": 0.5,
+          "caucasian": 0.5
+        },
+        "skinControls": [
+          {
+            "id": "originalRoughness",
+            "disabled": false
+          },
+          {
+            "id": "originalOil",
+            "disabled": false
+          },
+          {
+            "id": "originalDetail",
+            "disabled": false
+          },
+          {
+            "id": "originalVariation",
+            "disabled": false
+          },
+          {
+            "id": "originalRedness",
+            "disabled": false
+          },
+          {
+            "id": "originalOilFilm",
+            "disabled": false
+          },
+          {
+            "id": "roughness",
+            "disabled": false
+          },
+          {
+            "id": "noise",
+            "disabled": false
+          },
+          {
+            "id": "oil",
+            "disabled": false
+          },
+          {
+            "id": "regionalColor",
+            "disabled": false
+          },
+          {
+            "id": "bodyVariation",
+            "disabled": false
+          },
+          {
+            "id": "bodyPores",
+            "disabled": false
+          },
+          {
+            "id": "jointTone",
+            "disabled": false
+          },
+          {
+            "id": "neckCreases",
+            "disabled": false
+          }
+        ],
+        "surface": {
+          "mode": "source",
+          "materialMode": "original",
+          "sourceSkinInspection": null,
+          "activeInspectionMode": null,
+          "dynamicOriginalShadows": null,
+          "originalDiffusion": null,
+          "fullOriginalOptics": null,
+          "originalActiveSkin": {
+            "motionShading": "boundary-consistent",
+            "edgeAntialiasing": {
+              "enabled": true,
+              "method": "edge-aware colour filter",
+              "frames": 7,
+              "width": 1314,
+              "height": 983
+            },
+            "sourceActiveBodyMaterial": true,
+            "sourceHostMaterialDifferent": true,
+            "sourceShaderSHA256": "27c846dc419b218d93db3057cf8bd452f088a337dfa057ff1abccda0e1d6f9c7",
+            "sourceGraphFieldsByteExact": true,
+            "sharedGraphGPUBytes": 178956960,
+            "currentSourceShadowGPUBytes": 33554432,
+            "materialTargetsGPUBytes": 56833128,
+            "sourceShadows": true,
+            "sourceDiffusion": true,
+            "fullVolumeScattering": false,
+            "sourceFidelityAccepted": false,
+            "bodySurfaceControls": {},
+            "lightingOverrides": {
+              "key": 1.6,
+              "rim": 3.5,
+              "environment": 0.9,
+              "exposure": 0.7,
+              "environmentRotation": -69,
+              "keyColor": "#ffffff",
+              "rimColor": "#efa37e"
+            },
+            "shadowDirectionsUnchanged": true,
+            "draws": 126,
+            "lastMS": 1.5
+          },
+          "characterTriangleFaces": 0,
+          "webglError": 0
+        },
+        "catalogCount": 1916,
+        "bodyCatalogCount": 965,
+        "controlGroups": {
+          "anny.phenotypes": 11,
+          "anny.localChanges": 127,
+          "anny.pose": 294,
+          "anny.translations": 294,
+          "mhr.identity": 45,
+          "mhr.pose": 193,
+          "mhr.correctives": 1
+        },
+        "personKeys": [
+          "adapterFingerprint",
+          "bodyFunctionSystem",
+          "bodyReconstruction",
+          "browLash",
+          "cinematicLook",
+          "earStructure",
+          "eyeSurface",
+          "eyelidMargin",
+          "faceFeatureTone",
+          "faceIdentity",
+          "faceSurface",
+          "fiberLayer",
+          "geometricSkinFolds",
+          "graphSkin",
+          "headMorphology",
+          "lifelikeIdle",
+          "lipAnatomyDNA",
+          "lipPerformance",
+          "lipPerformanceContext",
+          "lipStructure",
+          "nasalContents",
+          "nativeCrop",
+          "naturalEyes",
+          "overallSkin",
+          "proceduralBodySurface",
+          "proceduralHeadSurface",
+          "regionalFace",
+          "restoredLighting",
+          "schema",
+          "skinAppendages",
+          "skinDNA",
+          "skinInspection",
+          "skinOverallLook",
+          "skinSurfaceFinish",
+          "state",
+          "surface",
+          "surfaceFinish",
+          "surfaceReadability",
+          "surfaceReadout",
+          "tissueReadout",
+          "topologySha256"
+        ],
+        "motionButtons": [
+          {
+            "id": "neutral",
+            "disabled": false
+          },
+          {
+            "id": "reach",
+            "disabled": false
+          },
+          {
+            "id": "bend",
+            "disabled": false
+          },
+          {
+            "id": "twist",
+            "disabled": false
+          },
+          {
+            "id": "trunk",
+            "disabled": false
+          },
+          {
+            "id": "arms",
+            "disabled": false
+          }
+        ]
+      },
+      "bendAttempt": {
+        "applied": false,
+        "error": "这个参数组合尚未接入原数据轮廓，人物没有改变。若需查看未验收候选，请先选择“连续参数研究候选”。"
+      },
+      "afterBend": {
+        "ready": true,
+        "busy": false,
+        "lastError": null,
+        "sourceStatus": "当前身体已显示，可直接调整参数。",
+        "operationStatus": "身体已更新。",
+        "rig": "mhr",
+        "phenotypes": {
+          "gender": 0,
+          "age": 0.74,
+          "muscle": 0.96,
+          "weight": 0.66,
+          "height": 0.39,
+          "proportions": 0.38,
+          "cupsize": 0.5,
+          "firmness": 0.5,
+          "african": 0.5,
+          "asian": 0.5,
+          "caucasian": 0.5
+        },
+        "skinControls": [
+          {
+            "id": "originalRoughness",
+            "disabled": false
+          },
+          {
+            "id": "originalOil",
+            "disabled": false
+          },
+          {
+            "id": "originalDetail",
+            "disabled": false
+          },
+          {
+            "id": "originalVariation",
+            "disabled": false
+          },
+          {
+            "id": "originalRedness",
+            "disabled": false
+          },
+          {
+            "id": "originalOilFilm",
+            "disabled": false
+          },
+          {
+            "id": "roughness",
+            "disabled": false
+          },
+          {
+            "id": "noise",
+            "disabled": false
+          },
+          {
+            "id": "oil",
+            "disabled": false
+          },
+          {
+            "id": "regionalColor",
+            "disabled": false
+          },
+          {
+            "id": "bodyVariation",
+            "disabled": false
+          },
+          {
+            "id": "bodyPores",
+            "disabled": false
+          },
+          {
+            "id": "jointTone",
+            "disabled": false
+          },
+          {
+            "id": "neckCreases",
+            "disabled": false
+          }
+        ],
+        "surface": {
+          "mode": "source",
+          "materialMode": "original",
+          "sourceSkinInspection": null,
+          "activeInspectionMode": null,
+          "dynamicOriginalShadows": null,
+          "originalDiffusion": null,
+          "fullOriginalOptics": null,
+          "originalActiveSkin": {
+            "motionShading": "boundary-consistent",
+            "edgeAntialiasing": {
+              "enabled": true,
+              "method": "edge-aware colour filter",
+              "frames": 7,
+              "width": 1314,
+              "height": 983
+            },
+            "sourceActiveBodyMaterial": true,
+            "sourceHostMaterialDifferent": true,
+            "sourceShaderSHA256": "27c846dc419b218d93db3057cf8bd452f088a337dfa057ff1abccda0e1d6f9c7",
+            "sourceGraphFieldsByteExact": true,
+            "sharedGraphGPUBytes": 178956960,
+            "currentSourceShadowGPUBytes": 33554432,
+            "materialTargetsGPUBytes": 56833128,
+            "sourceShadows": true,
+            "sourceDiffusion": true,
+            "fullVolumeScattering": false,
+            "sourceFidelityAccepted": false,
+            "bodySurfaceControls": {},
+            "lightingOverrides": {
+              "key": 1.6,
+              "rim": 3.5,
+              "environment": 0.9,
+              "exposure": 0.7,
+              "environmentRotation": -69,
+              "keyColor": "#ffffff",
+              "rimColor": "#efa37e"
+            },
+            "shadowDirectionsUnchanged": true,
+            "draws": 126,
+            "lastMS": 1.5
+          },
+          "characterTriangleFaces": 0,
+          "webglError": 0
+        },
+        "catalogCount": 1916,
+        "bodyCatalogCount": 965,
+        "controlGroups": {
+          "anny.phenotypes": 11,
+          "anny.localChanges": 127,
+          "anny.pose": 294,
+          "anny.translations": 294,
+          "mhr.identity": 45,
+          "mhr.pose": 193,
+          "mhr.correctives": 1
+        },
+        "personKeys": [
+          "adapterFingerprint",
+          "bodyFunctionSystem",
+          "bodyReconstruction",
+          "browLash",
+          "cinematicLook",
+          "earStructure",
+          "eyeSurface",
+          "eyelidMargin",
+          "faceFeatureTone",
+          "faceIdentity",
+          "faceSurface",
+          "fiberLayer",
+          "geometricSkinFolds",
+          "graphSkin",
+          "headMorphology",
+          "lifelikeIdle",
+          "lipAnatomyDNA",
+          "lipPerformance",
+          "lipPerformanceContext",
+          "lipStructure",
+          "nasalContents",
+          "nativeCrop",
+          "naturalEyes",
+          "overallSkin",
+          "proceduralBodySurface",
+          "proceduralHeadSurface",
+          "regionalFace",
+          "restoredLighting",
+          "schema",
+          "skinAppendages",
+          "skinDNA",
+          "skinInspection",
+          "skinOverallLook",
+          "skinSurfaceFinish",
+          "state",
+          "surface",
+          "surfaceFinish",
+          "surfaceReadability",
+          "surfaceReadout",
+          "tissueReadout",
+          "topologySha256"
+        ],
+        "motionButtons": [
+          {
+            "id": "neutral",
+            "disabled": false
+          },
+          {
+            "id": "reach",
+            "disabled": false
+          },
+          {
+            "id": "bend",
+            "disabled": false
+          },
+          {
+            "id": "twist",
+            "disabled": false
+          },
+          {
+            "id": "trunk",
+            "disabled": false
+          },
+          {
+            "id": "arms",
+            "disabled": false
+          }
+        ]
+      }
+    }
+  },
+  "errors": [],
+  "passed": true
+}
