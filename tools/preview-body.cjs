@@ -14,6 +14,9 @@ http.createServer((req,res)=>{
   else if(pathname==='/joint-functions')manifest=selected.researchBuild||'BUILD-POSE-R28.json';
   else if(pathname==='/support-study'||pathname==='/身体_P1_参考支撑隔离研究.html')manifest='BUILD-SUPPORT-P1.json';
   else if(pathname==='/torso-study'||pathname==='/身体_P1_连续躯干隔离研究.html')manifest='BUILD-TORSO-P1.json';
+  else if(pathname==='/人物身体_R35_可调皮肤.html')manifest='BUILD-R35.json';
+  else if(pathname==='/身体_R35_可调皮肤.html')manifest='BUILD-SOURCE-R35.json';
+  else if(pathname==='/身体_R35_连续皮肤.html')manifest='BUILD-STUDY-R35.json';
   else if(pathname==='/人物身体_R34_动作肤色预览.html')manifest='BUILD-R34.json';
   else if(pathname==='/身体_R33_实时轮廓.html')manifest='BUILD-SOURCE-R33.json';
   else if(pathname==='/人物身体_R33_实时轮廓.html')manifest='BUILD-R33.json';

@@ -1,0 +1,203 @@
+{
+  "testedUTC": "2026-10-28T04:40:41.978Z",
+  "workbenchSHA256": "64b5967b6705e91a96b7bd9151676e0b24b60b2c3b8b96314e2b80fea0301c52",
+  "baseURL": "http://127.0.0.1:8914",
+  "passed": true,
+  "checks": [
+    {
+      "name": "new skin controls operate in the fixed body",
+      "passed": true,
+      "detail": {
+        "originalRoughness": 0.47,
+        "originalOil": 0.32,
+        "originalDetail": 0.72,
+        "originalVariation": 0.9,
+        "originalRedness": 0.48,
+        "originalOilFilm": 0.8,
+        "originalTone": 0.31,
+        "originalWarmth": 0.46,
+        "originalPores": 0.88,
+        "originalScatter": 0.75,
+        "originalFreckles": 0.2,
+        "originalFuzz": 0.85,
+        "originalWrinkles": 2.4,
+        "originalGraphPores": 1.5,
+        "originalMeso": 1.5,
+        "originalCavity": 1.5,
+        "originalDiffusion": 0.25
+      }
+    },
+    {
+      "name": "fixed A body keeps skin and updates shadows when light direction changes",
+      "passed": true,
+      "detail": {
+        "mode": "source",
+        "shadow": {
+          "enabled": true,
+          "updates": 1,
+          "lastMS": 463.10000002384186,
+          "unknownPixels": 0,
+          "dimensions": [
+            [
+              2048,
+              2048
+            ],
+            [
+              2048,
+              2048
+            ]
+          ],
+          "matrices": [
+            [
+              0.1509350934788212,
+              -0.1107055425783731,
+              -0.10780389109356285,
+              0,
+              0,
+              0.3356045074235387,
+              -0.04329368902856566,
+              0,
+              -0.3236813525130892,
+              -0.05162284230449965,
+              -0.0502697799958358,
+              0,
+              0.6321208588504932,
+              0.5653648489717469,
+              0.5795556294833207,
+              1
+            ],
+            [
+              -0.1785714285714285,
+              0.1774042017471979,
+              0.08979828859699016,
+              0,
+              0,
+              0.2925543015317828,
+              -0.07260461219633492,
+              0,
+              0.309294787065871,
+              0.10242436363411535,
+              0.051845066094239944,
+              0,
+              0.4539693866353315,
+              0.42731155299755347,
+              0.5975422073047212,
+              1
+            ]
+          ],
+          "source": "current body function ray intersections",
+          "characterTriangleFaces": 0
+        }
+      }
+    },
+    {
+      "name": "fixed body restores original shadows when the light returns",
+      "passed": true
+    },
+    {
+      "name": "skin settings carry into the adjusted body",
+      "passed": true,
+      "detail": {
+        "surface": "dynamic-body-p1",
+        "controls": {
+          "fbEnabled": 1,
+          "fbRegional": 0.72,
+          "fbVariation": 0.64,
+          "fbPores": 0.78,
+          "fbJointTone": 0.42,
+          "fbNeckCreases": 0.34,
+          "psRoughness": 0.47,
+          "psOil": 0.32,
+          "psMicro": 0.72,
+          "psVariation": 0.9,
+          "psBlood": 0.48,
+          "personOilFilm": 0.8,
+          "psTone": 0.31,
+          "psWarmth": 0.46,
+          "psPores": 0.88,
+          "psScatter": 0.75,
+          "psFreckles": 0.2,
+          "personSoftFuzz": 0.85,
+          "gmWrinkles": 2.4,
+          "gmPores": 1.5,
+          "gmMeso": 1.5,
+          "gmCavityStrength": 1.5
+        }
+      }
+    },
+    {
+      "name": "head data stays intact",
+      "passed": true
+    },
+    {
+      "name": "fixed B body keeps skin and recalculates shadows for changed light",
+      "passed": true,
+      "detail": {
+        "mode": "original",
+        "shadow": {
+          "enabled": true,
+          "updates": 1,
+          "lastMS": 311.1999999284744,
+          "unknownPixels": 0,
+          "dimensions": [
+            [
+              2048,
+              2048
+            ],
+            [
+              2048,
+              2048
+            ]
+          ],
+          "matrices": [
+            [
+              0.1509350934788212,
+              -0.1107055425783731,
+              -0.10780389109356285,
+              0,
+              0,
+              0.3356045074235387,
+              -0.04329368902856566,
+              0,
+              -0.3236813525130892,
+              -0.05162284230449965,
+              -0.0502697799958358,
+              0,
+              0.6321208588504932,
+              0.5653648489717469,
+              0.5795556294833207,
+              1
+            ],
+            [
+              -0.1785714285714285,
+              0.1774042017471979,
+              0.08979828859699016,
+              0,
+              0,
+              0.2925543015317828,
+              -0.07260461219633492,
+              0,
+              0.309294787065871,
+              0.10242436363411535,
+              0.051845066094239944,
+              0,
+              0.4539693866353315,
+              0.42731155299755347,
+              0.5975422073047212,
+              1
+            ]
+          ],
+          "source": "current body function ray intersections",
+          "characterTriangleFaces": 0
+        },
+        "note": "以下设置可调整当前身体的皮肤；体型和姿势变化后会继续保留。"
+      }
+    },
+    {
+      "name": "no browser exceptions",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

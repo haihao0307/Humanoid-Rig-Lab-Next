@@ -137,10 +137,10 @@
   },
   "originalEB1LightsAndEnvironmentRestored": true,
   "schema": "body-source-atlas-viewer/2",
-  "builtUTC": "2026-10-28T03:09:05.810Z",
-  "file": "delivery/身体_R33_实时轮廓.html",
-  "sha256": "7f27294046acc059fb9367a1350e4b49b57a3e13ce8d4f583ef24985e0522872",
-  "bytes": 884992,
+  "builtUTC": "2026-10-28T04:37:58.830Z",
+  "file": "delivery/身体_R35_可调皮肤.html",
+  "sha256": "5f5ee4f14bdbf8cf2a345ebdcb3593386a604b592bfbe6f148e4e54b2b761dd1",
+  "bytes": 899042,
   "data": {
     "file": "data/body-source-atlas-r24.json",
     "sha256": "172a19de2613102f037dafa79ac370547824f84da0d4c52ac29c10b04f06f97d",
@@ -627,20 +627,64 @@
       "sha256": "66714b01980eaa3908569e968a8548f4a382bc2e8bc5a02e77ef18e458bea686"
     },
     {
-      "file": "tools/build.cjs",
-      "sha256": "236bd5c5def7284f2119db438802f2e0873acdabc233babcd2a26e7a6263f507"
-    },
-    {
-      "file": "tools/preview-body.cjs",
-      "sha256": "483b111fc379c33c348f5b2d84f235a7274db022ad526fc959bfeef126843dee"
-    },
-    {
       "file": "tools/build-r33.cjs",
       "sha256": "a68bc0518288e98c9a9e4aa9885d1128539289162d16182f9dc197a880e7c805"
     },
     {
       "file": "tools/research/r33/motion-skin.cjs",
       "sha256": "9df5781ad87050d6499ac71b1b9ba7b0b9afa7afe762115765427c72ec300088"
+    },
+    {
+      "file": "tools/build-r35.cjs",
+      "sha256": "201cffb0827766d34039a09315a39ec70daaf026c8a477ffa59b89a52a134882"
+    },
+    {
+      "file": "tools/build.cjs",
+      "sha256": "ef956e0778e4fc2312b29b0406929c6f43078c4aaa2f9866de821c5075bf4096"
+    },
+    {
+      "file": "tools/preview-body.cjs",
+      "sha256": "8be32d669889c4142a5c1c448d6f8b956823765479444e5fda19fdd61bfe21c1"
+    },
+    {
+      "file": "tools/research/r35/build-candidate.cjs",
+      "sha256": "cbad250e9d1ac976d25568c3611e205864dfe3f0e10c9dc618bc0b20f19653f0"
+    },
+    {
+      "file": "tools/research/r35/patch-pose-renderer.cjs",
+      "sha256": "3fda3b7640c63b2c5423587b7185333413b792857ef52d94c55c908ff9e216bf"
+    },
+    {
+      "file": "tools/research/r35/patch-source-renderer.cjs",
+      "sha256": "718c7c362a9a62dbad60a56dcfb30bab65ff6f3619c26ea87ce03980e57bf8a6"
+    },
+    {
+      "file": "tools/research/r35/skin-controls.cjs",
+      "sha256": "8001375658547d7b1ddb804b29e9aff628b5d62a01dec4b91adb6413a154de40"
+    },
+    {
+      "file": "src/research/r35/BodyAtlasRaySkinR35.js",
+      "sha256": "87e40568a4a300e5089b867fa7768a8ae4520d6b8901ea90ddea5200e2ca069e"
+    },
+    {
+      "file": "src/research/r35/BodyDynamicOriginalSkinR35.js",
+      "sha256": "d1af3d19c5855d1b8ca427890423138562bd5241935e71ce6ec3c94835961f3c"
+    },
+    {
+      "file": "src/research/r35/BodyDynamicShadowsR35.js",
+      "sha256": "bf20bbbcec8e2ca4ebe896f8cdf61c438d79ecae7198025986acb8d447683339"
+    },
+    {
+      "file": "src/research/r35/BodyPoseRaySkinR35.js",
+      "sha256": "658d7b06941c690168b223a85278c24a960049104bc032b4b918a2b094ce0b09"
+    },
+    {
+      "file": "src/research/r35/BodyUnknownPixelsR35.js",
+      "sha256": "3220b4857cfb7a062659066f8c135f946e8d561b4c14661384da3dfab26ca262"
+    },
+    {
+      "file": "src/research/r35/TorsoStudyAppR35.js",
+      "sha256": "12585f141ac15e9d472d55c3b3c4ab8cfe6b527e294fc7bf416b2ae99e5259c6"
     }
   ],
   "characterTriangleFaces": 0,
@@ -1037,7 +1081,7 @@
     "measuredAnatomicalBoneLengths": false
   },
   "canonicalFile": "delivery/身体_R33_实时轮廓.html",
-  "version": "R33",
+  "version": "R35",
   "exactDomainAssets": [
     {
       "file": "delivery/assets/body-exact-r25/2e9bf28a922ddfd1d85b236ca3e2919108e6d3182219de499b53c0efc2328ba2.gz",
@@ -1163,15 +1207,18 @@
     "archivesPreserveExactInputSpelling": true
   },
   "inheritedSourceImplementation": {
-    "file": "BUILD-SOURCE-R32.json",
-    "sha256": "fb0e618576677c227e6c925cc1a2250668ffee0fb295e547412cb9d0bf76579b",
+    "file": "BUILD-SOURCE-R33.json",
+    "sha256": "7b846469bcaca69f99db06ae7317e30a27be57804e0fca236845511baae3bede",
     "geometryUnchanged": true
   },
   "edgeAntialiasing": "display-only edge filter and bounded device-aware supersampling",
   "interactiveShading": "surface-boundary quads use the same derivative neighbourhood during movement",
-  "selectedVersion": "R34",
-  "companionBuild": "BUILD-R34.json",
-  "companionWorkbench": "BUILD-R34.json",
+  "skinControlsR35": 22,
+  "directionalShadowUpdatesR35": true,
+  "fullVolumeScattering": false,
+  "selectedVersion": "R35",
+  "companionBuild": "BUILD-R35.json",
+  "companionWorkbench": "BUILD-R35.json",
   "researchBuild": "BUILD-POSE-R32.json",
-  "selection": "R34 retains the R33 fixed body and routes compatible A-rig poses to the skin-colour preview; complete dynamic skin and animation remain unfinished."
+  "selection": "R35 integrates adjustable current skin for fixed and supported A-rig bodies; continuous animation and other unsupported body states remain pending."
 }
