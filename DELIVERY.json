@@ -1,21 +1,21 @@
 {
-  "schema": "body-delivery-r37/1",
-  "version": "R37",
-  "updatedUTC": "2026-10-28T08:20:11.788Z",
+  "schema": "body-delivery-r38/1",
+  "version": "R38",
+  "updatedUTC": "2026-10-28T10:01:59.679Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
     "file": "delivery/身体_R35_可调皮肤.html",
     "sha256": "5f5ee4f14bdbf8cf2a345ebdcb3593386a604b592bfbe6f148e4e54b2b761dd1",
     "bytes": 899042,
-    "url": "http://127.0.0.1:8914/?v=R37-5f5ee4f1",
+    "url": "http://127.0.0.1:8914/?v=R38-5f5ee4f1",
     "inheritedGeometryFrom": "BUILD-SOURCE-R33.json"
   },
   "workbench": {
-    "file": "delivery/人物身体_R37_连续动作.html",
-    "sha256": "875e78912e2c59198a9c3ad5a86f29ec2b96d4c3dfb7f3381753a5c14b71e3c1",
-    "bytes": 1930167,
-    "url": "http://127.0.0.1:8914/workbench?v=R37-875e7891"
+    "file": "delivery/人物身体_R38_动作编辑.html",
+    "sha256": "2d95f58d31411fe02312e3b99ce72aa44c83bcd0d01120f5c4081d6c6cb8e3b7",
+    "bytes": 1961119,
+    "url": "http://127.0.0.1:8914/workbench?v=R38-2d95f58d"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
@@ -153,7 +153,21 @@
     "shapeCacheEquivalence": "qa/animation-r37/cache-equivalence.json",
     "attachmentFrames": "qa/animation-r37/attachment-ui.json",
     "attachmentMatrices": "qa/animation-r37/attachment-matrices.json",
-    "releaseIntegrity": "qa/animation-r37/release-integrity.json"
+    "releaseIntegrity": "qa/animation-r37/release-integrity.json",
+    "motionTimelineR38": "qa/motion-r38/timeline.json",
+    "motionBoundsR38": "qa/motion-r38/animation-bounds.json",
+    "motionResumeR38": "qa/motion-r38/resume.json",
+    "motionLibraryR38": "qa/motion-r38/library-ui.json",
+    "motionImportExportR38": "qa/motion-r38/import-export.json",
+    "motionPreviewFastR38": "qa/motion-r38/preview-fast.json",
+    "motionExtremeR38": "qa/motion-r38/extreme-preview.json",
+    "motionWaistR38": "qa/motion-r38/waist-correction.json",
+    "motionWaistUIR38": "qa/motion-r38/waist-ui.json",
+    "motionPerformanceR38": "qa/motion-r38/performance.json",
+    "motionLegacyR38": "qa/motion-r38/legacy-custom.json",
+    "motionLifecycleR38": "qa/motion-r38/lifecycle.json",
+    "releaseIntegrityR38": "qa/motion-r38/release-integrity.json",
+    "productionUIR38": "qa/motion-r38/production-ui.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
@@ -187,7 +201,7 @@
       "task": "头身接口、附件与平台整合"
     }
   ],
-  "previousDelivery": "DELIVERY-R35.json",
+  "previousDelivery": "DELIVERY-R37.json",
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
     "branch": "body/reconstruction-r18-20261023"
@@ -384,7 +398,7 @@
     "highDpiCheck": "qa/edges-r33/high-dpi.json",
     "userVisualReviewPending": true
   },
-  "capabilityReview": "docs/BODY-R37.md",
+  "capabilityReview": "docs/BODY-R38.md",
   "platformCapabilities": {
     "defaultOriginalBodySkin": true,
     "defaultSkinControlsSampled": true,
@@ -421,7 +435,15 @@
     "customClipSavedInPersonArchive": true,
     "handFootGroupedControls": true,
     "bodyAttachmentFrames": true,
-    "actualHeadAccessoryIntegration": false
+    "actualHeadAccessoryIntegration": false,
+    "motionLibrary": true,
+    "motionBuiltinActions": 10,
+    "customMotionMaximum": 20,
+    "motionKeyframesMaximum": 16,
+    "actionImportExport": true,
+    "fullMotionLibraryImportExport": true,
+    "extremeBRigWaistCorrection": true,
+    "allExtremeMotionDeformationsSolved": false
   },
   "surfaceControls": 22,
   "surfaceImplementation": {
@@ -474,10 +496,10 @@
     "fullVisualAcceptance": false
   },
   "remainingSpecific": [
-    "旧档手指、足部局部细节适配，以及按实际需要处理的旧特殊法线",
-    "更复杂动作编辑、动作库和极端体型动作变形",
-    "独立头部、附件与完整人物平台的实际联动",
-    "跨设备、更多形体组合和用户视觉调整"
+    "A、B 骨架在极端体型下的髋部、肩腋、肘膝和手足自然变形仍需改善；部分胖体型大腿根部仍有异常折痕",
+    "更完整的动作编辑、步态和脚部接地、碰撞与物理约束尚未完成",
+    "旧档专用手指、足部细节和旧档改形与新腰腹柔化的叠加尚未完成",
+    "独立头部、附件与完整人物平台的实际联动，以及更多设备和体型组合的视觉检查"
   ],
   "continuousBodyR37": {
     "file": "delivery/身体_R37_连续动作.html",
@@ -512,5 +534,52 @@
     ],
     "headOrAccessoriesGenerated": false,
     "attachmentReferenceSchema": "body-attachment-frames-r37/1"
+  },
+  "continuousBodyR38": {
+    "file": "delivery/身体_R38_动作编辑.html",
+    "sha256": "aad4de08fbdc951eb453f9b0ed2a222816f9192690aa5189ce191ff949c28380",
+    "bytes": 872652,
+    "sourceDerived": true,
+    "characterTriangleFaces": 0,
+    "fullVisualAcceptance": false
+  },
+  "motionR38": {
+    "libraryBuiltinCount": 10,
+    "previousContinuousPresetsRetained": 6,
+    "bothBodyRigs": true,
+    "customActionsMaximum": 20,
+    "keyframesMaximum": 16,
+    "wholePoseAndLayeredClips": true,
+    "individualAndLibraryImportExport": true,
+    "savedInPersonArchive": true,
+    "oldTwoPoseClipRetained": true,
+    "playback": [
+      "loop",
+      "pingpong",
+      "once"
+    ],
+    "easing": [
+      "smooth",
+      "linear"
+    ],
+    "seek": true,
+    "normalSampleBudget": 25,
+    "extremeSampleBudget": 33,
+    "denseKeyframeSampleBudget": 33,
+    "legacyExtremeSampleBudget": 17,
+    "previewIntermediate": "bounded cubic function coefficients with linear display normals",
+    "pausedPose": "full current body evaluation",
+    "previewNotExactIntermediate": true,
+    "previewShadowPixels": 1024,
+    "pausedShadowPixels": 2048,
+    "waistCorrection": {
+      "rig": "B",
+      "when": "higher body weight and forward lower-spine bending",
+      "enabledByDefault": true,
+      "optionalAndSavedInPerson": true,
+      "originalJointAnglesAndHeadPreserved": true,
+      "oldLegacyDeformationNotCombined": true,
+      "hipAndAllExtremePosesNotSolved": true
+    }
   }
 }

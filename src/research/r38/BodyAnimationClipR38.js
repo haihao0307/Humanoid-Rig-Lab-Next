@@ -1,0 +1,41 @@
+/* Smooth preview between evaluated body function states. The character remains
+ * a direct ray-intersected function surface; no mesh or connectivity is made.
+ * On pause the ordinary full evaluator restores the exact requested pose. */
+(()=>{'use strict';
+function tangents(samples,times,field,closed){const n=samples.length,length=samples[0][field].length,out=Array.from({length:n},()=>new Float64Array(length)),h=times.slice(1).map((x,i)=>x-times[i]),slopes=new Float64Array(n-1);const harmonic=(a,b,ha,hb)=>{if(a*b<=0)return 0;const wa=2*hb+ha,wb=hb+2*ha;return(wa+wb)/(wa/a+wb/b);},endpoint=(a,b,ha,hb)=>{let v=((2*ha+hb)*a-ha*b)/(ha+hb);if(v*a<=0)v=0;else if(a*b<0&&Math.abs(v)>Math.abs(3*a))v=3*a;return v;};for(let j=0;j<length;j++){for(let i=0;i<n-1;i++)slopes[i]=(samples[i+1][field][j]-samples[i][field][j])/h[i];for(let i=1;i<n-1;i++)out[i][j]=harmonic(slopes[i-1],slopes[i],h[i-1],h[i]);if(closed)out[0][j]=out[n-1][j]=harmonic(slopes[n-2],slopes[0],h[n-2],h[0]);else if(n===2)out[0][j]=out[1][j]=slopes[0];else{out[0][j]=endpoint(slopes[0],slopes[1],h[0],h[1]);out[n-1][j]=endpoint(slopes[n-2],slopes[n-3],h[n-2],h[n-3]);}}return out;}
+function corners(domains,f){const lines=Array.from({length:3},(_,i)=>Array.from(domains.slice(f*9+i*3,f*9+i*3+3)));return[[2,0],[0,1],[1,2]].map(([a,b])=>{const p=lines[a],q=lines[b],d=p[0]*q[1]-q[0]*p[1];if(!Number.isFinite(d)||Math.abs(d)<1e-15)throw Error('动作表面裁剪边界无效');const u=(p[1]*q[2]-q[1]*p[2])/d,v=(p[2]*q[0]-q[2]*p[0])/d;if(!Number.isFinite(u)||!Number.isFinite(v))throw Error('动作表面参数无效');return[u,v];});}
+function createClip(samples,times=null,options={}){
+ if(!Array.isArray(samples)||samples.length<2||samples.length>33)throw Error('动作样本数量无效');
+ times=times==null?samples.map((_,i)=>i/(samples.length-1)):Array.from(times);
+ if(times.length!==samples.length||times[0]!==0||times.at(-1)!==1||times.some((x,i)=>!Number.isFinite(x)||x<0||x>1||(i>0&&x<=times[i-1])))throw Error('动作样本时间无效');
+ const first=samples[0],count=first.program.functions,n=count*6;
+ if(!first.program.orientation||first.program.orientation.length!==count||!first.animationBoxes||first.animationBoxes.length!==n)throw Error('动作表面范围不完整');
+ for(const frame of samples)if(frame.program.functions!==count||frame.animationBoxes?.length!==n||frame.coefficients.length!==count*9||frame.normals.length!==count*9)throw Error('动作样本与当前身体不匹配');
+ const cubic=options.method!=='linear',closed=samples[0].coefficients.every((v,i)=>v===samples.at(-1).coefficients[i]),coefficientTangents=cubic?tangents(samples,times,'coefficients',closed):null,uv=cubic?Array.from({length:count},(_,f)=>corners(first.program.domains,f)):null,groupSize=4,groups=[];
+ // Use a conservative tree for each short part of the action. The interior
+ // Bezier controls enclose each cubic segment and every affine domain point.
+ // Shorter bounds reduce overlap when the limbs travel a long distance.
+ for(let segment=0;segment<samples.length-1;segment+=groupSize){const end=Math.min(samples.length-1,segment+groupSize),boxes=new Float64Array(samples[segment].animationBoxes),ids=Array.from({length:count},(_,i)=>i),nodes=[];
+  for(let f=segment+1;f<=end;f++){const b=samples[f].animationBoxes;for(let i=0;i<n;i+=6)for(let k=0;k<3;k++){boxes[i+k]=Math.min(boxes[i+k],b[i+k]);boxes[i+3+k]=Math.max(boxes[i+3+k],b[i+3+k]);}}
+  if(cubic)for(let i=segment;i<end;i++){const h=(times[i+1]-times[i])/3,c0=samples[i].coefficients,c1=samples[i+1].coefficients,m0=coefficientTangents[i],m1=coefficientTangents[i+1];for(let f=0;f<count;f++)for(const [u,v]of uv[f])for(let k=0;k<3;k++){const j=f*9+k*3,p0=c0[j]*u+c0[j+1]*v+c0[j+2],p1=c1[j]*u+c1[j+1]*v+c1[j+2],d0=m0[j]*u+m0[j+1]*v+m0[j+2],d1=m1[j]*u+m1[j+1]*v+m1[j+2],b0=p0+h*d0,b1=p1-h*d1;if(!Number.isFinite(b0)||!Number.isFinite(b1))throw Error('动作插值范围无效');boxes[f*6+k]=Math.min(boxes[f*6+k],b0,b1);boxes[f*6+3+k]=Math.max(boxes[f*6+3+k],b0,b1);}}
+  function build(start,stop){const lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity],clo=lo.slice(),chi=hi.slice();for(let i=start;i<stop;i++){const j=ids[i]*6;for(let k=0;k<3;k++){lo[k]=Math.min(lo[k],boxes[j+k]);hi[k]=Math.max(hi[k],boxes[j+3+k]);const center=(boxes[j+k]+boxes[j+3+k])/2;clo[k]=Math.min(clo[k],center);chi[k]=Math.max(chi[k],center);}}const at=nodes.length,node={lo,hi,start,end:stop,left:-1,right:-1};nodes.push(node);if(stop-start>6){let axis=0;for(let k=1;k<3;k++)if(chi[k]-clo[k]>chi[axis]-clo[axis])axis=k;const sorted=ids.slice(start,stop).sort((a,b)=>(boxes[a*6+axis]+boxes[a*6+3+axis])-(boxes[b*6+axis]+boxes[b*6+3+axis]));for(let i=0;i<sorted.length;i++)ids[start+i]=sorted[i];const mid=(start+stop)>>1;node.left=build(start,mid);node.right=build(mid,stop);}return at;}build(0,ids.length);
+  groups.push({ids,nodes,bounds:nodes[0].lo.map((v,k)=>[v,nodes[0].hi[k]])});
+ }
+ // Keep the light and camera fitting bounds fixed for the whole action even
+ // though ray traversal switches trees; this avoids a shadow projection jump.
+ const bounds=[0,1,2].map(k=>[Math.min(...groups.map(g=>g.bounds[k][0])),Math.max(...groups.map(g=>g.bounds[k][1]))]);
+ return{schema:'body-motion-preview-r38/1',times,program:{functions:count,domains:first.program.domains,orientation:first.program.orientation},frames:samples.map((x,i)=>({coefficients:x.coefficients,normals:x.normals,coefficientTangents:coefficientTangents?.[i]||null,bindingSupport:x.bindingSupport})),groups,groupSize,ids:groups[0].ids,nodes:groups[0].nodes,bounds,intermediateGeometry:cubic?'bounded monotone cubic interpolation between evaluated pose functions':'linear interpolation between evaluated pose functions',normalInterpolation:'linear between evaluated normals',cubic};
+}
+function makeBuffers(clip,sourceMaterial){const n=clip.program.functions;return{program:clip.program,coefficients:new Float64Array(n*9),normals:new Float64Array(n*9),geometric:new Float64Array(n*3),inverse:new Float64Array(n*6),inverseAxes:new Uint8Array(n),nodes:clip.nodes,ids:clip.ids,bounds:clip.bounds,exactFields:null,sourceMaterial,normalMethod:'interpolated source-derived display-normal functions for animation preview',characterTriangleFaces:0,characterVertexBuffers:0};}
+function update(clip,amount,out){
+ if(!Number.isFinite(amount))throw Error('动作时间无效');amount=Math.max(0,Math.min(1,amount));
+ const times=clip.times;let lo=0,hi=times.length-1;while(hi-lo>1){const mid=(lo+hi)>>1;if(times[mid]<=amount)lo=mid;else hi=mid;}const index=Math.min(clip.frames.length-2,lo),t=(amount-times[index])/(times[index+1]-times[index]),s=1-t,a=clip.frames[index],b=clip.frames[index+1],c=out.coefficients,n=out.normals,group=clip.groups[Math.floor(index/clip.groupSize)];out.ids=group.ids;out.nodes=group.nodes;out.bounds=clip.bounds;
+ if(clip.cubic){const h=times[index+1]-times[index],t2=t*t,t3=t2*t,A=2*t3-3*t2+1,B=(t3-2*t2+t)*h,C=-2*t3+3*t2,D=(t3-t2)*h;for(let i=0;i<c.length;i++){c[i]=A*a.coefficients[i]+B*a.coefficientTangents[i]+C*b.coefficients[i]+D*b.coefficientTangents[i];n[i]=a.normals[i]*s+b.normals[i]*t;}}else for(let i=0;i<c.length;i++){c[i]=a.coefficients[i]*s+b.coefficients[i]*t;n[i]=a.normals[i]*s+b.normals[i]*t;}
+ for(let f=0;f<clip.program.functions;f++){const j=f*9,g=f*3,k=f*6,ux=c[j],uy=c[j+3],uz=c[j+6],vx=c[j+1],vy=c[j+4],vz=c[j+7],gx=uy*vz-uz*vy,gy=uz*vx-ux*vz,gz=ux*vy-uy*vx,length=Math.hypot(gx,gy,gz);
+  if(!(length>0)){out.geometric.fill(0,g,g+3);out.inverse.fill(0,k,k+6);out.inverseAxes[f]=0;continue;}
+  const sign=clip.program.orientation[f];let axis=0;if(Math.abs(gy)>Math.abs(gx))axis=1;if(Math.abs(gz)>Math.abs(axis===0?gx:gy))axis=2;out.inverseAxes[f]=axis;const x=(axis+1)%3,y=(axis+2)%3,dux=x===0?ux:x===1?uy:uz,duy=y===0?ux:y===1?uy:uz,dvx=x===0?vx:x===1?vy:vz,dvy=y===0?vx:y===1?vy:vz,d=dux*dvy-duy*dvx,A=dvy/d,B=-dvx/d,C=-duy/d,D=dux/d;out.inverse[k]=A;out.inverse[k+1]=B;out.inverse[k+2]=-A*c[j+x*3+2]-B*c[j+y*3+2];out.inverse[k+3]=C;out.inverse[k+4]=D;out.inverse[k+5]=-C*c[j+x*3+2]-D*c[j+y*3+2];out.geometric[g]=sign*gx/length;out.geometric[g+1]=sign*gy/length;out.geometric[g+2]=sign*gz/length;
+ }
+ out.bindingSupport=BodyAttachmentFramesR37.interpolate(a.bindingSupport,b.bindingSupport,t);return out;
+}
+globalThis.BodyAnimationClipR37={createClip,makeBuffers,update};globalThis.BodyAnimationClipR38=globalThis.BodyAnimationClipR37;
+})();

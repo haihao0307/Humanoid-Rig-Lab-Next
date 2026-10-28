@@ -1,0 +1,18 @@
+/* Sparse body-pose timelines; every recorded key is an evaluated sample.
+ * This module does not change the body surface or generate character faces. */
+(()=>{'use strict';
+function prepare(action,rig,controls){
+ if(!action||action.rig!==rig||!Array.isArray(action.frames)||action.frames.length<2||action.frames.length>16)throw Error('动作需要同一骨架的 2 至 16 个关键帧');
+ if(!Number.isFinite(action.duration)||action.duration<1||action.duration>30||!['loop','pingpong','once'].includes(action.mode)||!['smooth','linear'].includes(action.easing))throw Error('动作时长或播放方式无效');
+ const frames=action.frames.map(f=>({time:Number(f.time),values:f.values})).sort((a,b)=>a.time-b.time),keys=new Set();
+ if(frames[0].time!==0||frames.at(-1).time!==1||frames.some((f,i)=>!Number.isFinite(f.time)||f.time<0||f.time>1||(i&&f.time<=frames[i-1].time)||!f.values||typeof f.values!=='object'||Array.isArray(f.values)))throw Error('关键帧须从 0% 到 100%，且时间不能重复');
+ for(const frame of frames)for(const [id,v]of Object.entries(frame.values)){const c=controls[id],body=rig==='anny'?c?.group==='anny.pose'||c?.group==='anny.translations':c?.group==='mhr.pose';if(!body||typeof v!=='number'||!Number.isFinite(v)||c.bounds&&(v<c.bounds[0]||v>c.bounds[1]))throw Error('动作含有不支持的身体控制：'+id);keys.add(id);}
+ if(keys.size>700)throw Error('动作控制数量过多');let changed=false;for(const id of keys){for(let i=1;i<frames.length;i++)if(Math.abs((frames[i].values[id]??0)-(frames[0].values[id]??0))>1e-9)changed=true;if(action.mode==='loop'&&Math.abs((frames.at(-1).values[id]??0)-(frames[0].values[id]??0))>1e-9)throw Error('循环动作首尾姿势须一致；可选择往返播放');}if(!changed)throw Error('关键帧姿势相同，请调整后重新记录');
+ const tangent=(a,b,ha,hb)=>{if(a*b<=0)return 0;const wa=2*hb+ha,wb=hb+2*ha;return(wa+wb)/(wa/a+wb/b);};
+ const tracks=[...keys].map(id=>{const v=frames.map(f=>f.values[id]??0),h=frames.slice(1).map((f,i)=>f.time-frames[i].time),d=h.map((x,i)=>(v[i+1]-v[i])/x),m=Array(v.length).fill(0);for(let i=1;i<v.length-1;i++)m[i]=tangent(d[i-1],d[i],h[i-1],h[i]);if(action.mode==='loop'){m[0]=m[m.length-1]=tangent(d.at(-1),d[0],h.at(-1),h[0]);}return{id,v,m};});
+ return{frames,keys:[...keys],tracks,duration:action.duration,mode:action.mode,easing:action.easing,rig};
+}
+function values(timeline,time){const f=timeline.frames,t=Math.max(0,Math.min(1,time));let i=0;while(i<f.length-2&&f[i+1].time<=t)i++;const h=f[i+1].time-f[i].time,u=(t-f[i].time)/h;return Object.fromEntries(timeline.tracks.map(({id,v,m})=>{const a=v[i],b=v[i+1];if(timeline.easing==='linear')return[id,a+(b-a)*u];const u2=u*u,u3=u2*u,y=(2*u3-3*u2+1)*a+(u3-2*u2+u)*h*m[i]+(-2*u3+3*u2)*b+(u3-u2)*h*m[i+1];return[id,Math.max(Math.min(a,b),Math.min(Math.max(a,b),y))];}));}
+function sampleTimes(timeline,budget=24){if(!Number.isInteger(budget)||budget<timeline.frames.length-1||budget>32)throw Error('动作样本预算无效');const f=timeline.frames,segments=f.length-1,divisions=Array(segments).fill(1),difficulty=[];for(let i=0;i<segments;i++){let largest=0;for(const id of timeline.keys){const delta=Math.abs((f[i+1].values[id]??0)-(f[i].values[id]??0));const degrees=id.startsWith('pose.B.')&&Number(id.slice(7))>=3?delta*180/Math.PI:id.startsWith('translation.')||/^pose\.B\.[012]$/.test(id)?delta*500:delta;largest=Math.max(largest,degrees);}difficulty.push(Math.max(1,largest/6));}let total=segments;while(total<budget){let best=0;for(let i=1;i<segments;i++)if(difficulty[i]/divisions[i]>difficulty[best]/divisions[best])best=i;if(total>=8&&difficulty[best]/divisions[best]<=1)break;divisions[best]++;total++;}const times=[];for(let i=0;i<segments;i++)for(let j=0;j<divisions[i];j++)times.push(f[i].time+(f[i+1].time-f[i].time)*j/divisions[i]);times.push(1);return times;}
+globalThis.BodyMotionTimelineR38={prepare,values,sampleTimes};
+})();
