@@ -137,10 +137,10 @@
   },
   "originalEB1LightsAndEnvironmentRestored": true,
   "schema": "body-source-atlas-viewer/2",
-  "builtUTC": "2026-10-27T09:33:34.077Z",
-  "file": "delivery/身体_R31_原形体与连续体型.html",
-  "sha256": "1868a8a0e6d71c56ff94d122e904ec9bb121b5e551a5fc0f1b864458a58483fb",
-  "bytes": 878220,
+  "builtUTC": "2026-10-28T02:47:50.356Z",
+  "file": "delivery/身体_R32_平滑轮廓.html",
+  "sha256": "fb0e618576677c227e6c925cc1a2250668ffee0fb295e547412cb9d0bf76579b",
+  "bytes": 883774,
   "data": {
     "file": "data/body-source-atlas-r24.json",
     "sha256": "172a19de2613102f037dafa79ac370547824f84da0d4c52ac29c10b04f06f97d",
@@ -599,24 +599,12 @@
       "sha256": "d41974275c1191795578deb5587ee3e32af30274ea96789cd5312757934476fc"
     },
     {
-      "file": "tools/build.cjs",
-      "sha256": "3cf1702cf76a15dc179d12ea176c65ab2372e81079953befbce157e62f4826c1"
-    },
-    {
       "file": "tools/build-r28.cjs",
       "sha256": "01e4c403e5d24acb60da45ea38657074b84a7c23941503b61f063f245a380cd0"
     },
     {
-      "file": "tools/build.cjs",
-      "sha256": "b40a27f8154e18fbf05a33c202bcfa896d96beca243536bfd060db02ce90a08b"
-    },
-    {
       "file": "tools/build-r29.cjs",
       "sha256": "4a9c25b959e9be9c15e57b94aec41fc406fb565dfd05a4bba48a55d89071afeb"
-    },
-    {
-      "file": "tools/build.cjs",
-      "sha256": "776976da573516c37fbbc9bf6a06cbedbb4eee18039ded92f6cad55718e8344a"
     },
     {
       "file": "tools/build-r30.cjs",
@@ -625,6 +613,26 @@
     {
       "file": "tools/build-r31.cjs",
       "sha256": "69f1612a2015ad605ded5a08d8495a42174b46605ec9eb0243f3f528e9050d10"
+    },
+    {
+      "file": "src/BodyEdgeAA32.js",
+      "sha256": "5b802de8b1341e9f26a5cd3dfaecbfe99d745993e918422a601fd3a7f96e2ee1"
+    },
+    {
+      "file": "tools/research/r32/render-integration.cjs",
+      "sha256": "d4917726feb8c4d101af927400b9e7732965f3b4620d2397937ade1da1d08199"
+    },
+    {
+      "file": "tools/build-r32.cjs",
+      "sha256": "66714b01980eaa3908569e968a8548f4a382bc2e8bc5a02e77ef18e458bea686"
+    },
+    {
+      "file": "tools/build.cjs",
+      "sha256": "1b89708716425056c57cc5e815939439b13540b2520b35d98117d9d511c96acb"
+    },
+    {
+      "file": "tools/preview-body.cjs",
+      "sha256": "0476bfcc1500b15b7eb91abc35bfe443a36aeb732f5c699f8399641f269dca2d"
     }
   ],
   "characterTriangleFaces": 0,
@@ -1020,8 +1028,8 @@
     "referenceOnly": true,
     "measuredAnatomicalBoneLengths": false
   },
-  "canonicalFile": "delivery/身体_R31_原形体与连续体型.html",
-  "version": "R31",
+  "canonicalFile": "delivery/身体_R32_平滑轮廓.html",
+  "version": "R32",
   "exactDomainAssets": [
     {
       "file": "delivery/assets/body-exact-r25/2e9bf28a922ddfd1d85b236ca3e2919108e6d3182219de499b53c0efc2328ba2.gz",
@@ -1147,13 +1155,15 @@
     "archivesPreserveExactInputSpelling": true
   },
   "inheritedSourceImplementation": {
-    "file": "BUILD-SOURCE-R30.json",
-    "sha256": "0c6994120e4f725b8b46e26b1b0f454780d39c1d040fbd9ff6bba63a9d7ecb2c",
-    "geometryAndMaterialCodeUnchanged": true
+    "file": "BUILD-SOURCE-R31.json",
+    "sha256": "1868a8a0e6d71c56ff94d122e904ec9bb121b5e551a5fc0f1b864458a58483fb",
+    "geometryUnchanged": true,
+    "displayEdgeFiltering": true
   },
-  "selectedVersion": "R31",
-  "companionBuild": "BUILD-R31.json",
-  "companionWorkbench": "BUILD-R31.json",
-  "researchBuild": "BUILD-POSE-R29.json",
-  "selection": "Original fixed-state body and original full person are retained. A source-derived candidate for six continuous body phenotypes, 117 signed local body controls, supported A-rig rotations and translations, and a dynamic neck is available in the workbench for the supported reference person. Source skin functions use inspection lighting or original environment lighting without dynamic shadows; the full original optical pipeline, autonomous mother, broader parameters, visual acceptance and project remain unfinished."
+  "edgeAntialiasing": "display-only edge filter and bounded device-aware supersampling",
+  "selectedVersion": "R32",
+  "companionBuild": "BUILD-R32.json",
+  "companionWorkbench": "BUILD-R32.json",
+  "researchBuild": "BUILD-POSE-R32.json",
+  "selection": "R32 retains the existing adjustable body and its construction history, improves displayed edge sampling, and continues visual refinement without requiring a new source-data comparison."
 }

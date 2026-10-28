@@ -14,6 +14,12 @@ http.createServer((req,res)=>{
   else if(pathname==='/joint-functions')manifest=selected.researchBuild||'BUILD-POSE-R28.json';
   else if(pathname==='/support-study'||pathname==='/身体_P1_参考支撑隔离研究.html')manifest='BUILD-SUPPORT-P1.json';
   else if(pathname==='/torso-study'||pathname==='/身体_P1_连续躯干隔离研究.html')manifest='BUILD-TORSO-P1.json';
+  else if(pathname==='/身体_R32_平滑轮廓.html')manifest='BUILD-SOURCE-R32.json';
+  else if(pathname==='/身体_R32_连续体型.html')manifest='BUILD-STUDY-R32.json';
+  else if(pathname==='/身体_R32_连续动作.html')manifest='BUILD-POSE-R32.json';
+  else if(pathname==='/人物身体_R32_平滑轮廓.html')manifest='BUILD-R32.json';
+  else if(pathname==='/身体_R31_原形体与连续体型.html')manifest='BUILD-SOURCE-R31.json';
+  else if(pathname==='/人物身体_R31_连续体型与颈口.html')manifest='BUILD-R31.json';
   else if(pathname==='/身体_R30_原形体与校准.html')manifest='BUILD-SOURCE-R30.json';
   else if(pathname==='/人物身体_R30_可回退体量校准.html')manifest='BUILD-R30.json';
   else if(pathname==='/身体_R29_连续关节原轮廓候选.html')manifest='BUILD-POSE-R29.json';

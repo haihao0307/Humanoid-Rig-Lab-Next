@@ -1,21 +1,21 @@
 {
-  "schema": "body-delivery-r31/1",
-  "version": "R31",
-  "updatedUTC": "2026-10-27T09:38:41.768Z",
+  "schema": "body-delivery-r32/1",
+  "version": "R32",
+  "updatedUTC": "2026-10-28T02:49:22.285Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
-    "file": "delivery/身体_R31_原形体与连续体型.html",
-    "sha256": "1868a8a0e6d71c56ff94d122e904ec9bb121b5e551a5fc0f1b864458a58483fb",
-    "bytes": 878220,
-    "url": "http://127.0.0.1:8914/?v=R31-1868a8a0",
-    "inheritedGeometryAndMaterialFrom": "BUILD-SOURCE-R30.json"
+    "file": "delivery/身体_R32_平滑轮廓.html",
+    "sha256": "fb0e618576677c227e6c925cc1a2250668ffee0fb295e547412cb9d0bf76579b",
+    "bytes": 883774,
+    "url": "http://127.0.0.1:8914/?v=R32-fb0e6185",
+    "inheritedGeometryFrom": "BUILD-SOURCE-R31.json"
   },
   "workbench": {
-    "file": "delivery/人物身体_R31_连续体型与颈口.html",
-    "sha256": "f8dbe0caf708f1a7e76f159a2cbf871f15f18cc7822322895dc45627cbf278f1",
-    "bytes": 1894039,
-    "url": "http://127.0.0.1:8914/workbench?v=R31-f8dbe0ca"
+    "file": "delivery/人物身体_R32_平滑轮廓.html",
+    "sha256": "5449567d100cf70ab0ffc7db71b54fea2aa4799b9eb8f008753d906f1a9c9487",
+    "bytes": 1897774,
+    "url": "http://127.0.0.1:8914/workbench?v=R32-5449567d"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
@@ -113,12 +113,13 @@
     "sampledViewRays": "qa/p1-torso/dynamic-full-view-ray-grids.json",
     "dynamicNeck": "qa/p1-torso/dynamic-neck-head-native.json",
     "completeArchive": "qa/p1-torso/full-body-archive-browser.json",
-    "workbench": "qa/p1-torso/workbench-dynamic-body-browser.json"
+    "workbench": "qa/p1-torso/workbench-dynamic-body-browser.json",
+    "edgeAntialiasing": "qa/edges-r32/workbench.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
-  "currentMainTask": "P1",
-  "currentSubtask": "P1.1",
+  "currentMainTask": "P2",
+  "currentSubtask": "P2.edge",
   "mainTasksAccepted": 0,
   "remaining": [
     {
@@ -134,7 +135,7 @@
     {
       "id": "P3",
       "status": "not_accepted",
-      "task": "自主母体、形态和绑定逐区替换"
+      "task": "函数表面、参数和绑定"
     },
     {
       "id": "P4",
@@ -147,7 +148,7 @@
       "task": "头部、附件与总平台整合"
     }
   ],
-  "previousDelivery": "DELIVERY-R30.json",
+  "previousDelivery": "DELIVERY-R31.json",
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
     "branch": "body/reconstruction-r18-20261023"
@@ -318,5 +319,23 @@
     "sourceFidelityAccepted": false,
     "visualAccepted": false,
     "completedMotherConversion": false
+  },
+  "direction": "当前人物由参考、既有数据与多轮迭代形成；以当前效果与参数可调为基准继续改进，不再要求原数据表面分析或一比一对照作为前置条件。历史来源记录保留。",
+  "edgeAntialiasing": {
+    "method": "bounded device-aware supersampling and display-only edge-aware filtering",
+    "changesCharacterSurface": false,
+    "sourceState": true,
+    "continuousBody": true,
+    "continuousPose": true,
+    "legacyContinuous": true,
+    "qa": "qa/edges-r32/workbench.json",
+    "testedViewAngles": [
+      "front",
+      "side",
+      "back",
+      "half"
+    ],
+    "testedShapePoseAndArchive": true,
+    "userVisualReviewPending": true
   }
 }

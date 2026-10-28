@@ -1,0 +1,3576 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>身体 R29 · 连续关节与原轮廓候选</title>
+<style>[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:#f1f2eb;color:#243f35;font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif}header{height:72px;display:flex;justify-content:space-between;align-items:center;gap:18px;padding:12px 22px}strong{font-size:20px;font-weight:550}button,a.button{font:inherit;color:inherit;text-decoration:none;background:#fcfcf7;border:1px solid #c7d0c2;border-radius:6px;padding:7px 11px;cursor:pointer}button:disabled,select:disabled{opacity:.5;cursor:wait}main{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;padding:0 22px 20px;height:calc(100vh - 72px)}.stage{position:relative;overflow:hidden;min-height:350px;background:#273431;border-radius:13px}canvas{width:100%;height:100%;display:block;touch-action:none}.views{position:absolute;bottom:15px;left:15px;display:flex;gap:6px;flex-wrap:wrap;max-width:95%}.views button{color:#e6ece3;background:#263b32dc;border-color:#637765}aside{overflow:auto;padding:5px 3px 25px}h1{font-size:25px;line-height:1.4;font-weight:500;margin:8px 0 13px}h2{font-size:15px;font-weight:550;margin:24px 0 8px}.tag{font-size:11px;letter-spacing:1px;color:#7b8e79}.small{font-size:12px;color:#71806d}.notice{padding:12px;border-left:3px solid #7d967c;background:#e7ece0;border-radius:3px}select{width:100%;padding:8px;color:inherit;font:inherit;background:#fcfcf7;border:1px solid #c7d0c2;border-radius:6px}label.rotation{display:grid;grid-template-columns:25px 1fr 65px;gap:7px;align-items:center;margin:12px 0}input[type=range]{width:100%;accent-color:#57785a}output{font-variant-numeric:tabular-nums;text-align:right;font-size:12px}.row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.loading{position:absolute;inset:0;display:grid;place-items:center;background:#273431ee;color:#e4ebdf;padding:25px;text-align:center}.loading[hidden]{display:none}#state-description{position:absolute;top:14px;left:16px;color:#e4ebdf;font-size:12px;pointer-events:none;max-width:90%}@media(max-width:850px){header{height:auto;min-height:72px;align-items:flex-start;flex-wrap:wrap}main{grid-template-columns:1fr;height:auto;padding:0 12px}.stage{height:72vh}aside{overflow:visible;padding:12px}strong{font-size:18px}}</style>
+<header><strong>人物身体 · 连续关节与原轮廓</strong><div class="row"><a class="button" href="./人物身体_R29_连续关节与原形体.html">完整参数工作页</a><a class="button" href="./身体_R29_原形体与参数衔接.html">原貌对照</a><button id="save" disabled>下载完整人物</button><button id="open" disabled>打开人物</button><input type="file" id="file" accept=".json,application/json" hidden></div></header>
+<main><section class="stage"><canvas id="body-view"></canvas><div id="state-description">原轮廓函数候选</div><div class="views"><button data-view="full">全身</button><button data-view="half">半身</button><button data-view="front">正面</button><button data-view="oblique">斜侧</button><button data-view="side">侧面</button><button data-view="back">背面</button></div><div class="loading" id="loading">正在载入原轮廓函数…</div></section><aside><div class="tag">CONTINUOUS SOURCE FORM / R29</div><h1>保留轮廓，<br>继续打通动作。</h1><p class="notice">这是独立的连续关节候选。六种原体型，以及驱动 B 关闭姿态修正的原状态下，四肢动作直接作用于原分区表面函数；六种 Anny 模板接入根关节与五段躯干主链，B 明确关闭修正时也接入根关节与脊柱，头颈边界随原绑定响应。原法线和完整外观仍待验收。</p><p class="small">拖动旋转，滚轮缩放；Shift 或右键拖动平移。当前用灰色结构光检查形体。已有原貌页与完整工作页保留。</p><h2>原体型模板</h2><select id="profile" disabled></select><p class="small">这里选择的是原版体型。任意连续体型滑杆尚未接入这条原轮廓函数路线。</p><h2>连续关节</h2><select id="joint" disabled></select><label class="rotation">X<input data-rotation="0" type="range" min="-180" max="180" step=".125" disabled><output>0°</output></label><label class="rotation">Y<input data-rotation="1" type="range" min="-180" max="180" step=".125" disabled><output>0°</output></label><label class="rotation">Z<input data-rotation="2" type="range" min="-180" max="180" step=".125" disabled><output>0°</output></label><label class="rotation">移 X<input data-translation="0" type="range" min="-.1" max=".1" step=".000125"><output>0 mm</output></label><label class="rotation">移 Y<input data-translation="1" type="range" min="-.1" max=".1" step=".000125"><output>0 mm</output></label><label class="rotation">移 Z<input data-translation="2" type="range" min="-.1" max=".1" step=".000125"><output>0 mm</output></label><div id="b-pose-control" hidden><label>驱动 B 原参数值<input data-b-pose type="range" step=".005"></label><input data-b-pose type="number" step=".005" aria-label="驱动 B 原参数数值"></div><p id="active-joints" class="small"></p><div class="row"><button data-pose="trunk">躯干联动</button><button data-pose="arms">手臂组合</button><button data-pose="legs">下肢组合</button><button data-pose="combined">全身四肢组合</button></div><div class="row"><button id="reference">临时对照原始静态</button><button id="reset">恢复原始动作</button></div><h2>观察方式</h2><select id="look"><option value="geometry">灰色结构光</option><option value="normals">候选法线方向</option></select><p class="small">已接入原面积累计、颈口调和与显示细分的标量响应。原法线的剩余局部差异仍待验收。灰模表现不能作为原皮肤一致的证明。</p><h2>仍待完成</h2><p class="small">任意连续体型、驱动 B 开启姿态修正的连续动作、任意颈头参数、原法线和皮肤、完整来源验收、自主母体。当前仍保留原分区和来源系数，没有宣称完成函数母体转换。</p><button id="retry-precision" hidden>重试边界核对</button><p id="status" class="small">准备中</p></aside></main>
+<script type="application/json" id="pose-functions-r29">{
+  "schema": "body-pose-functions-candidate-r29/1",
+  "referenceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+  "sourceProgramSHA256": "21977efd7038eced66aacb2719f307620892d23486f35a3cb6c475e4841f5af7",
+  "neckOperatorSHA256": "92495f2273e15c684c988eb68df2e94fd72fb936627c3a41b64311c4149e6d2c",
+  "sourceFacetPartitionInformationRetained": true,
+  "completedMotherConversion": false,
+  "sourceFidelityAccepted": false,
+  "acceptanceTolerance": null,
+  "profiles": [
+    {
+      "id": "baseline",
+      "label": "原人物",
+      "encoding": "gzip-typed-function-packet-r28",
+      "file": "delivery/assets/body-functions-r29/862183c2837b775e6792954e5feb689667e0f4b5e962f83ff22e7dab72375cf5.gz",
+      "url": "assets/body-functions-r29/862183c2837b775e6792954e5feb689667e0f4b5e962f83ff22e7dab72375cf5.gz",
+      "rawBytes": 1442096,
+      "rawSHA256": "f0000f00eadd249a14e5b6d439e99f10e5a35256104b8488a77673a00ddc85f3",
+      "compressedBytes": 986255,
+      "compressedSHA256": "862183c2837b775e6792954e5feb689667e0f4b5e962f83ff22e7dab72375cf5",
+      "functions": 18416,
+      "jointMomentFunctions": 0,
+      "normalPolynomialTerms": 0,
+      "sourceCaseSHA256": "3d3df0a9c7f4f0dae2041ccae7cac320c8c71109aa13c2aecd4c4869722fb383",
+      "rounded": {
+        "id": "baseline",
+        "file": "delivery/assets/body-rounded-r29/b285b0781d80f5f43cbf62b17a668fba4d1226e3fa49e8d6186382b753ac989c.gz",
+        "url": "assets/body-rounded-r29/b285b0781d80f5f43cbf62b17a668fba4d1226e3fa49e8d6186382b753ac989c.gz",
+        "encoding": "gzip-json-source-function-r28",
+        "rawBytes": 23656537,
+        "rawSHA256": "654a972959c091d8132ce11d1c40f15a194b7aae1cb06ef9f41906eb41d9099b",
+        "compressedBytes": 8119195,
+        "compressedSHA256": "b285b0781d80f5f43cbf62b17a668fba4d1226e3fa49e8d6186382b753ac989c",
+        "sourceFacetPartitionInformationRetained": true,
+        "sourceBoundarySupportRelationRetained": true,
+        "completedMotherConversion": false,
+        "sourceFidelityAccepted": false,
+        "originalNativeOperands": true
+      },
+      "previousCoreCompressedBytes": 24130931,
+      "inheritedJointMomentFunctionCount": 63654,
+      "displayNormals": {
+        "id": "baseline",
+        "file": "delivery/assets/body-normals-r29/d255797d573b45e732828ce6242ef44b34c40e586784be829d0cde13de4087c5.gz",
+        "url": "assets/body-normals-r29/d255797d573b45e732828ce6242ef44b34c40e586784be829d0cde13de4087c5.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 10706657,
+        "compressedSHA256": "d255797d573b45e732828ce6242ef44b34c40e586784be829d0cde13de4087c5",
+        "rawBytes": 53736934,
+        "rawSHA256": "f37c7f2712cefd61798ec433e7abcb6bf71ab12549d8a0593be16270b434ec49",
+        "functions": 18416,
+        "instructions": 2527258,
+        "sourceObservationSHA256": "483620253cdf698f709486906fcc3ad324cbf25339012e3bf91aa9ec013d9f3d"
+      },
+      "headBoundaryFunctions": {
+        "id": "baseline",
+        "file": "delivery/assets/body-head-boundary-r29/0d8add4a7bf7d50e8f7ff3ad6a4f9de5c80409b2f2c1739811f18bf5c39ca91a.gz",
+        "url": "assets/body-head-boundary-r29/0d8add4a7bf7d50e8f7ff3ad6a4f9de5c80409b2f2c1739811f18bf5c39ca91a.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 323845,
+        "compressedSHA256": "0d8add4a7bf7d50e8f7ff3ad6a4f9de5c80409b2f2c1739811f18bf5c39ca91a",
+        "rawBytes": 1412777,
+        "rawSHA256": "4515ca8523e89122b44f185d236a3f1b42fb4c9338c2df148103339a42315830",
+        "allowedJoints": [
+          "root",
+          "pelvis.L",
+          "upperleg01.L",
+          "upperleg02.L",
+          "lowerleg01.L",
+          "lowerleg02.L",
+          "foot.L",
+          "toe1-1.L",
+          "toe1-2.L",
+          "toe2-1.L",
+          "toe2-2.L",
+          "toe2-3.L",
+          "toe3-1.L",
+          "toe3-2.L",
+          "toe3-3.L",
+          "toe4-1.L",
+          "toe4-2.L",
+          "toe4-3.L",
+          "toe5-1.L",
+          "toe5-2.L",
+          "toe5-3.L",
+          "pelvis.R",
+          "upperleg01.R",
+          "upperleg02.R",
+          "lowerleg01.R",
+          "lowerleg02.R",
+          "foot.R",
+          "toe1-1.R",
+          "toe1-2.R",
+          "toe2-1.R",
+          "toe2-2.R",
+          "toe2-3.R",
+          "toe3-1.R",
+          "toe3-2.R",
+          "toe3-3.R",
+          "toe4-1.R",
+          "toe4-2.R",
+          "toe4-3.R",
+          "toe5-1.R",
+          "toe5-2.R",
+          "toe5-3.R",
+          "spine05",
+          "spine04",
+          "spine03",
+          "spine02",
+          "spine01",
+          "clavicle.L",
+          "shoulder01.L",
+          "upperarm01.L",
+          "upperarm02.L",
+          "lowerarm01.L",
+          "lowerarm02.L",
+          "wrist.L",
+          "finger1-1.L",
+          "finger1-2.L",
+          "finger1-3.L",
+          "metacarpal1.L",
+          "finger2-1.L",
+          "finger2-2.L",
+          "finger2-3.L",
+          "metacarpal2.L",
+          "finger3-1.L",
+          "finger3-2.L",
+          "finger3-3.L",
+          "metacarpal3.L",
+          "finger4-1.L",
+          "finger4-2.L",
+          "finger4-3.L",
+          "metacarpal4.L",
+          "finger5-1.L",
+          "finger5-2.L",
+          "finger5-3.L",
+          "clavicle.R",
+          "shoulder01.R",
+          "upperarm01.R",
+          "upperarm02.R",
+          "lowerarm01.R",
+          "lowerarm02.R",
+          "wrist.R",
+          "finger1-1.R",
+          "finger1-2.R",
+          "finger1-3.R",
+          "metacarpal1.R",
+          "finger2-1.R",
+          "finger2-2.R",
+          "finger2-3.R",
+          "metacarpal2.R",
+          "finger3-1.R",
+          "finger3-2.R",
+          "finger3-3.R",
+          "metacarpal3.R",
+          "finger4-1.R",
+          "finger4-2.R",
+          "finger4-3.R",
+          "metacarpal4.R",
+          "finger5-1.R",
+          "finger5-2.R",
+          "finger5-3.R"
+        ],
+        "instructions": 70462
+      }
+    },
+    {
+      "id": "lean",
+      "label": "原参数 · 偏瘦",
+      "encoding": "gzip-typed-function-packet-r28",
+      "file": "delivery/assets/body-functions-r29/080fdda94738d66940f37919be05f9d42c18f11387ab236f74b97e96e87b33f9.gz",
+      "url": "assets/body-functions-r29/080fdda94738d66940f37919be05f9d42c18f11387ab236f74b97e96e87b33f9.gz",
+      "rawBytes": 1441875,
+      "rawSHA256": "d6a197a54c18371c1a2e73dbba98a9066b4235d3275b09a1128c74b6d489ddf1",
+      "compressedBytes": 983464,
+      "compressedSHA256": "080fdda94738d66940f37919be05f9d42c18f11387ab236f74b97e96e87b33f9",
+      "functions": 18416,
+      "jointMomentFunctions": 0,
+      "normalPolynomialTerms": 0,
+      "sourceCaseSHA256": "30d7e3ff91bc1d36fee0f2a2b7a49fe33ab8fc8907cde90fb2f752740979bbfd",
+      "rounded": {
+        "id": "lean",
+        "file": "delivery/assets/body-rounded-r29/bfe6b2e8e8d523cb7a268470a6f39a8a0ef147957294d05b4c6a6632f406ce66.gz",
+        "url": "assets/body-rounded-r29/bfe6b2e8e8d523cb7a268470a6f39a8a0ef147957294d05b4c6a6632f406ce66.gz",
+        "encoding": "gzip-json-source-function-r28",
+        "rawBytes": 22478088,
+        "rawSHA256": "1f2169919ba84fb16b0887c6badf93c6e6bd294eeebf48edb4db59e6e5137ffb",
+        "compressedBytes": 7602603,
+        "compressedSHA256": "bfe6b2e8e8d523cb7a268470a6f39a8a0ef147957294d05b4c6a6632f406ce66",
+        "sourceFacetPartitionInformationRetained": true,
+        "sourceBoundarySupportRelationRetained": true,
+        "completedMotherConversion": false,
+        "sourceFidelityAccepted": false,
+        "originalNativeOperands": true
+      },
+      "previousCoreCompressedBytes": 24101742,
+      "inheritedJointMomentFunctionCount": 63654,
+      "displayNormals": {
+        "id": "lean",
+        "file": "delivery/assets/body-normals-r29/8bfcd3fe459153492a638f9516e8a7cfb628b216a2c4414df07868412ef9c3f1.gz",
+        "url": "assets/body-normals-r29/8bfcd3fe459153492a638f9516e8a7cfb628b216a2c4414df07868412ef9c3f1.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 10706206,
+        "compressedSHA256": "8bfcd3fe459153492a638f9516e8a7cfb628b216a2c4414df07868412ef9c3f1",
+        "rawBytes": 53736804,
+        "rawSHA256": "bf79f3d15954db877e6a65f70d15e824eaa798569867032e86712840c7220b87",
+        "functions": 18416,
+        "instructions": 2527252,
+        "sourceObservationSHA256": "6df5febe40c871d02301366c98e26c8cb2d6e245574af4a50a7530141f89e08a"
+      },
+      "headBoundaryFunctions": {
+        "id": "lean",
+        "file": "delivery/assets/body-head-boundary-r29/6506c4882a9b98d4660d815cfc82a337495375cc49ecfd8ef722fde8d9b8fce8.gz",
+        "url": "assets/body-head-boundary-r29/6506c4882a9b98d4660d815cfc82a337495375cc49ecfd8ef722fde8d9b8fce8.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 322446,
+        "compressedSHA256": "6506c4882a9b98d4660d815cfc82a337495375cc49ecfd8ef722fde8d9b8fce8",
+        "rawBytes": 1412431,
+        "rawSHA256": "d93fd0230acde87176653678eef80abb812e758bfc158e8dcbcdee43e1f328a9",
+        "allowedJoints": [
+          "root",
+          "pelvis.L",
+          "upperleg01.L",
+          "upperleg02.L",
+          "lowerleg01.L",
+          "lowerleg02.L",
+          "foot.L",
+          "toe1-1.L",
+          "toe1-2.L",
+          "toe2-1.L",
+          "toe2-2.L",
+          "toe2-3.L",
+          "toe3-1.L",
+          "toe3-2.L",
+          "toe3-3.L",
+          "toe4-1.L",
+          "toe4-2.L",
+          "toe4-3.L",
+          "toe5-1.L",
+          "toe5-2.L",
+          "toe5-3.L",
+          "pelvis.R",
+          "upperleg01.R",
+          "upperleg02.R",
+          "lowerleg01.R",
+          "lowerleg02.R",
+          "foot.R",
+          "toe1-1.R",
+          "toe1-2.R",
+          "toe2-1.R",
+          "toe2-2.R",
+          "toe2-3.R",
+          "toe3-1.R",
+          "toe3-2.R",
+          "toe3-3.R",
+          "toe4-1.R",
+          "toe4-2.R",
+          "toe4-3.R",
+          "toe5-1.R",
+          "toe5-2.R",
+          "toe5-3.R",
+          "spine05",
+          "spine04",
+          "spine03",
+          "spine02",
+          "spine01",
+          "clavicle.L",
+          "shoulder01.L",
+          "upperarm01.L",
+          "upperarm02.L",
+          "lowerarm01.L",
+          "lowerarm02.L",
+          "wrist.L",
+          "finger1-1.L",
+          "finger1-2.L",
+          "finger1-3.L",
+          "metacarpal1.L",
+          "finger2-1.L",
+          "finger2-2.L",
+          "finger2-3.L",
+          "metacarpal2.L",
+          "finger3-1.L",
+          "finger3-2.L",
+          "finger3-3.L",
+          "metacarpal3.L",
+          "finger4-1.L",
+          "finger4-2.L",
+          "finger4-3.L",
+          "metacarpal4.L",
+          "finger5-1.L",
+          "finger5-2.L",
+          "finger5-3.L",
+          "clavicle.R",
+          "shoulder01.R",
+          "upperarm01.R",
+          "upperarm02.R",
+          "lowerarm01.R",
+          "lowerarm02.R",
+          "wrist.R",
+          "finger1-1.R",
+          "finger1-2.R",
+          "finger1-3.R",
+          "metacarpal1.R",
+          "finger2-1.R",
+          "finger2-2.R",
+          "finger2-3.R",
+          "metacarpal2.R",
+          "finger3-1.R",
+          "finger3-2.R",
+          "finger3-3.R",
+          "metacarpal3.R",
+          "finger4-1.R",
+          "finger4-2.R",
+          "finger4-3.R",
+          "metacarpal4.R",
+          "finger5-1.R",
+          "finger5-2.R",
+          "finger5-3.R"
+        ],
+        "instructions": 70455
+      }
+    },
+    {
+      "id": "fuller",
+      "label": "原参数 · 丰满",
+      "encoding": "gzip-typed-function-packet-r28",
+      "file": "delivery/assets/body-functions-r29/1611ea7e1aa944a72dca0ff2bbc2ab9a5deef570951e99c1ec23b358a68573d1.gz",
+      "url": "assets/body-functions-r29/1611ea7e1aa944a72dca0ff2bbc2ab9a5deef570951e99c1ec23b358a68573d1.gz",
+      "rawBytes": 1442113,
+      "rawSHA256": "586725d0b9e468e33c1c6e8d99dc58dff6dd86aab3cede38e54485524f7e4019",
+      "compressedBytes": 988637,
+      "compressedSHA256": "1611ea7e1aa944a72dca0ff2bbc2ab9a5deef570951e99c1ec23b358a68573d1",
+      "functions": 18416,
+      "jointMomentFunctions": 0,
+      "normalPolynomialTerms": 0,
+      "sourceCaseSHA256": "274feaa059abe5779ff15e6ba0560a7642c6bc995da4c05356526058dc0dcab7",
+      "rounded": {
+        "id": "fuller",
+        "file": "delivery/assets/body-rounded-r29/55f009605a4dc749cdefb07c60f36f06a33295b735aa201e5be2b66ea084750d.gz",
+        "url": "assets/body-rounded-r29/55f009605a4dc749cdefb07c60f36f06a33295b735aa201e5be2b66ea084750d.gz",
+        "encoding": "gzip-json-source-function-r28",
+        "rawBytes": 23656081,
+        "rawSHA256": "df0d0ef4f0e9123bd43c538bb116c131a0e137e6bb53844ffc3a3196da1740b3",
+        "compressedBytes": 8117286,
+        "compressedSHA256": "55f009605a4dc749cdefb07c60f36f06a33295b735aa201e5be2b66ea084750d",
+        "sourceFacetPartitionInformationRetained": true,
+        "sourceBoundarySupportRelationRetained": true,
+        "completedMotherConversion": false,
+        "sourceFidelityAccepted": false,
+        "originalNativeOperands": true
+      },
+      "previousCoreCompressedBytes": 24134450,
+      "inheritedJointMomentFunctionCount": 63654,
+      "displayNormals": {
+        "id": "fuller",
+        "file": "delivery/assets/body-normals-r29/f08eb2ea1bb5bffe244bb39dc8e7ab1e0a0f34cb7fd07b35bec70f99f8ad4d13.gz",
+        "url": "assets/body-normals-r29/f08eb2ea1bb5bffe244bb39dc8e7ab1e0a0f34cb7fd07b35bec70f99f8ad4d13.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 10706304,
+        "compressedSHA256": "f08eb2ea1bb5bffe244bb39dc8e7ab1e0a0f34cb7fd07b35bec70f99f8ad4d13",
+        "rawBytes": 53736869,
+        "rawSHA256": "74138c363da71c833c973142f1f7bb185dfbd34d7c19ab2f2d9828080b9edcaa",
+        "functions": 18416,
+        "instructions": 2527255,
+        "sourceObservationSHA256": "a1142024ea4a79e126da9036da34d352bbeba60b724b9f942c8bdff8b7d3ccaf"
+      },
+      "headBoundaryFunctions": {
+        "id": "fuller",
+        "file": "delivery/assets/body-head-boundary-r29/ef77ef676e1436f8fb77666b912eb100c7ec1cd92250cc1efce2b8a7b9d1e8c3.gz",
+        "url": "assets/body-head-boundary-r29/ef77ef676e1436f8fb77666b912eb100c7ec1cd92250cc1efce2b8a7b9d1e8c3.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 324086,
+        "compressedSHA256": "ef77ef676e1436f8fb77666b912eb100c7ec1cd92250cc1efce2b8a7b9d1e8c3",
+        "rawBytes": 1412542,
+        "rawSHA256": "17978767218e2eea39ec1103284f58d125807ad244332dc98b66a0c5290bca1e",
+        "allowedJoints": [
+          "root",
+          "pelvis.L",
+          "upperleg01.L",
+          "upperleg02.L",
+          "lowerleg01.L",
+          "lowerleg02.L",
+          "foot.L",
+          "toe1-1.L",
+          "toe1-2.L",
+          "toe2-1.L",
+          "toe2-2.L",
+          "toe2-3.L",
+          "toe3-1.L",
+          "toe3-2.L",
+          "toe3-3.L",
+          "toe4-1.L",
+          "toe4-2.L",
+          "toe4-3.L",
+          "toe5-1.L",
+          "toe5-2.L",
+          "toe5-3.L",
+          "pelvis.R",
+          "upperleg01.R",
+          "upperleg02.R",
+          "lowerleg01.R",
+          "lowerleg02.R",
+          "foot.R",
+          "toe1-1.R",
+          "toe1-2.R",
+          "toe2-1.R",
+          "toe2-2.R",
+          "toe2-3.R",
+          "toe3-1.R",
+          "toe3-2.R",
+          "toe3-3.R",
+          "toe4-1.R",
+          "toe4-2.R",
+          "toe4-3.R",
+          "toe5-1.R",
+          "toe5-2.R",
+          "toe5-3.R",
+          "spine05",
+          "spine04",
+          "spine03",
+          "spine02",
+          "spine01",
+          "clavicle.L",
+          "shoulder01.L",
+          "upperarm01.L",
+          "upperarm02.L",
+          "lowerarm01.L",
+          "lowerarm02.L",
+          "wrist.L",
+          "finger1-1.L",
+          "finger1-2.L",
+          "finger1-3.L",
+          "metacarpal1.L",
+          "finger2-1.L",
+          "finger2-2.L",
+          "finger2-3.L",
+          "metacarpal2.L",
+          "finger3-1.L",
+          "finger3-2.L",
+          "finger3-3.L",
+          "metacarpal3.L",
+          "finger4-1.L",
+          "finger4-2.L",
+          "finger4-3.L",
+          "metacarpal4.L",
+          "finger5-1.L",
+          "finger5-2.L",
+          "finger5-3.L",
+          "clavicle.R",
+          "shoulder01.R",
+          "upperarm01.R",
+          "upperarm02.R",
+          "lowerarm01.R",
+          "lowerarm02.R",
+          "wrist.R",
+          "finger1-1.R",
+          "finger1-2.R",
+          "finger1-3.R",
+          "metacarpal1.R",
+          "finger2-1.R",
+          "finger2-2.R",
+          "finger2-3.R",
+          "metacarpal2.R",
+          "finger3-1.R",
+          "finger3-2.R",
+          "finger3-3.R",
+          "metacarpal3.R",
+          "finger4-1.R",
+          "finger4-2.R",
+          "finger4-3.R",
+          "metacarpal4.R",
+          "finger5-1.R",
+          "finger5-2.R",
+          "finger5-3.R"
+        ],
+        "instructions": 70458
+      }
+    },
+    {
+      "id": "muscular",
+      "label": "原参数 · 高肌肉",
+      "encoding": "gzip-typed-function-packet-r28",
+      "file": "delivery/assets/body-functions-r29/4cada9b5625cc4179a3531d3151975806cae99a13f9e5bdc3aee5b791103bdc6.gz",
+      "url": "assets/body-functions-r29/4cada9b5625cc4179a3531d3151975806cae99a13f9e5bdc3aee5b791103bdc6.gz",
+      "rawBytes": 1441889,
+      "rawSHA256": "70a83d03857220295f3fcb49bbfa787c4269d426f387d3b7c18c69179c2ba487",
+      "compressedBytes": 983046,
+      "compressedSHA256": "4cada9b5625cc4179a3531d3151975806cae99a13f9e5bdc3aee5b791103bdc6",
+      "functions": 18416,
+      "jointMomentFunctions": 0,
+      "normalPolynomialTerms": 0,
+      "sourceCaseSHA256": "039ccecc68e5377d7da2a8a679130de4c8795c65fba07d4763dfc62327ab716b",
+      "rounded": {
+        "id": "muscular",
+        "file": "delivery/assets/body-rounded-r29/120c91144cd06d1a614a4fc84e5716600d71d771c6675808366d4ee4a4f27068.gz",
+        "url": "assets/body-rounded-r29/120c91144cd06d1a614a4fc84e5716600d71d771c6675808366d4ee4a4f27068.gz",
+        "encoding": "gzip-json-source-function-r28",
+        "rawBytes": 22480729,
+        "rawSHA256": "76144539ee9d66884f64fbd6969cf905a85b16add2f4168c74ce23807e422188",
+        "compressedBytes": 7601177,
+        "compressedSHA256": "120c91144cd06d1a614a4fc84e5716600d71d771c6675808366d4ee4a4f27068",
+        "sourceFacetPartitionInformationRetained": true,
+        "sourceBoundarySupportRelationRetained": true,
+        "completedMotherConversion": false,
+        "sourceFidelityAccepted": false,
+        "originalNativeOperands": true
+      },
+      "previousCoreCompressedBytes": 24101284,
+      "inheritedJointMomentFunctionCount": 63654,
+      "displayNormals": {
+        "id": "muscular",
+        "file": "delivery/assets/body-normals-r29/0071ec4ad3e1a045d36aa6d08f364b241776d0c6963baad7efcce96f08717eba.gz",
+        "url": "assets/body-normals-r29/0071ec4ad3e1a045d36aa6d08f364b241776d0c6963baad7efcce96f08717eba.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 10706420,
+        "compressedSHA256": "0071ec4ad3e1a045d36aa6d08f364b241776d0c6963baad7efcce96f08717eba",
+        "rawBytes": 53736787,
+        "rawSHA256": "1456c87d91de999dea7fc434183f61afd80236a41fef0e11a05373bb801d9835",
+        "functions": 18416,
+        "instructions": 2527251,
+        "sourceObservationSHA256": "e885a619c4703947eaf476ec26f753129131f8990fd5b7c7f86ffd0ecd0c8fde"
+      },
+      "headBoundaryFunctions": {
+        "id": "muscular",
+        "file": "delivery/assets/body-head-boundary-r29/3314c932fe2c3e43e2f9cfaefb8f600fb9f26d99e3b82249df9012c2970aca48.gz",
+        "url": "assets/body-head-boundary-r29/3314c932fe2c3e43e2f9cfaefb8f600fb9f26d99e3b82249df9012c2970aca48.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 322457,
+        "compressedSHA256": "3314c932fe2c3e43e2f9cfaefb8f600fb9f26d99e3b82249df9012c2970aca48",
+        "rawBytes": 1412417,
+        "rawSHA256": "cdc9b54c2353d6ac74e902ec662dfe33c5fe2b837d46a5622ab9b182739b821f",
+        "allowedJoints": [
+          "root",
+          "pelvis.L",
+          "upperleg01.L",
+          "upperleg02.L",
+          "lowerleg01.L",
+          "lowerleg02.L",
+          "foot.L",
+          "toe1-1.L",
+          "toe1-2.L",
+          "toe2-1.L",
+          "toe2-2.L",
+          "toe2-3.L",
+          "toe3-1.L",
+          "toe3-2.L",
+          "toe3-3.L",
+          "toe4-1.L",
+          "toe4-2.L",
+          "toe4-3.L",
+          "toe5-1.L",
+          "toe5-2.L",
+          "toe5-3.L",
+          "pelvis.R",
+          "upperleg01.R",
+          "upperleg02.R",
+          "lowerleg01.R",
+          "lowerleg02.R",
+          "foot.R",
+          "toe1-1.R",
+          "toe1-2.R",
+          "toe2-1.R",
+          "toe2-2.R",
+          "toe2-3.R",
+          "toe3-1.R",
+          "toe3-2.R",
+          "toe3-3.R",
+          "toe4-1.R",
+          "toe4-2.R",
+          "toe4-3.R",
+          "toe5-1.R",
+          "toe5-2.R",
+          "toe5-3.R",
+          "spine05",
+          "spine04",
+          "spine03",
+          "spine02",
+          "spine01",
+          "clavicle.L",
+          "shoulder01.L",
+          "upperarm01.L",
+          "upperarm02.L",
+          "lowerarm01.L",
+          "lowerarm02.L",
+          "wrist.L",
+          "finger1-1.L",
+          "finger1-2.L",
+          "finger1-3.L",
+          "metacarpal1.L",
+          "finger2-1.L",
+          "finger2-2.L",
+          "finger2-3.L",
+          "metacarpal2.L",
+          "finger3-1.L",
+          "finger3-2.L",
+          "finger3-3.L",
+          "metacarpal3.L",
+          "finger4-1.L",
+          "finger4-2.L",
+          "finger4-3.L",
+          "metacarpal4.L",
+          "finger5-1.L",
+          "finger5-2.L",
+          "finger5-3.L",
+          "clavicle.R",
+          "shoulder01.R",
+          "upperarm01.R",
+          "upperarm02.R",
+          "lowerarm01.R",
+          "lowerarm02.R",
+          "wrist.R",
+          "finger1-1.R",
+          "finger1-2.R",
+          "finger1-3.R",
+          "metacarpal1.R",
+          "finger2-1.R",
+          "finger2-2.R",
+          "finger2-3.R",
+          "metacarpal2.R",
+          "finger3-1.R",
+          "finger3-2.R",
+          "finger3-3.R",
+          "metacarpal3.R",
+          "finger4-1.R",
+          "finger4-2.R",
+          "finger4-3.R",
+          "metacarpal4.R",
+          "finger5-1.R",
+          "finger5-2.R",
+          "finger5-3.R"
+        ],
+        "instructions": 70455
+      }
+    },
+    {
+      "id": "female",
+      "label": "原参数 · 女性形态",
+      "encoding": "gzip-typed-function-packet-r28",
+      "file": "delivery/assets/body-functions-r29/d4a71f4569e42b790395d1b0f4d8a634493a0ac52ccc6cfd7cb47c73bbb224f4.gz",
+      "url": "assets/body-functions-r29/d4a71f4569e42b790395d1b0f4d8a634493a0ac52ccc6cfd7cb47c73bbb224f4.gz",
+      "rawBytes": 1442390,
+      "rawSHA256": "9afe144b6ebc313f41e33a0e8a50500c973105c5bacd740b6b303ca920347023",
+      "compressedBytes": 984604,
+      "compressedSHA256": "d4a71f4569e42b790395d1b0f4d8a634493a0ac52ccc6cfd7cb47c73bbb224f4",
+      "functions": 18416,
+      "jointMomentFunctions": 0,
+      "normalPolynomialTerms": 0,
+      "sourceCaseSHA256": "bd90be9482e710966ccbf752bd9c56779ce0889c63db1258bdf204646add01f1",
+      "rounded": {
+        "id": "female",
+        "file": "delivery/assets/body-rounded-r29/8ecd76805f9c3476dc9d5d3d6602dd9c917e46b49764c4f22d17bac7e3617f6a.gz",
+        "url": "assets/body-rounded-r29/8ecd76805f9c3476dc9d5d3d6602dd9c917e46b49764c4f22d17bac7e3617f6a.gz",
+        "encoding": "gzip-json-source-function-r28",
+        "rawBytes": 23635466,
+        "rawSHA256": "f39064afd334e82e11795dba17638243b15320bdb828d90002f2161fd797d120",
+        "compressedBytes": 8105530,
+        "compressedSHA256": "8ecd76805f9c3476dc9d5d3d6602dd9c917e46b49764c4f22d17bac7e3617f6a",
+        "sourceFacetPartitionInformationRetained": true,
+        "sourceBoundarySupportRelationRetained": true,
+        "completedMotherConversion": false,
+        "sourceFidelityAccepted": false,
+        "originalNativeOperands": true
+      },
+      "previousCoreCompressedBytes": 24133443,
+      "inheritedJointMomentFunctionCount": 63654,
+      "displayNormals": {
+        "id": "female",
+        "file": "delivery/assets/body-normals-r29/fa2496aad79c5edbe855f71d7e64933de3dcd4eddf811c516bbd075ac0e49cb9.gz",
+        "url": "assets/body-normals-r29/fa2496aad79c5edbe855f71d7e64933de3dcd4eddf811c516bbd075ac0e49cb9.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 10706667,
+        "compressedSHA256": "fa2496aad79c5edbe855f71d7e64933de3dcd4eddf811c516bbd075ac0e49cb9",
+        "rawBytes": 53736953,
+        "rawSHA256": "304901fcdd3eb6aeec19cefa14d88cb9fb2b22dda6ad652d230d720fcef48479",
+        "functions": 18416,
+        "instructions": 2527259,
+        "sourceObservationSHA256": "e3db301614ebed38c3eba383e1ba82a148c3af3a1952d5b8256e544dedf5a784"
+      },
+      "headBoundaryFunctions": {
+        "id": "female",
+        "file": "delivery/assets/body-head-boundary-r29/b3fd7b2be2e4f5f68b4dbd876435ef7906c93759d9d30c6a9a78c2399951f500.gz",
+        "url": "assets/body-head-boundary-r29/b3fd7b2be2e4f5f68b4dbd876435ef7906c93759d9d30c6a9a78c2399951f500.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 323754,
+        "compressedSHA256": "b3fd7b2be2e4f5f68b4dbd876435ef7906c93759d9d30c6a9a78c2399951f500",
+        "rawBytes": 1413616,
+        "rawSHA256": "7840faecded39161d68e1bac5f96a009a41bc985966281b993c66c6868ed58e6",
+        "allowedJoints": [
+          "root",
+          "pelvis.L",
+          "upperleg01.L",
+          "upperleg02.L",
+          "lowerleg01.L",
+          "lowerleg02.L",
+          "foot.L",
+          "toe1-1.L",
+          "toe1-2.L",
+          "toe2-1.L",
+          "toe2-2.L",
+          "toe2-3.L",
+          "toe3-1.L",
+          "toe3-2.L",
+          "toe3-3.L",
+          "toe4-1.L",
+          "toe4-2.L",
+          "toe4-3.L",
+          "toe5-1.L",
+          "toe5-2.L",
+          "toe5-3.L",
+          "pelvis.R",
+          "upperleg01.R",
+          "upperleg02.R",
+          "lowerleg01.R",
+          "lowerleg02.R",
+          "foot.R",
+          "toe1-1.R",
+          "toe1-2.R",
+          "toe2-1.R",
+          "toe2-2.R",
+          "toe2-3.R",
+          "toe3-1.R",
+          "toe3-2.R",
+          "toe3-3.R",
+          "toe4-1.R",
+          "toe4-2.R",
+          "toe4-3.R",
+          "toe5-1.R",
+          "toe5-2.R",
+          "toe5-3.R",
+          "spine05",
+          "spine04",
+          "spine03",
+          "spine02",
+          "spine01",
+          "clavicle.L",
+          "shoulder01.L",
+          "upperarm01.L",
+          "upperarm02.L",
+          "lowerarm01.L",
+          "lowerarm02.L",
+          "wrist.L",
+          "finger1-1.L",
+          "finger1-2.L",
+          "finger1-3.L",
+          "metacarpal1.L",
+          "finger2-1.L",
+          "finger2-2.L",
+          "finger2-3.L",
+          "metacarpal2.L",
+          "finger3-1.L",
+          "finger3-2.L",
+          "finger3-3.L",
+          "metacarpal3.L",
+          "finger4-1.L",
+          "finger4-2.L",
+          "finger4-3.L",
+          "metacarpal4.L",
+          "finger5-1.L",
+          "finger5-2.L",
+          "finger5-3.L",
+          "clavicle.R",
+          "shoulder01.R",
+          "upperarm01.R",
+          "upperarm02.R",
+          "lowerarm01.R",
+          "lowerarm02.R",
+          "wrist.R",
+          "finger1-1.R",
+          "finger1-2.R",
+          "finger1-3.R",
+          "metacarpal1.R",
+          "finger2-1.R",
+          "finger2-2.R",
+          "finger2-3.R",
+          "metacarpal2.R",
+          "finger3-1.R",
+          "finger3-2.R",
+          "finger3-3.R",
+          "metacarpal3.R",
+          "finger4-1.R",
+          "finger4-2.R",
+          "finger4-3.R",
+          "metacarpal4.R",
+          "finger5-1.R",
+          "finger5-2.R",
+          "finger5-3.R"
+        ],
+        "instructions": 70462
+      }
+    },
+    {
+      "id": "calibration-soft",
+      "label": "校准档 · 肌肉/脂肪中值",
+      "encoding": "gzip-typed-function-packet-r28",
+      "file": "delivery/assets/body-functions-r29/8113bf67b7c6da5bcf44bd2afd24f055d99ae14ce3f3f208af875c3ec0e868b4.gz",
+      "url": "assets/body-functions-r29/8113bf67b7c6da5bcf44bd2afd24f055d99ae14ce3f3f208af875c3ec0e868b4.gz",
+      "rawBytes": 1441852,
+      "rawSHA256": "2fe82e96135ae6da1ad1f6fa89a682bd8b81c4005e4a61b0e4fee0762fa16711",
+      "compressedBytes": 982582,
+      "compressedSHA256": "8113bf67b7c6da5bcf44bd2afd24f055d99ae14ce3f3f208af875c3ec0e868b4",
+      "functions": 18416,
+      "jointMomentFunctions": 0,
+      "normalPolynomialTerms": 0,
+      "sourceCaseSHA256": "1b09ebf265eeb888b2bbf5674675be9de3001a297d7f6058521cbacc450ef7c3",
+      "rounded": {
+        "id": "calibration-soft",
+        "file": "delivery/assets/body-rounded-r29/e5c68950161ca0b16211662d4fd34e7cc18535b090d24fafa2e032fbe58823e2.gz",
+        "url": "assets/body-rounded-r29/e5c68950161ca0b16211662d4fd34e7cc18535b090d24fafa2e032fbe58823e2.gz",
+        "encoding": "gzip-json-source-function-r28",
+        "rawBytes": 22449013,
+        "rawSHA256": "8ab9bba16f25da6fdcb3a527fbc164f051552757da6d9cb6f80fd42e0470c361",
+        "compressedBytes": 7587845,
+        "compressedSHA256": "e5c68950161ca0b16211662d4fd34e7cc18535b090d24fafa2e032fbe58823e2",
+        "sourceFacetPartitionInformationRetained": true,
+        "sourceBoundarySupportRelationRetained": true,
+        "completedMotherConversion": false,
+        "sourceFidelityAccepted": false,
+        "originalNativeOperands": true
+      },
+      "previousCoreCompressedBytes": 24099154,
+      "inheritedJointMomentFunctionCount": 63654,
+      "displayNormals": {
+        "id": "calibration-soft",
+        "file": "delivery/assets/body-normals-r29/30efc7279b7cf8ee569436c87a493e22772a5d3431b062531d98578be44ad5dc.gz",
+        "url": "assets/body-normals-r29/30efc7279b7cf8ee569436c87a493e22772a5d3431b062531d98578be44ad5dc.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 10706340,
+        "compressedSHA256": "30efc7279b7cf8ee569436c87a493e22772a5d3431b062531d98578be44ad5dc",
+        "rawBytes": 53736648,
+        "rawSHA256": "2c69ad1d1dd16a5a7597d68f2328691d28860fa628550bc79018a8fb83cf2214",
+        "functions": 18416,
+        "instructions": 2527244,
+        "sourceObservationSHA256": "f5ebfb2bec68cc74d5beda3d6e11e59a92fd2ca0ddce7eb435f8613871e40bcf"
+      },
+      "headBoundaryFunctions": {
+        "id": "calibration-soft",
+        "file": "delivery/assets/body-head-boundary-r29/01801879aaa4a1bf26b4e0697ce9bdb7d7faf51b8935069a84e971acebfbb931.gz",
+        "url": "assets/body-head-boundary-r29/01801879aaa4a1bf26b4e0697ce9bdb7d7faf51b8935069a84e971acebfbb931.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 321845,
+        "compressedSHA256": "01801879aaa4a1bf26b4e0697ce9bdb7d7faf51b8935069a84e971acebfbb931",
+        "rawBytes": 1412185,
+        "rawSHA256": "ced7939c0209031936a7f0a2d17e1300ac65670ded02e26b2e327ae04a81e2d3",
+        "allowedJoints": [
+          "root",
+          "pelvis.L",
+          "upperleg01.L",
+          "upperleg02.L",
+          "lowerleg01.L",
+          "lowerleg02.L",
+          "foot.L",
+          "toe1-1.L",
+          "toe1-2.L",
+          "toe2-1.L",
+          "toe2-2.L",
+          "toe2-3.L",
+          "toe3-1.L",
+          "toe3-2.L",
+          "toe3-3.L",
+          "toe4-1.L",
+          "toe4-2.L",
+          "toe4-3.L",
+          "toe5-1.L",
+          "toe5-2.L",
+          "toe5-3.L",
+          "pelvis.R",
+          "upperleg01.R",
+          "upperleg02.R",
+          "lowerleg01.R",
+          "lowerleg02.R",
+          "foot.R",
+          "toe1-1.R",
+          "toe1-2.R",
+          "toe2-1.R",
+          "toe2-2.R",
+          "toe2-3.R",
+          "toe3-1.R",
+          "toe3-2.R",
+          "toe3-3.R",
+          "toe4-1.R",
+          "toe4-2.R",
+          "toe4-3.R",
+          "toe5-1.R",
+          "toe5-2.R",
+          "toe5-3.R",
+          "spine05",
+          "spine04",
+          "spine03",
+          "spine02",
+          "spine01",
+          "clavicle.L",
+          "shoulder01.L",
+          "upperarm01.L",
+          "upperarm02.L",
+          "lowerarm01.L",
+          "lowerarm02.L",
+          "wrist.L",
+          "finger1-1.L",
+          "finger1-2.L",
+          "finger1-3.L",
+          "metacarpal1.L",
+          "finger2-1.L",
+          "finger2-2.L",
+          "finger2-3.L",
+          "metacarpal2.L",
+          "finger3-1.L",
+          "finger3-2.L",
+          "finger3-3.L",
+          "metacarpal3.L",
+          "finger4-1.L",
+          "finger4-2.L",
+          "finger4-3.L",
+          "metacarpal4.L",
+          "finger5-1.L",
+          "finger5-2.L",
+          "finger5-3.L",
+          "clavicle.R",
+          "shoulder01.R",
+          "upperarm01.R",
+          "upperarm02.R",
+          "lowerarm01.R",
+          "lowerarm02.R",
+          "wrist.R",
+          "finger1-1.R",
+          "finger1-2.R",
+          "finger1-3.R",
+          "metacarpal1.R",
+          "finger2-1.R",
+          "finger2-2.R",
+          "finger2-3.R",
+          "metacarpal2.R",
+          "finger3-1.R",
+          "finger3-2.R",
+          "finger3-3.R",
+          "metacarpal3.R",
+          "finger4-1.R",
+          "finger4-2.R",
+          "finger4-3.R",
+          "metacarpal4.R",
+          "finger5-1.R",
+          "finger5-2.R",
+          "finger5-3.R"
+        ],
+        "instructions": 70448
+      }
+    },
+    {
+      "id": "B-no-correctives",
+      "boundaryProfile": "B-neutral",
+      "label": "驱动 B · 原体型（姿态修正关闭）",
+      "encoding": "gzip-typed-function-packet-r28",
+      "file": "delivery/assets/body-functions-r29/ffcfd848d1960218bda204e93df98df93c6c9733b4e8e28449d9229079041599.gz",
+      "url": "assets/body-functions-r29/ffcfd848d1960218bda204e93df98df93c6c9733b4e8e28449d9229079041599.gz",
+      "rawBytes": 1455349,
+      "rawSHA256": "7e758a079624a6f3285db9287757c7fa209bae5e86e66c62dfc9fedf36e90215",
+      "compressedBytes": 989041,
+      "compressedSHA256": "ffcfd848d1960218bda204e93df98df93c6c9733b4e8e28449d9229079041599",
+      "functions": 18416,
+      "jointMomentFunctions": 0,
+      "normalPolynomialTerms": 0,
+      "sourceCaseSHA256": "b9f7fd3e4efc9008ba3241be5cd583bdde66aeca08b017aabea8692bbf475654",
+      "rounded": {
+        "id": "B-no-correctives",
+        "file": "delivery/assets/body-rounded-r29/651c1657d5e6e1537f11656ca3126860be105fa18ec2ecb35b739f288d368faf.gz",
+        "url": "assets/body-rounded-r29/651c1657d5e6e1537f11656ca3126860be105fa18ec2ecb35b739f288d368faf.gz",
+        "encoding": "gzip-json-source-function-r28",
+        "rawBytes": 20179816,
+        "rawSHA256": "61aed0c0b62421cec5d9fc389602be7debb131dd00782624429e875fac412d77",
+        "compressedBytes": 7423206,
+        "compressedSHA256": "651c1657d5e6e1537f11656ca3126860be105fa18ec2ecb35b739f288d368faf",
+        "sourceFacetPartitionInformationRetained": true,
+        "sourceBoundarySupportRelationRetained": true,
+        "completedMotherConversion": false,
+        "sourceFidelityAccepted": false,
+        "originalNativeOperands": true
+      },
+      "previousCoreCompressedBytes": 24570676,
+      "inheritedJointMomentFunctionCount": 68667,
+      "displayNormals": {
+        "id": "B-no-correctives",
+        "file": "delivery/assets/body-normals-r29/4ea439b5cfc4935b11117215f273e4608182069b9b801789076fb2b66cbdc5c2.gz",
+        "url": "assets/body-normals-r29/4ea439b5cfc4935b11117215f273e4608182069b9b801789076fb2b66cbdc5c2.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 10706661,
+        "compressedSHA256": "4ea439b5cfc4935b11117215f273e4608182069b9b801789076fb2b66cbdc5c2",
+        "rawBytes": 53736942,
+        "rawSHA256": "db4b2b5551a1e248ff448ae85d986aa01b92ac24ca5a26aef7d1bdc30c3173bb",
+        "functions": 18416,
+        "instructions": 2527258,
+        "sourceObservationSHA256": "aa0e2209c40b3dd7d67acfe4e8d9a08b7635f4ef82cb13a2d66a448d67af1315"
+      },
+      "headBoundaryFunctions": {
+        "id": "B-no-correctives",
+        "file": "delivery/assets/body-head-boundary-r29/5f1c4ee0457e9562291b45fea517af6a1b9cd45ce45da32e08a76f15f7ec3d21.gz",
+        "url": "assets/body-head-boundary-r29/5f1c4ee0457e9562291b45fea517af6a1b9cd45ce45da32e08a76f15f7ec3d21.gz",
+        "encoding": "gzip-typed-function-packet-r28",
+        "compressedBytes": 324964,
+        "compressedSHA256": "5f1c4ee0457e9562291b45fea517af6a1b9cd45ce45da32e08a76f15f7ec3d21",
+        "rawBytes": 1425948,
+        "rawSHA256": "87a1f596a0bf9964a36d58225d969e3c6ccce27121a14337f308d7703d27651a",
+        "allowedJoints": [],
+        "allowedPoseIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          132,
+          133,
+          134,
+          135,
+          141,
+          142,
+          143,
+          144,
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          156,
+          157,
+          158,
+          159,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167,
+          168,
+          169,
+          170,
+          171,
+          172,
+          173,
+          174,
+          175,
+          176,
+          177,
+          178,
+          179,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          191,
+          192,
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203
+        ],
+        "instructions": 70462
+      }
+    }
+  ]
+}
+</script><script type="application/json" id="original-person-r29">{
+  "schema": "kaopu/review-platform@1",
+  "createdAt": "2026-10-23T02:33:40.514Z",
+  "selection": {
+    "selected": "P01",
+    "skinId": "silk",
+    "eyeId": "darkBrown",
+    "browId": "natural",
+    "tissueId": "luminous",
+    "lipId": "natural",
+    "bodyId": "r02-adult-male-sturdy",
+    "lightId": "studio",
+    "cameraId": "oblique",
+    "idle": false
+  },
+  "person": {
+    "schema": "kaopu-common-archive/rebuild-1",
+    "topologySha256": "e8526431b9b24bec71d8161ed409794a8398ffc68ad25800abb27e0fc09644de",
+    "adapterFingerprint": "4ac1f6b9ffac5ab45d1a427a1eb5e9578af0e7f105d58bff4d48555e4e2027a5",
+    "state": {
+      "schema": "kaopu-common-person/rebuild-1",
+      "headShapeComposition": "shared-layers/1",
+      "owners": {
+        "rig": "anny",
+        "headRig": "gnm",
+        "expression": "anny",
+        "headShape": "gnm",
+        "gaze": "gnm"
+      },
+      "gnm": {
+        "identity": [
+          0.4257696,
+          -0.460077,
+          -0.205085,
+          -0.7090891,
+          0.9138139,
+          0.1012641,
+          1.8510954,
+          -0.9706408,
+          -0.4908831,
+          1.5652567,
+          1.9663887,
+          -0.8852043,
+          -1.2714547,
+          0.712993,
+          1.4801169,
+          -0.1372007,
+          0.9318796,
+          -0.8543185,
+          -1.5101134,
+          0.8563384,
+          0.9668927,
+          0.3700296,
+          -0.6722452,
+          0.7167583,
+          0.9239004,
+          0.0126434,
+          0.2205673,
+          0.1482325,
+          -0.426315,
+          0.5094812,
+          0.9197972,
+          -0.8135799,
+          0.4969138,
+          -0.36671,
+          -0.5568118,
+          0.9223279,
+          -0.5437115,
+          -2.2,
+          -0.9970598,
+          -0.0732698,
+          -1.5887131,
+          -1.5502939,
+          0.1279792,
+          0.3419234,
+          1.4150605,
+          0.4227176,
+          0.7865771,
+          0.8324065,
+          1.3381585,
+          -1.9678035,
+          0.3639958,
+          -0.2165063,
+          -1.1919397,
+          -0.86534,
+          -0.3141298,
+          -0.4797836,
+          -0.666531,
+          0.1577122,
+          -0.4309381,
+          -0.7231253,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "expression": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      },
+      "anny": {
+        "phenotypes": {
+          "gender": 0,
+          "age": 0.74,
+          "muscle": 0.96,
+          "weight": 0.66,
+          "height": 0.39,
+          "proportions": 0.38,
+          "cupsize": 0.5,
+          "firmness": 0.5,
+          "african": 0.5,
+          "asian": 0.5,
+          "caucasian": 0.5
+        },
+        "localChanges": {
+          "measure-shoulder-dist-incr": 0.27,
+          "measure-waist-circ-incr": 0.04,
+          "torso-scale-depth-incr": 0.08,
+          "hip-scale-horiz-incr": 0.045,
+          "l-upperarm-fat-incr": 0.04,
+          "r-upperarm-fat-incr": 0.04,
+          "l-upperleg-fat-incr": 0.05,
+          "r-upperleg-fat-incr": 0.05,
+          "l-upperarm-shoulder-muscle-incr": 0.36,
+          "r-upperarm-shoulder-muscle-incr": 0.36,
+          "l-upperleg-muscle-incr": 0.2808,
+          "r-upperleg-muscle-incr": 0.2808,
+          "torso-muscle-dorsi-incr": 0.27,
+          "torso-vshape-incr": 0.216,
+          "head-fat-incr": 0.12,
+          "head-scale-horiz-incr": 0.13,
+          "chin-width-incr": 0.12,
+          "chin-height-incr": 0.02,
+          "chin-prominent-incr": 0.06,
+          "measure-neck-circ-incr": 0.25,
+          "neck-double-incr": 0.035,
+          "l-cheek-volume-incr": 0.13,
+          "r-cheek-volume-incr": 0.13,
+          "l-cheek-bones-incr": 0.22,
+          "r-cheek-bones-incr": 0.22,
+          "chin-bones-incr": 0.08,
+          "nose-scale-depth-incr": 0.045,
+          "forehead-temple-incr": 0.035
+        },
+        "facialActions": {},
+        "pose": {},
+        "translations": {}
+      },
+      "mhr": {
+        "identity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "pose": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "expression": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "correctives": true
+      }
+    },
+    "eyeSurface": {
+      "schema": "kaopu/native-eye-layer@1",
+      "topology": "e8526431b9b24bec71d8161ed409794a8398ffc68ad25800abb27e0fc09644de",
+      "settings": {
+        "enabled": true,
+        "lid": 1,
+        "brow": 1,
+        "medial": 1,
+        "resolution": 1,
+        "gray": false,
+        "grid": false
+      }
+    },
+    "faceSurface": {
+      "schema": "kaopu/native-face-surface@1",
+      "topology": "e8526431b9b24bec71d8161ed409794a8398ffc68ad25800abb27e0fc09644de",
+      "settings": {
+        "enabled": true,
+        "structure": 0.75,
+        "detail": 1,
+        "meso": 0.75,
+        "colorDetail": 0.5,
+        "pigment": 0,
+        "blood": 0.35,
+        "oil": 0.55,
+        "wrap": 0.28,
+        "diffusion": 0.65,
+        "radius": 1.3,
+        "layer": "beauty"
+      }
+    },
+    "faceIdentity": {
+      "schema": "kaopu/facial-identity@1",
+      "topology": "e8526431b9b24bec71d8161ed409794a8398ffc68ad25800abb27e0fc09644de",
+      "traits": {
+        "enabled": true,
+        "seed": 1729,
+        "freckles": 0,
+        "freckleSize": 0.65,
+        "freckleContrast": 0.55,
+        "freckleSpread": 0.65,
+        "acne": 0,
+        "acneSize": 1.25,
+        "acneRedness": 0.65,
+        "acneRelief": 0.28,
+        "acneWhiteheads": 0.35,
+        "acneMarks": 0,
+        "pittedScars": 0,
+        "forehead": 0,
+        "frown": 0,
+        "crowsFeet": 0,
+        "underEye": 0,
+        "nasolabial": 0,
+        "lipLines": 0,
+        "wrinkleDepth": 0.22,
+        "wrinkleWidth": 0.55,
+        "wrinkleIrregularity": 0.65,
+        "darkCircles": 0,
+        "ageSpots": 0,
+        "ageSpotSize": 2.1,
+        "scar": 0,
+        "scarX": 33,
+        "scarY": 275,
+        "scarLength": 22,
+        "scarAngle": -25,
+        "scarWidth": 1.3,
+        "scarRelief": -0.18,
+        "scarAge": 0.75,
+        "scarJagged": 0.45,
+        "moles": 0,
+        "moleX": -35,
+        "moleY": 256,
+        "moleSize": 1,
+        "redPatches": 0
+      },
+      "shape": {
+        "bridgeMM": 0,
+        "crease": 0,
+        "creaseHeightMM": 3.4,
+        "creaseWidthMM": 0.8
+      }
+    },
+    "naturalEyes": {
+      "schema": "kaopu/natural-eyes@1",
+      "enabled": true,
+      "reference": false,
+      "autoPupil": false,
+      "illumination": 0.5,
+      "left": {
+        "source": 0,
+        "irisScale": 1,
+        "pupil": 0.39,
+        "brightness": 0.86,
+        "tint": "#64452f",
+        "tintAmount": 0.94,
+        "innerColor": "#765438",
+        "innerAmount": 0.18,
+        "scleraWhite": 0.28,
+        "yellow": 0.035,
+        "redness": 0.06,
+        "veinAmount": 0.38,
+        "veinDensity": 0.65,
+        "limbal": 0.28,
+        "rotation": 0,
+        "contrast": 1,
+        "wetness": 0.68,
+        "corneaRoughness": 0.075,
+        "scleraRoughness": 0.29,
+        "parallax": 0.45
+      },
+      "right": {
+        "source": 0,
+        "irisScale": 1,
+        "pupil": 0.39,
+        "brightness": 0.86,
+        "tint": "#64452f",
+        "tintAmount": 0.94,
+        "innerColor": "#765438",
+        "innerAmount": 0.18,
+        "scleraWhite": 0.28,
+        "yellow": 0.035,
+        "redness": 0.06,
+        "veinAmount": 0.38,
+        "veinDensity": 0.65,
+        "limbal": 0.28,
+        "rotation": 0,
+        "contrast": 1,
+        "wetness": 0.68,
+        "corneaRoughness": 0.075,
+        "scleraRoughness": 0.29,
+        "parallax": 0.45
+      }
+    },
+    "lipStructure": {
+      "schema": "kaopu/lip-structure@2",
+      "enabled": true,
+      "structure": 1,
+      "upperVolume": 0.8,
+      "lowerVolume": 0.7,
+      "cupid": 0.75,
+      "tubercle": 0.8,
+      "corners": 0.55,
+      "borderSoftness": 0.52,
+      "furrows": 0.58,
+      "pigment": 0.64,
+      "wetness": 0.32,
+      "dryRoughness": 0.53,
+      "eyeSmoothing": 0.35,
+      "colorVariation": 0.65,
+      "upperShade": 0.45,
+      "dryness": 0.3,
+      "microRelief": 0.65,
+      "textureDensity": 1,
+      "patternSeed": 37
+    },
+    "lipAnatomyDNA": {
+      "schema": "kaopu/lip-anatomy-dna@1",
+      "upperMelanin": 0.26,
+      "lowerMelanin": 0.16,
+      "upperBlood": 0.48,
+      "lowerBlood": 0.54,
+      "oxygenation": 0.72,
+      "upperRoughness": 0.54,
+      "lowerRoughness": 0.49,
+      "upperWetness": 0.35,
+      "lowerWetness": 0.45,
+      "tissueDepth": 1,
+      "microGeometry": 1,
+      "skinRefinement": 0.65
+    },
+    "lipPerformance": {
+      "schema": "kaopu/lip-performance@1",
+      "pucker": 0,
+      "funnel": 0,
+      "press": 0,
+      "seal": 0,
+      "rollIn": 0,
+      "rollOut": 0,
+      "stretchLeft": 0,
+      "stretchRight": 0,
+      "upperRaise": 0,
+      "lowerDepress": 0,
+      "cornerLeft": 0,
+      "cornerRight": 0,
+      "adhesion": 0,
+      "release": 0
+    },
+    "lipPerformanceContext": {
+      "ownerBeforeJaw": null
+    },
+    "earStructure": {
+      "schema": "kaopu/ear-structure@3",
+      "enabled": true,
+      "left": {
+        "cartilageGrowth": 0.5,
+        "conchaGrowth": 0.5,
+        "lobuleGrowth": 0.5,
+        "rootAngle": 0,
+        "size": 1,
+        "width": 1,
+        "projection": 0,
+        "tilt": 0,
+        "helix": 0.92,
+        "helixRoll": 0.58,
+        "upperRoundness": 0.6,
+        "darwin": 0.06,
+        "antihelix": 1.08,
+        "superiorCrus": 0.92,
+        "inferiorCrus": 0.9,
+        "crusSpread": 0.5,
+        "scaphaWidth": 0.5,
+        "fold": 0.85,
+        "concha": 0.92,
+        "conchaWidth": 0.5,
+        "cymbaRatio": 0.52,
+        "tragus": 0.85,
+        "tragusAngle": 0,
+        "antitragus": 0.82,
+        "notchWidth": 0.5,
+        "lobule": 0.5,
+        "lobuleAttachment": 0.45,
+        "lobuleFullness": 0.5,
+        "lobuleHang": 0.35,
+        "redness": 0.3,
+        "pores": 0.55,
+        "poreSize": 0.28,
+        "creaseRelief": 0.35,
+        "roughness": 0.61,
+        "oil": 0.25,
+        "transmission": 0.22
+      },
+      "right": {
+        "cartilageGrowth": 0.5,
+        "conchaGrowth": 0.5,
+        "lobuleGrowth": 0.5,
+        "rootAngle": 0,
+        "size": 1,
+        "width": 1,
+        "projection": 0,
+        "tilt": 0,
+        "helix": 0.92,
+        "helixRoll": 0.58,
+        "upperRoundness": 0.6,
+        "darwin": 0.06,
+        "antihelix": 1.08,
+        "superiorCrus": 0.92,
+        "inferiorCrus": 0.9,
+        "crusSpread": 0.5,
+        "scaphaWidth": 0.5,
+        "fold": 0.85,
+        "concha": 0.92,
+        "conchaWidth": 0.5,
+        "cymbaRatio": 0.52,
+        "tragus": 0.85,
+        "tragusAngle": 0,
+        "antitragus": 0.82,
+        "notchWidth": 0.5,
+        "lobule": 0.5,
+        "lobuleAttachment": 0.45,
+        "lobuleFullness": 0.5,
+        "lobuleHang": 0.35,
+        "redness": 0.3,
+        "pores": 0.55,
+        "poreSize": 0.28,
+        "creaseRelief": 0.35,
+        "roughness": 0.61,
+        "oil": 0.25,
+        "transmission": 0.22
+      }
+    },
+    "lifelikeIdle": {
+      "schema": "kaopu/lifelike-idle@1",
+      "settings": {
+        "enabled": true,
+        "profile": "listening",
+        "seed": 4197,
+        "intensity": 0.85,
+        "blink": true,
+        "gaze": true,
+        "mouth": true,
+        "head": true,
+        "breath": true,
+        "surface": true,
+        "surfaceGain": 0.75,
+        "wrinkleGain": 0.65
+      }
+    },
+    "cinematicLook": {
+      "schema": "kaopu/cinematic-look@1",
+      "settings": {
+        "lighting": true,
+        "skin": true,
+        "preset": "window",
+        "keyEV": 0,
+        "fillStops": 2.4,
+        "rimStops": 1.6,
+        "keyAzimuth": -43,
+        "keyElevation": 24,
+        "distance": 1.1,
+        "width": 0.75,
+        "height": 1.1,
+        "keyK": 5600,
+        "fillK": 7000,
+        "rimK": 6500,
+        "exposureEV": -0.1,
+        "ambient": 0.08,
+        "shadow": true,
+        "shadowSoftness": 2.5,
+        "poreGain": 1.05,
+        "mesoGain": 0.75,
+        "specular": 0.75,
+        "lobeMix": 0.3,
+        "roughnessOffset": 0.035,
+        "fuzz": 0.07,
+        "diffusionScale": 0.8
+      }
+    },
+    "geometricSkinFolds": {
+      "schema": "kaopu/geometric-skin-folds@2",
+      "settings": {
+        "strength": 0.1,
+        "slack": 0.12,
+        "compression": 0.55,
+        "forehead": 0.05,
+        "eyes": 0.08,
+        "nasolabial": 0.78,
+        "cheeks": 0.55,
+        "sag": 0.55,
+        "makeup": 0.12,
+        "light": "natural",
+        "chroma": 0.28,
+        "exposure": 0,
+        "shadows": false,
+        "diffusion": true,
+        "gray": false
+      }
+    },
+    "regionalFace": {
+      "schema": "kaopu/unified-regional-face@1",
+      "settings": {
+        "enabled": true,
+        "zygoma": 0.16,
+        "malar": 0.18,
+        "buccal": 0.12,
+        "masseter": 0.14,
+        "jaw": 0.12,
+        "temple": 0.1,
+        "brow": 0.12,
+        "vault": 0.08,
+        "pores": 0.85,
+        "poreScale": 1,
+        "regional": 1,
+        "oil": 0.25,
+        "scatter": 0.4,
+        "diagnostic": 0
+      }
+    },
+    "headMorphology": {
+      "schema": "kaopu/head-morphology@1",
+      "settings": {
+        "enabled": true,
+        "headWidth": -0.18,
+        "headHeight": 0.12,
+        "headDepth": 0.12,
+        "templeWidth": -0.15,
+        "cheekboneWidth": 0.1,
+        "jawWidth": -0.48,
+        "jawAngle": 0.12,
+        "jawDefinition": 0.72,
+        "chinWidth": -0.26,
+        "chinLength": 0.16,
+        "chinProjection": 0.26,
+        "chinSquare": -0.3,
+        "malarFullness": 0.12,
+        "buccalFullness": -0.55,
+        "masseterFullness": -0.26,
+        "jowlFullness": -0.48,
+        "submentalFullness": -0.36,
+        "eyeWidth": 0.55,
+        "eyeOpening": -0.48,
+        "eyeTilt": 0.38,
+        "upperArch": -0.22,
+        "lowerArch": -0.12,
+        "eyeApex": 0.24,
+        "eyeHood": 0.18,
+        "noseRootProjection": 0,
+        "noseBridgeWidth": 0,
+        "noseBridgeProjection": 0,
+        "noseTipWidth": 0,
+        "noseTipProjection": 0,
+        "noseTipRotation": 0,
+        "noseAlarWidth": 0,
+        "noseAlarLift": 0,
+        "mouthWidth": 0,
+        "mouthVertical": 0,
+        "upperLipVolume": 0,
+        "lowerLipVolume": 0,
+        "lipProjection": 0,
+        "mouthCornerLift": 0
+      },
+      "selected": "P01"
+    },
+    "skinDNA": {
+      "schema": "kaopu.skin-dna/2",
+      "preset": "silk",
+      "enabled": true,
+      "quality": "fast",
+      "profile": {
+        "seed": 41731,
+        "melanin": 0.22,
+        "blood": 0.24,
+        "variation": 0.48,
+        "freckles": 0.035,
+        "sun": 0.12,
+        "age": 0.2,
+        "oil": 0.27,
+        "hydration": 0.55,
+        "pores": 0.65,
+        "poreScale": 1,
+        "detail": 0.55
+      },
+      "state": {
+        "flush": 0,
+        "sweat": 0,
+        "dryness": 0
+      }
+    },
+    "browLash": {
+      "schema": "kaopu/brow-lash-groom@1",
+      "settings": {
+        "enabled": true,
+        "brows": false,
+        "lashes": true,
+        "seed": 7219,
+        "browDensity": 1,
+        "browWidth": 1,
+        "browLength": 1,
+        "browArch": 0,
+        "lashDensity": 1,
+        "lashLength": 1,
+        "lashCurl": 1,
+        "fiberWidth": 1,
+        "roughness": 0.48,
+        "color": "#503322"
+      },
+      "selected": "natural"
+    },
+    "surface": {
+      "schema": "kaopu-common-surface/1",
+      "settings": {
+        "enabled": true,
+        "tone": 0.64,
+        "warmth": 0.5,
+        "lipColor": "#985955",
+        "lipMix": 0.6,
+        "detail": 0.72,
+        "roughness": 0.62,
+        "oil": 0.18,
+        "variation": 0.4,
+        "redness": 0.34,
+        "layer": "beauty"
+      }
+    },
+    "proceduralHeadSurface": {
+      "schema": "kaopu/procedural-head-surface@1",
+      "version": "HEAD-PROCEDURAL-R01",
+      "settings": {
+        "enabled": true,
+        "seed": 731,
+        "tone": 0.72,
+        "warmth": 0.46,
+        "blood": 0.48,
+        "variation": 0.9,
+        "pores": 0.88,
+        "poreRadius": 0.09,
+        "poreSpacing": 0.58,
+        "microrelief": 0.72,
+        "roughness": 0.47,
+        "oil": 0.32,
+        "scatter": 0.75,
+        "freckles": 0.2,
+        "lipColor": 0.54,
+        "lipWetness": 0.24,
+        "eyeThinness": 0.34,
+        "diagnostic": 0
+      }
+    },
+    "proceduralBodySurface": {
+      "schema": "kaopu/procedural-fullbody-surface@1",
+      "version": "SKIN-FULLBODY-R02",
+      "settings": {
+        "enabled": true,
+        "regionalColor": 0.72,
+        "lidWarmth": 0.46,
+        "noseWarmth": 0.38,
+        "earBlood": 0.44,
+        "earTransmission": 0.58,
+        "bodyVariation": 0.64,
+        "bodyPores": 0.78,
+        "jointTone": 0.42,
+        "neckCreases": 0.34,
+        "beardShadow": 0.04,
+        "audit": 0
+      }
+    },
+    "graphSkin": {
+      "schema": "kaopu/skin-graph@1",
+      "settings": {
+        "enabled": true,
+        "seed": 731,
+        "density": 1,
+        "width": 1,
+        "poreWidth": 1,
+        "wrinkles": 1.65,
+        "pores": 1.5,
+        "meso": 1.5,
+        "gloss": 1,
+        "cavity": 1.5,
+        "angle": 0,
+        "view": 0,
+        "filter": true
+      }
+    },
+    "skinSurfaceFinish": {
+      "schema": "kaopu/skin-surface-finish@1",
+      "settings": {
+        "oilFilm": 0.8,
+        "fuzz": 0.85
+      }
+    },
+    "skinOverallLook": {
+      "schema": "kaopu/skin-overall-look@1",
+      "settings": {
+        "colour": 1,
+        "reflection": 0.6
+      }
+    },
+    "skinInspection": {
+      "schema": "kaopu/skin-inspection@1",
+      "selected": "P01",
+      "view": "bust",
+      "camera": {
+        "position": [
+          -0.48932267990462963,
+          0.6435724039077759,
+          0.6603621479582509
+        ],
+        "target": [
+          -0.00006476417183876038,
+          0.6435724039077759,
+          0.029960371553897865
+        ],
+        "fov": 31,
+        "zoom": 1,
+        "near": 0.01,
+        "far": 50
+      },
+      "finish": {
+        "diffusion": 0.65,
+        "radius": 1.3
+      }
+    },
+    "eyelidMargin": {
+      "schema": "kaopu/eyelid-margin@1",
+      "settings": {
+        "section": 1,
+        "finish": 1,
+        "compare": false
+      }
+    },
+    "surfaceReadability": {
+      "schema": "kaopu/surface-readability@1",
+      "settings": {
+        "enabled": true,
+        "scale": 3.4,
+        "relief": 1.8,
+        "surface": 1.9
+      }
+    },
+    "skinAppendages": {
+      "schema": "kaopu/skin-appendages@1",
+      "settings": {
+        "enabled": 1,
+        "blackheads": 0.75,
+        "filaments": 0.65,
+        "oil": 0.6,
+        "follicles": 0.65,
+        "vellus": 0.8
+      },
+      "lashDirection": true
+    },
+    "surfaceReadout": {
+      "schema": "kaopu/surface-readout@1",
+      "settings": {
+        "enabled": true,
+        "film": 1,
+        "relief": 1,
+        "fuzz": 1,
+        "scatter": 1
+      }
+    },
+    "restoredLighting": {
+      "schema": "kaopu/restored-eb1@1",
+      "profile": {
+        "schema": "kaopu.eb1/1",
+        "preset": "custom",
+        "exposure": 0.7,
+        "key": 1.6,
+        "rim": 3.5,
+        "environment": 0.9,
+        "keyAzimuth": -154,
+        "keyElevation": 8,
+        "rimAzimuth": 71,
+        "rimElevation": 11.309932,
+        "environmentRotation": -69,
+        "keyColor": "#ffffff",
+        "rimColor": "#efa37e",
+        "background": 0.85,
+        "shadowSize": 2048
+      },
+      "reverse": false
+    },
+    "faceFeatureTone": {
+      "schema": "kaopu/face-feature-tone@1",
+      "settings": {
+        "enabled": true,
+        "lashes": 1,
+        "lips": 1,
+        "lipRound": 1
+      }
+    },
+    "fiberLayer": {
+      "schema": "kaopu/fiber-layer@1",
+      "settings": {
+        "enabled": true
+      }
+    },
+    "nasalContents": {
+      "schema": "kaopu/nasal-contents@1",
+      "settings": {
+        "enabled": true,
+        "relief": 1
+      }
+    },
+    "surfaceFinish": {
+      "schema": "kaopu/surface-finish@1",
+      "settings": {
+        "enabled": true,
+        "balance": 1,
+        "grain": 1
+      }
+    },
+    "tissueReadout": {
+      "schema": "kaopu/tissue-readout@1",
+      "settings": {
+        "enabled": true,
+        "thinTissue": 1,
+        "sheen": 1
+      }
+    },
+    "overallSkin": {
+      "schema": "kaopu/overall-skin@1",
+      "settings": {
+        "shadow": 1,
+        "colour": 1,
+        "compare": false
+      }
+    },
+    "nativeCrop": {
+      "schema": "kaopu/native-crop@1",
+      "preset": "crop",
+      "settings": {
+        "enabled": true
+      }
+    }
+  },
+  "camera": {
+    "position": [
+      -0.48932267990462963,
+      0.6435724039077759,
+      0.6603621479582509
+    ],
+    "target": [
+      -0.00006476417183876038,
+      0.6435724039077759,
+      0.029960371553897865
+    ],
+    "zoom": 1
+  },
+  "sourceVersions": {
+    "head": "f5017cb7cb9c2024df6a08328564c3f4ae502509",
+    "skin": "7c406b142ac5732c999a87797251e38697b31f17",
+    "reference": "91b1dd7cf402294a26051abe051696b2848207af"
+  }
+}</script><script type="application/json" id="boundaries-r29">{
+  "schema": "body-reference-boundary-inputs/1",
+  "sourceDerived": true,
+  "headSurfaceGenerated": false,
+  "sourceFidelityAccepted": false,
+  "sourceFile": "data/body-neck-operator-r24.json",
+  "sourceSHA256": "664a6a69cf288d23f7ec8db75d22d37c06f6ac503acaca8187398457694b96ed",
+  "profiles": [
+    {
+      "id": "baseline",
+      "file": "delivery/assets/body-boundary-r26/f9acc3acb1ea8e30e59fad0b1a03f49e54635c25c5a86e7a97d7db0de06bfa35.gz",
+      "url": "./assets/body-boundary-r26/f9acc3acb1ea8e30e59fad0b1a03f49e54635c25c5a86e7a97d7db0de06bfa35.gz",
+      "compressedSHA256": "f9acc3acb1ea8e30e59fad0b1a03f49e54635c25c5a86e7a97d7db0de06bfa35",
+      "compressedBytes": 42508,
+      "rawSHA256": "aefbabf139ea9656ac2033dae62d4f70d11101615347a7e2540208ec5cb8ce1f",
+      "rawBytes": 97676
+    },
+    {
+      "id": "lean",
+      "file": "delivery/assets/body-boundary-r26/ba08d1b92cc9bb102d5163868e5724421549c1dda87e9b7caa6c99cce7b1e4cc.gz",
+      "url": "./assets/body-boundary-r26/ba08d1b92cc9bb102d5163868e5724421549c1dda87e9b7caa6c99cce7b1e4cc.gz",
+      "compressedSHA256": "ba08d1b92cc9bb102d5163868e5724421549c1dda87e9b7caa6c99cce7b1e4cc",
+      "compressedBytes": 42444,
+      "rawSHA256": "d7beff6195933a53eb46d85f77e26d5ffc77a65036070de8b825764613b80017",
+      "rawBytes": 97704
+    },
+    {
+      "id": "fuller",
+      "file": "delivery/assets/body-boundary-r26/9859e47000b9d1b6ab451dea26a1df1f65901b38775f9cc6ffc1089699e34b77.gz",
+      "url": "./assets/body-boundary-r26/9859e47000b9d1b6ab451dea26a1df1f65901b38775f9cc6ffc1089699e34b77.gz",
+      "compressedSHA256": "9859e47000b9d1b6ab451dea26a1df1f65901b38775f9cc6ffc1089699e34b77",
+      "compressedBytes": 42503,
+      "rawSHA256": "cc70cf731655c4252434f985ccd794fb3ce9dcb88bfc8dc72dedb74376cd0169",
+      "rawBytes": 97508
+    },
+    {
+      "id": "muscular",
+      "file": "delivery/assets/body-boundary-r26/36030ffb3295ca803f69f862ff628d25bbd818d650bb21deb6f494022164fc39.gz",
+      "url": "./assets/body-boundary-r26/36030ffb3295ca803f69f862ff628d25bbd818d650bb21deb6f494022164fc39.gz",
+      "compressedSHA256": "36030ffb3295ca803f69f862ff628d25bbd818d650bb21deb6f494022164fc39",
+      "compressedBytes": 42439,
+      "rawSHA256": "632ba24e604d72993efcda4b7e6d4ffa023343615dc6bc23cdf0280bb94fb30b",
+      "rawBytes": 97657
+    },
+    {
+      "id": "female",
+      "file": "delivery/assets/body-boundary-r26/7897289bffcc3c3eaaea3a94a5ad9fc33dec0340050dd972ac6b48d083b12f2f.gz",
+      "url": "./assets/body-boundary-r26/7897289bffcc3c3eaaea3a94a5ad9fc33dec0340050dd972ac6b48d083b12f2f.gz",
+      "compressedSHA256": "7897289bffcc3c3eaaea3a94a5ad9fc33dec0340050dd972ac6b48d083b12f2f",
+      "compressedBytes": 42594,
+      "rawSHA256": "fb918d603d76bf5dd829e02a2d6ef060a60f219107d1385b720b2c064bb95b8c",
+      "rawBytes": 98217
+    },
+    {
+      "id": "A-reach",
+      "file": "delivery/assets/body-boundary-r26/a0b42a71216b5f6738a4da1464d18c5a9cab23168b6f3fbcbb8d4ba6072ea924.gz",
+      "url": "./assets/body-boundary-r26/a0b42a71216b5f6738a4da1464d18c5a9cab23168b6f3fbcbb8d4ba6072ea924.gz",
+      "compressedSHA256": "a0b42a71216b5f6738a4da1464d18c5a9cab23168b6f3fbcbb8d4ba6072ea924",
+      "compressedBytes": 42530,
+      "rawSHA256": "7bce1a7f811e1c480f4b64e980ac2aa6c4c9f594ba12eff725acf1e0a5479434",
+      "rawBytes": 97724
+    },
+    {
+      "id": "A-joints",
+      "file": "delivery/assets/body-boundary-r26/126795b15514d209b0d85b261643588dbc18dd8efc8d45114b7ba845ee22f461.gz",
+      "url": "./assets/body-boundary-r26/126795b15514d209b0d85b261643588dbc18dd8efc8d45114b7ba845ee22f461.gz",
+      "compressedSHA256": "126795b15514d209b0d85b261643588dbc18dd8efc8d45114b7ba845ee22f461",
+      "compressedBytes": 42555,
+      "rawSHA256": "7df0c2509c925cceae8771a157e317a1d15eaef5c10b55282ffe32ff9f0317cb",
+      "rawBytes": 97768
+    },
+    {
+      "id": "B-neutral",
+      "file": "delivery/assets/body-boundary-r26/2308445c43bd0c1e74faa77ba1fcfcf96035f982bf47fa850699d9cc937dc349.gz",
+      "url": "./assets/body-boundary-r26/2308445c43bd0c1e74faa77ba1fcfcf96035f982bf47fa850699d9cc937dc349.gz",
+      "compressedSHA256": "2308445c43bd0c1e74faa77ba1fcfcf96035f982bf47fa850699d9cc937dc349",
+      "compressedBytes": 42423,
+      "rawSHA256": "a878c52e792d3b007ed838375237a1badba1285c56ac9de8def39306c3fa0efc",
+      "rawBytes": 97401
+    },
+    {
+      "id": "B-bend",
+      "file": "delivery/assets/body-boundary-r26/8e8af3e7ac4c877bdda3c22e304106349b3867b558aa5cd8ce76647744ea995f.gz",
+      "url": "./assets/body-boundary-r26/8e8af3e7ac4c877bdda3c22e304106349b3867b558aa5cd8ce76647744ea995f.gz",
+      "compressedSHA256": "8e8af3e7ac4c877bdda3c22e304106349b3867b558aa5cd8ce76647744ea995f",
+      "compressedBytes": 42505,
+      "rawSHA256": "eedc5e607a86ae9261971ad273ae230e2498b126b08ba9dee381246ef15b31c9",
+      "rawBytes": 97901
+    },
+    {
+      "id": "calibration-soft",
+      "file": "delivery/assets/body-boundary-r26/09e782725205d9e16c599c5ccdb42dfd371e6c0ce626a246bb9c772ef3b61df1.gz",
+      "url": "./assets/body-boundary-r26/09e782725205d9e16c599c5ccdb42dfd371e6c0ce626a246bb9c772ef3b61df1.gz",
+      "compressedSHA256": "09e782725205d9e16c599c5ccdb42dfd371e6c0ce626a246bb9c772ef3b61df1",
+      "compressedBytes": 42432,
+      "rawSHA256": "dd4a019d0a48e42f695eaed1b0163d9594e72629878784e8bc5c9c0bfc5575b7",
+      "rawBytes": 97538
+    }
+  ]
+}
+</script><script type="application/json" id="pose-state-identity-r29">{"schema":"body-source-state-identity/1","sourceDerived":true,"sourceProgramSHA256":"21977efd7038eced66aacb2719f307620892d23486f35a3cb6c475e4841f5af7","annyBones":["root","pelvis.L","upperleg01.L","upperleg02.L","lowerleg01.L","lowerleg02.L","foot.L","toe1-1.L","toe1-2.L","toe2-1.L","toe2-2.L","toe2-3.L","toe3-1.L","toe3-2.L","toe3-3.L","toe4-1.L","toe4-2.L","toe4-3.L","toe5-1.L","toe5-2.L","toe5-3.L","pelvis.R","upperleg01.R","upperleg02.R","lowerleg01.R","lowerleg02.R","foot.R","toe1-1.R","toe1-2.R","toe2-1.R","toe2-2.R","toe2-3.R","toe3-1.R","toe3-2.R","toe3-3.R","toe4-1.R","toe4-2.R","toe4-3.R","toe5-1.R","toe5-2.R","toe5-3.R","spine05","spine04","spine03","spine02","spine01","clavicle.L","shoulder01.L","upperarm01.L","upperarm02.L","lowerarm01.L","lowerarm02.L","wrist.L","finger1-1.L","finger1-2.L","finger1-3.L","metacarpal1.L","finger2-1.L","finger2-2.L","finger2-3.L","metacarpal2.L","finger3-1.L","finger3-2.L","finger3-3.L","metacarpal3.L","finger4-1.L","finger4-2.L","finger4-3.L","metacarpal4.L","finger5-1.L","finger5-2.L","finger5-3.L","clavicle.R","shoulder01.R","upperarm01.R","upperarm02.R","lowerarm01.R","lowerarm02.R","wrist.R","finger1-1.R","finger1-2.R","finger1-3.R","metacarpal1.R","finger2-1.R","finger2-2.R","finger2-3.R","metacarpal2.R","finger3-1.R","finger3-2.R","finger3-3.R","metacarpal3.R","finger4-1.R","finger4-2.R","finger4-3.R","metacarpal4.R","finger5-1.R","finger5-2.R","finger5-3.R","neck01","neck02","neck03","head","eye.L","eye.R"],"annyLocals":["l-lowerarm-scale-depth-incr","r-lowerarm-scale-depth-incr","l-upperarm-scale-horiz-incr","r-upperarm-scale-horiz-incr","l-upperarm-fat-incr","r-upperarm-fat-incr","measure-upperarm-length-incr","l-lowerarm-fat-incr","r-lowerarm-fat-incr","l-lowerarm-scale-horiz-incr","r-lowerarm-scale-horiz-incr","l-lowerarm-muscle-incr","r-lowerarm-muscle-incr","l-upperarm-shoulder-muscle-incr","r-upperarm-shoulder-muscle-incr","measure-upperarm-circ-incr","l-upperarm-scale-depth-incr","r-upperarm-scale-depth-incr","l-lowerarm-scale-vert-incr","r-lowerarm-scale-vert-incr","measure-lowerarm-length-incr","l-upperarm-muscle-incr","r-upperarm-muscle-incr","l-upperarm-scale-vert-incr","r-upperarm-scale-vert-incr","breast-point-incr","nipple-point-incr","nipple-size-incr","breast-dist-incr","breast-volume-vert-up","breast-trans-up","buttocks-volume-incr","l-cheek-trans-up","r-cheek-trans-up","l-cheek-volume-incr","r-cheek-volume-incr","l-cheek-inner-incr","r-cheek-inner-incr","l-cheek-bones-incr","r-cheek-bones-incr","chin-jaw-drop-incr","chin-height-incr","chin-prominent-incr","chin-bones-incr","chin-width-incr","chin-cleft-incr","chin-prognathism-incr","l-ear-lobe-incr","r-ear-lobe-incr","l-ear-shape-round","r-ear-shape-round","l-ear-trans-forward","r-ear-trans-forward","l-ear-rot-forward","r-ear-rot-forward","l-ear-trans-up","r-ear-trans-up","l-ear-scale-vert-incr","r-ear-scale-vert-incr","l-ear-flap-incr","r-ear-flap-incr","l-ear-shape-triangle","r-ear-shape-triangle","l-ear-scale-incr","r-ear-scale-incr","l-ear-scale-depth-incr","r-ear-scale-depth-incr","l-ear-wing-incr","r-ear-wing-incr","eyebrows-angle-up","eyebrows-trans-up","eyebrows-trans-forward","l-eye-corner1-up","r-eye-corner1-up","l-eye-height1-incr","r-eye-height1-incr","l-eye-scale-incr","r-eye-scale-incr","l-eye-push1-out","r-eye-push1-out","l-eye-eyefold-up","r-eye-eyefold-up","l-eye-height3-incr","r-eye-height3-incr","l-eye-height2-incr","r-eye-height2-incr","l-eye-bag-incr","r-eye-bag-incr","l-eye-push2-out","r-eye-push2-out","l-eye-trans-up","r-eye-trans-up","l-eye-bag-height-incr","r-eye-bag-height-incr","l-eye-epicanthus-out","r-eye-epicanthus-out","l-eye-eyefold-angle-up","r-eye-eyefold-angle-up","l-eye-bag-out","r-eye-bag-out","l-eye-corner2-up","r-eye-corner2-up","l-eye-trans-out","r-eye-trans-out","l-foot-scale-horiz-incr","r-foot-scale-horiz-incr","l-foot-trans-out","r-foot-trans-out","l-foot-scale-vert-incr","r-foot-scale-vert-incr","l-foot-trans-forward","r-foot-trans-forward","l-foot-scale-depth-incr","r-foot-scale-depth-incr","l-foot-scale-incr","r-foot-scale-incr","l-foot-trans-up","r-foot-trans-up","measure-ankle-circ-incr","forehead-temple-incr","forehead-trans-forward","forehead-scale-vert-incr","forehead-nubian-incr","l-hand-trans-out","r-hand-trans-out","l-hand-fingers-length-incr","r-hand-fingers-length-incr","l-hand-scale-incr","r-hand-scale-incr","l-hand-fingers-diameter-incr","r-hand-fingers-diameter-incr","l-hand-fingers-distance-incr","r-hand-fingers-distance-incr","measure-wrist-circ-incr","head-angle-out","head-scale-vert-incr","head-trans-forward","head-trans-up","head-fat-incr","head-trans-out","head-back-scale-depth-incr","head-age-incr","head-scale-depth-incr","head-scale-horiz-incr","hip-trans-out","hip-scale-horiz-incr","hip-scale-depth-incr","hip-waist-up","hip-trans-forward","hip-scale-vert-incr","hip-trans-up","measure-calf-circ-incr","measure-lowerleg-height-incr","l-upperleg-fat-incr","r-upperleg-fat-incr","l-lowerleg-muscle-incr","r-lowerleg-muscle-incr","l-leg-valgus-incr","r-leg-valgus-incr","l-lowerleg-scale-depth-incr","r-lowerleg-scale-depth-incr","l-lowerleg-scale-vert-incr","r-lowerleg-scale-vert-incr","l-upperleg-scale-depth-incr","r-upperleg-scale-depth-incr","l-upperleg-scale-horiz-incr","r-upperleg-scale-horiz-incr","upperlegs-height-incr","l-lowerleg-fat-incr","r-lowerleg-fat-incr","l-lowerleg-scale-horiz-incr","r-lowerleg-scale-horiz-incr","lowerlegs-height-incr","measure-upperleg-height-incr","l-upperleg-muscle-incr","r-upperleg-muscle-incr","measure-knee-circ-incr","measure-thigh-circ-incr","l-upperleg-scale-vert-incr","r-upperleg-scale-vert-incr","mouth-lowerlip-height-incr","mouth-scale-horiz-incr","mouth-cupidsbow-incr","mouth-laugh-lines-out","mouth-scale-depth-incr","mouth-lowerlip-volume-incr","mouth-angles-up","mouth-upperlip-ext-up","mouth-lowerlip-width-incr","mouth-trans-forward","mouth-upperlip-width-incr","mouth-scale-vert-incr","mouth-dimples-out","mouth-upperlip-height-incr","mouth-upperlip-volume-incr","mouth-cupidsbow-width-incr","mouth-lowerlip-ext-up","mouth-upperlip-middle-up","mouth-trans-up","mouth-trans-out","mouth-lowerlip-middle-up","mouth-philtrum-volume-incr","measure-neck-circ-incr","measure-neck-height-incr","neck-scale-depth-incr","neck-trans-forward","neck-double-incr","neck-trans-out","neck-back-scale-depth-incr","neck-scale-horiz-incr","neck-scale-vert-incr","neck-trans-up","nose-nostrils-angle-up","nose-flaring-incr","nose-curve-convex","nose-scale-depth-incr","nose-scale-vert-incr","nose-point-width-incr","nose-scale-horiz-incr","nose-width1-incr","nose-trans-forward","nose-trans-up","nose-hump-incr","nose-nostrils-width-incr","nose-trans-out","nose-greek-incr","nose-point-up","nose-width2-incr","nose-width3-incr","nose-septumangle-incr","nose-base-up","nose-compression-uncompress","nose-volume-incr","bulge-incr","pelvis-tone-incr","stomach-pregnant-incr","stomach-navel-out","stomach-navel-up","stomach-tone-incr","torso-trans-forward","torso-muscle-pectoral-incr","measure-underbust-circ-incr","torso-scale-horiz-incr","torso-scale-depth-incr","measure-napetowaist-dist-incr","measure-waisttohip-dist-incr","measure-shoulder-dist-incr","measure-hips-circ-incr","torso-vshape-incr","torso-trans-up","torso-muscle-dorsi-incr","measure-waist-circ-incr","measure-frontchest-dist-incr","torso-scale-vert-incr","measure-bust-circ-incr","torso-trans-out"],"normalizations":["explicit positive-zero rotation/translation entries","equivalent rotation object and translation dictionary spelling","known local positive-zero entries"],"parameterQuantization":false,"headStateIgnored":false,"unknownStateFieldsIgnored":false,"completedMotherConversion":false}
+</script><script>/* Known complete-person head inputs outside person.state also affect neck
+ * normals. Unknown archive data are retained; known unmatched inputs cannot be
+ * silently certified against a fixed source template. */
+(()=>{'use strict';
+function key(x){if(x===null)return'z';if(x===undefined)return'u';if(typeof x==='number')return'n'+(Object.is(x,-0)?'-0':String(x));if(typeof x==='string')return's'+JSON.stringify(x);if(typeof x==='boolean')return x?'t':'f';if(Array.isArray(x)||ArrayBuffer.isView(x)&&!(x instanceof DataView))return'['+Array.from(x,key).join(',')+']';if(typeof x==='object')return'{'+Object.keys(x).sort().map(k=>JSON.stringify(k)+':'+key(x[k])).join(',')+'}';throw Error('Unknown complete-person head value');}
+function create(reference){const omitted=new Set(['state','proceduralBodySurface','restoredLighting','bodyFunctionSystem']),fields=Object.keys(reference).filter(k=>!omitted.has(k)),value=(p,k)=>{const v=p?.[k];if(k!=='skinInspection'||!v)return v;const copy={...v};delete copy.camera;delete copy.view;return copy;};
+ function check(archive){const person=archive?.person;if(!person)return{compatible:false,field:null};for(const field of fields)if(key(value(reference,field))!==key(value(person,field)))return{compatible:false,field};return{compatible:true,field:null};}
+ return{check,compatible:archive=>check(archive).compatible};
+}
+globalThis.BodyHeadEnvelopeR29={create};
+})();
+</script>
+<script>/* Consume a verified transport packet once. Preserve every typed coefficient
+ * bit and the original duplicate-view identity; do not rename source arrays
+ * or claim conversion of the retained source calibration. */
+(()=>{'use strict';
+const types=new Set(['Float64Array','Float32Array','Uint32Array','Int32Array','Uint16Array','Int16Array','Uint8Array','Uint8ClampedArray','Int8Array']);
+function consume(raw,{shared=true}={}){
+ if(!(raw instanceof ArrayBuffer)||raw.byteLength<4)throw Error('Invalid body coefficient buffer');
+ const transportRawBytes=raw.byteLength,size=new DataView(raw).getUint32(0,true),start=4+size;if(start>raw.byteLength)throw Error('Invalid body coefficient header');
+ const header=JSON.parse(new TextDecoder().decode(new Uint8Array(raw,4,size))),payloadBytes=raw.byteLength-start;if(!Array.isArray(header.arrays))throw Error('Missing body coefficient directory');
+ const descriptors=header.arrays.map(a=>{if(!types.has(a.type)||!Number.isSafeInteger(a.offset)||a.offset<0||!Number.isSafeInteger(a.length)||a.length<0)throw Error('Invalid body coefficient view');const T=globalThis[a.type],bytes=a.length*T.BYTES_PER_ELEMENT;if(!Number.isSafeInteger(bytes)||a.offset+bytes>payloadBytes)throw Error('Body coefficient view outside packet');return{...a,T,bytes,key:a.type+':'+a.offset+':'+a.length};});
+ let sharedReason=null;const ranges=[...new Map(descriptors.filter(a=>a.bytes).map(a=>[a.key,a])).values()].sort((a,b)=>a.offset-b.offset);
+ for(let i=1;i<ranges.length;i++)if(ranges[i].offset<ranges[i-1].offset+ranges[i-1].bytes)sharedReason='distinct original views overlap';
+ const relocation=new Map;let alignedBytes=0;for(const a of ranges){alignedBytes=Math.ceil(alignedBytes/8)*8;relocation.set(a.key,alignedBytes);if(alignedBytes>start+a.offset)sharedReason='in-place relocation could overwrite unread source';alignedBytes+=a.bytes;}for(const a of descriptors)if(!a.bytes)relocation.set(a.key,0);
+ if(alignedBytes>raw.byteLength)sharedReason='aligned payload exceeds verified container';
+ const useShared=shared&&!sharedReason;let backing=null,shrunk=false;
+ if(useShared){const bytes=new Uint8Array(raw);for(const a of ranges)bytes.copyWithin(relocation.get(a.key),start+a.offset,start+a.offset+a.bytes);backing=raw;if(typeof raw.transferToFixedLength==='function'){backing=raw.transferToFixedLength(alignedBytes);shrunk=true;}}
+ const cache=new Map;let allocatedCoefficientBytes=0;
+ const arrays=descriptors.map(a=>{if(cache.has(a.key))return cache.get(a.key);const view=useShared?new a.T(backing,relocation.get(a.key),a.length):new a.T(new Uint8Array(raw,start+a.offset,a.bytes).slice().buffer);cache.set(a.key,view);allocatedCoefficientBytes+=view.byteLength;return view;});
+ function unpack(x){if(x&&x.$array!==undefined){if(!Number.isSafeInteger(x.$array)||!arrays[x.$array])throw Error('Invalid body coefficient reference');return arrays[x.$array];}if(x&&x.$map)return new Map(x.$map.map(([k,v])=>[k,unpack(v)]));if(x&&x.$set)return new Set(x.$set);if(Array.isArray(x))return x.map(unpack);if(x&&typeof x==='object')return Object.fromEntries(Object.entries(x).map(([k,v])=>[k,unpack(v)]));return x;}
+ return{program:unpack(header.tree),arrays,report:{version:'BODY-PROGRAM-STORAGE-R27',transportRawBytes,payloadBytes,alignedPayloadBytes:alignedBytes,logicalArrays:arrays.length,uniqueArrays:cache.size,allocatedCoefficientBytes,sharedCoefficientBacking:useShared,coefficientBackingBuffers:useShared?1:cache.size,retainedCoefficientBackingBytes:useShared?backing.byteLength:allocatedCoefficientBytes,extraCoefficientAllocationBytes:useShared?0:allocatedCoefficientBytes,payloadRelocatedInPlace:useShared,relocatedBytes:useShared?allocatedCoefficientBytes:0,unusedHeaderTailReleased:shrunk,sharedFallbackReason:sharedReason,originalDuplicateViewsPreserved:true,distinctViewOverlapIntroduced:false,bitExactStorage:true}};
+}
+globalThis.BodyProgramStorageR27={consume};
+})();
+</script>
+<script>/* Conservative identity of equivalent source input spellings. This does not
+ * round parameters, match nearby poses or ignore head/unknown state fields.
+ * The original state is never modified or replaced in the person's archive. */
+(()=>{'use strict';
+const key=x=>{if(x===null)return'z';if(typeof x==='number')return'n'+(Object.is(x,-0)?'-0':String(x));if(typeof x==='string')return's'+JSON.stringify(x);if(typeof x==='boolean')return x?'t':'f';if(x===undefined)return'u';if(Array.isArray(x)||ArrayBuffer.isView(x)&&!(x instanceof DataView))return'['+Array.from(x,key).join(',')+']';if(typeof x==='object')return'{'+Object.keys(x).sort().map(k=>JSON.stringify(k)+':'+key(x[k])).join(',')+'}';throw Error('Unsupported person state value');};
+function create(contract){
+ if(contract?.schema!=='body-source-state-identity/1')throw Error('Body state identity contract missing');
+ const bones=new Set(contract.annyBones),locals=new Set(contract.annyLocals),list=x=>(Array.isArray(x)||ArrayBuffer.isView(x)&&!(x instanceof DataView))&&x.length===3&&Array.from(x).every(v=>typeof v==='number'&&Number.isFinite(v)),zero=x=>x.every(v=>Object.is(v,0));
+ function canonical(state){
+  const out=structuredClone(state),a=out?.anny;if(!a||typeof a!=='object')return out;
+  // Do not make unknown or malformed inputs eligible for a fixed source state.
+  const rotations=a.pose||{},translations=a.translations||{};
+  if(Array.isArray(rotations)||Array.isArray(translations)||typeof rotations!=='object'||typeof translations!=='object')return out;
+  const pose={},offset={};
+  for(const name of new Set([...Object.keys(rotations),...Object.keys(translations)])){
+   if(!bones.has(name))return out;
+   const raw=rotations[name];
+   if(raw&&typeof raw==='object'&&!Array.isArray(raw)&&!ArrayBuffer.isView(raw)&&Object.keys(raw).some(k=>!['rotation','translation'].includes(k)))return out;
+   const r=(raw?.rotation||raw)??[0,0,0],t=translations[name]||raw?.translation||[0,0,0];
+   if(!list(r)||!list(t))return out;
+   if(!zero(r))pose[name]=Array.from(r);
+   if(!zero(t))offset[name]=Array.from(t);
+  }
+  a.pose=pose;a.translations=offset;
+  if(a.localChanges&&typeof a.localChanges==='object'&&!Array.isArray(a.localChanges))for(const[name,value]of Object.entries(a.localChanges))if(locals.has(name)&&Object.is(value,0))delete a.localChanges[name];
+  return out;
+ }
+ const stateKey=state=>key(canonical(state));
+ return{canonical,key:stateKey,equal:(a,b)=>stateKey(a)===stateKey(b),match:(profiles,state)=>profiles.find(p=>stateKey(p.state)===stateKey(state))||null,report:()=>({schema:contract.schema,parameterQuantization:false,nearbyStateMatching:false,headStateIgnored:false,unknownStateFieldsIgnored:false,originalArchiveMutated:false})};
+}
+globalThis.BodyStateIdentityR26={create};
+})();
+</script>
+<script>/* Project-authored numerical primitives. Row-major matrices, column vectors.
+ * These functions contain no character positions, shape or skinning data. */
+(()=>{'use strict';
+const I=()=>[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],add=(a,b)=>a.map((x,i)=>x+b[i]),sub=(a,b)=>a.map((x,i)=>x-b[i]),scale=(a,s)=>a.map(x=>x*s),dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>Math.hypot(...a),unit=a=>{const l=norm(a);if(!(l>1e-14))throw Error('Degenerate body direction');return scale(a,1/l)};
+function mul(a,b){const c=new Float64Array(16);for(let r=0;r<4;r++)for(let k=0;k<4;k++)for(let j=0;j<4;j++)c[r*4+k]+=a[r*4+j]*b[j*4+k];return c;}
+const point=(m,p)=>[0,1,2].map(i=>m[4*i]*p[0]+m[4*i+1]*p[1]+m[4*i+2]*p[2]+m[4*i+3]),vector=(m,p)=>[0,1,2].map(i=>m[4*i]*p[0]+m[4*i+1]*p[1]+m[4*i+2]*p[2]),position=m=>[m[3],m[7],m[11]];
+function rigidInverse(m){const r=I();for(let i=0;i<3;i++){for(let j=0;j<3;j++)r[i*4+j]=m[j*4+i];r[i*4+3]=-(m[i]*m[3]+m[4+i]*m[7]+m[8+i]*m[11]);}return r;}
+// Preserve the existing animation interface's uniform-scale convention.
+// This deliberately differs from an arbitrary-affine inverse for slightly
+// non-orthogonal legacy bind frames; silently changing it alters attachments.
+function uniformInverse(m){const r=I(),s=m[0]*m[0]+m[4]*m[4]+m[8]*m[8];if(!(s>0))throw Error('Degenerate uniform body frame');for(let i=0;i<3;i++)for(let j=0;j<3;j++)r[i*4+j]=m[j*4+i]/s;for(let i=0;i<3;i++)r[i*4+3]=-(r[i*4]*m[3]+r[i*4+1]*m[7]+r[i*4+2]*m[11]);return r;}
+function inverse(m){const a=Array.from({length:4},(_,r)=>[...Array.from(m.slice(r*4,r*4+4)),...I().slice(r*4,r*4+4)]);for(let k=0;k<4;k++){let pivot=k;for(let r=k+1;r<4;r++)if(Math.abs(a[r][k])>Math.abs(a[pivot][k]))pivot=r;if(Math.abs(a[pivot][k])<1e-18)throw Error('Singular body transform');[a[k],a[pivot]]=[a[pivot],a[k]];const d=a[k][k];for(let j=0;j<8;j++)a[k][j]/=d;for(let r=0;r<4;r++)if(r!==k){const q=a[r][k];for(let j=0;j<8;j++)a[r][j]-=q*a[k][j];}}return Float64Array.from(a.flatMap(r=>r.slice(4)));}
+function affine(r,t=[0,0,0]){const m=I();for(let i=0;i<3;i++){for(let j=0;j<3;j++)m[i*4+j]=r[i*3+j];m[i*4+3]=t[i];}return Float64Array.from(m);}
+function qmul(a,b){return[a[3]*b[0]+a[0]*b[3]+a[1]*b[2]-a[2]*b[1],a[3]*b[1]-a[0]*b[2]+a[1]*b[3]+a[2]*b[0],a[3]*b[2]+a[0]*b[1]-a[1]*b[0]+a[2]*b[3],a[3]*b[3]-a[0]*b[0]-a[1]*b[1]-a[2]*b[2]];}
+function quaternionMatrix(q,t=[0,0,0],s=1){const[x,y,z,w]=scale(q,1/(norm(q)||1));return affine([(1-2*y*y-2*z*z)*s,(2*x*y-2*z*w)*s,(2*x*z+2*y*w)*s,(2*x*y+2*z*w)*s,(1-2*x*x-2*z*z)*s,(2*y*z-2*x*w)*s,(2*x*z-2*y*w)*s,(2*y*z+2*x*w)*s,(1-2*x*x-2*y*y)*s],t);}
+function rotateQuaternion(q,p){const u=cross(q.slice(0,3),p),v=cross(q.slice(0,3),u);return p.map((x,i)=>x+2*(q[3]*u[i]+v[i]));}
+function composeSRT(a,b){const qa=scale(a.slice(3,7),1/(norm(a.slice(3,7))||1)),qb=scale(b.slice(3,7),1/(norm(b.slice(3,7))||1));return[...add(a.slice(0,3),scale(rotateQuaternion(qa,b.slice(0,3)),a[7])),...qmul(qa,qb),a[7]*b[7]];}
+function srtMatrix(a){return quaternionMatrix(a.slice(3,7),a.slice(0,3),a[7]);}
+function eulerQuaternion(x,y,z){const sx=Math.sin(x/2),sy=Math.sin(y/2),sz=Math.sin(z/2),cx=Math.cos(x/2),cy=Math.cos(y/2),cz=Math.cos(z/2);return[sx*cy*cz-cx*sy*sz,cx*sy*cz+sx*cy*sz,cx*cy*sz-sx*sy*cz,cx*cy*cz+sx*sy*sz];}
+function rotvecDegrees(v,t){const[x,y,z]=v.map(x=>x*Math.PI/180),a=Math.hypot(x,y,z),q=a*a,s=a<1e-6?1-q/6+q*q/120:Math.sin(a)/a,c=a<1e-6?.5-q/24+q*q/720:(1-Math.cos(a))/q;return affine([1-c*(y*y+z*z),c*x*y-s*z,c*x*z+s*y,c*x*y+s*z,1-c*(x*x+z*z),c*y*z-s*x,c*x*z-s*y,c*y*z+s*x,1-c*(x*x+y*y)],t);}
+// Closest proper rotation of a 3x3 covariance through its quaternion form.
+// A bounded Jacobi eigensolve handles anisotropic and nearly singular frames.
+function properRotation(input){let s=0;for(const x of input){if(!Number.isFinite(x))throw Error('Invalid body orientation');s=Math.max(s,Math.abs(x));}if(s===0)return[1,0,0,0,1,0,0,0,1];const[a,b,c,d,e,f,g,h,i]=Array.from(input,x=>x/s),k=[a-e-i,b+d,c+g,h-f,b+d,e-a-i,f+h,c-g,c+g,f+h,i-a-e,d-b,h-f,c-g,d-b,a+e+i],v=I();for(let step=0;step<80;step++){let p=0,q=1,largest=0;for(let r=0;r<4;r++)for(let j=r+1;j<4;j++)if(Math.abs(k[r*4+j])>largest){largest=Math.abs(k[r*4+j]);p=r;q=j;}if(largest<2e-15)break;const off=k[p*4+q],tau=(k[q*4+q]-k[p*4+p])/(2*off),t=(tau>=0?1:-1)/(Math.abs(tau)+Math.hypot(1,tau)),co=1/Math.hypot(1,t),si=t*co;k[p*4+p]-=t*off;k[q*4+q]+=t*off;k[p*4+q]=k[q*4+p]=0;for(let r=0;r<4;r++){if(r!==p&&r!==q){const ap=k[r*4+p],aq=k[r*4+q];k[r*4+p]=k[p*4+r]=co*ap-si*aq;k[r*4+q]=k[q*4+r]=si*ap+co*aq;}const vp=v[r*4+p],vq=v[r*4+q];v[r*4+p]=co*vp-si*vq;v[r*4+q]=si*vp+co*vq;}}let best=3;for(let r=0;r<3;r++)if(k[r*4+r]>k[best*4+best])best=r;const m=quaternionMatrix([v[best],v[4+best],v[8+best],v[12+best]]);return[m[0],m[1],m[2],m[4],m[5],m[6],m[8],m[9],m[10]];}
+function align(a,b){const x=unit(a),y=unit(b),c=dot(x,y);if(c>.99999999)return I();if(c< -.99999999){const axis=unit(cross(x,Math.abs(x[0])<.8?[1,0,0]:[0,1,0]));return quaternionMatrix([...axis,0]);}return quaternionMatrix([...cross(x,y),1+c]);}
+function palm(a,b){const x=unit(a),z=unit(cross(x,b)),y=cross(z,x);return affine([x[0],y[0],z[0],x[1],y[1],z[1],x[2],y[2],z[2]]);}
+const matrices=(a,n,stride=16)=>Array.from({length:n},(_,i)=>Array.from(a.slice(i*stride,(i+1)*stride))),finite=(a,n,label)=>{const v=a==null?Array(n).fill(0):Array.from(a);if(v.length!==n||!v.every(Number.isFinite))throw Error('Invalid '+label);return v;};
+globalThis.BodyMathR01={I,add,sub,scale,dot,cross,norm,unit,mul,point,vector,position,rigidInverse,uniformInverse,inverse,affine,qmul,quaternionMatrix,rotateQuaternion,composeSRT,srtMatrix,eulerQuaternion,rotvecDegrees,properRotation,align,palm,matrices,finite};
+})();
+</script>
+<script>/* Exact replay of the original neck numeric operator on its required support.
+ * This is a source-derived boundary adapter, not the autonomous mother surface.
+ * No head surface, character triangles or face connectivity is constructed. */
+(()=>{'use strict';
+function stateKey(x){if(x===null)return'z';if(typeof x==='number')return'n'+(Object.is(x,-0)?'-0':String(x));if(typeof x==='string')return's'+JSON.stringify(x);if(typeof x==='boolean')return x?'t':'f';if(x===undefined)return'u';if(Array.isArray(x)||ArrayBuffer.isView(x)&&!(x instanceof DataView))return'['+Array.from(x,stateKey).join(',')+']';if(typeof x==='object')return'{'+Object.keys(x).sort().map(k=>JSON.stringify(k)+':'+stateKey(x[k])).join(',')+'}';throw Error('Unsupported person state value');}
+function create(operator){
+ if(operator?.schema!=='body-neck-source-operator/1'||operator.semantics?.sourceWorkingPrecision!=='Float32 positions; Float64 arithmetic; original Float32 harmonic weights')throw Error('Unknown source neck operator');
+ const p=structuredClone(operator),n=p.ids.length,bodyCount=p.bodyCount,headIndices=p.headIds.map(id=>p.ids.indexOf(id));
+ const validIndex=i=>Number.isSafeInteger(i)&&i>=0&&i<n,finite=x=>typeof x==='number'&&Number.isFinite(x),list=a=>Array.isArray(a)||ArrayBuffer.isView(a)&&!(a instanceof DataView),matrix=a=>list(a)&&a.length===16&&a.every(finite)&&a.slice(12).every((x,i)=>x===[0,0,0,1][i]);
+ if(!Number.isSafeInteger(bodyCount)||bodyCount<1||p.ids.slice(0,bodyCount).some((id,i)=>id!==i)||new Set(p.ids).size!==n||p.headIds.some((id,i)=>id<bodyCount||headIndices[i]<0))throw Error('Invalid source neck support');
+ for(const r of p.contour.ring)if(![r.index,r.a,r.b].every(validIndex)||!finite(r.t))throw Error('Invalid source contour ring');
+ for(const r of p.contour.links)if(![r.index,r.a,r.b].every(validIndex)||![r.t,r.w].every(finite))throw Error('Invalid source contour links');
+ for(const r of p.fairing.stencils)if(!validIndex(r.index)||!finite(r.weight)||!r.neighbors.length||!r.neighbors.every(validIndex))throw Error('Invalid source fairing row');for(const s of p.fairing.steps)if(!finite(s.step)||!s.rows.every(i=>Number.isSafeInteger(i)&&i>=0&&i<p.fairing.stencils.length))throw Error('Invalid source fairing step');const fairing=p.fairing.steps.map(s=>({step:s.step,rows:s.rows.map(i=>p.fairing.stencils[i])}));
+ if(!p.surface.boundary.every(validIndex))throw Error('Invalid source harmonic boundary');for(const r of p.surface.rows)if(!validIndex(r.index)||r.index>=bodyCount||r.weights.length!==p.surface.boundary.length||!r.weights.every(x=>finite(x)&&Math.fround(x)===x))throw Error('Invalid source harmonic row');
+ function validate(packet,state){if(packet?.schema!=='body-neck-head-boundary/1'||packet.topologySha256!==p.topologySha256||packet.sourceReferenceSHA256!==p.sourceReferenceSHA256||packet.coordinateSystem!=='metre Z-up'||packet.inputPhase!=='after original head rig bridge, before contour')throw Error('Head boundary phase, provenance or coordinate mismatch');if(stateKey(packet.sourceState)!==stateKey(state))throw Error('Head boundary belongs to a different complete person state');if(!list(packet.headIds)||packet.headIds.length!==p.headIds.length||packet.headIds.some((id,i)=>id!==p.headIds[i]))throw Error('Head boundary support mismatch');if(!list(packet.headPositions)||packet.headPositions.length!==headIndices.length*3||!packet.headPositions.every(x=>finite(x)&&Math.fround(x)===x)||!matrix(packet.gnmRootRestMatrix)||!matrix(packet.neckSkinMatrix)||!finite(packet.headScale)||packet.headScale<=0)throw Error('Invalid original head boundary values');return packet;}
+ function apply(body,packet,state){validate(packet,state);if(!(body instanceof Float32Array)||body.length!==bodyCount*3||!body.every(Number.isFinite))throw Error('Invalid original body samples');const a=new Float32Array(n*3);a.set(body);for(let i=0;i<headIndices.length;i++)a.set(packet.headPositions.slice(i*3,i*3+3),headIndices[i]*3);
+  const deltas=new Map,skin=packet.neckSkinMatrix,gap=[skin[2],skin[6],skin[10]].map(x=>x*p.contour.gapMetres*packet.headScale);
+  for(const r of p.contour.ring)deltas.set(r.index,[0,1,2].map(k=>a[r.a*3+k]*(1-r.t)+a[r.b*3+k]*r.t+gap[k]-a[r.index*3+k]));
+  for(const r of p.contour.links){const x=deltas.get(r.a),y=deltas.get(r.b);if(!x||!y)throw Error('Missing contour delta');for(let k=0;k<3;k++)a[r.index*3+k]+=r.w*(x[k]*(1-r.t)+y[k]*r.t);}
+  const afterContour=a.slice(0,bodyCount*3),scratch=a.slice();
+  for(const step of fairing){scratch.set(a);for(const r of step.rows)for(let k=0;k<3;k++){let average=0;for(const j of r.neighbors)average+=a[j*3+k];average/=r.neighbors.length;scratch[r.index*3+k]=a[r.index*3+k]+step.step*r.weight*(average-a[r.index*3+k]);}a.set(scratch);}
+  const afterFairing=a.slice(0,bodyCount*3),boundary=new Float64Array(p.surface.boundary.length*3);for(let i=0;i<p.surface.boundary.length;i++)for(let k=0;k<3;k++)boundary[i*3+k]=a[p.surface.boundary[i]*3+k];
+  for(const row of p.surface.rows){let x=0,y=0,z=0;for(let i=0;i<p.surface.boundary.length;i++){const w=row.weights[i];x+=w*boundary[i*3];y+=w*boundary[i*3+1];z+=w*boundary[i*3+2];}a[row.index*3]=x;a[row.index*3+1]=y;a[row.index*3+2]=z;}
+  const positions=a.slice(0,bodyCount*3);if(!positions.every(Number.isFinite))throw Error('Non-finite source neck result');let max=0,changed=0;for(let i=0;i<bodyCount;i++){let d=Math.hypot(positions[i*3]-body[i*3],positions[i*3+1]-body[i*3+1],positions[i*3+2]-body[i*3+2]);max=Math.max(max,d);if(d)changed++;}
+  return{positions,afterContour,afterFairing,report:{schema:'body-neck-source-replay/1',applied:true,inputPhase:packet.inputPhase,sourceReferenceSHA256:p.sourceReferenceSHA256,sourceOperatorSHA256:p.sourceOperatorSHA256,sourceDerived:true,headSupportSamples:headIndices.length,bodyChangedSamples:changed,maxBodyDisplacementMM:max*1000,sourceArithmeticPreserved:true,headSurfaceGenerated:false,sourceFidelityAccepted:false}};
+ }
+ function normalize(packet,state){validate(packet,state);return{...structuredClone(packet),headIds:Array.from(packet.headIds),headPositions:Array.from(packet.headPositions),gnmRootRestMatrix:Array.from(packet.gnmRootRestMatrix),neckSkinMatrix:Array.from(packet.neckSkinMatrix)};}
+ return{apply,validate,normalize,stateKey,topologySha256:p.topologySha256,headIds:()=>p.headIds.slice(),bodyCount};
+}
+globalThis.BodyNeckSourceR22={create,stateKey};
+})();
+</script>
+<script>/* Exact replay of the original neck numeric operator on its required support.
+ * This is a source-derived boundary adapter, not the autonomous mother surface.
+ * No head surface, character triangles or face connectivity is constructed. */
+(()=>{'use strict';
+function stateKey(x){if(x===null)return'z';if(typeof x==='number')return'n'+(Object.is(x,-0)?'-0':String(x));if(typeof x==='string')return's'+JSON.stringify(x);if(typeof x==='boolean')return x?'t':'f';if(x===undefined)return'u';if(Array.isArray(x)||ArrayBuffer.isView(x)&&!(x instanceof DataView))return'['+Array.from(x,stateKey).join(',')+']';if(typeof x==='object')return'{'+Object.keys(x).sort().map(k=>JSON.stringify(k)+':'+stateKey(x[k])).join(',')+'}';throw Error('Unsupported person state value');}
+function create(operator){
+ if(operator?.schema!=='body-neck-source-operator/1'||operator.semantics?.sourceWorkingPrecision!=='Float32 positions; Float64 arithmetic; original Float32 harmonic weights')throw Error('Unknown source neck operator');
+ const p=structuredClone(operator),n=p.ids.length,bodyCount=p.bodyCount,headIndices=p.headIds.map(id=>p.ids.indexOf(id));
+ const validIndex=i=>Number.isSafeInteger(i)&&i>=0&&i<n,finite=x=>typeof x==='number'&&Number.isFinite(x),list=a=>Array.isArray(a)||ArrayBuffer.isView(a)&&!(a instanceof DataView),matrix=a=>list(a)&&a.length===16&&a.every(finite)&&a.slice(12).every((x,i)=>x===[0,0,0,1][i]);
+ if(!Number.isSafeInteger(bodyCount)||bodyCount<1||p.ids.slice(0,bodyCount).some((id,i)=>id!==i)||new Set(p.ids).size!==n||p.headIds.some((id,i)=>id<bodyCount||headIndices[i]<0))throw Error('Invalid source neck support');
+ for(const r of p.contour.ring)if(![r.index,r.a,r.b].every(validIndex)||!finite(r.t))throw Error('Invalid source contour ring');
+ for(const r of p.contour.links)if(![r.index,r.a,r.b].every(validIndex)||![r.t,r.w].every(finite))throw Error('Invalid source contour links');
+ for(const r of p.fairing.stencils)if(!validIndex(r.index)||!finite(r.weight)||!r.neighbors.length||!r.neighbors.every(validIndex))throw Error('Invalid source fairing row');for(const s of p.fairing.steps)if(!finite(s.step)||!s.rows.every(i=>Number.isSafeInteger(i)&&i>=0&&i<p.fairing.stencils.length))throw Error('Invalid source fairing step');const fairing=p.fairing.steps.map(s=>({step:s.step,rows:s.rows.map(i=>p.fairing.stencils[i])}));
+ if(!p.surface.boundary.every(validIndex))throw Error('Invalid source harmonic boundary');for(const r of p.surface.rows)if(!validIndex(r.index)||r.index>=bodyCount||r.weights.length!==p.surface.boundary.length||!r.weights.every(x=>finite(x)&&Math.fround(x)===x))throw Error('Invalid source harmonic row');
+ function validate(packet,state){if(packet?.schema!=='body-neck-head-boundary/1'||packet.topologySha256!==p.topologySha256||packet.sourceReferenceSHA256!==p.sourceReferenceSHA256||packet.coordinateSystem!=='metre Z-up'||packet.inputPhase!=='after original head rig bridge, before contour')throw Error('Head boundary phase, provenance or coordinate mismatch');if(stateKey(packet.sourceState)!==stateKey(state))throw Error('Head boundary belongs to a different complete person state');if(!list(packet.headIds)||packet.headIds.length!==p.headIds.length||packet.headIds.some((id,i)=>id!==p.headIds[i]))throw Error('Head boundary support mismatch');if(!list(packet.headPositions)||packet.headPositions.length!==headIndices.length*3||!packet.headPositions.every(x=>finite(x)&&Math.fround(x)===x)||!matrix(packet.gnmRootRestMatrix)||!matrix(packet.neckSkinMatrix)||!finite(packet.headScale)||packet.headScale<=0)throw Error('Invalid original head boundary values');return packet;}
+ function apply(body,packet,state){validate(packet,state);if(!(body instanceof Float32Array)||body.length!==bodyCount*3||!body.every(Number.isFinite))throw Error('Invalid original body samples');const a=new Float32Array(n*3);a.set(body);for(let i=0;i<headIndices.length;i++)a.set(packet.headPositions.slice(i*3,i*3+3),headIndices[i]*3);
+  const deltas=new Map,skin=packet.neckSkinMatrix,gap=[skin[2],skin[6],skin[10]].map(x=>x*p.contour.gapMetres*packet.headScale);
+  for(const r of p.contour.ring)deltas.set(r.index,[0,1,2].map(k=>a[r.a*3+k]*(1-r.t)+a[r.b*3+k]*r.t+gap[k]-a[r.index*3+k]));
+  for(const r of p.contour.links){const x=deltas.get(r.a),y=deltas.get(r.b);if(!x||!y)throw Error('Missing contour delta');for(let k=0;k<3;k++)a[r.index*3+k]+=r.w*(x[k]*(1-r.t)+y[k]*r.t);}
+  const afterContour=a.slice(0,bodyCount*3),scratch=a.slice();
+  for(const step of fairing){scratch.set(a);for(const r of step.rows)for(let k=0;k<3;k++){let average=0;for(const j of r.neighbors)average+=a[j*3+k];average/=r.neighbors.length;scratch[r.index*3+k]=a[r.index*3+k]+step.step*r.weight*(average-a[r.index*3+k]);}a.set(scratch);}
+  const afterFairing=a.slice(0,bodyCount*3),boundary=new Float64Array(p.surface.boundary.length*3);for(let i=0;i<p.surface.boundary.length;i++)for(let k=0;k<3;k++)boundary[i*3+k]=a[p.surface.boundary[i]*3+k];
+  for(const row of p.surface.rows){let x=0,y=0,z=0;for(let i=0;i<p.surface.boundary.length;i++){const w=row.weights[i];x+=w*boundary[i*3];y+=w*boundary[i*3+1];z+=w*boundary[i*3+2];}a[row.index*3]=x;a[row.index*3+1]=y;a[row.index*3+2]=z;}
+  const positions=a.slice(0,bodyCount*3);if(!positions.every(Number.isFinite))throw Error('Non-finite source neck result');let max=0,changed=0;for(let i=0;i<bodyCount;i++){let d=Math.hypot(positions[i*3]-body[i*3],positions[i*3+1]-body[i*3+1],positions[i*3+2]-body[i*3+2]);max=Math.max(max,d);if(d)changed++;}
+  return{positions,afterContour,afterFairing,supportValueByOperatorInput:index=>{if(!validIndex(index))throw Error("Unknown original boundary support function");const at=index*3;return[a[at],a[at+2],-a[at+1]];},report:{schema:'body-neck-source-replay/1',applied:true,inputPhase:packet.inputPhase,sourceReferenceSHA256:p.sourceReferenceSHA256,sourceOperatorSHA256:p.sourceOperatorSHA256,sourceDerived:true,headSupportSamples:headIndices.length,bodyChangedSamples:changed,maxBodyDisplacementMM:max*1000,sourceArithmeticPreserved:true,headSurfaceGenerated:false,sourceFidelityAccepted:false}};
+ }
+ function normalize(packet,state){validate(packet,state);return{...structuredClone(packet),headIds:Array.from(packet.headIds),headPositions:Array.from(packet.headPositions),gnmRootRestMatrix:Array.from(packet.gnmRootRestMatrix),neckSkinMatrix:Array.from(packet.neckSkinMatrix)};}
+ return{apply,validate,normalize,stateKey,topologySha256:p.topologySha256,headIds:()=>p.headIds.slice(),bodyCount};
+}
+globalThis.BodyNeckSourceR29={create,stateKey};
+})();
+</script>
+<script>/* Source head-boundary scalar expressions only. The independent head board is
+ * untouched. No head surface, head geometry or character display is produced. */
+(()=>{'use strict';
+function evaluate(program,state,pose){
+ if(program.schema!=='body-source-head-boundary-functions-r29/1')throw Error('原头颈输入函数版本不匹配');
+ const transforms=BodyPoseFunctionsR29.matrices(program.poseProgram,pose),posed=transforms.originalPoseMatrices;if(program.driver!=='mhr-no-correctives'&&!posed)throw Error('原头颈关节主链未能求值');
+ const skin=program.driver==='mhr-no-correctives'?program.headRigRest.map((m,j)=>program.headMatrixDispatch[j]>=0?transforms[program.headMatrixDispatch[j]].slice():BodyMathR01.mul(m,BodyMathR01.rigidInverse(m))):posed.map((m,j)=>BodyMathR01.mul(m,BodyMathR01.rigidInverse(program.headRigRest[j]))),values=new Float64Array(program.ops.length),{ops,a,b,constants,roots}=program;
+ for(let i=0;i<ops.length;i++){const x=values[a[i]],y=values[b[i]];switch(ops[i]){case 0:values[i]=constants[i];break;case 2:values[i]=x+y;break;case 4:values[i]=x*y;break;case 7:values[i]=Math.fround(x);break;case 13:values[i]=skin[a[i]][b[i]];break;default:throw Error('未知头颈标量指令');}if(!Number.isFinite(values[i]))throw Error('原头颈输入函数未解出');}
+ const packet={...structuredClone(program.referencePacket),sourceState:structuredClone(state),headPositions:Array.from(roots,i=>values[i]),neckSkinMatrix:skin[program.neckJoint].slice()};return{packet,skin,transforms,headSurfaceGenerated:false};
+}
+globalThis.BodySourceHeadR29={evaluate};
+})();
+</script>
+<script>/* Original display response compiled as scalar expressions. No source vertex
+ * positions, face connections, refined geometry or character buffers are made.
+ * Source support relationships remain; this is not an autonomous mother. */
+(()=>{'use strict';
+function evaluate(program,surface){
+ if(program?.schema!=='body-original-display-normal-functions-r29/1')throw Error('原显示法线函数版本不匹配');
+ const start=performance.now(),{ops,a,b,c,constants,roots}=program,values=new Float64Array(ops.length);
+ for(let i=0;i<ops.length;i++){const x=values[a[i]],y=values[b[i]];switch(ops[i]){case 0:values[i]=constants[i];break;case 1:values[i]=surface.valueAtDomainExtremum(a[i],b[i])[c[i]];break;case 2:values[i]=x+y;break;case 3:values[i]=x-y;break;case 4:values[i]=x*y;break;case 5:values[i]=x/y;break;case 6:values[i]=Math.sqrt(x);break;case 7:values[i]=Math.fround(x);break;case 8:values[i]=x>.72?1:0;break;case 9:values[i]=x?y:values[c[i]];break;case 10:values[i]=x===0?1:x;break;case 11:values[i]=surface.supportValueByOperatorInput(a[i])[b[i]];break;case 12:values[i]=surface.uncorrectedValueAtDomainExtremum(a[i],b[i])[c[i]];break;case 13:values[i]=surface.sourceHeadTransforms[a[i]][b[i]];break;case 14:values[i]=Math.hypot(x,y,values[c[i]]);break;case 15:values[i]=Math.max(.65,Math.min(1.5,x));break;case 16:values[i]=-x;break;case 17:values[i]=x<0?1:0;break;case 18:if(x<1e-8)throw Error('原头颈支撑坐标架退化；保留上一人物');values[i]=x;break;default:throw Error('未知原法线标量指令');}if(!Number.isFinite(values[i]))throw Error('原显示法线函数未能求值；保留上一人物');}
+ const coefficients=new Float64Array(program.functions*9);let zeroNormals=0;
+ for(let f=0;f<program.functions;f++){const uv=surface.domainParameters(f),[[x0,y0],[x1,y1],[x2,y2]]=uv,det=(x1-x0)*(y2-y0)-(x2-x0)*(y1-y0);if(det===0)throw Error('原法线函数域退化');for(let k=0;k<3;k++){const p=[0,1,2].map(corner=>values[roots[f*9+corner*3+k]]),A=((p[1]-p[0])*(y2-y0)-(p[2]-p[0])*(y1-y0))/det,B=((x1-x0)*(p[2]-p[0])-(x2-x0)*(p[1]-p[0]))/det;coefficients.set([A,B,p[0]-A*x0-B*y0],f*9+k*3);}for(let corner=0;corner<3;corner++)if([0,1,2].every(k=>values[roots[f*9+corner*3+k]]===0))zeroNormals++;}
+ return{coefficients,normalAtDomainExtremum:(f,corner)=>[0,1,2].map(k=>values[roots[f*9+corner*3+k]]),report:{schema:program.schema,method:'original ordered Float32 area accumulation, current landmark-frame morphology support, and normal-dependent display response expressed as scalar functions',instructions:ops.length,originalFloat32WritesPreserved:true,sourceSupportRelationshipsRetained:true,originalHeadMorphBoundary:program.originalHeadMorphBoundary||null,headSurfaceGenerated:false,zeroNormalObservations:zeroNormals,buildMS:performance.now()-start,sourceFidelityAccepted:false,completedMotherConversion:false}};
+}
+globalThis.BodyDisplayNormalsR29={evaluate};
+})();
+</script>
+<script>/* Finite-precision function lifting research. Domain extrema are material
+ * parameters, not a character vertex/index buffer. Native source coordinates
+ * are evaluated from rational scalar fields and immediately composed into
+ * the affine surface function. Source partitions/boundary support remain. */
+(()=>{'use strict';
+const gcd=(a,b)=>{a=a<0n?-a:a;b=b<0n?-b:b;while(b){const r=a%b;a=b;b=r;}return a;},cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const floatView=new DataView(new ArrayBuffer(4));
+function domain(values){
+ const binary=values.flatMap(p=>p.map(x=>{if(!Number.isFinite(x)||Math.fround(x)!==x)throw Error('Original Float32 function value missing');if(x===0)return[0n,0];floatView.setFloat32(0,x,false);const bits=floatView.getUint32(0,false),e=bits>>>23&255,m=(bits&8388607)+(e?8388608:0);return[BigInt(bits>>>31?-m:m),(e?e-127:-126)-23];})),power=Math.min(0,...binary.map(x=>x[1])),p=[0,1,2].map(i=>binary.slice(i*3,i*3+3).map(([n,e])=>n<<BigInt(e-power))),u=p[1].map((v,k)=>v-p[0][k]),v=p[2].map((x,k)=>x-p[0][k]),n=cross(u,v);let axis=0;for(let k=1;k<3;k++)if((n[k]<0n?-n[k]:n[k])>(n[axis]<0n?-n[axis]:n[axis]))axis=k;if(n[axis]===0n)return{degenerate:true,plane:[0n,0n,0n,0n],axis,edges:[]};
+ const shift=BigInt(-power),plane=[...n.map(x=>x<<shift),-n.reduce((s,x,k)=>s+x*p[0][k],0n)],a=(axis+1)%3,b=(axis+2)%3,sign=n[axis]<0n?-1n:1n,edges=p.map((q,i)=>{const next=p[(i+1)%3],dx=next[a]-q[a],dy=next[b]-q[b];return[-dy*sign<<shift,dx*sign<<shift,(dy*q[a]-dx*q[b])*sign];});return{plane,axis,edges};
+}
+function dyadic(n,d){if(d===0n)throw Error('Unresolved rational source function');if(d<0n){n=-n;d=-d;}if(n===0n)return 0;const g=gcd(n,d);n/=g;d/=g;if((d&(d-1n))!==0n)throw Error('Source scalar was not evaluated at an exact original domain extremum');let exponent=-(d.toString(2).length-1);while((n>9007199254740991n||n< -9007199254740991n)&&(n&1n)===0n){n>>=1n;exponent++;}if(n>9007199254740991n||n< -9007199254740991n)throw Error('Original scalar precision not recovered');const value=Number(n)*2**exponent;if(!Number.isFinite(value))throw Error('Nonfinite original scalar');return value;}
+function prepare(program){
+ if(program.schema!=='body-rounded-source-functions-research-r28/1')throw Error('Unknown rounded function program');
+ const scalars=program.scalarFunctions.map(p=>p.map(BigInt)),constants=scalars.map(([a,b,c,d])=>a===0n&&b===0n?dyadic(c,d):undefined),parameters=program.charts.map(c=>{const lines=c.lines.map(p=>p.map(BigInt));return lines.map((line,i)=>{let p=cross(lines[(i+2)%3],line);if(p[2]<0n)p=p.map(v=>-v);const g=p.reduce(gcd);return p.map(v=>v/g);});}),neck=BodyNeckSourceR29.create(program.sourceNeckOperator),selectors=new Map(program.neckSelectors.map(s=>[s.function*3+s.corner,s.operatorOutput]));
+ // Immutable scalar-function evaluations only. No posed world coordinates or
+ // character topology is cached. The key includes the exact domain parameter.
+ const memo=new Map;let keyValuePayloadBytes=0;const maximumKeyValuePayloadBytes=64*1024*1024;
+ function evaluate(transforms,packet,state,audit=null){const started=performance.now();let sourceWrites=0,misses=0;
+  function scalar(id,q){if(constants[id]!==undefined)return constants[id];const key=id+'/'+q.join('/');if(memo.has(key))return memo.get(key);const [a,b,c,d]=scalars[id],v=dyadic(a*q[0]+b*q[1]+c*q[2],d*q[2]);misses++;const bytes=key.length*2+8;if(keyValuePayloadBytes+bytes<=maximumKeyValuePayloadBytes){memo.set(key,v);keyValuePayloadBytes+=bytes;}return v;}
+  function native(branch,q){const blend=new Float64Array(12);for(let slot=0;slot<program.sourceInfluences;slot++){const weight=scalar(branch.weights[slot],q);if(weight===0)continue;const joint=scalar(branch.joints[slot],q);if(!Number.isSafeInteger(joint)||joint<0||joint>=transforms.length)throw Error('Original binding scalar not recovered');const m=transforms[joint];for(let r=0;r<12;r++)blend[r]+=weight*m[r];}return BodyMathR01.point(blend,branch.rest.map(id=>scalar(id,q))).map(Math.fround);}
+  function bodyAt(field,q){const c=program.charts[field];if(program.driver==='mhr-no-correctives'){const p=c.targetRest.map(id=>scalar(id,q));if(state.mhr.pose.every(v=>v===0))return p;const out=[0,0,0],count=scalar(c.weightCount,q);if(!Number.isSafeInteger(count)||count<0)throw Error('Original B binding count not recovered');for(let slot=0;slot<count;slot++){const w=scalar(c.weights[slot],q),j=scalar(c.joints[slot],q),v=BodyMathR01.point(transforms[j],p);for(let k=0;k<3;k++)out[k]+=w*v[k];}sourceWrites+=3;return out.map(v=>Math.fround(v+0));}const a=native(c.branches[0],q),b=native(c.branches[1],q),t=scalar(c.recipe,q);sourceWrites+=9;return a.map((v,k)=>Math.fround(v*(1-t)+b[k]*t));}
+  const support=new Float32Array(program.sourceNeckOperator.bodyCount*3);for(const ref of program.neckSupport)support.set(bodyAt(ref.function,ref.parameter.map(BigInt)),ref.operatorInput*3);
+  const neckResult=neck.apply(support,packet,state),corrected=neckResult.positions,coefficients=new Float64Array(program.charts.length*9),functionBounds=new Float64Array(program.charts.length*6),exactFields=[];let maximumDomainReconstruction=0;
+  for(let f=0;f<program.charts.length;f++){const uv=parameters[f].map(q=>[dyadic(q[0],q[2]),dyadic(q[1],q[2])]),values=parameters[f].map((q,corner)=>{const id=selectors.get(f*3+corner),p=id===undefined?bodyAt(f,q):Array.from(corrected.subarray(id*3,id*3+3));if(audit)audit(f,corner,p);return[p[0],p[2],-p[1]];}),[[x0,y0],[x1,y1],[x2,y2]]=uv,det=(x1-x0)*(y2-y0)-(x2-x0)*(y1-y0);if(det===0)throw Error('Original function domain is degenerate');
+   exactFields.push(domain(values));for(let k=0;k<3;k++){functionBounds[f*6+k]=Math.min(...values.map(p=>p[k]));functionBounds[f*6+3+k]=Math.max(...values.map(p=>p[k]));const a=((values[1][k]-values[0][k])*(y2-y0)-(values[2][k]-values[0][k])*(y1-y0))/det,b=((x1-x0)*(values[2][k]-values[0][k])-(x2-x0)*(values[1][k]-values[0][k]))/det,c=values[0][k]-a*x0-b*y0;coefficients.set([a,b,c],f*9+k*3);for(let i=0;i<3;i++)maximumDomainReconstruction=Math.max(maximumDomainReconstruction,Math.abs(a*uv[i][0]+b*uv[i][1]+c-values[i][k]));}
+  }
+  return{coefficients,functionBounds,exactFields,uncorrectedValueAtDomainExtremum:(f,corner)=>{const p=bodyAt(f,parameters[f][corner]);return[p[0],p[2],-p[1]];},supportValueByOperatorInput:neckResult.supportValueByOperatorInput,valueAtDomainExtremum:(f,corner)=>{const id=selectors.get(f*3+corner),p=id===undefined?bodyAt(f,parameters[f][corner]):Array.from(corrected.subarray(id*3,id*3+3));return[p[0],p[2],-p[1]];},domainParameters:f=>parameters[f].map(q=>[dyadic(q[0],q[2]),dyadic(q[1],q[2])]),report:{schema:program.schema,functions:program.charts.length,scalarFunctions:scalars.length,sourceScalarEvaluations:misses,scalarCacheEntries:memo.size,scalarCacheKeyValuePayloadBytes:keyValuePayloadBytes,scalarCacheMaximumKeyValuePayloadBytes:maximumKeyValuePayloadBytes,scalarCacheMapAndStringEngineOverheadExcluded:true,orderedSourceFloat32Writes:sourceWrites,neckSupportInputs:program.neckSupport.length,originalNeckStagesReplayed:true,maximumDomainReconstructionMetres:maximumDomainReconstruction,buildMS:performance.now()-started,sourceFacetPartitionInformationRetained:true,completedMotherConversion:false,sourceFidelityAccepted:false}};
+ }
+ return{evaluate};
+}
+globalThis.BodyRoundedFunctionsR29={prepare};
+})();
+</script>
+<script>/* Exact dyadic rays against moving plane/trim FUNCTIONS. The Number path is
+ * a conservative exclusion filter only; all retained roots and trim decisions
+ * use integer predicates, rational nearest-root ordering, and no geometry
+ * epsilon. Source facet partitions remain, not an autonomous mother. */
+(()=>{'use strict';
+function createTracer(frame,options={}){
+ const fields=frame.exactFields,nodes=frame.nodes,ids=frame.ids;if(!fields||fields.length!==frame.program.functions)throw Error('Moving exact function domains missing');
+ const numeric=fields.map(f=>({plane:f.plane.map(Number),edges:f.edges.map(p=>p.map(Number)),axis:f.axis,degenerate:f.degenerate})),view=new DataView(new ArrayBuffer(8)),E=64*Number.EPSILON;let rays=0,tests=0,exactTests=0;
+ const abs=x=>x<0n?-x:x;
+ function next(x,up){if(!Number.isFinite(x))return x;if(x===0)return up?Number.MIN_VALUE:-Number.MIN_VALUE;view.setFloat64(0,x,false);let bits=view.getBigUint64(0,false);bits+=(x>0)===up?1n:-1n;view.setBigUint64(0,bits,false);return view.getFloat64(0,false);}
+ function affine(p,x){let s=0,m=0;for(let k=0;k<x.length;k++){const a=p[k]*x[k];s+=a;m+=Math.abs(a);}if(p.length>x.length){s+=p[x.length];m+=Math.abs(p[x.length]);}const r=m*E+Number.MIN_VALUE*64;return Number.isFinite(s)&&Number.isFinite(r)?[s-r,s+r]:null;}
+ function quotient(a,b){if(!a||!b||b[0]<=0&&b[1]>=0)return null;const q=[a[0]/b[0],a[0]/b[1],a[1]/b[0],a[1]/b[1]];return q.every(Number.isFinite)?[next(Math.min(...q),false),next(Math.max(...q),true)]:null;}
+ function product(a,b){if(!a||!b)return null;const q=[a[0]*b[0],a[0]*b[1],a[1]*b[0],a[1]*b[1]];return q.every(Number.isFinite)?[next(Math.min(...q),false),next(Math.max(...q),true)]:null;}
+ function add(a,b){if(!a||!b)return null;const lo=a[0]+b[0],hi=a[1]+b[1];return Number.isFinite(lo)&&Number.isFinite(hi)?[next(lo,false),next(hi,true)]:null;}
+ function integerRay(origin,direction){const binary=[...origin,...direction].map(x=>{if(!Number.isFinite(x))throw Error('Nonfinite moving ray');if(!x)return[0n,0];view.setFloat64(0,x,false);const bits=view.getBigUint64(0,false),e=Number(bits>>52n&2047n),m=(bits&4503599627370495n)+(e?4503599627370496n:0n);return[bits>>63n?-m:m,(e?e-1023:-1022)-52];}),power=Math.min(0,...binary.map(x=>x[1]));return{D:1n<<BigInt(-power),x:binary.map(([n,e])=>n<<BigInt(e-power))};}
+ function number(n,d){if(!n)return 0;const sign=n<0n?-1:1;n=abs(n);let e=n.toString(2).length-d.toString(2).length;if(e>=0?n<d<<BigInt(e):n<<BigInt(-e)<d)e--;if(e>1023)return sign*Infinity;const shift=e< -1022?1074:52-e,N=shift>=0?n<<BigInt(shift):n,D=shift>=0?d:d<<BigInt(-shift);let q=N/D;const r=N%D;if(r*2n>D||r*2n===D&&(q&1n))q++;if(e< -1022)return sign*Number(q)*2**-1074;if(q===9007199254740992n){q>>=1n;e++;}return e>1023?sign*Infinity:sign*Number(q)*2**(e-52);}
+ function box(node,origin,direction,best){let lo=0,hi=best===Infinity?Infinity:next(best,true);for(let k=0;k<3;k++){if(direction[k]===0){if(origin[k]<node.lo[k]||origin[k]>node.hi[k])return false;continue;}const a=quotient(affine([1,-origin[k]],[node.lo[k]]),[direction[k],direction[k]]),b=quotient(affine([1,-origin[k]],[node.hi[k]]),[direction[k],direction[k]]);if(!a||!b)return true;lo=Math.max(lo,Math.min(a[0],b[0]));hi=Math.min(hi,Math.max(a[1],b[1]));if(lo>hi)return false;}return true;}
+ function maybe(f,origin,direction){if(f.degenerate)return false;const rate=affine(f.plane.slice(0,3),direction);if(rate&&rate[0]>=0)return false;const s=affine(f.plane,origin),t=quotient(s&&[-s[1],-s[0]],rate);if(!t)return true;if(t[1]<=0)return false;const u=(f.axis+1)%3,v=(f.axis+2)%3;for(const p of f.edges){const a=affine(p,[origin[u],origin[v]]),b=affine(p.slice(0,2),[direction[u],direction[v]]),value=add(a,product(b,t));if(value&&value[1]<0)return false;}return true;}
+ function ray(origin,direction){if(origin.length!==3||direction.length!==3||direction.every(v=>v===0)||[...origin,...direction].some(v=>!Number.isFinite(v)))throw Error('Invalid moving ray');rays++;let integer=null,best=null,bestNumber=Infinity,chosen=[];const stack=[0];while(stack.length){const node=nodes[stack.pop()];if(!box(node,origin,direction,bestNumber))continue;if(node.left>=0){stack.push(node.left,node.right);continue;}for(let at=node.start;at<node.end;at++){const f=ids[at];tests++;if(!maybe(numeric[f],origin,direction))continue;exactTests++;if(!integer)integer=integerRay(origin,direction);const {D,x}=integer,p=fields[f].plane,rate=p[0]*x[3]+p[1]*x[4]+p[2]*x[5];if(rate>=0n)continue;const s=p[0]*x[0]+p[1]*x[1]+p[2]*x[2]+p[3]*D,n=s,d=-rate;if(n<=0n||best&&n*best[1]>best[0]*d)continue;const u=(fields[f].axis+1)%3,v=(fields[f].axis+2)%3;let inside=true;for(const edge of fields[f].edges){const a=edge[0]*x[u]+edge[1]*x[v]+edge[2]*D,b=edge[0]*x[u+3]+edge[1]*x[v+3];if(a*d+b*n<0n){inside=false;break;}}if(!inside)continue;if(!best||n*best[1]<best[0]*d){best=[n,d];bestNumber=number(n,d);chosen=[f];}else chosen.push(f);}}
+  if(!best)return null;chosen.sort((a,b)=>a-b);return{t:bestNumber,fields:chosen,...options.exactParameter===false?{}:{exactParameter:{numerator:best[0].toString(),denominator:best[1].toString()}}};
+ }
+ return{ray,report:()=>({rays,functionTests:tests,exactTests,integerTrimPredicates:true,rationalRootOrdering:true,geometricExpansion:0,characterTriangleFaces:0,sourceFacetPartitionInformationRetained:true,sourceFidelityAccepted:false})};
+}
+globalThis.BodyMovingDomainR28={createTracer,workerCode:'globalThis.BodyMovingDomainR28={createTracer:'+createTracer.toString()+'};'};
+})();
+
+globalThis.BodyMovingDomainR29=BodyMovingDomainR28;</script>
+<script>/* Background full-frame integer/rational source-function intersections.
+ * Workers receive analytic plane/trim coefficients and a BVH, not a character
+ * point/face table. Camera changes cancel stale results before presentation. */
+(()=>{'use strict';
+function workerMain(){let tracer=null,revision=0,queued=null,running=false;self.onmessage=event=>{const m=event.data;try{if(m.type==='program'){revision++;queued=null;tracer=BodyMovingDomainR28.createTracer(m.frame,{exactParameter:false});return;}if(m.type==='cancel'){revision++;queued=null;return;}if(m.type==='render'){revision++;queued=m;if(!running)drain();}}catch(e){self.postMessage({type:'error',id:m.id,error:e.stack});}};
+ async function drain(){running=true;while(queued){const m=queued;queued=null;const ticket=revision,active=tracer,start=performance.now();try{const {camera,width,height,first,last}=m,out=new Float32Array(width*(last-first)*4),unit=a=>{const length=Math.hypot(...a);return a.map(v=>v/length);},eye=[camera.target[0]+Math.sin(camera.yaw)*Math.cos(camera.pitch)*camera.distance,camera.target[1]+Math.sin(camera.pitch)*camera.distance,camera.target[2]+Math.cos(camera.yaw)*Math.cos(camera.pitch)*camera.distance],f=unit(camera.target.map((v,k)=>v-eye[k])),right=unit([-f[2],0,f[0]]),up=[right[1]*f[2]-right[2]*f[1],right[2]*f[0]-right[0]*f[2],right[0]*f[1]-right[1]*f[0]];let cancelled=false,hits=0;
+  for(let y=first;y<last;y++){if(y>first&&(y-first)%8===0){await new Promise(r=>setTimeout(r,0));if(ticket!==revision){cancelled=true;break;}}for(let x=0;x<width;x++){const sx=(x+.5-width*.5)/height,sy=(height*.5-y-.5)/height,rd=unit(f.map((v,k)=>v+.95*(sx*right[k]+sy*up[k]))),hit=active.ray(eye,rd),at=(x+width*(y-first))*4;if(hit){out[at]=eye[0]+rd[0]*hit.t;out[at+1]=eye[1]+rd[1]*hit.t;out[at+2]=eye[2]+rd[2]*hit.t;out[at+3]=hit.fields[0]+1;hits++;}else out[at+3]=-1;}}
+  if(!cancelled)self.postMessage({type:'render',id:m.id,first,last,width,height,hits,world:out.buffer,ms:performance.now()-start},[out.buffer]);
+ }catch(e){self.postMessage({type:'error',id:m.id,error:e.stack});}}running=false;}
+}
+function create({onSurface,onStatus}){
+ let helpers=[],url=null,closed=false,timer=null,serial=0,current=null,programFrame=null,ready=false,error=null,completed=0,cancelled=0,latestMS=null,poolGeneration=0;
+ const hardware=navigator.hardwareConcurrency||2,count=hardware>=12?3:hardware>=6?2:1;
+ const status=()=>({enabled:true,ready,working:!!current&&!ready,lastError:error,workers:helpers.length,completed,cancelled,lastMS:latestMS,characterTriangleFaces:0,integerPredicates:true,rationalFirstHitOrdering:true,geometryTolerance:null,scope:'complete per-pixel source-function geometry; Float32 display positions and unaccepted normal/material response remain separate'});
+ function update(){onStatus?.(status());}
+ function abort(){clearTimeout(timer);timer=null;if(current&&!ready){cancelled++;for(const w of helpers)w.postMessage({type:'cancel'});}current=null;ready=false;}
+ function ensure(){if(helpers.length)return;url=URL.createObjectURL(new Blob([BodyMovingDomainR28.workerCode,'\n(',workerMain.toString(),')();'],{type:'application/javascript'}));const generation=++poolGeneration;try{for(let i=0;i<count;i++){const w=new Worker(url);w.onmessage=event=>{if(generation===poolGeneration)receive(event.data);};w.onerror=e=>{if(generation===poolGeneration)fail(e.message);};helpers.push(w);}}catch(e){for(const w of helpers)w.terminate();helpers=[];URL.revokeObjectURL(url);url=null;throw e;}}
+ function fail(message){if(closed)return;abort();poolGeneration++;for(const w of helpers)w.terminate();helpers=[];if(url)URL.revokeObjectURL(url);url=null;programFrame=null;error=message;update();}
+ function receive(m){if(closed||!current||m.id!==current.id)return;if(m.type==='error'){fail(m.error);return;}if(m.type!=='render')return;current.world.set(new Float32Array(m.world),m.first*m.width*4);current.pending--;current.hits+=m.hits;if(current.pending)return;const done=current;latestMS=performance.now()-done.started;try{onSurface({world:done.world,width:done.width,height:done.height,key:done.key,hits:done.hits});if(current!==done)return;ready=true;completed++;error=null;update();}catch(e){fail(e.message);}}
+ function request(frame,camera,width,height,key){if(closed||current?.key===key)return;abort();error=null;const id=++serial;current={id,key,frame,camera:structuredClone(camera),width,height,pending:count,hits:0,world:null,started:0};update();timer=setTimeout(()=>{timer=null;if(closed||!current||current.id!==id)return;try{ensure();const c=current;c.world=new Float32Array(width*height*4);c.started=performance.now();if(programFrame!==frame){const minimal={exactFields:frame.exactFields,nodes:frame.nodes,ids:frame.ids,program:{functions:frame.program.functions}};for(const w of helpers)w.postMessage({type:'program',id,frame:minimal});programFrame=frame;}for(let i=0;i<helpers.length;i++)helpers[i].postMessage({type:'render',id,width,height,first:Math.floor(height*i/helpers.length),last:Math.floor(height*(i+1)/helpers.length),camera:c.camera});}catch(e){fail(e.message);}},140);}
+ return{request,cancel(){abort();update();},report:status,retry(){abort();error=null;update();},close(){closed=true;abort();poolGeneration++;for(const w of helpers)w.terminate();helpers=[];if(url)URL.revokeObjectURL(url);url=null;programFrame=null;}};
+}
+globalThis.BodyPosePrecisionR29={create};
+})();
+</script>
+<script>/* Continuous, source-derived affine chart functions. Research candidate only.
+ * No vertex table, face connections, generated polygon or character mesh.
+ * Trim partitions and moment coefficients are inherited from the source.
+ * This does not certify source Float32 rounding, normals, or a mother system. */
+(()=>{'use strict';
+const M=BodyMathR01,cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],unit=a=>{const n=Math.hypot(...a);return a.map(v=>v/n);};
+const roundedKernels=new WeakMap;
+function matrices(program,pose={}){
+ if(program.rig.kind==='mhr-no-correctives')return mhrMatrices(program,pose);
+ const r=program.rig,allowed=new Set(program.allowedJoints);for(const [name,p]of Object.entries(pose)){if(!allowed.has(name))throw Error('这个候选尚未接入该动作：'+name);const rotation=Array.isArray(p)?p:p.rotation||[0,0,0],translation=Array.isArray(p)?[0,0,0]:p.translation||[0,0,0];if(rotation.length!==3||translation.length!==3||![...rotation,...translation].every(Number.isFinite)||rotation.some(v=>Math.abs(v)>180))throw Error('动作必须是有限的三轴角度和位移');}
+ const inverses=r.bind.map(M.rigidInverse),orientationChain=rotations=>{const poses=[],transforms=[];for(const j of r.order){const parent=r.parents[j],frame=parent<0?r.bind[j]:M.mul(transforms[parent],r.bind[j]),p=frame.slice();for(let row=0;row<3;row++)for(let k=0;k<3;k++)p[row*4+k]=rotations[j][row*3+k];poses[j]=p;transforms[j]=M.mul(parent<0?frame:p,inverses[j]);}return poses;};
+ const ref=r.referenceOrientations.length?orientationChain(r.labels.map((_,j)=>r.referenceOrientations.slice(j*9,j*9+9))):r.bind,inv=ref.map(M.rigidInverse),root=inv[0],posed=[],deltas=[];
+ if(r.parameterization!=='local-ref')throw Error('Unsupported original rig parameterization');
+ for(const j of r.order){const parent=r.parents[j],p=pose[r.labels[j]],rotation=Array.isArray(p)?p:p?.rotation||[0,0,0],translation=Array.isArray(p)?undefined:p?.translation;let motion=M.rotvecDegrees(rotation,translation);const orientation=ref[j].slice();orientation[3]=orientation[7]=orientation[11]=0;motion=M.mul(M.mul(M.rigidInverse(orientation),motion),orientation);const local=M.mul(ref[j],motion);posed[j]=parent<0?M.mul(root,local):M.mul(deltas[parent],local);deltas[j]=M.mul(posed[j],inv[j]);}
+ const skin=posed.map((p,j)=>M.mul(p,inverses[j]));Object.defineProperty(skin,"originalPoseMatrices",{value:posed});return skin;
+}
+function mhrMatrices(program,input){
+ const r=program.rig,pose=Array.isArray(input)||ArrayBuffer.isView(input)?Array.from(input):Array.from({length:204},(_,i)=>input[i]??0),allowed=new Set(program.allowedPoseIndices);
+ if(pose.length!==204||pose.some((v,i)=>!Number.isFinite(v)||v<r.poseLimits[i][0]||v>r.poseLimits[i][1]||(!allowed.has(i)&&v!==0)))throw Error('驱动 B 的这个参数超出原范围或已接入的身体范围；姿态修正必须由用户明确关闭');
+ if(!Array.isArray(input)&&!ArrayBuffer.isView(input)&&Object.keys(input).some(k=>!/^\d+$/.test(k)||Number(k)>203))throw Error('未知驱动 B 动作输入');
+ const parameters=new Float32Array(r.labels.length*7);for(let row=0;row<parameters.length;row++){let value=0;for(let k=r.transform_ptr[row];k<r.transform_ptr[row+1];k++)value+=r.transform_val[k]*pose[r.transform_idx[k]];parameters[row]=value;}
+ const posed=[],skin=[],changed=[];
+ for(let j=0;j<r.labels.length;j++){const parent=r.parents[j],k=j*7;changed[j]=(parent>=0&&changed[parent])||Array.from(parameters.subarray(k,k+7)).some(v=>v!==0);if(!changed[j]){posed[j]=r.bind[j].slice();skin[j]=M.I();continue;}const rotation=M.eulerQuaternion(parameters[k+3],parameters[k+4],parameters[k+5]),pre=M.quaternionMatrix(Array.from(r.prerotation.subarray(j*4,j*4+4))),translation=M.vector(M.uniformInverse(pre),[parameters[k]/100,parameters[k+1]/100,parameters[k+2]/100]),scale=parent<0||j<=1?1:r.scales[parent],motion=M.quaternionMatrix(rotation,translation.map(v=>v*scale),Math.exp(parameters[k+6]*.6931471824645996)),local=M.mul(r.local[j],motion);posed[j]=parent<0?local:M.mul(posed[parent],local);skin[j]=M.mul(posed[j],M.uniformInverse(r.bind[j]));}
+ return skin;
+}
+function evaluate(program,pose={}){
+ if(program.requiresRoundedSourceFunctions&&!program.roundedFunctions||program.requiresDisplayNormalFunctions&&!program.displayNormals)throw Error('当前原轮廓函数数据不完整；保留上一人物');
+ const started=performance.now(),transforms=matrices(program,pose),delta=transforms.map((m,j)=>m.map((v,k)=>v-program.rig.baseTransforms[j][k]));let rounded=null;
+ if(program.roundedFunctions){let kernel=roundedKernels.get(program.roundedFunctions);if(!kernel){kernel=BodyRoundedFunctionsR29.prepare(program.roundedFunctions);roundedKernels.set(program.roundedFunctions,kernel);}const state=structuredClone(program.state);if(program.rig.kind==='mhr-no-correctives')state.mhr.pose=Array.isArray(pose)||ArrayBuffer.isView(pose)?Array.from(pose):Array.from({length:204},(_,i)=>pose[i]||0);else{state.anny.pose={};state.anny.translations={};for(const[name,p]of Object.entries(pose)){state.anny.pose[name]=Array.from(Array.isArray(p)?p:p.rotation||[0,0,0]);if(!Array.isArray(p)&&p.translation?.some(v=>v!==0))state.anny.translations[name]=Array.from(p.translation);}}const head=program.headBoundaryFunctions?BodySourceHeadR29.evaluate(program.headBoundaryFunctions,state,pose):null,packet=head?head.packet:{...structuredClone(program.roundedSourcePacket),sourceState:state};rounded=kernel.evaluate(transforms,packet,state);rounded.sourceHeadTransforms=head?.skin||null;rounded.headBoundary=packet;}
+ const count=program.functions,coefficients=rounded?rounded.coefficients:Float64Array.from(program.base),inverse=new Float64Array(count*6),inverseAxes=new Uint8Array(count),normals=new Float64Array(count*9),normalMaps=program.displayNormals?null:new Float64Array(count*9),boxes=new Float64Array(count*6),geometric=new Float64Array(count*3),degenerate=[];
+ for(let f=0;f<count;f++){
+  const at=f*9;
+  if(!rounded)for(let row=0;row<3;row++){const zrow=[0,2,1][row],sign=row===2?-1:1;for(let k=program.offsets[f];k<program.offsets[f+1];k++){const d=delta[program.joints[k]],start=k*12;for(let c=0;c<3;c++)for(let q=0;q<4;q++)coefficients[at+row*3+c]+=sign*d[zrow*4+q]*program.moments[start+q*3+c];}}
+  const du=[coefficients[at],coefficients[at+3],coefficients[at+6]],dv=[coefficients[at+1],coefficients[at+4],coefficients[at+7]],gn=cross(du,dv),size=Math.hypot(...gn);let axis=0;for(let k=1;k<3;k++)if(Math.abs(gn[k])>Math.abs(gn[axis]))axis=k;
+  if(!(size>0)||!Number.isFinite(size)){degenerate.push(f);continue;}
+  inverseAxes[f]=axis;const u=(axis+1)%3,v=(axis+2)%3,det=du[u]*dv[v]-du[v]*dv[u],a=dv[v]/det,b=-dv[u]/det,c=-du[v]/det,d=du[u]/det;
+  inverse.set([a,b,-a*coefficients[at+u*3+2]-b*coefficients[at+v*3+2],c,d,-c*coefficients[at+u*3+2]-d*coefficients[at+v*3+2]],f*6);
+  geometric.set(unit(gn).map(x=>x*program.winding[f]),f*3);
+  if(!program.displayNormals){
+  const bu=[program.base[at],program.base[at+3],program.base[at+6]],bv=[program.base[at+1],program.base[at+4],program.base[at+7]],bn=unit(cross(bu,bv)),nn=unit(gn),det3=dot(du,cross(dv,nn)),basis=[cross(dv,nn).map(x=>x/det3),cross(nn,du).map(x=>x/det3),cross(du,dv).map(x=>x/det3)];
+  // The differential inverse transpose is a research normal transport, not the
+  // original renderer's area-averaged normal operator. Kept explicit in reports.
+  for(let k=0;k<3;k++)for(let j=0;j<3;j++)normalMaps[at+k*3+j]=basis[0][k]*bu[j]+basis[1][k]*bv[j]+basis[2][k]*bn[j];
+  for(let row=0;row<3;row++)for(let c=0;c<3;c++)for(let k=0;k<3;k++)normals[at+row*3+c]+=normalMaps[at+row*3+k]*program.normal[at+k*3+c];
+  }
+  if(!rounded){
+  const [loU,hiU,loV,hiV]=program.rects.slice(f*4,f*4+4);
+  for(let row=0;row<3;row++){const a=coefficients[at+row*3],b=coefficients[at+row*3+1],c=coefficients[at+row*3+2],lo=c+a*(a<0?hiU:loU)+b*(b<0?hiV:loV),hi=c+a*(a<0?loU:hiU)+b*(b<0?loV:hiV);boxes[f*6+row]=lo;boxes[f*6+row+3]=hi;}  }
+
+ }
+ if(degenerate.some(f=>!rounded?.exactFields[f].degenerate))throw Error('函数域退化且未能证明源函数为空；保留上一人物：'+degenerate.slice(0,8).join(','));if(rounded)boxes.set(rounded.functionBounds);
+ let normalResponseMS=0;
+ if(program.displayNormals){const result=BodyDisplayNormalsR29.evaluate(program.displayNormals,rounded);normals.set(result.coefficients);normalResponseMS=result.report.buildMS;rounded.displayNormalReport=result.report;rounded.normalAtDomainExtremum=result.normalAtDomainExtremum;}else if(program.normalPolynomials){const normalStart=performance.now(),p=program.normalPolynomials,columns=Array.from({length:p.variableCount},(_,a)=>a>=p.constantStart?[0,1,2].map(k=>k===a-p.constantStart?1:0):[delta[a>>2][a%4],delta[a>>2][8+a%4],-delta[a>>2][4+a%4]]),pairCache=new Map;
+  const evaluated=Array.from({length:p.expressionOffsets.length-1},(_,e)=>{const out=Array.from(p.constants.subarray(e*3,e*3+3));for(let i=p.expressionOffsets[e];i<p.expressionOffsets[e+1];i++){const key=p.pairs[i];let value=pairCache.get(key);if(!value){const a=Math.floor(key/p.variableCount),b=key%p.variableCount;value=cross(columns[a],columns[b]);pairCache.set(key,value);}for(let k=0;k<3;k++)out[k]+=p.coefficients[i]*value[k];}const length=Math.sqrt(dot(out,out));if(!(length>0)||!Number.isFinite(length))throw Error('原法线响应函数退化；保留上一人物');return out.map(v=>v/length);});
+  normals.fill(0);for(let f=0;f<count;f++)for(let term=0;term<3;term++){const n=evaluated[p.refs[f*3+term]],at=(f*3+term)*3;for(let row=0;row<3;row++)for(let k=0;k<3;k++)normals[f*9+row*3+k]+=n[row]*p.blend[at+k];}
+  normalResponseMS=performance.now()-normalStart;
+ }
+ const ids=Array.from({length:count},(_,i)=>i),nodes=[];
+ function build(start,end){const lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity],centresLo=lo.slice(),centresHi=hi.slice();for(let at=start;at<end;at++){const id=ids[at]*6;for(let k=0;k<3;k++){lo[k]=Math.min(lo[k],boxes[id+k]);hi[k]=Math.max(hi[k],boxes[id+k+3]);const c=(boxes[id+k]+boxes[id+k+3])/2;centresLo[k]=Math.min(centresLo[k],c);centresHi[k]=Math.max(centresHi[k],c);}}const index=nodes.length,node={lo,hi,start,end,left:-1,right:-1};nodes.push(node);if(end-start>6){let axis=0;for(let k=1;k<3;k++)if(centresHi[k]-centresLo[k]>centresHi[axis]-centresLo[axis])axis=k;const sorted=ids.slice(start,end).sort((a,b)=>(boxes[a*6+axis]+boxes[a*6+axis+3])-(boxes[b*6+axis]+boxes[b*6+axis+3]));for(let i=0;i<sorted.length;i++)ids[start+i]=sorted[i];const mid=(start+end)>>1;node.left=build(start,mid);node.right=build(mid,end);}return index;}
+ build(0,count);
+ return{program,pose:structuredClone(pose),valueAtDomainExtremum:rounded?.valueAtDomainExtremum,normalAtDomainExtremum:rounded?.normalAtDomainExtremum,headBoundary:rounded?.headBoundary,transforms,coefficients,exactFields:rounded?.exactFields||null,inverse,inverseAxes,normals,geometric,boxes,ids,nodes,bounds:nodes[0].lo.map((v,k)=>[v,nodes[0].hi[k]]),buildMS:performance.now()-started,normalResponseMS,roundedSourcePositionArithmetic:rounded?.report||null,originalDisplayNormals:rounded?.displayNormalReport||null,normalMethod:program.displayNormals?'original ordered Float32 display-response scalar functions':program.normalPolynomials?'source-derived area-response polynomials; finite precision and native postprocessing unaccepted':'chart differential transport',characterTriangleFaces:0,characterVertexBuffers:0,sourceFacetPartitionInformationRetained:true,completedMotherConversion:false,sourceFidelityAccepted:false};
+}
+function createTracer(frame){
+ const {program:p,coefficients:c,inverse:inv,normals:n,geometric:g,nodes,ids}=frame;const exact=frame.exactFields?BodyMovingDomainR28.createTracer(frame):null;
+ function ray(origin,direction){if(exact){const h=exact.ray(origin,direction);if(!h)return null;const f=h.fields[0],j=f*9,point=origin.map((v,k)=>v+h.t*direction[k]),axis=frame.exactFields[f].axis,u=(axis+1)%3,v=(axis+2)%3,k=f*6;let oldAxis=0;for(let a=1;a<3;a++)if(Math.abs(g[f*3+a])>Math.abs(g[f*3+oldAxis]))oldAxis=a;const a=(oldAxis+1)%3,b=(oldAxis+2)%3,U=inv[k]*point[a]+inv[k+1]*point[b]+inv[k+2],V=inv[k+3]*point[a]+inv[k+4]*point[b]+inv[k+5];return{...h,field:f,U,V,point,normal:unit([0,1,2].map(row=>n[j+row*3]*U+n[j+row*3+1]*V+n[j+row*3+2]))};}let best=Infinity,hit=null;const stack=[0];while(stack.length){const node=nodes[stack.pop()];let lo=0,hi=best;for(let k=0;k<3;k++){if(direction[k]===0){if(origin[k]<node.lo[k]||origin[k]>node.hi[k])hi=-1;continue;}let a=(node.lo[k]-origin[k])/direction[k],b=(node.hi[k]-origin[k])/direction[k];if(a>b)[a,b]=[b,a];lo=Math.max(lo,a);hi=Math.min(hi,b);}if(hi<lo)continue;if(node.left>=0){stack.push(node.left,node.right);continue;}for(let at=node.start;at<node.end;at++){const f=ids[at],j=f*9,gn=Array.from(g.subarray(f*3,f*3+3)),den=dot(gn,direction);if(den>=0)continue;const t=dot(gn,[c[j+2]-origin[0],c[j+5]-origin[1],c[j+8]-origin[2]])/den;if(!(t>0&&t<best))continue;const point=origin.map((v,k)=>v+t*direction[k]);let axis=0;for(let k=1;k<3;k++)if(Math.abs(gn[k])>Math.abs(gn[axis]))axis=k;const u=(axis+1)%3,v=(axis+2)%3,k=f*6,U=inv[k]*point[u]+inv[k+1]*point[v]+inv[k+2],V=inv[k+3]*point[u]+inv[k+4]*point[v]+inv[k+5];let inside=true;for(let e=0;e<3;e++){const z=j+e*3;if(p.domains[z]*U+p.domains[z+1]*V+p.domains[z+2]<0){inside=false;break;}}if(!inside)continue;const normal=unit([0,1,2].map(row=>n[j+row*3]*U+n[j+row*3+1]*V+n[j+row*3+2]));best=t;hit={t,field:f,U,V,point,normal};}}return hit;}
+ return{ray};
+}
+globalThis.BodyPoseFunctionsR29={matrices,evaluate,createTracer};
+})();
+</script>
+<script>/* Display-only edge antialiasing for directly intersected body surfaces.
+ * The surface, intersection, material inputs and person parameters are unchanged.
+ * A single fullscreen compositor samples a copy of the finished colour buffer;
+ * its screen triangle is not a character mesh. */
+(()=>{'use strict';
+const vertex=`#version 300 es
+precision highp float;
+void main(){
+  vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));
+  gl_Position=vec4(p*2.-1.,0.,1.);
+}`;
+const fragment=`#version 300 es
+precision highp float;
+uniform sampler2D picture;
+uniform vec2 resolution;
+out vec4 colour;
+vec4 premul(vec2 uv){vec4 c=texture(picture,uv);return vec4(c.rgb*c.a,c.a);}
+float luminance(vec4 c){return dot(c.rgb,vec3(.299,.587,.114));}
+void main(){
+  vec2 uv=gl_FragCoord.xy/resolution, px=1./resolution;
+  vec4 m=premul(uv),nw=premul(uv+px*vec2(-1.,1.)),ne=premul(uv+px),
+       sw=premul(uv-px),se=premul(uv+px*vec2(1.,-1.));
+  float lm=luminance(m),lnw=luminance(nw),lne=luminance(ne),
+        lsw=luminance(sw),lse=luminance(se);
+  float low=min(lm,min(min(lnw,lne),min(lsw,lse)));
+  float high=max(lm,max(max(lnw,lne),max(lsw,lse)));
+  if(high-low<max(.025,high*.10)){colour=vec4(m.rgb/max(m.a,.000001),m.a);return;}
+  vec2 dir=vec2(-((lnw+lne)-(lsw+lse)),(lnw+lsw)-(lne+lse));
+  float reduce=max((lnw+lne+lsw+lse)*(.25*.125),1./128.);
+  dir=clamp(dir/(min(abs(dir.x),abs(dir.y))+reduce),vec2(-8.),vec2(8.))*px;
+  vec4 a=.5*(premul(uv+dir*(1./3.-.5))+premul(uv+dir*(2./3.-.5)));
+  vec4 b=.5*a+.25*(premul(uv-dir*.5)+premul(uv+dir*.5));
+  float lb=luminance(b);vec4 result=(lb<low||lb>high)?a:b;
+  colour=vec4(result.rgb/max(result.a,.000001),result.a);
+}`;
+
+function size(canvas){
+  const w=Math.max(1,canvas.clientWidth),h=Math.max(1,canvas.clientHeight);
+  const scale=Math.min(2,Math.max(1,window.devicePixelRatio||1))*1.25;
+  const targetW=w*scale,targetH=h*scale,maxPixels=1500000,maxSide=1920;
+  const cap=Math.min(1,maxSide/targetW,maxSide/targetH,Math.sqrt(maxPixels/(targetW*targetH)));
+  return [Math.max(1,Math.round(targetW*cap)),Math.max(1,Math.round(targetH*cap))];
+}
+function create(gl,canvas){
+  const compile=(type,text)=>{const s=gl.createShader(type);gl.shaderSource(s,text);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error('身体轮廓抗锯齿：'+gl.getShaderInfoLog(s));return s;};
+  const vs=compile(gl.VERTEX_SHADER,vertex),fs=compile(gl.FRAGMENT_SHADER,fragment),program=gl.createProgram();
+  gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
+  if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error('身体轮廓抗锯齿：'+gl.getProgramInfoLog(program));
+  gl.deleteShader(vs);gl.deleteShader(fs);
+  const vao=gl.createVertexArray(),texture=gl.createTexture(),resolution=gl.getUniformLocation(program,'resolution'),picture=gl.getUniformLocation(program,'picture');
+  // WebGL forbids copying an opaque RGB drawing buffer into an RGBA texture.
+  const opaque=gl.getContextAttributes()?.alpha===false;
+  let width=0,height=0,frames=0;
+  function apply(){
+    if(globalThis.__BODY_EDGE_AA_DISABLED__===true||gl.isContextLost()||!canvas.width||!canvas.height||gl.getParameter(gl.FRAMEBUFFER_BINDING)!==null)return false;
+    const old={program:gl.getParameter(gl.CURRENT_PROGRAM),vao:gl.getParameter(gl.VERTEX_ARRAY_BINDING),active:gl.getParameter(gl.ACTIVE_TEXTURE),viewport:gl.getParameter(gl.VIEWPORT),mask:gl.getParameter(gl.COLOR_WRITEMASK),depth:gl.isEnabled(gl.DEPTH_TEST),blend:gl.isEnabled(gl.BLEND),scissor:gl.isEnabled(gl.SCISSOR_TEST),cull:gl.isEnabled(gl.CULL_FACE)};
+    gl.activeTexture(gl.TEXTURE0);old.texture=gl.getParameter(gl.TEXTURE_BINDING_2D);gl.bindTexture(gl.TEXTURE_2D,texture);
+    if(width!==canvas.width||height!==canvas.height){
+      width=canvas.width;height=canvas.height;
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D,0,opaque?gl.RGB8:gl.RGBA8,width,height,0,opaque?gl.RGB:gl.RGBA,gl.UNSIGNED_BYTE,null);
+    }
+    gl.copyTexSubImage2D(gl.TEXTURE_2D,0,0,0,0,0,width,height);
+    gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);gl.disable(gl.SCISSOR_TEST);gl.disable(gl.CULL_FACE);gl.colorMask(true,true,true,true);
+    gl.viewport(0,0,width,height);gl.bindVertexArray(vao);gl.useProgram(program);gl.uniform2f(resolution,width,height);gl.uniform1i(picture,0);gl.drawArrays(gl.TRIANGLES,0,3);
+    gl.bindVertexArray(old.vao);gl.useProgram(old.program);gl.viewport(...old.viewport);gl.colorMask(...old.mask);
+    for(const [flag,enabled] of [[gl.DEPTH_TEST,old.depth],[gl.BLEND,old.blend],[gl.SCISSOR_TEST,old.scissor],[gl.CULL_FACE,old.cull]])enabled?gl.enable(flag):gl.disable(flag);
+    gl.bindTexture(gl.TEXTURE_2D,old.texture);gl.activeTexture(old.active);frames++;
+    return true;
+  }
+  return{apply,report:()=>({enabled:true,method:'edge-aware colour filter',frames,width,height}),close(){gl.deleteTexture(texture);gl.deleteVertexArray(vao);gl.deleteProgram(program);}};
+}
+globalThis.BodyEdgeAA32={create,size};
+})();
+
+/* Direct intersection of deforming trimmed affine functions. GL_POINTS is a
+ * screen substrate only. No character point/element buffers or polygon draws.
+ * Float32 GPU predicates are diagnostic, not an exact source acceptance pass. */
+(()=>{'use strict';
+const vertex=`#version 300 es
+precision highp float;uniform vec2 resolution;uniform int columns;uniform float tile;
+void main(){vec2 cell=vec2(gl_VertexID%columns,gl_VertexID/columns),p=min((cell+.5)*tile,resolution-.5*tile);gl_Position=vec4(p/resolution*2.-1.,0.,1.);gl_PointSize=tile;}`;
+const fragment=`#version 300 es
+precision highp float;precision highp int;uniform sampler2D branches,functions,leaves;uniform int dataWidth;uniform vec2 resolution;uniform vec3 eye,target;uniform int mode;uniform int exactSurface;uniform sampler2D sourceWorld;
+out vec4 colour;
+vec4 rec(sampler2D tex,int i){return texelFetch(tex,ivec2(i%dataWidth,i/dataWidth),0);}
+bool box(vec3 ro,vec3 rd,vec3 lo,vec3 hi,float best){float a=0.,b=best;for(int k=0;k<3;k++){if(rd[k]==0.){if(ro[k]<lo[k]||ro[k]>hi[k])return false;}else{vec2 span=vec2(lo[k]-ro[k],hi[k]-ro[k])/rd[k];a=max(a,min(span.x,span.y));b=min(b,max(span.x,span.y));}}return b>=a;}
+bool trace(vec3 ro,vec3 rd,out float best,out vec3 normal,out int field,out bool unresolved){
+ best=1e20;field=-1;int stack[64];int count=1;stack[0]=0;unresolved=false;
+ for(int visit=0;visit<16384;visit++){if(count==0)break;int id=stack[--count];vec4 a=rec(branches,id*3),b=rec(branches,id*3+1),c=rec(branches,id*3+2);if(!box(ro,rd,a.xyz,b.xyz,best))continue;
+  if(a.w>=0.){if(count+2>64){unresolved=true;break;}stack[count++]=int(a.w+.5);stack[count++]=int(b.w+.5);continue;}
+  for(int at=0;at<6;at++){if(at>=int(c.y+.5))break;int slot=int(c.x+.5)+at;int f=int(rec(leaves,slot/4)[slot%4]+.5),j=f*11;vec4 x=rec(functions,j),y=rec(functions,j+1),z=rec(functions,j+2);vec3 n=vec3(x.w,y.w,z.w);float den=dot(n,rd);if(den>=0.)continue;float t=dot(n,vec3(x.z,y.z,z.z)-ro)/den;if(t<=0.||t>best||(t==best&&f>=field))continue;vec3 point=ro+t*rd;vec4 ia=rec(functions,j+3),ib=rec(functions,j+4);int axis=int(ia.w+.5);vec2 q=axis==0?point.yz:axis==1?point.zx:point.xy;vec3 uv=vec3(dot(ia.xyz,vec3(q,1.)),dot(ib.xyz,vec3(q,1.)),1.);bool inside=true;for(int e=0;e<3;e++)if(dot(rec(functions,j+8+e).xyz,uv)<0.)inside=false;if(!inside)continue;best=t;field=f;normal=normalize(vec3(dot(rec(functions,j+5).xyz,uv),dot(rec(functions,j+6).xyz,uv),dot(rec(functions,j+7).xyz,uv)));}
+ }
+ if(count>0)unresolved=true;return field>=0;
+}
+void main(){vec2 screen=(gl_FragCoord.xy-resolution*.5)/resolution.y;vec3 f=normalize(target-eye),r=normalize(cross(f,vec3(0,1,0))),u=cross(r,f),rd=normalize(f+.95*(screen.x*r+screen.y*u));float t;vec3 n;int field;bool unresolved=false;bool hit;if(exactSurface==1){vec4 p=texelFetch(sourceWorld,ivec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y),0);hit=p.w>.5;field=int(p.w+.5)-1;if(hit){int j=field*11;vec4 ia=rec(functions,j+3),ib=rec(functions,j+4);int axis=int(ia.w+.5);vec2 q=axis==0?p.yz:axis==1?p.zx:p.xy;vec3 uv=vec3(dot(ia.xyz,vec3(q,1.)),dot(ib.xyz,vec3(q,1.)),1.);n=normalize(vec3(dot(rec(functions,j+5).xyz,uv),dot(rec(functions,j+6).xyz,uv),dot(rec(functions,j+7).xyz,uv)));t=length(p.xyz-eye);}}else hit=trace(eye,rd,t,n,field,unresolved);vec3 bg=mix(vec3(.085,.105,.105),vec3(.17,.20,.195),gl_FragCoord.y/resolution.y);
+ if(unresolved){colour=vec4(1.,0.,.8,1.);return;}if(mode==3){if(!hit){colour=vec4(0.);return;}uint code=uint(clamp(t/8.,0.,1.)*16777215.);colour=vec4(float((code>>16u)&255u),float((code>>8u)&255u),float(code&255u),255.)/255.;return;}
+ if(!hit){colour=mode==4?vec4(0.):vec4(bg,1.);return;}if(mode==2){colour=vec4(n*.5+.5,1.);return;}if(mode==4){uint code=uint(field+1);colour=vec4(float((code>>16u)&255u),float((code>>8u)&255u),float(code&255u),255.)/255.;return;}
+ float key=max(0.,dot(n,normalize(vec3(-.6,.7,1.)))),fill=max(0.,dot(n,normalize(vec3(.8,.3,-.5)))),rim=pow(1.-max(0.,dot(n,-rd)),3.);vec3 albedo=vec3(.57,.61,.60);colour=vec4(pow(albedo*(.20+.68*key+.20*fill)+vec3(.14)*rim,vec3(1./2.2)),1.);
+}`;
+function create(canvas,initial){
+ let gl=null,shader=null,edgeAA=null,textures=[],locations={},frame=initial,closed=false,lost=false,draws=0,gpuBytes=0,baseGpuBytes=0,worldGpuBytes=0,mode=0,tile=1,timer=null,contextRecoveries=0,precision=null,worldKey=null,worldData=null,frameEpoch=0,probing=false;let camera={yaw:.28,pitch:.04,distance:2.9,target:[0,-.16,0]};
+ const width=1024;
+ function upload(unit,data){const h=Math.max(1,Math.ceil(data.length/4/width)),values=new Float32Array(width*h*4);values.set(data);const texture=textures[unit]||gl.createTexture();textures[unit]=texture;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,width,h,0,gl.RGBA,gl.FLOAT,values);return values.byteLength;}
+ function uploadFrame(){const nodes=new Float32Array(frame.nodes.length*12),functions=new Float32Array(frame.program.functions*44);for(let i=0;i<frame.nodes.length;i++){const n=frame.nodes[i];for(let k=0;k<3;k++){
+   // Broad-phase padding only; never expand a trim predicate or surface.
+   // Exact source/GPU equivalence is not certified by this diagnostic bound.
+   const margin=32*1.1920928955078125e-7*Math.max(1,Math.abs(n.lo[k]),Math.abs(n.hi[k]));nodes[i*12+k]=n.lo[k]-margin;nodes[i*12+4+k]=n.hi[k]+margin;}
+  nodes[i*12+3]=n.left;nodes[i*12+7]=n.right;nodes[i*12+8]=n.start;nodes[i*12+9]=n.end-n.start;}
+  for(let f=0;f<frame.program.functions;f++){const at=f*44;for(let row=0;row<3;row++){functions.set(frame.coefficients.subarray(f*9+row*3,f*9+row*3+3),at+row*4);functions[at+row*4+3]=frame.geometric[f*3+row];functions.set(frame.normals.subarray(f*9+row*3,f*9+row*3+3),at+20+row*4);functions.set(frame.program.domains.slice(f*9+row*3,f*9+row*3+3),at+32+row*4);}functions.set(frame.inverse.subarray(f*6,f*6+3),at+12);functions[at+15]=frame.inverseAxes[f];functions.set(frame.inverse.subarray(f*6+3,f*6+6),at+16);}
+  baseGpuBytes=upload(0,nodes)+upload(1,functions)+upload(2,frame.ids);gpuBytes=baseGpuBytes+worldGpuBytes;const uploadError=gl.getError();if(uploadError!==gl.NO_ERROR)throw Error('连续函数显示数据未完整载入（WebGL '+uploadError+'）');
+ }
+ function initialize(){gl=canvas.getContext('webgl2',{alpha:false,antialias:false,preserveDrawingBuffer:true});if(!gl)throw Error('这个设备未提供所需的三维显示能力');edgeAA=BodyEdgeAA32.create(gl,canvas);const compile=(type,code)=>{const s=gl.createShader(type);gl.shaderSource(s,code);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;};shader=gl.createProgram();gl.attachShader(shader,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(shader,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(shader);if(!gl.getProgramParameter(shader,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(shader));for(const k of ['resolution','columns','tile','branches','functions','leaves','dataWidth','eye','target','mode','exactSurface','sourceWorld'])locations[k]=gl.getUniformLocation(shader,k);textures=[];gl.disable(gl.DITHER);gl.disable(gl.DEPTH_TEST);uploadFrame();const worldTexture=gl.createTexture();textures[3]=worldTexture;gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,worldTexture);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,1,1,0,gl.RGBA,gl.FLOAT,new Float32Array([0,0,0,-1]));worldGpuBytes=16;gpuBytes=baseGpuBytes+worldGpuBytes;}
+ function geometryKey(){return frameEpoch+'/'+canvas.width+'/'+canvas.height+'/'+JSON.stringify(camera,(_,v)=>Object.is(v,-0)?'-0':v);}
+ function draw(){if(closed||lost)return;gl.viewport(0,0,canvas.width,canvas.height);gl.useProgram(shader);for(let i=0;i<textures.length;i++){gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,textures[i]);}const eye=[camera.target[0]+Math.sin(camera.yaw)*Math.cos(camera.pitch)*camera.distance,camera.target[1]+Math.sin(camera.pitch)*camera.distance,camera.target[2]+Math.cos(camera.yaw)*Math.cos(camera.pitch)*camera.distance],columns=Math.ceil(canvas.width/tile);gl.uniform2f(locations.resolution,canvas.width,canvas.height);gl.uniform1i(locations.columns,columns);gl.uniform1f(locations.tile,tile);gl.uniform1i(locations.branches,0);gl.uniform1i(locations.functions,1);gl.uniform1i(locations.leaves,2);gl.uniform1i(locations.dataWidth,width);gl.uniform3fv(locations.eye,eye);gl.uniform3fv(locations.target,camera.target);gl.uniform1i(locations.mode,mode);const key=geometryKey(),exact=worldKey===key;gl.uniform1i(locations.exactSurface,exact?1:0);gl.uniform1i(locations.sourceWorld,3);gl.drawArrays(gl.POINTS,0,columns*Math.ceil(canvas.height/tile));if(!probing)edgeAA.apply();draws++;if(!probing&&frame.exactFields&&!exact)precision?.request(frame,camera,canvas.width,canvas.height,key);}
+ function interaction(){clearTimeout(timer);tile=2;draw();timer=setTimeout(()=>{tile=1;draw();},90);}
+ function fit(name){const h=frame.bounds[1][1]-frame.bounds[1][0];if(name==='front')camera.yaw=0;else if(name==='side')camera.yaw=Math.PI/2;else if(name==='back')camera.yaw=Math.PI;else if(name==='oblique')camera.yaw=.4;else if(name==='half'){camera.target=[0,frame.bounds[1][1]-h*.23,0];camera.distance=h*.95;}else if(name==='full'){camera.target=[0,(frame.bounds[1][0]+frame.bounds[1][1])/2,0];camera.distance=Math.max(h*1.35,(frame.bounds[0][1]-frame.bounds[0][0])/(.95*canvas.width/canvas.height)*1.1);}draw();}
+ function resize(){const [width,height]=BodyEdgeAA32.size(canvas);if(canvas.width===width&&canvas.height===height)return;canvas.width=width;canvas.height=height;draw();}
+ let drag=null;const context=e=>e.preventDefault(),down=e=>{drag={x:e.clientX,y:e.clientY,c:structuredClone(camera),pan:e.shiftKey||e.button===2};canvas.setPointerCapture(e.pointerId);},move=e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(drag.pan){const step=drag.c.distance*.95/canvas.clientHeight,side=[Math.cos(drag.c.yaw),0,-Math.sin(drag.c.yaw)];camera.target=drag.c.target.map((v,k)=>v-side[k]*dx*step+(k===1?dy*step:0));}else{camera.yaw=drag.c.yaw-dx*.007;camera.pitch=Math.max(-1.3,Math.min(1.3,drag.c.pitch+dy*.006));}interaction();},up=()=>{drag=null;},wheel=e=>{e.preventDefault();camera.distance=Math.max(.12,Math.min(10,camera.distance*Math.exp(e.deltaY*.001)));interaction();};
+ const lose=e=>{e.preventDefault();lost=true;clearTimeout(timer);precision?.cancel();worldKey=null;canvas.dispatchEvent(new CustomEvent('pose-display-state',{detail:{lost:true}}));},restore=()=>{try{worldGpuBytes=0;worldData=null;worldKey=null;initialize();lost=false;contextRecoveries++;draw();canvas.dispatchEvent(new CustomEvent('pose-display-state',{detail:{lost:false}}));}catch(e){canvas.dispatchEvent(new CustomEvent('pose-display-state',{detail:{lost:true,error:e.message}}));}};
+ initialize();precision=BodyPosePrecisionR29.create({onSurface(result){if(closed||lost||result.key!==geometryKey())return;const texture=textures[3]||gl.createTexture();textures[3]=texture;gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,texture);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,result.width,result.height,0,gl.RGBA,gl.FLOAT,result.world);if(gl.getError()!==gl.NO_ERROR)throw Error('精确边界画面未完整载入');worldGpuBytes=result.world.byteLength;gpuBytes=baseGpuBytes+worldGpuBytes;worldData=result;worldKey=result.key;tile=1;draw();},onStatus(detail){canvas.dispatchEvent(new CustomEvent('pose-precision-state',{detail}));}});const observer=new ResizeObserver(resize);observer.observe(canvas);for(const[name,fn]of [['contextmenu',context],['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',up],['wheel',wheel],['webglcontextlost',lose],['webglcontextrestored',restore]])canvas.addEventListener(name,fn,name==='wheel'?{passive:false}:undefined);resize();fit('full');
+ return{draw,view:fit,camera:()=>structuredClone(camera),setCamera(next){if(!next?.target?.every(Number.isFinite)||next.target.length!==3||![next.yaw,next.pitch,next.distance].every(Number.isFinite)||next.distance<=0)throw Error('Invalid camera');camera=structuredClone(next);draw();},setFrame(next){if(lost)throw Error('画面正在恢复，人物操作暂时保留');const prior=frame;try{frame=next;uploadFrame();frameEpoch++;worldKey=null;worldData=null;draw();}catch(e){frame=prior;uploadFrame();draw();throw e;}},appearance(value){mode=value==='normals'?2:0;draw();},precisionFrame(){return worldKey===geometryKey()?worldData:null;},precisionReport:()=>precision.report(),retryPrecision(){precision.retry();worldKey=null;draw();},probeFrame(channel='depth'){probing=true;const previous=mode;mode=channel==='field'?4:channel==='normals'?2:3;const previousTile=tile;tile=1;draw();const data=new Uint8Array(canvas.width*canvas.height*4);gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,data);mode=previous;tile=previousTile;probing=false;draw();return{width:canvas.width,height:canvas.height,depthRange:8,pixels:data};},report:()=>({edgeAntialiasing:edgeAA?.report(),ready:!lost,precision:precision?.report(),contextRecoveries,draws,gpuBytes,webglError:lost?null:gl.getError(),rasterPrimitive:'POINTS',characterVertexBuffers:0,characterTriangleFaces:0,characterElementBuffers:0,sourceFacetPartitionInformationRetained:true,sourceFidelityAccepted:false,sourceAveragedNormalsImplemented:false,normalMethod:frame.normalMethod,sourcePositionArithmeticReplayed:!!frame.roundedSourcePositionArithmetic,sourcePositionArithmetic:frame.roundedSourcePositionArithmetic,coefficientProgramSHA256:frame.program.coefficientProgramSHA256,roundingProgramSHA256:frame.program.roundingProgramSHA256,camera:structuredClone(camera),canvasSize:{width:canvas.width,height:canvas.height}}),close(){closed=true;clearTimeout(timer);precision?.close();worldData=null;observer.disconnect();for(const[name,fn]of [['contextmenu',context],['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',up],['wheel',wheel],['webglcontextlost',lose],['webglcontextrestored',restore]])canvas.removeEventListener(name,fn);if(!lost){edgeAA?.close();for(const t of textures)gl.deleteTexture(t);gl.deleteProgram(shader);}}};
+}
+globalThis.BodyPoseRayR29={create};
+})();
+</script>
+<script>(async()=>{'use strict';
+ const metadata=JSON.parse(document.querySelector('#pose-functions-r29').textContent),original=JSON.parse(document.querySelector('#original-person-r29').textContent),boundaries=JSON.parse(document.querySelector('#boundaries-r29').textContent);const stateIdentity=BodyStateIdentityR26.create(JSON.parse(document.querySelector('#pose-state-identity-r29').textContent));for(const id of ['pose-functions-r29','original-person-r29','boundaries-r29','pose-state-identity-r29'])document.querySelector('#'+id).remove();
+ const loading=document.querySelector('#loading'),status=document.querySelector('#status'),profileInput=document.querySelector('#profile'),jointInput=document.querySelector('#joint'),canvas=document.querySelector('#body-view');
+ const sha=async b=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',b)),v=>v.toString(16).padStart(2,'0')).join('');
+ const headGateR29=BodyHeadEnvelopeR29.create(original.person);const canonical=x=>x&&typeof x==='object'?(Array.isArray(x)?x.map(canonical):Object.fromEntries(Object.keys(x).sort().map(k=>[k,canonical(x[k])]))):x,equal=(a,b)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
+ let program=null,frame=null,renderer=null,person=structuredClone(original),pose={},current='baseline',packet=null,busy=false,lastError=null,updates=0,reference=false,debounce=null;const snapshots=new Map;
+ async function data(entry){const response=await fetch(new URL(entry.url,document.baseURI),{signal:AbortSignal.timeout(60000)});if(!response.ok)throw Error('原函数数据载入失败：'+response.status);const compressed=await response.arrayBuffer();if(compressed.byteLength!==entry.compressedBytes||await sha(compressed)!==entry.compressedSHA256)throw Error('原函数压缩数据校验失败');const raw=await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();if(raw.byteLength!==entry.rawBytes||await sha(raw)!==entry.rawSHA256)throw Error('原函数数据校验失败');return entry.encoding==='gzip-typed-function-packet-r28'?BodyProgramStorageR27.consume(raw).program:JSON.parse(new TextDecoder().decode(raw));}
+ function shapeState(state){const s=stateIdentity.canonical(state);if(s.owners.rig==='mhr')s.mhr.pose=Array(204).fill(0);else{s.anny.pose={};s.anny.translations={};}return s;}
+ function fromState(state){if(state.owners.rig==='mhr'){if(!Array.isArray(state.mhr.pose)||state.mhr.pose.some(v=>Object.is(v,-0)))throw Error('驱动 B 的这个候选尚未核对负零或非数组姿态');return state.mhr.pose.slice();}const out={};for(const name of new Set([...Object.keys(state.anny.pose||{}),...Object.keys(state.anny.translations||{})])){const r=state.anny.pose?.[name],rotation=r?.rotation||r||[0,0,0],translation=state.anny.translations?.[name]||r?.translation||[0,0,0];if([...rotation,...translation].some(v=>Object.is(v,-0)))throw Error('当前原轮廓候选尚未核对负零动作；完整工作页仍保留此输入');if([...rotation,...translation].some(x=>x!==0))out[name]={rotation:Array.from(rotation),translation:Array.from(translation)};}return out;}
+ function currentState(){return structuredClone(person.person.state);}
+ function updatePoseState(next,replace){if(program.rig.kind==='mhr-no-correctives'){person.person.state.mhr.pose=Array.from(next);return;}const a=person.person.state.anny;if(replace){a.pose={};a.translations={};}for(const [name,p]of Object.entries(next)){a.pose[name]=Array.from(Array.isArray(p)?p:p.rotation||[0,0,0]);const translation=Array.isArray(p)?[0,0,0]:p.translation||[0,0,0];if(translation.some(v=>v!==0))a.translations[name]=Array.from(translation);else delete a.translations[name];}}
+ function archive(){if(busy)throw Error('人物尚在载入，请稍后保存');const a=structuredClone(person),state=currentState();a.person.state=state;const base=a.person.bodyFunctionSystem||(a.person.bodyFunctionSystem={schema:'body-functions-noise-variables/1',representation:'continuous source-derived affine moment functions; research candidate',characterTriangleFaces:0,sourceDerivedCalibration:true,sourceFidelityAccepted:false,quality:1});if(base){base.headBoundary={...structuredClone(program.headBoundaryFunctions?BodySourceHeadR29.evaluate(program.headBoundaryFunctions,state,pose).packet:packet),sourceState:structuredClone(state)};}a.bodyPoseFunctionResearchR29={version:'R29',template:current,sourceFidelityAccepted:false,sourceFacetPartitionInformationRetained:true,completedMotherConversion:false,normalMethod:'source-derived area-response polynomials; source finite precision and head boundary remain unaccepted',headBoundaryInputsUnchanged:'head parameters and shape remain fixed; six original body root/spine chains are supported through original head-boundary scalar functions'};return a;}
+ function sync(){const isB=program?.rig.kind==='mhr-no-correctives';profileInput.value=current;for(const e of document.querySelectorAll('label.rotation'))e.hidden=!!isB;const controlB=document.querySelector('#b-pose-control');controlB.hidden=!isB;if(isB){const i=Number(jointInput.value)||program.allowedPoseIndices[0],limits=program.rig.poseLimits[i];for(const e of document.querySelectorAll('[data-b-pose]')){e.min=limits[0];e.max=limits[1];e.value=pose[i]||0;}} for(const input of document.querySelectorAll('[data-rotation]')){const value=pose[jointInput.value],r=Array.isArray(value)?value:value?.rotation||[0,0,0];input.value=r[Number(input.dataset.rotation)];input.nextElementSibling.value=Number(input.value).toFixed(2)+'°';}for(const e of document.querySelectorAll("[data-translation]")){e.value=pose[jointInput.value]?.translation?.[Number(e.dataset.translation)]||0;e.nextElementSibling.value=(Number(e.value)*1000).toFixed(2)+" mm";}document.querySelector("[data-pose=trunk]").hidden=!!isB&&!program.allowedPoseIndices.includes(7);for(const e of document.querySelectorAll('button,select,input'))e.disabled=busy;document.querySelector('#reference').textContent=reference?'返回当前动作':'临时对照原始静态';document.querySelector('#state-description').textContent=reference?'当前显示原始静态，动作参数仍保留。':'当前显示：连续关节原轮廓候选 · 灰色结构光';document.querySelector('#active-joints').textContent='已调整 '+(Array.isArray(pose)?pose.filter(v=>v!==0).length:Object.keys(pose).length)+' 项动作';}
+ function jointName(name){const side=name.endsWith('.L')?'左':name.endsWith('.R')?'右':'',stem=name.replace(/\.[LR]$/,'');const names={root:'整体根关节',spine05:'骨盆与下腰',spine04:'下腰',spine03:'腰背',spine02:'胸椎',spine01:'上胸',clavicle:'锁骨',shoulder01:'肩',upperarm01:'上臂',upperarm02:'上臂扭转',lowerarm01:'前臂',lowerarm02:'前臂扭转',wrist:'手腕',upperleg01:'大腿',upperleg02:'大腿扭转',lowerleg01:'小腿',lowerleg02:'小腿扭转',foot:'脚踝',toe1:'脚趾'};return side+(names[stem]||stem.replace('finger','手指 ').replace('metacarpal','掌骨 '));}
+ function populate(){const before=jointInput.value;if(program.rig.kind==='mhr-no-correctives'){jointInput.replaceChildren(...program.allowedPoseIndices.map(i=>{const o=document.createElement('option');o.value=String(i);o.textContent=program.rig.poseLabels[i];return o;}));jointInput.value=program.allowedPoseIndices.includes(Number(before))?before:'36';return;}jointInput.replaceChildren(...program.allowedJoints.map(name=>{const o=document.createElement('option');o.value=name;o.textContent=jointName(name);return o;}));jointInput.value=program.allowedJoints.includes(before)?before:'lowerarm01.L';}
+ async function select(id,archiveInput=null){clearTimeout(debounce);if(busy)throw Error('人物正在载入');const descriptor=metadata.profiles.find(p=>p.id===id);if(!descriptor)throw Error('未找到原体型函数');busy=true;lastError=null;sync();loading.hidden=false;loading.textContent='正在载入原轮廓函数…';try{const [next,boundary,rounded,displayNormals,headFunctions]=await Promise.all([data(descriptor),data(boundaries.profiles.find(p=>p.id===(descriptor.boundaryProfile||id))),descriptor.rounded?data(descriptor.rounded):null,data(descriptor.displayNormals),descriptor.headBoundaryFunctions?data(descriptor.headBoundaryFunctions):null]);next.displayNormals=displayNormals;next.headBoundaryFunctions=headFunctions;if(headFunctions){next.allowedJoints=headFunctions.poseProgram.allowedJoints;next.rig=headFunctions.poseProgram.rig;if(headFunctions.poseProgram.allowedPoseIndices)next.allowedPoseIndices=headFunctions.poseProgram.allowedPoseIndices;}if(rounded){if(rounded.id!==next.id||rounded.sourceCaseSHA256!==descriptor.sourceCaseSHA256||rounded.sourceProgramSHA256!==next.sourceProgramSHA256)throw Error('原取整函数与当前身体来源不一致');next.roundedFunctions=rounded;next.roundedSourcePacket=boundary.packet||boundary;}next.coefficientProgramSHA256=descriptor.rawSHA256;next.roundingProgramSHA256=descriptor.rounded?.rawSHA256||null;if(next.id!==id||next.schema!=='body-pose-moment-functions-r28/1'||next.functions!==descriptor.functions)throw Error('原体型函数版本不匹配');let a=archiveInput||snapshots.get(id)||structuredClone(original);if(!archiveInput&&!snapshots.has(id))a.person.state=structuredClone(next.state);if(!headGateR29.compatible(a))throw Error('这个人物带有其他头部结构或显示设置，当前原轮廓模板尚未接入；完整人物请在工作页打开。');if(!equal(shapeState(a.person.state),shapeState(next.state)))throw Error('这个候选仅接入六种原体型下的连续四肢动作。其余完整参数请在工作页打开。');for(const name of next.rig.kind==='mhr-no-correctives'?[]:new Set([...Object.keys(a.person.state.anny.pose||{}),...Object.keys(a.person.state.anny.translations||{})]))if(!next.rig.labels.includes(name))throw Error('这个候选尚未接入未知关节：'+name);const referenceBoundary=headFunctions?BodySourceHeadR29.evaluate(headFunctions,a.person.state,fromState(a.person.state)).packet:boundary.packet||boundary,ownBoundary=a.person.bodyFunctionSystem?.headBoundary;if(ownBoundary&&!equal({...ownBoundary,sourceState:referenceBoundary.sourceState},referenceBoundary))throw Error('这个人物带有其他头颈输入，当前原轮廓候选不能忽略这些输入');const nextPose=fromState(a.person.state),nextFrame=BodyPoseFunctionsR29.evaluate(next,nextPose);if(renderer)renderer.setFrame(nextFrame);else renderer=BodyPoseRayR29.create(canvas,nextFrame);if(program)snapshots.set(current,archiveDuringLoad());program=next;packet=boundary.packet||boundary;frame=nextFrame;pose=nextPose;person=structuredClone(a);current=id;reference=false;populate();updates++;status.textContent='当前原轮廓已载入。动作实时作用于函数；躯干主链与原显示法线响应已接入；任意体型和原皮肤仍待完成。';}
+ catch(error){lastError=error.message;status.textContent=error.message;throw error;}finally{busy=false;loading.hidden=true;sync();}}
+ function archiveDuringLoad(){const locked=busy;busy=false;try{return archive();}finally{busy=locked;}}
+ function apply(next,{replace=false}={}){clearTimeout(debounce);if(busy)throw Error('人物正在载入');let value;if(program.rig.kind==='mhr-no-correctives'){value=Array.isArray(next)?next.slice():replace?Array(204).fill(0):pose.slice();if(!Array.isArray(next))for(const[k,v]of Object.entries(next)){if(!/^\d+$/.test(k)||Number(k)>203)throw Error('未知驱动 B 输入');value[Number(k)]=v;}}else value=replace?structuredClone(next):{...structuredClone(pose),...structuredClone(next)};const candidate=BodyPoseFunctionsR29.evaluate(program,value);renderer.setFrame(candidate);pose=value;updatePoseState(replace?value:next,replace);frame=candidate;reference=false;updates++;lastError=null;status.textContent='连续动作已更新。当前是来源派生的函数候选，尚未通过一比一验收。';sync();return report();}
+ function report(){return{version:'R29',ready:!!renderer&&!busy,busy,updates,lastError,template:current,pose:structuredClone(pose),functions:program?.functions,sourceFacetPartitionInformationRetained:true,completedMotherConversion:false,sourceFidelityAccepted:false,visualAccepted:false,acceptanceTolerance:null,arbitraryContinuousBodyShapeImplemented:false,continuousLimbPoseImplemented:true,trunkMainChainImplemented:!!program?.headBoundaryFunctions,neckHeadParameterChangesImplemented:false,sourceFloat32RoundingPreserved:false,sourcePositionArithmeticReplayed:!!frame?.roundedSourcePositionArithmetic,sourcePositionArithmetic:frame?.roundedSourcePositionArithmetic,sourceDisplayNormalResponse:frame?.originalDisplayNormals||null,sourceAveragedNormalsImplemented:!!program?.displayNormals,headGenerated:false,renderer:renderer?.report(),buildMS:frame?.buildMS};}
+ window.bodyPoseFunctionsR29={apply,profile:select,archive,loadState:async (state,id=current)=>{if(id===current&&equal(shapeState(state),shapeState(program.state))){apply(fromState(state),{replace:true});return report();}const a=structuredClone(person);a.person.state=structuredClone(state);await select(id,a);return report();},state:()=>structuredClone(currentState()),restore:async a=>{if(!a?.person?.state||a.schema!==original.schema)throw Error('请选择完整人物档案');const id=metadata.profiles.find(p=>p.id===a.bodyPoseFunctionResearchR29?.template)?.id||await (async()=>{for(const d of metadata.profiles){const p=d.id===current?program:await data(d);if(equal(shapeState(a.person.state),shapeState(p.state)))return d.id;}return null;})();if(!id)throw Error('这个完整人物的连续体型尚未接入原轮廓候选');await select(id,a);return report();},report,get renderer(){return renderer;},trace(origin,direction){return BodyPoseFunctionsR29.createTracer(frame).ray(origin,direction);},coefficientFrame:()=>frame};
+ for(const d of metadata.profiles){const option=document.createElement('option');option.value=d.id;option.textContent=d.label;profileInput.append(option);}
+ profileInput.addEventListener('change',()=>select(profileInput.value).catch(()=>{profileInput.value=current;}));jointInput.addEventListener('change',sync);
+ for(const input of document.querySelectorAll('[data-rotation]'))input.addEventListener('input',()=>{input.nextElementSibling.value=Number(input.value).toFixed(2)+'°';clearTimeout(debounce);const name=jointInput.value,rotation=Array.from(document.querySelectorAll('[data-rotation]'),i=>Number(i.value)),prior=pose[name];debounce=setTimeout(()=>{try{apply({[name]:{rotation,translation:prior?.translation||[0,0,0]}});}catch(e){status.textContent=e.message;sync();}},80);});
+ for(const input of document.querySelectorAll('[data-translation]'))input.addEventListener('change',()=>{try{const name=jointInput.value,translation=Array.from(document.querySelectorAll('[data-translation]'),i=>Number(i.value));apply({[name]:{rotation:pose[name]?.rotation||pose[name]||[0,0,0],translation}});}catch(e){status.textContent=e.message;sync();}});
+ for(const input of document.querySelectorAll('[data-b-pose]'))input.addEventListener('change',()=>{try{apply({[jointInput.value]:Number(input.value)});}catch(e){status.textContent=e.message;sync();}});
+ for(const b of document.querySelectorAll('[data-view]'))b.addEventListener('click',()=>renderer.view(b.dataset.view));document.querySelector('#look').addEventListener('change',e=>renderer.appearance(e.target.value));
+ const demonstrations={trunk:{root:{rotation:[2.125,-1.375,4.625],translation:[.004375,-.002125,.001875]},spine05:{rotation:[7.875,3.625,-2.125]},spine03:{rotation:[-11.375,7.125,4.875]},spine01:{rotation:[5.625,-3.875,1.125]}},arms:{'upperarm01.L':{rotation:[17.25,-8.5,23.75]},'lowerarm01.L':{rotation:[49.125,0,0]},'wrist.R':{rotation:[12.375,-4.5,7.25]}},legs:{'upperleg01.L':{rotation:[-18.625,7.25,-3.5]},'lowerleg01.L':{rotation:[36.875,0,0]},'foot.R':{rotation:[8.125,-3.75,0]}},combined:{'clavicle.L':{rotation:[3.25,0,5.75]},'upperarm01.L':{rotation:[23.125,-9.75,14.5]},'lowerarm01.R':{rotation:[67.375,-3.25,0]},'upperleg01.R':{rotation:[-21.875,-6.5,3.75]},'lowerleg01.R':{rotation:[42.625,0,0]},'wrist.L':{rotation:[8.75,12.125,-9.25]},'foot.L':{rotation:[-11.375,5.25,3.125]}}};for(const b of document.querySelectorAll('[data-pose]'))b.addEventListener('click',()=>apply(program.rig.kind==='mhr-no-correctives'?({trunk:{7:.22,13:.28,11:.25},arms:{35:.375,36:1.125,45:.425,46:.875},legs:{52:-.425,53:1.025,61:-.375,62:.975},combined:{35:.375,36:1.125,45:.425,46:.875,52:-.425,53:1.025,61:-.375,62:.975}})[b.dataset.pose]:demonstrations[b.dataset.pose],{replace:true}));
+ document.querySelector('#reset').addEventListener('click',()=>apply({},{replace:true}));document.querySelector('#reference').addEventListener('click',()=>{const next=BodyPoseFunctionsR29.evaluate(program,reference?pose:{});renderer.setFrame(next);frame=next;reference=!reference;sync();});
+ document.querySelector('#save').addEventListener('click',()=>{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(archive(),null,2)],{type:'application/json'}));a.href=url;a.download='完整人物_连续关节_R29.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});document.querySelector('#open').addEventListener('click',()=>document.querySelector('#file').click());document.querySelector('#file').addEventListener('change',async e=>{try{const file=e.target.files[0];if(file)await bodyPoseFunctionsR29.restore(JSON.parse(await file.text()));}catch(error){lastError=error.message;status.textContent=error.message;}finally{e.target.value='';}});
+ document.querySelector('#retry-precision').addEventListener('click',()=>renderer.retryPrecision());canvas.addEventListener('pose-precision-state',e=>{document.querySelector('#retry-precision').hidden=!e.detail.lastError;status.textContent=e.detail.lastError?'边界核对未完成，保留交互预览；当前人物与参数仍保留。':e.detail.ready?'当前画面已更新完整的函数边界；原法线和皮肤仍待验收。':'当前为交互预览，停止操作后自动核对完整边界。';});
+ canvas.addEventListener('pose-display-state',e=>{status.textContent=e.detail.lost?'三维画面正在恢复，当前人物和动作仍保留。':'三维画面已恢复，人物和动作已重新显示。';});
+ const requestedTemplate=new URL(location.href).searchParams.get('template-r29');await select(metadata.profiles.some(p=>p.id===requestedTemplate)?requestedTemplate:'baseline');window.__BODY_POSE_FUNCTIONS_R29_READY__=true;
+})().catch(error=>{window.__BODY_POSE_FUNCTIONS_R29_ERROR__=error.stack;document.querySelector('#loading').textContent=error.message;console.error(error);});
+</script>
+</html>
