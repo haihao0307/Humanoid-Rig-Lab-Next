@@ -1,0 +1,175 @@
+{
+  "startedUTC": "2026-10-28T03:10:14.682Z",
+  "finishedUTC": "2026-10-28T03:10:58.262Z",
+  "artifactSHA256": "d27ef85f88b43dcf4b46056b085df10f74947feb58bc8ee783341bc61d0a29bb",
+  "scope": "actual headless pointer drags, immediate and settled appearance, adjusted body and archive",
+  "checks": [
+    {
+      "name": "initial body uses current display",
+      "passed": true
+    },
+    {
+      "name": "oblique drag draws smooth edges during actual drag",
+      "passed": true,
+      "detail": {
+        "before": {
+          "width": 1314,
+          "height": 983,
+          "aa": {
+            "enabled": true,
+            "method": "edge-aware colour filter",
+            "frames": 13,
+            "width": 1314,
+            "height": 983
+          },
+          "quality": "boundary-consistent",
+          "webglError": 0
+        },
+        "comparison": {
+          "changed": 0,
+          "isolatedBefore": 15,
+          "isolatedAfter": 15,
+          "pixels": 1291662,
+          "webglError": 0
+        },
+        "frameTimesMS": [
+          29,
+          30,
+          26,
+          28,
+          39,
+          31,
+          29,
+          33
+        ],
+        "medianMS": 31
+      }
+    },
+    {
+      "name": "oblique drag stays consistent after settling",
+      "passed": true,
+      "detail": {
+        "changed": 0,
+        "isolatedBefore": 15,
+        "isolatedAfter": 15,
+        "pixels": 1291662,
+        "webglError": 0
+      }
+    },
+    {
+      "name": "back-side drag draws smooth edges during actual drag",
+      "passed": true,
+      "detail": {
+        "before": {
+          "width": 1314,
+          "height": 983,
+          "aa": {
+            "enabled": true,
+            "method": "edge-aware colour filter",
+            "frames": 22,
+            "width": 1314,
+            "height": 983
+          },
+          "quality": "boundary-consistent",
+          "webglError": 0
+        },
+        "comparison": {
+          "changed": 6,
+          "isolatedBefore": 17,
+          "isolatedAfter": 17,
+          "pixels": 1291662,
+          "webglError": 0
+        },
+        "frameTimesMS": [
+          23,
+          18,
+          16,
+          16,
+          16,
+          27,
+          41,
+          18
+        ],
+        "medianMS": 18
+      }
+    },
+    {
+      "name": "back-side drag stays consistent after settling",
+      "passed": true,
+      "detail": {
+        "changed": 6,
+        "isolatedBefore": 17,
+        "isolatedAfter": 17,
+        "pixels": 1291662,
+        "webglError": 0
+      }
+    },
+    {
+      "name": "body parameters and pose still work",
+      "passed": true,
+      "detail": {
+        "surface": "dynamic-body-p1"
+      }
+    },
+    {
+      "name": "adjusted-body drag draws smooth edges during actual drag",
+      "passed": true,
+      "detail": {
+        "before": {
+          "width": 1314,
+          "height": 983,
+          "aa": {
+            "enabled": true,
+            "method": "edge-aware colour filter",
+            "frames": 15,
+            "width": 1314,
+            "height": 983
+          },
+          "quality": null,
+          "webglError": 0
+        },
+        "comparison": {
+          "changed": 0,
+          "isolatedBefore": 6,
+          "isolatedAfter": 6,
+          "pixels": 1291662,
+          "webglError": 0
+        },
+        "frameTimesMS": [
+          23,
+          16,
+          16,
+          17,
+          18,
+          16,
+          16,
+          17
+        ],
+        "medianMS": 17
+      }
+    },
+    {
+      "name": "adjusted-body drag stays consistent after settling",
+      "passed": true,
+      "detail": {
+        "changed": 0,
+        "isolatedBefore": 6,
+        "isolatedAfter": 6,
+        "pixels": 1291662,
+        "webglError": 0
+      }
+    },
+    {
+      "name": "whole person and archive restore",
+      "passed": true
+    },
+    {
+      "name": "no page errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "newDeliveredImageFiles": 0
+}

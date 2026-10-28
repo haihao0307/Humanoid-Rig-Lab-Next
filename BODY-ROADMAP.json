@@ -3,7 +3,7 @@
   "reviewedDate": "2026-10-28",
   "basis": "2026-10-28 用户新要求：以当前人物为基础迭代，外观与参数可调优先，首先修复轮廓锯齿。",
   "review": "docs/EXECUTION-ROUTE-HISTORY-THROUGH-R31.md",
-  "currentProductVersion": "R32",
+  "currentProductVersion": "R33",
   "currentMainTask": "P2",
   "currentSubtask": "P2.edge",
   "mainTasksAccepted": 0,
@@ -64,15 +64,15 @@
       "title": "轮廓、连接与变形",
       "status": "partial_not_accepted",
       "doneWhen": "肩髋、肘膝腕踝、手足在正常距离无突兀接痕、尖折或异常鼓瘪；轴向和限位明确，只对已测动作及组合作结论。",
-      "existing": "当前优先处理身体轮廓显示锯齿；A 驱动身体关节及局部体型控制已经接入，连接、动作自然度和 B 驱动仍需继续完善。",
+      "existing": "R33 修复旋转中的边缘着色不一致，延续轮廓抗锯齿；现有体型、局部控制和动作保留。其他连接与动作细节仍需继续完善。",
       "subtasks": [
         {
           "id": "P2.edge",
           "title": "人体轮廓锯齿和显示采样",
           "status": "partial_not_accepted",
           "doneWhen": "正常距离、缩放、旋转和常用体型动作下的轮廓锯齿明显减轻，参数、档案和交互保留；实际效果等待用户观察。",
-          "latestEvidence": "R32 将屏幕边缘滤波与受预算约束的显示采样接入当前、连续体型和动作画面；具体检查见 qa/edges-r32。",
-          "stillNeeds": "继续检查不同显示设备、极端角度和体型的轮廓质量及性能，由用户在实际三维页判断是否还需调整。"
+          "latestEvidence": "实际后台拖动中和停稳后分别检查斜侧、背侧及调整后的身体；常规和高 DPI 画面均通过，详见 qa/edges-r33。",
+          "stillNeeds": "请用户在实际三维页检查自己的观察角度；极端形态、其他设备和所有动作组合尚未逐一检查。"
         },
         {
           "id": "P2.1",

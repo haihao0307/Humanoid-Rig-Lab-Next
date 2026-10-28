@@ -20,3 +20,4 @@ require('./research/p1/build-locked-preview.cjs');
 require('./build-torso-study.cjs');
 require('./build-r31.cjs');
 require('./build-r32.cjs');
+require('./build-r33.cjs');
