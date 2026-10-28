@@ -1,21 +1,21 @@
 {
-  "schema": "body-delivery-r35/1",
-  "version": "R35",
-  "updatedUTC": "2026-10-28T04:40:48.148Z",
+  "schema": "body-delivery-r36/1",
+  "version": "R36",
+  "updatedUTC": "2026-10-28T06:27:47.357Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
     "file": "delivery/身体_R35_可调皮肤.html",
     "sha256": "5f5ee4f14bdbf8cf2a345ebdcb3593386a604b592bfbe6f148e4e54b2b761dd1",
     "bytes": 899042,
-    "url": "http://127.0.0.1:8914/?v=R35-5f5ee4f1",
+    "url": "http://127.0.0.1:8914/?v=R36-5f5ee4f1",
     "inheritedGeometryFrom": "BUILD-SOURCE-R33.json"
   },
   "workbench": {
-    "file": "delivery/人物身体_R35_可调皮肤.html",
-    "sha256": "64b5967b6705e91a96b7bd9151676e0b24b60b2c3b8b96314e2b80fea0301c52",
-    "bytes": 1901163,
-    "url": "http://127.0.0.1:8914/workbench?v=R35-64b5967b"
+    "file": "delivery/人物身体_R36_连续体型与骨架.html",
+    "sha256": "ba6a9fcce5da562ff4e78a020ee52cbd4aa14b6553671cf51bb46d222425dfab",
+    "bytes": 1905449,
+    "url": "http://127.0.0.1:8914/workbench?v=R36-ba6a9fcc"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
@@ -130,12 +130,19 @@
     "surfaceLights": "qa/skin-r35/light-presets.json",
     "surfaceLifecycle": "qa/skin-r35/lifecycle.json",
     "surfaceEquivalence": "qa/skin-r35/equivalence.json",
-    "surfaceSummary": "qa/skin-r35/summary.json"
+    "surfaceSummary": "qa/skin-r35/summary.json",
+    "ageSexUI": "qa/shape-r36/age-sex-ui.json",
+    "ageSexRanges": "qa/shape-r36/age-sex-range.json",
+    "bRigUI": "qa/shape-r36/b-rig-ui.json",
+    "bRigResponse": "qa/shape-r36/b-response.json",
+    "legacyUI": "qa/shape-r36/legacy-ui.json",
+    "legacyResponse": "qa/shape-r36/legacy-response.json",
+    "bRigDrag": "qa/shape-r36/b-drag.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
-  "currentMainTask": "P4",
-  "currentSubtask": "P4.2",
+  "currentMainTask": "P2",
+  "currentSubtask": "P2.4",
   "mainTasksAccepted": 0,
   "remaining": [
     {
@@ -164,7 +171,7 @@
       "task": "头身接口、附件与平台整合"
     }
   ],
-  "previousDelivery": "DELIVERY-R34.json",
+  "previousDelivery": "DELIVERY-R35.json",
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
     "branch": "body/reconstruction-r18-20261023"
@@ -361,7 +368,7 @@
     "highDpiCheck": "qa/edges-r33/high-dpi.json",
     "userVisualReviewPending": true
   },
-  "capabilityReview": "docs/SURFACE-R35.md",
+  "capabilityReview": "docs/BODY-R36.md",
   "platformCapabilities": {
     "defaultOriginalBodySkin": true,
     "defaultSkinControlsSampled": true,
@@ -370,6 +377,8 @@
     "dynamicOriginalShadows": true,
     "dynamicOriginalDiffusion": true,
     "supportedShapeControls": [
+      "gender",
+      "age",
       "weight",
       "muscle",
       "height",
@@ -379,17 +388,18 @@
     ],
     "supportedLocalControls": 117,
     "allControlCombinationsVerified": false,
-    "continuousAgeAndSexOnBodyPath": false,
+    "continuousAgeAndSexOnBodyPath": true,
     "staticPoseButtons": 6,
     "continuousAnimation": false,
     "rigBDefaultAvailable": true,
-    "rigBBendSampleAvailable": false,
+    "rigBBendSampleAvailable": true,
     "completePersonArchiveSampleRoundTrip": true,
-    "legacyR20BodyEffectsApplied": false,
+    "legacyR20BodyEffectsApplied": true,
     "completePersonVisualIntegration": false,
     "supportedDynamicOriginalSkin": true,
     "screenSpaceDiffusionOnly": true,
-    "fullVolumeScattering": false
+    "fullVolumeScattering": false,
+    "legacyR20BodyEffectsPartial": true
   },
   "surfaceControls": 22,
   "surfaceImplementation": {
@@ -401,6 +411,50 @@
     "screenSpaceDiffusion": true,
     "appearanceOnlyReusesGeometry": true,
     "visualAccepted": false,
-    "otherDevicesVerified": false
-  }
+    "otherDevicesVerified": false,
+    "supportedBRigShapesAndPoses": true,
+    "supportedLegacyBodyEffects": true
+  },
+  "continuousBodyR36": {
+    "file": "delivery/身体_R36_连续体型与骨架.html",
+    "sha256": "74dd50e2007746e21f225cc18c997ec2979b0033ef2cf5dc5ce5655e20e374cd",
+    "bytes": 824392,
+    "ageRange": [
+      -0.3333333333333333,
+      1
+    ],
+    "sexRange": [
+      0,
+      1
+    ],
+    "otherSupportedPhenotypes": [
+      "weight",
+      "muscle",
+      "height",
+      "proportions",
+      "cupsize",
+      "firmness"
+    ],
+    "bBodyPoseCorrectives": true,
+    "legacyEffectsApplied": [
+      "torso",
+      "structure",
+      "anatomy",
+      "articulation"
+    ],
+    "legacyEffectsPending": [
+      "digitFunctions",
+      "footFunctions",
+      "legacyNormalWarp"
+    ],
+    "sourceDerived": true,
+    "characterTriangleFaces": 0,
+    "fullVisualAcceptance": false
+  },
+  "remainingSpecific": [
+    "旧档手指与足部局部细节及特殊法线处理",
+    "连续动作播放和复杂姿势",
+    "独立头部、附件与平台整合",
+    "跨设备验证及用户视觉调整"
+  ]
 }

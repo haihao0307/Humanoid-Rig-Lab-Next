@@ -6,7 +6,7 @@ const root=path.resolve(__dirname,'..'),port=8914;
 http.createServer((req,res)=>{
  if(req.method!=='GET'&&req.method!=='HEAD'){res.writeHead(405);res.end();return;}
  try{const url=new URL(req.url,'http://127.0.0.1:'+port),pathname=decodeURIComponent(url.pathname);let manifest;
-  if(/^\/assets\/(body-skin-r22|body-skin-r24|body-atlas-r23|body-atlas-r24|body-exact-r25|body-boundary-r26|body-program-r23|body-program-r27|body-fields-r27|body-functions-r28|body-rounded-r28|body-normals-r29|body-head-boundary-r29|body-functions-r29|body-rounded-r29|body-dynamic-p1)\/[A-Za-z0-9_-]+\.gz$/.test(pathname)){const folder=pathname.split('/')[2],assetRoot=path.resolve(root,'delivery/assets',folder),asset=path.resolve(assetRoot,path.basename(pathname));if(!asset.startsWith(assetRoot+path.sep)||!fs.existsSync(asset)){res.writeHead(404);res.end();return;}res.writeHead(200,{'Content-Type':'application/octet-stream','Cache-Control':'private, max-age=31536000, immutable','Content-Length':fs.statSync(asset).size});if(req.method==='HEAD')res.end();else fs.createReadStream(asset).pipe(res);return;}
+  if(/^\/assets\/(body-skin-r22|body-skin-r24|body-atlas-r23|body-atlas-r24|body-exact-r25|body-boundary-r26|body-program-r23|body-program-r27|body-fields-r27|body-functions-r28|body-rounded-r28|body-normals-r29|body-head-boundary-r29|body-functions-r29|body-rounded-r29|body-dynamic-p1|body-dynamic-r36)\/[A-Za-z0-9_-]+\.gz$/.test(pathname)){const folder=pathname.split('/')[2],assetRoot=path.resolve(root,'delivery/assets',folder),asset=path.resolve(assetRoot,path.basename(pathname));if(!asset.startsWith(assetRoot+path.sep)||!fs.existsSync(asset)){res.writeHead(404);res.end();return;}res.writeHead(200,{'Content-Type':'application/octet-stream','Cache-Control':'private, max-age=31536000, immutable','Content-Length':fs.statSync(asset).size});if(req.method==='HEAD')res.end();else fs.createReadStream(asset).pipe(res);return;}
   const selected=JSON.parse(fs.readFileSync(path.join(root,'BUILD.json'),'utf8').replace(/^\uFEFF/,'')),companion=selected.companionBuild||'BUILD-R21.json';
   if(pathname==='/')manifest=url.searchParams.get('view')==='workbench'?companion:url.searchParams.get('view')==='r20'?'BUILD-R20.json':url.searchParams.get('view')==='r21'?'BUILD-SOURCE-R21.json':'BUILD.json';
   else if(pathname==='/source')manifest='BUILD.json';
@@ -14,6 +14,8 @@ http.createServer((req,res)=>{
   else if(pathname==='/joint-functions')manifest=selected.researchBuild||'BUILD-POSE-R28.json';
   else if(pathname==='/support-study'||pathname==='/身体_P1_参考支撑隔离研究.html')manifest='BUILD-SUPPORT-P1.json';
   else if(pathname==='/torso-study'||pathname==='/身体_P1_连续躯干隔离研究.html')manifest='BUILD-TORSO-P1.json';
+  else if(pathname==='/人物身体_R36_连续体型与骨架.html')manifest='BUILD-R36.json';
+  else if(pathname==='/身体_R36_连续体型与骨架.html')manifest='BUILD-STUDY-R36.json';
   else if(pathname==='/人物身体_R35_可调皮肤.html')manifest='BUILD-R35.json';
   else if(pathname==='/身体_R35_可调皮肤.html')manifest='BUILD-SOURCE-R35.json';
   else if(pathname==='/身体_R35_连续皮肤.html')manifest='BUILD-STUDY-R35.json';

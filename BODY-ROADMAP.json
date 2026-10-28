@@ -3,9 +3,9 @@
   "reviewedDate": "2026-10-28",
   "basis": "用户要求核查身体既有效果、参数、动作和人体生成平台实际可用性，并精简无使用价值的旧任务。",
   "review": "docs/EXECUTION-ROUTE-HISTORY-THROUGH-R31.md",
-  "currentProductVersion": "R34",
-  "currentMainTask": "P4",
-  "currentSubtask": "P4.2",
+  "currentProductVersion": "R36",
+  "currentMainTask": "P2",
+  "currentSubtask": "P2.4",
   "mainTasksAccepted": 0,
   "projectComplete": false,
   "acceptanceTolerance": null,
@@ -32,7 +32,7 @@
           "status": "partial_not_accepted",
           "scope": "以当前人物为基准检查胸肩、腰腹、骨盆及可调参数。",
           "doneWhen": "正常距离和多角度观察效果可用，参数调整保持自然且可回退。",
-          "latestEvidence": "18,416 个身体来源分区已接入原始显示法线和动态颈口；原版六体型组合、较大动作及抽样射线已做位置和法线对照。工作页可直接连续使用六项体型和117 项局部控制（范围为 -1 至 1）；检查范围及结果见 qa/p1-torso。",
+          "latestEvidence": "工作页支持年龄、性别及六项已有体型与 117 项局部控制；婴幼儿至老年的代表状态已通过三维页面检查，最终形体效果仍待用户观察。",
           "stillNeeds": "按用户实际观察继续改善局部形体和参数响应；无需重新开展原数据表面验收。"
         },
         {
@@ -94,8 +94,8 @@
           "id": "P2.4",
           "title": "姿势编辑、连续动作与骨架支持",
           "status": "partial_not_accepted",
-          "stillNeeds": "接入连续播放、完善实际使用的 B 骨架与关节限位，并核查组合动作自然度。",
-          "latestEvidence": "R35 受支持的 A 骨架姿势可使用可调皮肤与动态阴影；六个动作按钮仍是静态姿势。B 骨架默认状态可切换，屈髋膝组合尚未接通。"
+          "stillNeeds": "接入连续动作播放，检查复杂和极端姿势的变形与自然度，补齐未支持的 B 身份及头部组合。",
+          "latestEvidence": "R36 已接入 B 骨架屈曲和姿态修正，并检查与年龄、性别及旧档体积改形联动；A、B 动作数据切换时保留。"
         }
       ]
     },
@@ -125,8 +125,8 @@
           "id": "P3.3",
           "title": "参数生效与既有人物档案兼容",
           "status": "partial_not_accepted",
-          "latestEvidence": "完整人物样本的网页保存和读取往返通过。真实 R20 档案的躯干、手足等改形标记保留，但当前工作台不应用。",
-          "stillNeeds": "补齐实际需要的年龄、性别等参数；恢复有用的旧档身体效果，同时保留头部与未知字段。"
+          "latestEvidence": "年龄和性别连续控制可用；真实 R20 档案的躯干、肩背、四肢体积及关节修正已应用，人物档案和头部字段保留。",
+          "stillNeeds": "旧档手指和脚部局部细节、旧特殊法线变换及其他未支持人物组合仍需处理。"
         }
       ]
     },
@@ -135,7 +135,7 @@
       "title": "皮肤、显示和实际性能",
       "status": "partial_not_accepted",
       "doneWhen": "常用体型和姿势下的皮肤、细节、光照和调节可用；按实际设备需求保证加载和交互。",
-      "existing": "R35 已为固定预设和受支持的 A 骨架体型、姿势接入既有皮肤、22 项调节、动态方向光阴影及屏幕空间柔光；其他身体状态和设备仍需覆盖。",
+      "existing": "R36 在 R35 皮肤功能上覆盖连续年龄、性别、B 骨架及已接入的旧档改形；其他设备和极端组合仍需检查。",
       "subtasks": [
         {
           "id": "P4.1",
@@ -147,8 +147,8 @@
           "id": "P4.2",
           "title": "体型与姿势变化后的完整皮肤效果",
           "status": "partial_not_accepted",
-          "stillNeeds": "继续覆盖年龄、性别、旧档改形和 B 骨架等尚未接入的身体状态，并由用户观察实际效果；完整物理体积散射及目标设备验证未完成。",
-          "latestEvidence": "固定预设及受支持的 A 骨架形体和姿势使用既有皮肤、微细纹理、22 项界面调节和动态方向光阴影；屏幕空间扩散可调，实际工作页的滑块、近景、灯光、档案和恢复检查见 qa/skin-r35。"
+          "stillNeeds": "由用户观察实际外观，按需要检查更多形体、动作及目标设备；完整物理体积散射未完成。",
+          "latestEvidence": "R35 的皮肤、动态阴影和屏幕空间柔光已覆盖 R36 年龄、性别、B 骨架及已接入的旧档改形；后台页面检查见 qa/shape-r36。"
         },
         {
           "id": "P4.3",
@@ -192,6 +192,6 @@
     "P5",
     "P4.1/P4.3"
   ],
-  "priorityChange": "R33 的转动锯齿修复已完成后台检查，用户视觉复核仍开放；按本轮平台功能核查优先恢复体型与姿势变化后的皮肤。",
-  "capabilityReview": "docs/PLATFORM-CAPABILITIES-R34.md"
+  "priorityChange": "沿用既定 P4.2、P3.3、P2.4 顺序；本轮覆盖年龄、性别、B 骨架屈曲和部分旧档改形，接下来处理连续动作与剩余实用功能。",
+  "capabilityReview": "docs/BODY-R36.md"
 }
