@@ -1,0 +1,13 @@
+'use strict';
+const {chromium}=require(process.env.BODY_PLAYWRIGHT_PATH||'C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'),base=process.env.BODY_BASE||'http://127.0.0.1:8916';
+const ready=p=>p.waitForFunction(()=>bodyImplicitR02?.report().ready&&!bodyImplicitR02.report().busy,null,{timeout:300000});
+(async()=>{const checks=[],errors=[],browser=await chromium.launch({headless:true,executablePath:process.env.BODY_CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--enable-gpu','--enable-unsafe-swiftshader']});try{const page=await browser.newPage({viewport:{width:1200,height:800}});page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/workbench',{waitUntil:'domcontentloaded'});await ready(page);
+ for(const rig of ['A','B']){if(rig==='B'){await page.evaluate(()=>bodyImplicitR02.setOwner('mhr'));await ready(page);}await page.locator('#body-motion-kind').selectOption('hands');await page.locator('#body-motion-play').click();await page.waitForFunction(()=>{const r=bodyMotionR37.report();if(r.mode==='idle'&&r.error)throw Error(r.error);return r.mode==='playing'&&r.amount>.7;},null,{timeout:300000});
+  await page.evaluate(()=>{const w=document.querySelector('#body-dynamic-embedded-p1').contentWindow,r=w.torsoStudyP1.renderer;r.setCamera({...r.camera(),target:[.56,.075,.25],distance:.45});});
+  await page.waitForTimeout(250);if(process.env.BODY_CAPTURE_HANDS)await page.frameLocator('#body-dynamic-embedded-p1').locator('#body-view').screenshot({path:'qa/animation-r37/hand-'+rig+'-internal.png'});
+  await page.locator('#body-motion-pause').click();await page.waitForFunction(()=>bodyMotionR37.report().mode==='idle',null,{timeout:300000});await ready(page);const done=await page.evaluate(()=>({state:bodyImplicitR02.state(),archive:bodyImplicitR02.archive(),report:bodyImplicitR02.report()}));let changed;
+  if(rig==='A')changed=['L','R'].flatMap(side=>[1,2,3,4,5].flatMap(d=>[1,2,3].map(j=>done.state.anny.pose['finger'+d+'-'+j+'.'+side]?.[0]||0))).filter(x=>Math.abs(x)>.1).length;
+  else changed=[72,73,74,79,80,81,82,83,84,85,86,87,88,89,90,99,100,101,106,107,108,109,110,111,112,113,114,115,116,117].map(i=>done.state.mhr.pose[i]).filter(x=>Math.abs(x)>.001).length;
+  checks.push({name:rig+' two-hand gesture affects 30 existing joints and saves',changed,passed:changed===30&&!done.report.lastError&&JSON.stringify(done.archive.person.bodyFunctionSystem.headBoundary.sourceState)===JSON.stringify(done.state)});
+ }
+}catch(e){errors.push(e.stack);}finally{await browser.close();const passed=!errors.length&&checks.length===2&&checks.every(c=>c.passed);console.log(JSON.stringify({passed,checks,errors}));if(!passed)process.exitCode=1;}})();

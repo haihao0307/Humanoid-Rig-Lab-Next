@@ -3,7 +3,7 @@
   "reviewedDate": "2026-10-28",
   "basis": "用户要求核查身体既有效果、参数、动作和人体生成平台实际可用性，并精简无使用价值的旧任务。",
   "review": "docs/EXECUTION-ROUTE-HISTORY-THROUGH-R31.md",
-  "currentProductVersion": "R36",
+  "currentProductVersion": "R37",
   "currentMainTask": "P2",
   "currentSubtask": "P2.4",
   "mainTasksAccepted": 0,
@@ -65,14 +65,14 @@
       "title": "轮廓、连接与动作变形",
       "status": "partial_not_accepted",
       "doneWhen": "肩髋、肘膝腕踝、手足在正常距离无突兀接痕、尖折或异常鼓瘪；轴向和限位明确，只对已测动作及组合作结论。",
-      "existing": "R33 的轮廓及转动抗锯齿已做后台检查；R34 把支持的 A 骨架姿势由灰色结构显示改为肤色预览。连续动画和全部动作变形尚未完成。",
+      "existing": "R37 的 A、B 身体支持六种连续动作、两姿势自定义播放和暂停保存，播放与拖动保持边缘处理；复杂动作和极端组合仍未完成。",
       "subtasks": [
         {
           "id": "P2.edge",
           "title": "人体轮廓锯齿和显示采样",
           "status": "partial_not_accepted",
           "doneWhen": "正常距离、缩放、旋转和常用体型动作下的轮廓锯齿明显减轻，参数、档案和交互保留；实际效果等待用户观察。",
-          "latestEvidence": "R35 继承 R33 的边缘处理；受支持的动态皮肤在实际工作页的两组拖动和停稳对比见 qa/skin-r35/drag.json。",
+          "latestEvidence": "R37 在连续播放中旋转画面的后台检查见 qa/animation-r37/motion-lifecycle.json；实际效果仍待用户观察。",
           "stillNeeds": "用户在实际三维页检查常用角度；更多设备、极端形态及动作组合尚未逐一覆盖。"
         },
         {
@@ -88,14 +88,15 @@
         {
           "id": "P2.3",
           "title": "手足细节与约定动作组合",
-          "status": "not_accepted"
+          "status": "not_accepted",
+          "latestEvidence": "当前 A、B 手指关节支持双手开合；手足已有的七对局部控制集中在工作页，旧档专用手足隐式细节尚未适配。"
         },
         {
           "id": "P2.4",
           "title": "姿势编辑、连续动作与骨架支持",
           "status": "partial_not_accepted",
-          "stillNeeds": "接入连续动作播放，检查复杂和极端姿势的变形与自然度，补齐未支持的 B 身份及头部组合。",
-          "latestEvidence": "R36 已接入 B 骨架屈曲和姿态修正，并检查与年龄、性别及旧档体积改形联动；A、B 动作数据切换时保留。"
+          "stillNeeds": "完善更复杂的动作编辑和动作库，检查极端姿势自然度及未支持的 B 身份、头部组合。",
+          "latestEvidence": "R37 提供六种连续预设、两姿势自定义录制和档案保存；支持 A、B 当前身体和部分旧档效果。"
         }
       ]
     },
@@ -126,7 +127,7 @@
           "title": "参数生效与既有人物档案兼容",
           "status": "partial_not_accepted",
           "latestEvidence": "年龄和性别连续控制可用；真实 R20 档案的躯干、肩背、四肢体积及关节修正已应用，人物档案和头部字段保留。",
-          "stillNeeds": "旧档手指和脚部局部细节、旧特殊法线变换及其他未支持人物组合仍需处理。"
+          "stillNeeds": "旧档手指和脚部局部细节仍需适配；旧特殊法线按实际视觉需要评估，其他未支持人物组合仍待处理。"
         }
       ]
     },
@@ -141,14 +142,15 @@
           "id": "P4.1",
           "title": "按实际需要优化加载、缓存与更新",
           "status": "partial_not_accepted",
-          "stillNeeds": "根据实际等待、卡顿、资源占用和设备需求选择优化，不独立追求重写。"
+          "stillNeeds": "根据实际等待、卡顿、资源占用和设备需求选择优化，不独立追求重写。",
+          "latestEvidence": "R37 复用相同体型的计算，降低连续姿势更新等待；测试设备数据见 qa/animation-r37。"
         },
         {
           "id": "P4.2",
           "title": "体型与姿势变化后的完整皮肤效果",
           "status": "partial_not_accepted",
           "stillNeeds": "由用户观察实际外观，按需要检查更多形体、动作及目标设备；完整物理体积散射未完成。",
-          "latestEvidence": "R35 的皮肤、动态阴影和屏幕空间柔光已覆盖 R36 年龄、性别、B 骨架及已接入的旧档改形；后台页面检查见 qa/shape-r36。"
+          "latestEvidence": "R37 连续播放保留当前皮肤和动态阴影，暂停后恢复完整求值与阴影；更多设备和组合未覆盖。"
         },
         {
           "id": "P4.3",
@@ -163,22 +165,27 @@
       "title": "头身接口、附件与平台整合",
       "status": "partial_not_accepted",
       "doneWhen": "与独立头部项目完成共同坐标、颈口和材质衔接，附件跟随及完整人物存档联调；不越界修改独立头部项目。",
-      "existing": "同一个参考人物的动态头侧边界与完整人物档案已联动；头部表面由独立项目负责，任意提供方、附件和总平台未完成。",
+      "existing": "已有头侧边界、完整档案与 A/B 身体关节跟随参考；独立头部、附件和总平台尚未实际接通。",
       "subtasks": [
         {
           "id": "P5.1",
           "title": "头身接口与任意头侧提供方",
-          "status": "partial_not_accepted"
+          "status": "partial_not_accepted",
+          "latestEvidence": "身体侧暴露颈、头的关节变换及现有动态颈口数据；独立头部尚未连接。",
+          "stillNeeds": "与独立头部项目联调颈口、坐标、材质及动作。"
         },
         {
           "id": "P5.2",
           "title": "附件、坐标与跟随",
-          "status": "not_accepted"
+          "status": "partial_not_accepted",
+          "latestEvidence": "身体侧暴露随动作更新的躯干、手腕、足部等关节变换，不生成人物附件。",
+          "stillNeeds": "实现真实附件加载、跟随和视觉联调。"
         },
         {
           "id": "P5.3",
           "title": "完整存档和总平台联调",
-          "status": "partial_not_accepted"
+          "status": "partial_not_accepted",
+          "stillNeeds": "对接实际头部和附件后联调整个人物存档与平台。"
         }
       ]
     }
@@ -192,6 +199,6 @@
     "P5",
     "P4.1/P4.3"
   ],
-  "priorityChange": "沿用既定 P4.2、P3.3、P2.4 顺序；本轮覆盖年龄、性别、B 骨架屈曲和部分旧档改形，接下来处理连续动作与剩余实用功能。",
-  "capabilityReview": "docs/BODY-R36.md"
+  "priorityChange": "沿用既定 P4.2、P3.3、P2.4 顺序；R37 已补基础连续动作与自定义两姿势播放，继续旧档手足细节及实际平台联动。",
+  "capabilityReview": "docs/BODY-R37.md"
 }

@@ -137,7 +137,7 @@
   },
   "originalEB1LightsAndEnvironmentRestored": true,
   "schema": "body-source-atlas-viewer/2",
-  "builtUTC": "2026-10-28T06:23:51.413Z",
+  "builtUTC": "2026-10-28T08:17:04.374Z",
   "file": "delivery/身体_R35_可调皮肤.html",
   "sha256": "5f5ee4f14bdbf8cf2a345ebdcb3593386a604b592bfbe6f148e4e54b2b761dd1",
   "bytes": 899042,
@@ -683,14 +683,6 @@
       "sha256": "8b7de08360a207fff1be8cded90d75854c51fcb60408b912abde07553e1dd94a"
     },
     {
-      "file": "tools/build.cjs",
-      "sha256": "827a4432989b44a3aa25ed2b5cf9e287e30036ff326aaff2ca8b756e5f8f947f"
-    },
-    {
-      "file": "tools/preview-body.cjs",
-      "sha256": "2bcecbf474436c2362490c9141c8c063f862ee15a8552b6caa4d5e4149f27f1e"
-    },
-    {
       "file": "tools/research/r36/build-candidate.cjs",
       "sha256": "0db3f55e7f8687051c78b923b4854633117d21b2fecb570dcd7e12a6c0f07c80"
     },
@@ -749,6 +741,62 @@
     {
       "file": "data/body-legacy-support-r36.json",
       "sha256": "20ecb4720cc66d4f01e009a749e91a55acbfa9340657f11461d48cd89e72bf9c"
+    },
+    {
+      "file": "tools/build-r37.cjs",
+      "sha256": "58bc66a6725dd6e26697e4d584c697247f17b453ab8736426da190fba500f736"
+    },
+    {
+      "file": "tools/build.cjs",
+      "sha256": "8ffe09a7373b2386540242252798d9049d3bdaf5cc1a236725bf2591edf943e3"
+    },
+    {
+      "file": "tools/preview-body.cjs",
+      "sha256": "3bdeee9ab130adde3dc1c769702e3b5558146532d1f54b00d1f0c377a1ff9612"
+    },
+    {
+      "file": "tools/research/r37/build-candidate.cjs",
+      "sha256": "de4f273bc7e8b1f0c0f4be787b1cb1da7bdcafd71934506c90e3ffde64a307b2"
+    },
+    {
+      "file": "tools/research/r37/patch-pose-renderer.cjs",
+      "sha256": "af8aace9b65ead8e4d600c59899a1596dea291ee21a695b087f766e80bf2ca3f"
+    },
+    {
+      "file": "tools/research/r37/patch-shadow-validation.cjs",
+      "sha256": "18973c9a05bcd25d47348d28715521297399aee68120468e44cf276502d03b24"
+    },
+    {
+      "file": "src/research/r37/BodyAnimationClipR37.js",
+      "sha256": "8c6a4681e30d2334864176d1cb65bec4868996c0585525824be7c48a817ad501"
+    },
+    {
+      "file": "src/research/r37/BodyAttachmentFramesR37.js",
+      "sha256": "9c22b1c1ba04ec5e22edee47bea90dbd1d7e16ecd5a5d721d11914fa65fd643a"
+    },
+    {
+      "file": "src/research/r37/BodyDynamicFullR37.js",
+      "sha256": "a4857a8e73da411a5c6e66da2a52e70d56d0100f3fd8d3a33e14e8eef7d011f8"
+    },
+    {
+      "file": "src/research/r37/BodyHandFootControlsR37.js",
+      "sha256": "4be1f5fb1f7060b54828c3e5a4b7352b3cdc91b05b152f3e87d042ad226e981c"
+    },
+    {
+      "file": "src/research/r37/BodyMotionControllerR37.js",
+      "sha256": "3f022a60c8b893876253007f6723d31413e5cf4e82957a33840c255c2b4eff8d"
+    },
+    {
+      "file": "src/research/r37/BodyShadowValidationR37.js",
+      "sha256": "4275be60f8bf0d3ecae1afccd38e6ae0e8c2469769b543030c5c4e4df939d435"
+    },
+    {
+      "file": "src/research/r37/FullBodyStudyWorkerR37.js",
+      "sha256": "931b63dc5a1d497151f9cf20fdf45714b3c7c6afa38cfa8c451d2d8261a6d71e"
+    },
+    {
+      "file": "src/research/r37/TorsoStudyAppR37.js",
+      "sha256": "6da2f7f5ee05c9110815caad0d013b73ae72e3f1e35af4d0ad081ff5568b4bc2"
     }
   ],
   "characterTriangleFaces": 0,
@@ -1145,7 +1193,7 @@
     "measuredAnatomicalBoneLengths": false
   },
   "canonicalFile": "delivery/身体_R33_实时轮廓.html",
-  "version": "R36",
+  "version": "R37",
   "exactDomainAssets": [
     {
       "file": "delivery/assets/body-exact-r25/2e9bf28a922ddfd1d85b236ca3e2919108e6d3182219de499b53c0efc2328ba2.gz",
@@ -1281,9 +1329,9 @@
   "directionalShadowUpdatesR35": true,
   "fullVolumeScattering": false,
   "fixedViewInheritedR35": true,
-  "selectedVersion": "R36",
-  "companionBuild": "BUILD-R36.json",
-  "companionWorkbench": "BUILD-R36.json",
+  "selectedVersion": "R37",
+  "companionBuild": "BUILD-R37.json",
+  "companionWorkbench": "BUILD-R37.json",
   "researchBuild": "BUILD-POSE-R32.json",
-  "selection": "R36 adds continuous age and sex, supported B-rig bending with correctives, and selected legacy body volume/joint effects while retaining the current skin and complete archives."
+  "selection": "R37 retains the current body and skin and adds six body motion previews, saved two-pose custom actions, faster pose updates and body-side attachment frames."
 }
