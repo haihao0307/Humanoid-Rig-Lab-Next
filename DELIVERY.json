@@ -1,7 +1,7 @@
 {
   "schema": "body-delivery-r38/1",
   "version": "R38",
-  "updatedUTC": "2026-10-28T10:01:59.679Z",
+  "updatedUTC": "2026-10-28T10:12:58.814Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
@@ -13,9 +13,9 @@
   },
   "workbench": {
     "file": "delivery/人物身体_R38_动作编辑.html",
-    "sha256": "2d95f58d31411fe02312e3b99ce72aa44c83bcd0d01120f5c4081d6c6cb8e3b7",
-    "bytes": 1961119,
-    "url": "http://127.0.0.1:8914/workbench?v=R38-2d95f58d"
+    "sha256": "e76a96a838c0b4a256a410f9726d842dd93e5141a25550f9940671c7ddaaf74a",
+    "bytes": 1964687,
+    "url": "http://127.0.0.1:8914/workbench?v=R38-e76a96a8"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
@@ -167,7 +167,9 @@
     "motionLegacyR38": "qa/motion-r38/legacy-custom.json",
     "motionLifecycleR38": "qa/motion-r38/lifecycle.json",
     "releaseIntegrityR38": "qa/motion-r38/release-integrity.json",
-    "productionUIR38": "qa/motion-r38/production-ui.json"
+    "productionUIR38": "qa/motion-r38/production-ui.json",
+    "motionEditorExtrasR38": "qa/motion-r38/editor-extras.json",
+    "productionEditorR38": "qa/motion-r38/production-editor.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
@@ -443,7 +445,9 @@
     "actionImportExport": true,
     "fullMotionLibraryImportExport": true,
     "extremeBRigWaistCorrection": true,
-    "allExtremeMotionDeformationsSolved": false
+    "allExtremeMotionDeformationsSolved": false,
+    "motionBrowserLocalSave": true,
+    "keyframeDuplicationAndReverse": true
   },
   "surfaceControls": 22,
   "surfaceImplementation": {
@@ -551,6 +555,9 @@
     "keyframesMaximum": 16,
     "wholePoseAndLayeredClips": true,
     "individualAndLibraryImportExport": true,
+    "browserLocalSaveAndMerge": true,
+    "keyframeDuplication": true,
+    "actionReverse": true,
     "savedInPersonArchive": true,
     "oldTwoPoseClipRetained": true,
     "playback": [
