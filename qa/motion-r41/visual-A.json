@@ -1,0 +1,143 @@
+{
+  "passed": true,
+  "rig": "A",
+  "errors": [],
+  "contact": {
+    "schema": "body-foot-contact-r41/1",
+    "enabled": true,
+    "floor": -0.9635571241378784,
+    "relativeFloor": 0,
+    "offset": [
+      0,
+      -0.4310585856437683,
+      0
+    ],
+    "rootPosition": [
+      0,
+      -0.4310585856437683,
+      0
+    ],
+    "gait": null,
+    "collision": {
+      "enabled": true,
+      "method": "finite limb capsule pose avoidance",
+      "pairs": 5,
+      "initialMaxMM": 0,
+      "residualMaxMM": 0,
+      "iterations": 0,
+      "arbitrarySurfaceCollision": false,
+      "details": [
+        {
+          "pair": "lower-legs",
+          "initialMM": 0,
+          "residualMM": 0
+        },
+        {
+          "pair": "thighs",
+          "initialMM": 0,
+          "residualMM": 0
+        },
+        {
+          "pair": "forearms",
+          "initialMM": 0,
+          "residualMM": 0
+        },
+        {
+          "pair": "forearm-torso-L",
+          "initialMM": 0,
+          "residualMM": 0
+        },
+        {
+          "pair": "forearm-torso-R",
+          "initialMM": 0,
+          "residualMM": 0
+        }
+      ]
+    },
+    "supportSides": [
+      "L",
+      "R"
+    ],
+    "feet": {
+      "L": {
+        "minimum": -0.9635571241378784,
+        "point": [
+          0.18570218980312347,
+          -0.9635571241378784,
+          0.23856408894062042
+        ],
+        "clearanceMM": 0
+      },
+      "R": {
+        "minimum": -0.9635571241378784,
+        "point": [
+          -0.18570218980312347,
+          -0.9635571241378784,
+          0.23856408894062042
+        ],
+        "clearanceMM": 0
+      }
+    },
+    "minimumBodyClearanceMM": 0,
+    "headBoundaryCoordinate": "person-local",
+    "resolvedPose": {
+      "upperleg01.L": {
+        "rotation": [
+          -80,
+          0,
+          0
+        ]
+      },
+      "upperleg01.R": {
+        "rotation": [
+          -80,
+          0,
+          0
+        ]
+      },
+      "lowerleg01.L": {
+        "rotation": [
+          110,
+          0,
+          0
+        ]
+      },
+      "lowerleg01.R": {
+        "rotation": [
+          110,
+          0,
+          0
+        ]
+      },
+      "lowerarm01.L": {
+        "rotation": [
+          -100,
+          0,
+          0
+        ]
+      },
+      "foot.L": {
+        "rotation": [
+          -30.00000846869943,
+          -0.000005383595709971851,
+          0
+        ]
+      },
+      "foot.R": {
+        "rotation": [
+          -30.000008471490386,
+          0.000005384409678815978,
+          0
+        ]
+      }
+    },
+    "jointVolume": {
+      "enabled": true,
+      "strength": 0.65,
+      "correctedEvaluations": 62124,
+      "maximumCorrectionMM": 16.076614321476217,
+      "method": "bounded dual quaternion limb volume correction with original affine residual"
+    }
+  },
+  "shadowUnknown": 0
+}

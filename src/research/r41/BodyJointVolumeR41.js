@@ -1,0 +1,8 @@
+/* A rigid rotational correction is added to the existing affine and B-rig
+ * corrective response. It is restricted to mixed limb influences. */
+(()=>{'use strict';
+function create(matrices,names,gain,scale=1){const parts=matrices.map(BodyArticulationR20.dual),limb=names.map(n=>/arm|leg|wrist|foot|ball|toe|finger|thumb/i.test(n));let changed=0,maxMM=0;
+ function correction(rest,ids,weights){if(!gain||ids.length<2)return[0,0,0];let largest=0,total=0,limbWeight=0;const selected=[];for(let k=0;k<ids.length;k++){const w=weights[k];largest=Math.max(largest,w);total+=w;if(limb[ids[k]])limbWeight+=w;selected.push(parts[ids[k]]);}if(total<1e-8||limbWeight<.25)return[0,0,0];const mix=Math.min(1,Math.max(0,(1-largest/total-.025)/.275)),beta=gain*.75*mix*Math.min(1,limbWeight/total);if(!beta)return[0,0,0];const normalized=weights.map(w=>w/total),blended=BodyArticulationR20.blend(selected,normalized),old=[0,0,0];for(let j=0;j<selected.length;j++){const r=selected[j].r;for(let k=0;k<3;k++)old[k]+=normalized[j]*(r[k*3]*rest[0]+r[k*3+1]*rest[1]+r[k*3+2]*rest[2]+selected[j].t[k]);}const q=BodyMathR01.rotateQuaternion(blended.q,rest).map((v,k)=>v+blended.t[k]),delta=q.map((v,k)=>(v-old[k])*beta),size=Math.hypot(...delta),limit=.035*scale,mult=size>limit?limit/size:1;if(size>1e-8){changed++;maxMM=Math.max(maxMM,size*mult*1000);}return delta.map(v=>v*mult);}
+ return{correction,report:()=>({enabled:gain>0,strength:gain,correctedEvaluations:changed,maximumCorrectionMM:maxMM,method:'bounded dual quaternion limb volume correction with original affine residual'})};}
+globalThis.BodyJointVolumeR41={create};
+})();

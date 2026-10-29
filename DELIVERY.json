@@ -1,7 +1,7 @@
 {
-  "schema": "body-delivery-r40/1",
-  "version": "R40",
-  "updatedUTC": "2026-10-29T03:43:40.918Z",
+  "schema": "body-delivery-r41/1",
+  "version": "R41",
+  "updatedUTC": "2026-10-29T05:25:25.805Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
@@ -12,10 +12,10 @@
     "inheritedGeometryFrom": "BUILD-SOURCE-R33.json"
   },
   "workbench": {
-    "file": "delivery/人物身体_R40_皮肤与性能.html",
-    "sha256": "5695d6dc3dab2d8a09d459e4a77c0e91d7a6004aa388bea9972a74aed41e6c5f",
-    "bytes": 1990837,
-    "url": "http://127.0.0.1:8914/workbench?v=R40-5695d6dc"
+    "file": "delivery/人物身体_R41_动作与接地.html",
+    "sha256": "18e148e056f56ff98e755c2e720920a06fd726204b468c09682b4fc68596fd1f",
+    "bytes": 1999659,
+    "url": "http://127.0.0.1:8914/workbench?v=R41-18e148e0"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
@@ -197,7 +197,16 @@
     "redrawInputDiagnosticR40": "qa/skin-r40/redraw-diagnostic.json",
     "rejectedSkinShaderExperimentR40": "qa/skin-r40/experiment-mrt-same-frame.json",
     "productionR40": "qa/skin-r40/production.json",
-    "releaseIntegrityR40": "qa/skin-r40/release-integrity.json"
+    "releaseIntegrityR40": "qa/skin-r40/release-integrity.json",
+    "motionContactR41": "qa/motion-r41/engine.json",
+    "motionExtremeR41": "qa/motion-r41/extremes.json",
+    "motionCollisionR41": "qa/motion-r41/collision.json",
+    "motionArchiveR41": "qa/motion-r41/retained.json",
+    "motionSeamsR41": "qa/motion-r41/seams.json",
+    "motionBrowserR41": "qa/motion-r41/browser.json",
+    "releaseIntegrityR41": "qa/motion-r41/release-integrity.json",
+    "motionRenderingR41": "qa/motion-r41/upload.json",
+    "productionR41": "qa/motion-r41/production.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
@@ -231,7 +240,7 @@
       "task": "头身接口、附件与平台整合"
     }
   ],
-  "previousDelivery": "DELIVERY-R39.json",
+  "previousDelivery": "DELIVERY-R40.json",
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
     "branch": "body/reconstruction-r18-20261023"
@@ -460,7 +469,7 @@
     "screenSpaceDiffusionOnly": true,
     "fullVolumeScattering": false,
     "legacyR20BodyEffectsPartial": true,
-    "continuousMotionPresets": 6,
+    "continuousMotionPresets": 7,
     "customTwoPoseClip": true,
     "customClipSavedInPersonArchive": true,
     "handFootGroupedControls": true,
@@ -490,7 +499,14 @@
     "skinPresetsChangeOnlyRoughnessAndOil": true,
     "validatedSharedSkinFields": true,
     "initialDynamicPersonHandoff": true,
-    "pairedShadowValidation": true
+    "pairedShadowValidation": true,
+    "jointVolumeControl": true,
+    "flatGroundContact": true,
+    "supportFootLeveling": true,
+    "shapeAdaptiveWalking": true,
+    "finiteCapsuleAvoidance": true,
+    "fullSurfaceCollision": false,
+    "complexTerrainGait": false
   },
   "surfaceControls": 22,
   "surfaceImplementation": {
@@ -544,9 +560,9 @@
   },
   "remainingSpecific": [
     "P1：胸肩、腰腹和骨盆的体型响应，以及骨架支撑与软组织的分离仍需完善",
-    "P2：A、B 极端体型下的髋部及其他关节自然变形、脚部接地、步态和碰撞尚未完成",
-    "P3：旧档专用手指、脚部细节及旧档改形与新腰腹柔化的叠加尚未完成",
-    "P4：重复绘制的少量像素波动尚未定位；更多体型、动作、设备和场景、加载与播放性能、完整物理体积散射仍需推进",
+    "P2：R41 已接入平地接触、行走及有限胶囊避让；完整软组织接触、复杂地形、跳跑转弯和任意场景碰撞未完成",
+    "P3：旧档专用手指、脚部细节及旧档改形与腰腹柔化的完整叠加仍需适配",
+    "P4：更多体型、动作、设备和场景的实际外形及性能，以及完整物理体积散射仍需推进",
     "P5：独立头部、附件跟随和完整人物总平台尚未实际联调"
   ],
   "continuousBodyR37": {
@@ -738,5 +754,63 @@
     },
     "experimentalMRTSelected": false,
     "performanceDeviceDependent": true
+  },
+  "continuousBodyR41": {
+    "file": "delivery/身体_R41_动作与接地.html",
+    "sha256": "1822dc52f4a0d6eb18495ee30ffa792bf716cf700069f5773e5f59c6bb268041",
+    "bytes": 920652,
+    "sourceDerived": true,
+    "characterTriangleFaces": 0,
+    "fullVisualAcceptance": false
+  },
+  "motionR41": {
+    "jointVolume": {
+      "method": "bounded dual-quaternion limb correction retaining affine residuals",
+      "adjustable": true,
+      "legacyArticulationNotDuplicated": true
+    },
+    "ground": {
+      "analyticPlane": true,
+      "surfaceExtrema": true,
+      "supportFootLeveling": true,
+      "perPreviewFramePlacement": true,
+      "archivedHeadBoundary": "person-local"
+    },
+    "gait": {
+      "rigs": [
+        "A",
+        "B"
+      ],
+      "supportFraction": 0.6,
+      "swingFraction": 0.4,
+      "footSurfaceIK": true,
+      "shapeAdaptiveStride": true,
+      "adjustableStrideClearanceDuration": true,
+      "continuousTravel": true,
+      "cameraFollow": true,
+      "freezeToEditablePoseOnPause": true
+    },
+    "collision": {
+      "method": "finite capsule pairs with pose correction",
+      "pairs": [
+        "lower legs",
+        "thighs",
+        "forearms",
+        "left forearm and torso",
+        "right forearm and torso"
+      ],
+      "finalResidualReported": true,
+      "allSurfaceCollision": false,
+      "arbitrarySceneCollision": false
+    },
+    "archives": {
+      "completePerson": true,
+      "headInputsRetained": true,
+      "skinEditsDuringPlaybackRetained": true
+    },
+    "characterTriangleFaces": 0,
+    "allExtremeDeformationsSolved": false,
+    "complexTerrain": false,
+    "fullSoftTissuePhysics": false
   }
 }

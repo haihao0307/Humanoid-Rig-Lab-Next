@@ -3,9 +3,9 @@
   "reviewedDate": "2026-10-28",
   "basis": "用户要求核查身体既有效果、参数、动作和人体生成平台实际可用性，并精简无使用价值的旧任务。",
   "review": "docs/EXECUTION-ROUTE-HISTORY-THROUGH-R31.md",
-  "currentProductVersion": "R40",
-  "currentMainTask": "P4",
-  "currentSubtask": "P4.2",
+  "currentProductVersion": "R41",
+  "currentMainTask": "P2",
+  "currentSubtask": "P2.4",
   "mainTasksAccepted": 0,
   "projectComplete": false,
   "acceptanceTolerance": null,
@@ -65,7 +65,7 @@
       "title": "轮廓、连接与动作变形",
       "status": "partial_not_accepted",
       "doneWhen": "肩髋、肘膝腕踝、手足在正常距离无突兀接痕、尖折或异常鼓瘪；轴向和限位明确，只对已测动作及组合作结论。",
-      "existing": "R39 提供 A、B 关键帧时间轴、逐关节编辑、分段过渡、动作拼接及 16 个内置动作；连续预览保持所测相邻表面相接。",
+      "existing": "R41 保留原动作库和编辑器，新增 A/B 关节体积保护、平地接触、接地行走和五类胶囊避让。",
       "subtasks": [
         {
           "id": "P2.edge",
@@ -83,7 +83,9 @@
         {
           "id": "P2.2",
           "title": "肘膝腕踝轴向、限位和体积",
-          "status": "not_accepted"
+          "status": "partial_not_accepted",
+          "latestEvidence": "R41 新增可调、限幅、随身体尺度变化的关节体积修正；保留 B 姿态修正及旧档关节层，深屈曲胖瘦与儿童比例已抽样检查。",
+          "stillNeeds": "深屈曲贴合处完整软组织挤压、褶皱和更多姿势外形仍需改善。"
         },
         {
           "id": "P2.3",
@@ -95,8 +97,8 @@
           "id": "P2.4",
           "title": "姿势编辑、连续动作与骨架支持",
           "status": "partial_not_accepted",
-          "stillNeeds": "继续改善 A、B 极端形体的髋部和其他关节静态及动作形变；补充脚部接地、步态和碰撞，并验证更多体型和设备。",
-          "latestEvidence": "新增时间轴、逐关节控制、分段停顿、动作拼接和撤销重做；两套骨架的胖瘦组合抽样中，相邻函数边界未出现超过 0.1 毫米的播放缝隙。"
+          "stillNeeds": "完整软组织接触、复杂地形、跳跑转弯、全身表面及任意场景碰撞未实现；五类胶囊避让不代表完整物理系统。",
+          "latestEvidence": "R41 两套骨架平地行走、支撑脚平放、暂停转普通姿势、完整档案和皮肤保留已检查；胖瘦和儿童比例的函数边界、接地及保守范围有数值记录。"
         }
       ]
     },
