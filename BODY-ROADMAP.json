@@ -3,9 +3,9 @@
   "reviewedDate": "2026-10-28",
   "basis": "用户要求核查身体既有效果、参数、动作和人体生成平台实际可用性，并精简无使用价值的旧任务。",
   "review": "docs/EXECUTION-ROUTE-HISTORY-THROUGH-R31.md",
-  "currentProductVersion": "R39",
-  "currentMainTask": "P2",
-  "currentSubtask": "P2.4",
+  "currentProductVersion": "R40",
+  "currentMainTask": "P4",
+  "currentSubtask": "P4.2",
   "mainTasksAccepted": 0,
   "projectComplete": false,
   "acceptanceTolerance": null,
@@ -136,21 +136,21 @@
       "title": "皮肤、显示和实际性能",
       "status": "partial_not_accepted",
       "doneWhen": "常用体型和姿势下的皮肤、细节、光照和调节可用；按实际设备需求保证加载和交互。",
-      "existing": "R36 在 R35 皮肤功能上覆盖连续年龄、性别、B 骨架及已接入的旧档改形；其他设备和极端组合仍需检查。",
+      "existing": "R40 保留现有皮肤效果，增加皮肤样式导入导出、质感选项和动作中调节；已验证复用皮肤数据及阴影检查，其他设备和组合仍需检查。",
       "subtasks": [
         {
           "id": "P4.1",
           "title": "按实际需要优化加载、缓存与更新",
           "status": "partial_not_accepted",
-          "stillNeeds": "根据实际等待、卡顿、资源占用和设备需求选择优化，不独立追求重写。",
-          "latestEvidence": "动作准备时复用重复姿势；本机 R39 多关键帧播放与性能检查见 qa/motion-r39。"
+          "stillNeeds": "继续结合真实设备检查加载、显存和播放速度；本轮没有证明所有动作均加速。",
+          "latestEvidence": "固定和可动人物复用重新校验的皮肤字段，可动页面直接计算当前人物一次；两盏阴影可合并检查。实际播放与切换耗时、波动和实验结果见 qa/skin-r40。"
         },
         {
           "id": "P4.2",
           "title": "体型与姿势变化后的完整皮肤效果",
           "status": "partial_not_accepted",
-          "stillNeeds": "由用户观察实际外观，按需要检查更多形体、动作及目标设备；完整物理体积散射未完成。",
-          "latestEvidence": "R37 连续播放保留当前皮肤和动态阴影，暂停后恢复完整求值与阴影；更多设备和组合未覆盖。"
+          "stillNeeds": "由用户观察实际外观；更多体型、动作、设备及完整物理体积散射尚未完成。",
+          "latestEvidence": "22 项皮肤控制可显示数值并在动作中调整，样式可独立导入、导出和恢复；A、B 骨架及档案检查见 qa/skin-r40。"
         },
         {
           "id": "P4.3",
@@ -199,6 +199,6 @@
     "P5",
     "P4.1/P4.3"
   ],
-  "priorityChange": "沿用既定 P1～P5 编号；按用户要求继续 P2.4 动作编辑、动作库和极端体型动作变形。",
-  "capabilityReview": "docs/BODY-R39.md"
+  "priorityChange": "沿用既定 P1～P5 编号；本轮按用户要求处理 P4 皮肤和实际性能。",
+  "capabilityReview": "docs/SURFACE-R40.md"
 }

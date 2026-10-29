@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "A rig current body computes the actual person once",
+      "passed": true,
+      "detail": {
+        "rig": "anny",
+        "bootApplied": true,
+        "evaluations": 1,
+        "sequence": 1,
+        "personPreserved": true,
+        "skinRoughness": 0.38,
+        "actualSkin": 0.38,
+        "error": null,
+        "triangles": 0
+      }
+    },
+    {
+      "name": "B rig bent body computes the actual person once",
+      "passed": true,
+      "detail": {
+        "rig": "mhr",
+        "bootApplied": true,
+        "evaluations": 1,
+        "sequence": 1,
+        "personPreserved": true,
+        "skinRoughness": 0.38,
+        "actualSkin": 0.38,
+        "error": null,
+        "triangles": 0
+      }
+    },
+    {
+      "name": "invalid initial archive keeps the previous person",
+      "passed": true,
+      "detail": {
+        "surface": "source",
+        "error": "人物档案格式不匹配，当前人物未改变"
+      }
+    },
+    {
+      "name": "standalone dynamic page retains its normal initialization",
+      "passed": true,
+      "detail": {
+        "evaluations": 1,
+        "error": null,
+        "triangles": 0
+      }
+    },
+    {
+      "name": "missing initial handoff safely uses prior two-step route",
+      "passed": true,
+      "detail": {
+        "evaluations": 2,
+        "personPreserved": true,
+        "error": null
+      }
+    },
+    {
+      "name": "no browser exceptions",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

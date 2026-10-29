@@ -1,21 +1,21 @@
 {
-  "schema": "body-delivery-r39/1",
-  "version": "R39",
-  "updatedUTC": "2026-10-28T11:29:18.931Z",
+  "schema": "body-delivery-r40/1",
+  "version": "R40",
+  "updatedUTC": "2026-10-29T03:43:40.918Z",
   "scope": "BODY ONLY",
   "selectedBuild": "BUILD.json",
   "source": {
-    "file": "delivery/身体_R35_可调皮肤.html",
-    "sha256": "5f5ee4f14bdbf8cf2a345ebdcb3593386a604b592bfbe6f148e4e54b2b761dd1",
-    "bytes": 899042,
-    "url": "http://127.0.0.1:8914/?v=R39-5f5ee4f1",
+    "file": "delivery/身体_R40_固定皮肤.html",
+    "sha256": "40dc02f39e008b5b34878ba95203b0a70a09dc4d709263a5b0902ad8f90d8382",
+    "bytes": 900928,
+    "url": "http://127.0.0.1:8914/?v=R40-40dc02f3",
     "inheritedGeometryFrom": "BUILD-SOURCE-R33.json"
   },
   "workbench": {
-    "file": "delivery/人物身体_R39_动作与连续变形.html",
-    "sha256": "0f02990fe7254dd83bfb4a663ea1cd2dc46456cb31aa0c5e0d4ed2b17f862bf4",
-    "bytes": 1984286,
-    "url": "http://127.0.0.1:8914/workbench?v=R39-0f02990f"
+    "file": "delivery/人物身体_R40_皮肤与性能.html",
+    "sha256": "5695d6dc3dab2d8a09d459e4a77c0e91d7a6004aa388bea9972a74aed41e6c5f",
+    "bytes": 1990837,
+    "url": "http://127.0.0.1:8914/workbench?v=R40-5695d6dc"
   },
   "continuousSourceCandidate": {
     "file": "delivery/身体_R29_连续关节原轮廓候选.html",
@@ -182,7 +182,22 @@
     "motionEditorRegressionR39": "qa/motion-r39/editor-regression.json",
     "motionResumeR39": "qa/motion-r39/resume.json",
     "motionWaistUIR39": "qa/motion-r39/waist-ui.json",
-    "releaseIntegrityR39": "qa/motion-r39/release-integrity.json"
+    "releaseIntegrityR39": "qa/motion-r39/release-integrity.json",
+    "skinControlsR40": "qa/skin-r40/skin-styles.json",
+    "skinRigsR40": "qa/skin-r40/skin-rigs.json",
+    "skinCacheR40": "qa/skin-r40/cache.json",
+    "initialBodyHandoffR40": "qa/skin-r40/boot-handoff.json",
+    "legacyBodyR40": "qa/skin-r40/legacy-r20.json",
+    "shadowPairR40": "qa/skin-r40/shadow-pairs.json",
+    "shadowFallbackR40": "qa/skin-r40/shadow-fallback.json",
+    "skinHandoffPerformanceR40": "qa/skin-r40/skin-handoff-abba.json",
+    "shadowModePerformanceR40": "qa/skin-r40/shadow-mode-abba.json",
+    "playbackPerformanceR40": "qa/skin-r40/playback-abba.json",
+    "redrawComparisonR40": "qa/skin-r40/render-product.json",
+    "redrawInputDiagnosticR40": "qa/skin-r40/redraw-diagnostic.json",
+    "rejectedSkinShaderExperimentR40": "qa/skin-r40/experiment-mrt-same-frame.json",
+    "productionR40": "qa/skin-r40/production.json",
+    "releaseIntegrityR40": "qa/skin-r40/release-integrity.json"
   },
   "route": "EXECUTION-ROUTE.md",
   "roadmap": "BODY-ROADMAP.json",
@@ -216,7 +231,7 @@
       "task": "头身接口、附件与平台整合"
     }
   ],
-  "previousDelivery": "DELIVERY-R38.json",
+  "previousDelivery": "DELIVERY-R39.json",
   "github": {
     "repository": "haihao0307/Humanoid-Rig-Lab-Next",
     "branch": "body/reconstruction-r18-20261023"
@@ -413,7 +428,7 @@
     "highDpiCheck": "qa/edges-r33/high-dpi.json",
     "userVisualReviewPending": true
   },
-  "capabilityReview": "docs/BODY-R39.md",
+  "capabilityReview": "docs/SURFACE-R40.md",
   "platformCapabilities": {
     "defaultOriginalBodySkin": true,
     "defaultSkinControlsSampled": true,
@@ -466,7 +481,16 @@
     "perSegmentTransition": true,
     "actionComposition": true,
     "motionUndoRedo": true,
-    "seamPreservingMotionPreview": true
+    "seamPreservingMotionPreview": true,
+    "bodySkinControlCount": 22,
+    "skinStyleImportExport": true,
+    "skinStyleRestore": true,
+    "skinAdjustableDuringMotion": true,
+    "skinSliderValuesVisible": true,
+    "skinPresetsChangeOnlyRoughnessAndOil": true,
+    "validatedSharedSkinFields": true,
+    "initialDynamicPersonHandoff": true,
+    "pairedShadowValidation": true
   },
   "surfaceControls": 22,
   "surfaceImplementation": {
@@ -522,7 +546,7 @@
     "P1：胸肩、腰腹和骨盆的体型响应，以及骨架支撑与软组织的分离仍需完善",
     "P2：A、B 极端体型下的髋部及其他关节自然变形、脚部接地、步态和碰撞尚未完成",
     "P3：旧档专用手指、脚部细节及旧档改形与新腰腹柔化的叠加尚未完成",
-    "P4：更多体型与设备检查、加载和交互性能及完整物理体积散射仍需推进",
+    "P4：重复绘制的少量像素波动尚未定位；更多体型、动作、设备和场景、加载与播放性能、完整物理体积散射仍需推进",
     "P5：独立头部、附件跟随和完整人物总平台尚未实际联调"
   ],
   "continuousBodyR37": {
@@ -675,5 +699,44 @@
     },
     "sampleReuseWithinPreparation": true,
     "fullGroundContactOrGait": false
+  },
+  "continuousBodyR40": {
+    "file": "delivery/身体_R40_皮肤与性能.html",
+    "sha256": "f04f138db972f4c6bcaee18d6f026d2693eabf310b6248f7d8a261295ded233d",
+    "bytes": 881119,
+    "sourceDerived": true,
+    "characterTriangleFaces": 0,
+    "fullVisualAcceptance": false
+  },
+  "skinR40": {
+    "bodyControls": 22,
+    "bodyOnlyStyleImportExport": true,
+    "bodyOnlyStyleRestore": true,
+    "roughnessOilPresets": 3,
+    "adjustableDuringMotion": true,
+    "previousSkinShaderPreserved": true,
+    "screenSpaceDiffusion": true,
+    "fullVolumeScattering": false
+  },
+  "performanceR40": {
+    "sharedSkinFields": {
+      "sameOriginParent": true,
+      "byteHashesRechecked": true,
+      "expiryMS": 120000,
+      "maximumFields": 4
+    },
+    "initialDynamicHandoff": {
+      "actualPersonEvaluations": 1,
+      "standaloneOrInaccessibleParent": "original initialization and handoff",
+      "invalidArchive": "retain previous person"
+    },
+    "shadowValidation": {
+      "bothMapsChecked": true,
+      "pairedReadbacks": 1,
+      "unequalMapsOrShaderFailure": "separate exact reductions",
+      "integerTargetUnavailable": "full pixel readback"
+    },
+    "experimentalMRTSelected": false,
+    "performanceDeviceDependent": true
   }
 }

@@ -1,0 +1,148 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "initial fixed body prepared its verified skin data",
+      "passed": true,
+      "detail": {
+        "type": "source",
+        "fieldReport": {
+          "schema": "body-original-skin-fields/1",
+          "localFields": 0,
+          "downloadedFields": 4,
+          "generatedFields": 0,
+          "sharedFields": 0,
+          "rejectedSharedFields": 0,
+          "rejectedLocalFields": 0,
+          "rejectedDownloads": 0,
+          "generationMS": null,
+          "cacheWritten": true,
+          "cacheUnavailable": false,
+          "headGenerated": false,
+          "sourceFidelityAccepted": false,
+          "sharedValidationMS": null,
+          "rawBytes": 178956960,
+          "allFourFieldsByteExact": true
+        },
+        "shared": true,
+        "cacheEntries": [
+          "gmCavityMap",
+          "gmPoreMap",
+          "gmMesoMap",
+          "gmWrinkleMap"
+        ],
+        "cacheBytes": 178956960,
+        "triangles": 0
+      }
+    },
+    {
+      "name": "dynamic body reuses and revalidates all four skin fields",
+      "passed": true,
+      "detail": {
+        "type": "dynamic-body-p1",
+        "fieldReport": {
+          "schema": "body-original-skin-fields/1",
+          "localFields": 0,
+          "downloadedFields": 0,
+          "generatedFields": 0,
+          "sharedFields": 4,
+          "rejectedSharedFields": 0,
+          "rejectedLocalFields": 0,
+          "rejectedDownloads": 0,
+          "generationMS": null,
+          "cacheWritten": false,
+          "cacheUnavailable": false,
+          "headGenerated": false,
+          "sourceFidelityAccepted": false,
+          "sharedValidationMS": 153.09999990463257,
+          "rawBytes": 178956960,
+          "allFourFieldsByteExact": true
+        },
+        "shared": true,
+        "cacheEntries": [
+          "gmCavityMap",
+          "gmPoreMap",
+          "gmMesoMap",
+          "gmWrinkleMap"
+        ],
+        "cacheBytes": 178956960,
+        "triangles": 0,
+        "transitionMS": 31271
+      }
+    },
+    {
+      "name": "fixed body can reuse independent descriptors for the same fields",
+      "passed": true,
+      "detail": {
+        "type": "source",
+        "fieldReport": {
+          "schema": "body-original-skin-fields/1",
+          "localFields": 0,
+          "downloadedFields": 0,
+          "generatedFields": 0,
+          "sharedFields": 4,
+          "rejectedSharedFields": 0,
+          "rejectedLocalFields": 0,
+          "rejectedDownloads": 0,
+          "generationMS": null,
+          "cacheWritten": false,
+          "cacheUnavailable": false,
+          "headGenerated": false,
+          "sourceFidelityAccepted": false,
+          "sharedValidationMS": 133.70000004768372,
+          "rawBytes": 178956960,
+          "allFourFieldsByteExact": true
+        },
+        "shared": true,
+        "cacheEntries": [
+          "gmCavityMap",
+          "gmPoreMap",
+          "gmMesoMap",
+          "gmWrinkleMap"
+        ],
+        "cacheBytes": 178956960,
+        "triangles": 0
+      }
+    },
+    {
+      "name": "corrupted shared bytes are rejected and replaced from a verified source",
+      "passed": true,
+      "detail": {
+        "type": "dynamic-body-p1",
+        "fieldReport": {
+          "schema": "body-original-skin-fields/1",
+          "localFields": 4,
+          "downloadedFields": 0,
+          "generatedFields": 0,
+          "sharedFields": 0,
+          "rejectedSharedFields": 1,
+          "rejectedLocalFields": 0,
+          "rejectedDownloads": 0,
+          "generationMS": null,
+          "cacheWritten": false,
+          "cacheUnavailable": false,
+          "headGenerated": false,
+          "sourceFidelityAccepted": false,
+          "sharedValidationMS": null,
+          "rawBytes": 178956960,
+          "allFourFieldsByteExact": true
+        },
+        "shared": true,
+        "cacheEntries": [
+          "gmMesoMap",
+          "gmPoreMap",
+          "gmWrinkleMap",
+          "gmCavityMap"
+        ],
+        "cacheBytes": 178956960,
+        "triangles": 0
+      }
+    },
+    {
+      "name": "no browser exceptions",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,159 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "22 body skin values available",
+      "passed": true,
+      "detail": [
+        "originalTone",
+        "originalWarmth",
+        "originalRedness",
+        "originalVariation",
+        "originalFreckles",
+        "regionalColor",
+        "bodyVariation",
+        "jointTone",
+        "originalRoughness",
+        "originalOil",
+        "originalOilFilm",
+        "originalDetail",
+        "originalPores",
+        "bodyPores",
+        "originalGraphPores",
+        "originalWrinkles",
+        "originalMeso",
+        "originalCavity",
+        "neckCreases",
+        "originalScatter",
+        "originalDiffusion",
+        "originalFuzz"
+      ]
+    },
+    {
+      "name": "skin sliders show their current values",
+      "passed": true,
+      "detail": {
+        "count": 22,
+        "tone": "0.72"
+      }
+    },
+    {
+      "name": "preset changes only skin roughness and oil",
+      "passed": true,
+      "detail": {
+        "changed": [
+          "originalRoughness",
+          "originalOil",
+          "originalOilFilm"
+        ],
+        "bodyAndHeadPreserved": true,
+        "otherPersonFieldsPreserved": true
+      }
+    },
+    {
+      "name": "preset updates the displayed value",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "one-click restore returns the prior skin values",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "export contains body skin values only",
+      "passed": true,
+      "detail": {
+        "name": "身体皮肤样式.json",
+        "bytes": 663
+      }
+    },
+    {
+      "name": "actual file import restores exported style",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "invalid file does not partially change skin",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "restore after import returns pre-import skin",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "imported high-precision value is displayed without rounding away saved data",
+      "passed": true,
+      "detail": {
+        "display": "0.234567"
+      }
+    },
+    {
+      "name": "restored person refreshes skin value displays",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "action starts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "skin responds during playback without rebuilding body or shadows",
+      "passed": true,
+      "detail": {
+        "changed": 108850,
+        "geometryBefore": 24,
+        "geometryAfter": 24,
+        "shadowsBefore": 17,
+        "shadowsAfter": 17,
+        "skinBefore": 630,
+        "skinAfter": 648,
+        "mode": "playing",
+        "style": {
+          "originalTone": 0.24,
+          "originalWarmth": 0.46,
+          "originalRedness": 0.48,
+          "originalVariation": 0.9,
+          "originalFreckles": 0.2,
+          "regionalColor": 0.72,
+          "bodyVariation": 0.64,
+          "jointTone": 0.42,
+          "originalRoughness": 0.55,
+          "originalOil": 0.25,
+          "originalOilFilm": 0.35,
+          "originalDetail": 0.72,
+          "originalPores": 0.88,
+          "bodyPores": 0.78,
+          "originalGraphPores": 1.5,
+          "originalWrinkles": 1.65,
+          "originalMeso": 1.5,
+          "originalCavity": 1.5,
+          "neckCreases": 0.34,
+          "originalScatter": 0.75,
+          "originalDiffusion": 0.65,
+          "originalFuzz": 0.85
+        },
+        "error": 0
+      }
+    },
+    {
+      "name": "paused exact pose and archive retain playback skin",
+      "passed": true,
+      "detail": {
+        "mode": "idle",
+        "tone": 0.24,
+        "archiveTone": 0.24,
+        "triangles": 0
+      }
+    },
+    {
+      "name": "no browser exceptions",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

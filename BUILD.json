@@ -137,10 +137,10 @@
   },
   "originalEB1LightsAndEnvironmentRestored": true,
   "schema": "body-source-atlas-viewer/2",
-  "builtUTC": "2026-10-28T11:26:43.707Z",
-  "file": "delivery/身体_R35_可调皮肤.html",
-  "sha256": "5f5ee4f14bdbf8cf2a345ebdcb3593386a604b592bfbe6f148e4e54b2b761dd1",
-  "bytes": 899042,
+  "builtUTC": "2026-10-29T03:43:27.959Z",
+  "file": "delivery/身体_R40_固定皮肤.html",
+  "sha256": "40dc02f39e008b5b34878ba95203b0a70a09dc4d709263a5b0902ad8f90d8382",
+  "bytes": 900928,
   "data": {
     "file": "data/body-source-atlas-r24.json",
     "sha256": "172a19de2613102f037dafa79ac370547824f84da0d4c52ac29c10b04f06f97d",
@@ -831,14 +831,6 @@
       "sha256": "8af8d2e19a520bb4be8ce3a417fc9db914e80b2b0a410804891e40bf8b456c06"
     },
     {
-      "file": "tools/build.cjs",
-      "sha256": "1632db54005c8d6d6003fd89f0ebfa37641091a829b96ea892b5faaed79c6a99"
-    },
-    {
-      "file": "tools/preview-body.cjs",
-      "sha256": "4acba3bd3167874cdad8d83f96b273d38379399eb2b6f0c8421502fb2c4a8315"
-    },
-    {
       "file": "tools/research/r39/build-candidate.cjs",
       "sha256": "4f8bcbe4f2b8c9748d6677f132e93981fe7fcdeb2f98ad449d271a49251bede2"
     },
@@ -861,6 +853,42 @@
     {
       "file": "src/research/r39/TorsoStudyAppR39.js",
       "sha256": "91b5d028751127df6b752c180c61d25212c0dc206c48988a3a6caf49d98e4eb5"
+    },
+    {
+      "file": "tools/build-r40.cjs",
+      "sha256": "bb55bd79461d41918400ef0318754e1250dd7268bfa831b028f0cd4db9c05cd2"
+    },
+    {
+      "file": "tools/build.cjs",
+      "sha256": "ccb25cb9593aea5b5ee3eee2a279fe8760a897ec878764e8420edb9e62addc34"
+    },
+    {
+      "file": "tools/preview-body.cjs",
+      "sha256": "a7763b29a14f10734837f6684c3a7e10b2962fc1ab94816a1de086b86738c120"
+    },
+    {
+      "file": "tools/research/r40/build-candidate.cjs",
+      "sha256": "03b8dbc3b4137152a0f1f19fddc01018c8f0959269dea5cc08791888eb8c26ed"
+    },
+    {
+      "file": "tools/research/r40/patch-skin-mrt.cjs",
+      "sha256": "bdeac524e84445e5bf7f2959e3f62601fa6dbde8557a867c8a43c5a6c80d86e4"
+    },
+    {
+      "file": "tools/research/r40/patch-boot-handoff.cjs",
+      "sha256": "866441333c84cc90c25d1bfec7793a9f796e2a637fecb1290e0b0f0b35ef5901"
+    },
+    {
+      "file": "src/research/r40/BodySkinFieldsR40.js",
+      "sha256": "ebebbf7b660144cb20be476faaf83212f9586f49d678c68d1b98f1d593a9bae2"
+    },
+    {
+      "file": "src/research/r40/BodyShadowValidationR40.js",
+      "sha256": "90abda3b4f48483a05611bb41643fad95122f884537193999e3a357b129fd21f"
+    },
+    {
+      "file": "src/research/r40/BodySkinStylesR40.js",
+      "sha256": "3b91eeac6331370e9c97f8500004e0ef7c8d6d0dab42f37039cb859026498807"
     }
   ],
   "characterTriangleFaces": 0,
@@ -1257,7 +1285,7 @@
     "measuredAnatomicalBoneLengths": false
   },
   "canonicalFile": "delivery/身体_R33_实时轮廓.html",
-  "version": "R39",
+  "version": "R40",
   "exactDomainAssets": [
     {
       "file": "delivery/assets/body-exact-r25/2e9bf28a922ddfd1d85b236ca3e2919108e6d3182219de499b53c0efc2328ba2.gz",
@@ -1393,9 +1421,40 @@
   "directionalShadowUpdatesR35": true,
   "fullVolumeScattering": false,
   "fixedViewInheritedR35": true,
-  "selectedVersion": "R39",
-  "companionBuild": "BUILD-R39.json",
-  "companionWorkbench": "BUILD-R39.json",
+  "skin": {
+    "bodyControls": 22,
+    "bodyOnlyStyleImportExport": true,
+    "bodyOnlyStyleRestore": true,
+    "roughnessOilPresets": 3,
+    "adjustableDuringMotion": true,
+    "previousSkinShaderPreserved": true,
+    "screenSpaceDiffusion": true,
+    "fullVolumeScattering": false
+  },
+  "performance": {
+    "sharedSkinFields": {
+      "sameOriginParent": true,
+      "byteHashesRechecked": true,
+      "expiryMS": 120000,
+      "maximumFields": 4
+    },
+    "initialDynamicHandoff": {
+      "actualPersonEvaluations": 1,
+      "standaloneOrInaccessibleParent": "original initialization and handoff",
+      "invalidArchive": "retain previous person"
+    },
+    "shadowValidation": {
+      "bothMapsChecked": true,
+      "pairedReadbacks": 1,
+      "unequalMapsOrShaderFailure": "separate exact reductions",
+      "integerTargetUnavailable": "full pixel readback"
+    },
+    "experimentalMRTSelected": false,
+    "performanceDeviceDependent": true
+  },
+  "selectedVersion": "R40",
+  "companionBuild": "BUILD-R40.json",
+  "companionWorkbench": "BUILD-R40.json",
   "researchBuild": "BUILD-POSE-R32.json",
-  "selection": "R39 retains the current body and skin, adds motion editing tools and preserves shared function boundaries during animation."
+  "selection": "R40 retains the current body and skin, adds body-only skin styles and playback controls, and reduces repeated skin and shadow checking work."
 }

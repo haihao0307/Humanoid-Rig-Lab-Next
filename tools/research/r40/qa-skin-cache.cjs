@@ -1,0 +1,20 @@
+'use strict';
+const fs=require('fs');
+const {chromium}=require(process.env.BODY_PLAYWRIGHT_PATH||'C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const base=process.env.BODY_BASE||'http://127.0.0.1:8917';
+const ready=p=>p.waitForFunction(()=>bodyImplicitR02?.report().ready&&!bodyImplicitR02.report().busy,null,{timeout:300000});
+const child=p=>p.evaluate(()=>{const iframe=document.querySelector('#body-source-embedded-r25,#body-dynamic-embedded-p1'),w=iframe?.contentWindow,cache=window.__BODY_SKIN_FIELDS_R40__;return{type:bodyImplicitR02.report().renderer.activeSurface,fieldReport:w?.BodySkinFieldsR24?.report(),shared:!!cache,cacheEntries:cache?Object.keys(cache.raws):[],cacheBytes:cache?Object.values(cache.raws).reduce((n,b)=>n+b.byteLength,0):0,triangles:bodyImplicitR02.report().renderer.characterTriangleFaces};});
+(async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.BODY_CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--enable-gpu','--enable-unsafe-swiftshader']}),checks=[],errors=[],check=(name,passed,detail)=>{checks.push({name,passed:!!passed,detail});if(!passed)throw Error(name);};
+ try{const page=await browser.newPage({viewport:{width:1200,height:800}});page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/workbench',{waitUntil:'domcontentloaded'});await ready(page);
+  const initial=await child(page),archive=await page.evaluate(()=>bodyImplicitR02.archive());
+  check('initial fixed body prepared its verified skin data',initial.type==='source'&&initial.shared&&initial.cacheEntries.length===4&&initial.fieldReport.allFourFieldsByteExact&&initial.triangles===0,initial);
+  const start=Date.now();await page.evaluate(()=>bodyControlR17.apply({set:{'shape.weight':.43,'shape.muscle':.69},label:'复用皮肤检查'}));await ready(page);const dynamic=await child(page);
+  check('dynamic body reuses and revalidates all four skin fields',dynamic.type==='dynamic-body-p1'&&dynamic.fieldReport.sharedFields===4&&dynamic.fieldReport.allFourFieldsByteExact&&dynamic.cacheBytes===initial.cacheBytes&&dynamic.triangles===0,{...dynamic,transitionMS:Date.now()-start});
+  await page.evaluate(a=>bodyImplicitR02.restore(a),archive);await ready(page);const fixed=await child(page);
+  check('fixed body can reuse independent descriptors for the same fields',fixed.type==='source'&&fixed.fieldReport.sharedFields===4&&fixed.fieldReport.allFourFieldsByteExact&&fixed.shared&&fixed.triangles===0,fixed);
+  await page.evaluate(()=>{const c=window.__BODY_SKIN_FIELDS_R40__,p=new Uint8Array(c.raws.gmMesoMap);p[0]^=1;});
+  await page.evaluate(()=>bodyControlR17.apply({set:{'shape.weight':.44},label:'损坏皮肤缓存检查'}));await ready(page);const recovered=await child(page);
+  check('corrupted shared bytes are rejected and replaced from a verified source',recovered.type==='dynamic-body-p1'&&recovered.fieldReport.rejectedSharedFields===1&&recovered.fieldReport.sharedFields===0&&recovered.fieldReport.allFourFieldsByteExact&&recovered.shared&&recovered.triangles===0,recovered);
+  check('no browser exceptions',errors.length===0,errors);
+ }catch(e){errors.push(e.stack);}finally{await browser.close();const out={passed:errors.length===0&&checks.every(x=>x.passed),checks,errors};fs.mkdirSync('qa/skin-r40',{recursive:true});fs.writeFileSync('qa/skin-r40/cache.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out));if(!out.passed)process.exitCode=1;}
+})();

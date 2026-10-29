@@ -1,0 +1,16 @@
+'use strict';
+// Alternate the previous and candidate pages and update the same light, while
+// preserving the full-size maps and checking all unresolved rays each time.
+const fs=require('fs');
+const {chromium}=require(process.env.BODY_PLAYWRIGHT_PATH||'C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const ready=p=>p.waitForFunction(()=>bodyImplicitR02?.report().ready&&!bodyImplicitR02.report().busy,null,{timeout:300000});
+const pages={R39:'http://127.0.0.1:8914/人物身体_R39_动作与连续变形.html',R40:'http://127.0.0.1:8917/workbench'};
+(async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.BODY_CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--enable-gpu','--enable-unsafe-swiftshader']}),runs=[],errors=[];
+ try{for(const version of ['R39','R40','R40','R39']){const page=await browser.newPage({viewport:{width:1200,height:800}});page.on('pageerror',e=>errors.push(version+': '+e.message));try{
+  await page.goto(pages[version],{waitUntil:'domcontentloaded'});await ready(page);await page.evaluate(()=>bodyControlR17.apply({set:{'shape.weight':.45,'shape.muscle':.65},label:'皮肤阴影更新对照'}));await ready(page);
+  await page.waitForFunction(()=>!!document.querySelector('#body-dynamic-embedded-p1')?.contentWindow?.torsoStudyP1?.renderer.precisionFrame(),null,{timeout:300000});
+  const value=await page.evaluate(()=>{const child=document.querySelector('#body-dynamic-embedded-p1').contentWindow,r=child.torsoStudyP1.renderer,c=child.document.querySelector('#body-view'),gl=c.getContext('webgl2'),d=gl.getExtension('WEBGL_debug_renderer_info'),samples=[];for(const angle of [-150,-151,-152,-153,-154,-155,-156,-157]){const start=performance.now();bodyImplicitR02.renderer.lighting({keyAzimuth:angle});gl.finish();const elapsed=performance.now()-start,q=r.report();samples.push({angle,elapsedMS:elapsed,shadowMS:q.dynamicShadow.lastMS,unknown:q.dynamicShadow.unknownPixels,method:q.dynamicShadow.validationMethod,glError:gl.getError()});}return{samples,dimensions:r.report().dynamicShadow.dimensions,canvas:[c.width,c.height],renderer:d?gl.getParameter(d.UNMASKED_RENDERER_WEBGL):null};});
+  const measured=value.samples.slice(2),ok=measured.every(x=>x.unknown===0&&x.glError===0&&x.method===(version==='R40'?'gpu-reduction':'full-readback'));runs.push({version,meanShadowMS:measured.reduce((s,x)=>s+x.shadowMS,0)/measured.length,meanTotalMS:measured.reduce((s,x)=>s+x.elapsedMS,0)/measured.length,...value,ok});process.stderr.write(JSON.stringify({version,meanShadowMS:runs.at(-1).meanShadowMS,meanTotalMS:runs.at(-1).meanTotalMS,ok})+'\n');
+ }finally{await page.close();}}}catch(e){errors.push(e.stack);}finally{await browser.close();}
+ const out={passed:errors.length===0&&runs.length===4&&runs.every(x=>x.ok),runs,errors,note:'Alternating real pages on one device. Full 2048-pixel maps and unresolved-ray checks are preserved; timings include a GPU finish and are not frame rates.'};fs.mkdirSync('qa/skin-r40',{recursive:true});fs.writeFileSync('qa/skin-r40/shadow-abba.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out));if(!out.passed)process.exitCode=1;
+})();

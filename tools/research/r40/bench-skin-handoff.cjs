@@ -1,0 +1,14 @@
+'use strict';
+// End-to-end body switching and skin-field loading in alternating order.
+const fs=require('fs');
+const {chromium}=require(process.env.BODY_PLAYWRIGHT_PATH||'C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const ready=p=>p.waitForFunction(()=>bodyImplicitR02?.report().ready&&!bodyImplicitR02.report().busy,null,{timeout:300000}),pages={R39:'http://127.0.0.1:8914/人物身体_R39_动作与连续变形.html',R40:'http://127.0.0.1:8917/workbench'};
+(async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.BODY_CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--enable-gpu','--enable-unsafe-swiftshader']}),runs=[],errors=[];
+ try{for(const version of ['R39','R40','R40','R39']){const page=await browser.newPage({viewport:{width:1200,height:800}});page.on('pageerror',e=>errors.push(version+': '+e.message));try{
+  await page.addInitScript(()=>{let api;Object.defineProperty(window,'BodySkinFieldsR24',{configurable:true,get:()=>api,set(value){const load=value.load;value.load=async function(...args){const t=performance.now();try{return await load.apply(this,args);}finally{window.__BODY_SKIN_LOAD_MS_R40__=performance.now()-t;}};api=value;}});});
+  await page.goto(pages[version],{waitUntil:'domcontentloaded'});await ready(page);const before=await page.evaluate(()=>bodyImplicitR02.report().renderer.activeSurface);if(before!=='source')throw Error('Expected fixed body at start');
+  const start=Date.now();await page.evaluate(()=>bodyControlR17.apply({set:{'shape.weight':.43,'shape.muscle':.69},label:'皮肤读取性能对照'}));await ready(page);const sample=await page.evaluate(()=>{const w=document.querySelector('#body-dynamic-embedded-p1').contentWindow;return{skinLoadMS:w.__BODY_SKIN_LOAD_MS_R40__,fields:w.BodySkinFieldsR24.report(),surface:bodyImplicitR02.report().renderer.activeSurface};});const elapsedMS=Date.now()-start;
+  const ok=sample.surface==='dynamic-body-p1'&&sample.fields.allFourFieldsByteExact&&Number.isFinite(sample.skinLoadMS)&&(version==='R40'?sample.fields.sharedFields===4:sample.fields.localFields===4);runs.push({version,elapsedMS,...sample,ok});process.stderr.write(JSON.stringify({version,elapsedMS,skinLoadMS:sample.skinLoadMS,ok})+'\n');
+ }finally{await page.close();}}}catch(e){errors.push(e.stack);}finally{await browser.close();}
+ const out={passed:errors.length===0&&runs.length===4&&runs.every(x=>x.ok),runs,errors,note:'Alternating pages on one device; timings vary with GPU and concurrent workloads. Both versions verify the same skin field hashes.'};fs.mkdirSync('qa/skin-r40',{recursive:true});fs.writeFileSync('qa/skin-r40/skin-handoff-abba.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out));if(!out.passed)process.exitCode=1;
+})();

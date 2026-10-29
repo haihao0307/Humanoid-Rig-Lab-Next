@@ -27,3 +27,4 @@ require('./build-r36.cjs');
 require('./build-r37.cjs');
 require('./build-r38.cjs');
 require('./build-r39.cjs');
+require('./build-r40.cjs');
