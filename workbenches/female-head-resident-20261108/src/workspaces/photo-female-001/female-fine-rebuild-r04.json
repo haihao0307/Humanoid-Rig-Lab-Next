@@ -1,0 +1,105 @@
+{
+  "schema": "human.female.photo-fine-residual-field/1",
+  "accepted": false,
+  "version": "r04",
+  "baseField": {
+    "version": "v10",
+    "sha256": "da464a309a899509b7ee92e146d5c68833138d8c5ae49bb65a816241afd3f4b2"
+  },
+  "sourcePhotoSHA256": "0b76772023ecb6e67f63b1542bcea77cf046cc21d201eef63789adbc67c7d488",
+  "storage": {
+    "file": "female-fine-rebuild-r04.f16",
+    "bytes": 25165824,
+    "sha256": "8e9fe63a33d0c828c01f1c43f8c3fe2c240b665ddd6a27a7bd389d31c2a4d05b",
+    "bits": 20,
+    "width": 2048,
+    "rowsPerLevel": 512,
+    "format": "RGBA binary16 little endian"
+  },
+  "spacingMM": [
+    0.375,
+    0.1875,
+    0.09375
+  ],
+  "originMM": [
+    -105.0,
+    145.0,
+    -100.0
+  ],
+  "pixelFilterK": 0.5,
+  "gainLimit": 0.2,
+  "support": {
+    "originMM": [
+      -76.0,
+      225.0,
+      48.0
+    ],
+    "spacingMM": 2.0,
+    "dimensions": [
+      77,
+      49,
+      54
+    ],
+    "alphaLayer": 0,
+    "construction": "train-observation voxels, 2 mm binary dilation and 6 mm continuous distance feather"
+  },
+  "photoSupport": {
+    "originMM": [
+      -105.0,
+      145.0,
+      -100.0
+    ],
+    "spacingMM": 3.0,
+    "dimensions": [
+      72,
+      82,
+      86
+    ],
+    "alphaLayer": 1,
+    "construction": "3mm real-photo first-hit voxels, one-voxel dilation and 6mm smooth distance feather; no generated side/back samples",
+    "approximate": true
+  },
+  "training": {
+    "split": "95% of observed pixels for training, 5% interleaved held out; separate 10-degree camera held out",
+    "selection": "highest residual luminance correlation on interleaved holdout subject to mean and 95th percentile not exceeding baseline",
+    "bestStep": 250,
+    "steps": 1500,
+    "batch": 8192,
+    "lr": 0.002,
+    "metrics": {
+      "step": 250,
+      "elapsedSeconds": 1.1,
+      "loss": 0.001810606336221099,
+      "sameViewInterleavedHoldout": {
+        "samples": 16502,
+        "baselineMeanMaxRGB8": 1.5756072998046875,
+        "meanMaxRGB8": 1.300742745399475,
+        "baselineP95MaxRGB8": 3.761971414089203,
+        "p95MaxRGB8": 2.6242399930953977,
+        "p99MaxRGB8": 3.719691598415374,
+        "maxMaxRGB8": 11.917232513427734,
+        "residualLumaCorrelation": 0.8021424775618116
+      },
+      "differentAngleHoldout": {
+        "samples": 50000,
+        "baselineMeanMaxRGB8": 1.9623041152954102,
+        "meanMaxRGB8": 1.226814866065979,
+        "baselineP95MaxRGB8": 4.816037726402282,
+        "p95MaxRGB8": 2.414040219783782,
+        "p99MaxRGB8": 3.6028761720657383,
+        "maxMaxRGB8": 16.437728881835938,
+        "residualLumaCorrelation": 0.901977612877848
+      },
+      "gpuAllocatedMB": 208.4
+    },
+    "datasetSHA256": "566900b1c3cb4d2a86695f29e45c99a205443394c264b13a6ce43953f099428f"
+  },
+  "provenance": "Three source-derived continuous 3D residual colour functions fit to high-pass original-photo projection on cheek first hits; no photo sampled at runtime",
+  "limitations": [
+    "Single real front photo only, plus an estimated photo projection; photo light can enter residual",
+    "No measured microgeometry, true albedo, specular or scattering recovered",
+    "Cheeks only; elsewhere the original candidate remains",
+    "Heldout angle shares the same photograph and registration",
+    "Finite views and automatic landmarks do not establish one-to-one fidelity"
+  ]
+}

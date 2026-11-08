@@ -1,0 +1,108 @@
+{
+  "schema": "human.female.procedural-rebuild-field/1",
+  "version": "v10",
+  "accepted": false,
+  "scope": "isolated corrected-observation research candidate; direct surface functions; not measured material",
+  "spacingMM": [
+    24.0,
+    12.0,
+    6.0,
+    3.0,
+    1.5,
+    0.75,
+    0.375
+  ],
+  "originMM": [
+    -105.0,
+    145.0,
+    -100.0
+  ],
+  "pixelFilterK": 0.5,
+  "pixelFootMaxMM": 3.0,
+  "function": "seven 3D hash-indexed triquintic continuous basis fields; log diffuse gain bounded [-2.5,2.5]; coefficients evaluated at rest-space surface hit",
+  "storage": {
+    "file": "female-rebuild-field-v10.f16",
+    "bytes": 58720256,
+    "sha256": "da464a309a899509b7ee92e146d5c68833138d8c5ae49bb65a816241afd3f4b2",
+    "bits": 20,
+    "width": 2048,
+    "rowsPerLevel": 512,
+    "format": "RGBA binary16 little endian",
+    "quantizationMaximumAbs": 0.0009391307830810547,
+    "quantizationMeanAbs": 2.5343751985928975e-06
+  },
+  "provenance": "Fitted to the front photo and generated side observations with experimental source-landmark and colour-confidence masking; photo lighting and registration defects can remain. No photo is sampled by the field at runtime.",
+  "training": {
+    "latest": {
+      "step": 2500,
+      "elapsedSeconds": 61.9,
+      "loss": 0.005578485317528248,
+      "train": {
+        "samples": 20000,
+        "mean": 1.3994611501693726,
+        "median": 0.8466287851333618,
+        "p95": 4.149431467056271,
+        "p99": 9.554022502899164,
+        "max": 57.279518127441406
+      },
+      "sameCaptureHoldout": {
+        "samples": 20000,
+        "mean": 2.2695934772491455,
+        "median": 1.5224491357803345,
+        "p95": 6.464926433563232,
+        "p99": 12.538866529464649,
+        "max": 64.85497283935547
+      },
+      "gpuAllocatedMB": 838.6
+    },
+    "samples": 1704829,
+    "observations": "observations-fixed-gpufoot.npz",
+    "fit": {
+      "initialField": "v07-best",
+      "learningRate": 0.001,
+      "gradientWeight": 0.4,
+      "outlierWeight": 1.0,
+      "outlierThreshold": 0.03137254901960784,
+      "selectionMeanPlusP99Weight": 0.2
+    },
+    "source": "same face photo and generated sides with experimental feature confidence; photo light remains",
+    "split": "random pixels from same captures; not independent",
+    "heldoutViews": [
+      "heldout-left",
+      "heldout-right"
+    ],
+    "accepted": false
+  },
+  "limitations": [
+    "Not measured physical albedo, normals or scattering",
+    "Generated sides are not the subject's photographs",
+    "Landmarks and colour confidence are unverified",
+    "Same-capture random holdout is not independent; separate angles and people are required",
+    "Position and feature geometry are unchanged and not accepted"
+  ],
+  "observedSupport": {
+    "originMM": [
+      -102.0,
+      -9.0,
+      -75.0
+    ],
+    "spacingMM": 3.0,
+    "dimensions": [
+      69,
+      143,
+      78
+    ],
+    "alphaLayer": 0,
+    "paddingCells": 1,
+    "kind": "dense triquintic interpolation of binary observed-cell vertices",
+    "source": "all training views, no independent rear reference",
+    "trainingCells": 18581,
+    "occupiedVertices": 86140
+  },
+  "supportProvenance": "Copied v08 observed-support alpha after checking every new training hit; unobserved surfaces retain baseline material.",
+  "featureConfidence": {
+    "file": "side-feature-exclusion-r03.json",
+    "sha256": "a8befb6d9164932ed15a44a268fa769ef7049708b7af4ffffadc5a09580e5abb",
+    "accepted": false
+  }
+}

@@ -1,0 +1,1222 @@
+{
+  "schema": "human.source-native-surface/1",
+  "bounds": {
+    "min": [
+      -85.32460281675999,
+      169.01670912415616,
+      -74.82885430867081
+    ],
+    "max": [
+      85.567410509708,
+      406.201621660583,
+      146.70630892087075
+    ]
+  },
+  "sourceFidelityAccepted": false,
+  "runtimeBindingAccepted": false,
+  "sourceDerived": true,
+  "defaultLoaded": false,
+  "compactPlanes": true,
+  "scope": "Isolated lossless material-channel sharing for all head components; source-specific geometric domains retained; whole-head source and shared mother remain unaccepted.",
+  "field": {
+    "url": "/src/layers/snapshots/native-source-functions-0-8b61f3c306c10ba7.bin",
+    "bytes": 204646500,
+    "sha256": "8b61f3c306c10ba7cdb4516ac36f27fdfce73d03f6429f3d8514f487a98c8e97",
+    "format": "original-coordinate-affine-functions/1"
+  },
+  "trim": {
+    "url": "/src/layers/snapshots/research-native-whole-skin-trim-e237cae705f3a329.bin",
+    "bytes": 56778124,
+    "sha256": "e237cae705f3a32939917466ddf2b8d5fe0eea05082a9e6d6fadf161a7d4b06c"
+  },
+  "materialInputs": {
+    "schema": "human.native-material-input-functions/1",
+    "sourceSHA256": "f63c538a548108f3f61657ddbec3c0c05fbb4f4456770ba7668c67b948247edd",
+    "fieldSHA256": "8b61f3c306c10ba7cdb4516ac36f27fdfce73d03f6429f3d8514f487a98c8e97",
+    "functions": 433573,
+    "channels": 54,
+    "fields": [
+      {
+        "name": "position",
+        "varying": "vETPosition",
+        "start": 0,
+        "size": 3,
+        "units": "metres",
+        "absoluteGoal": 1e-08
+      },
+      {
+        "name": "fRest",
+        "varying": "vFRest",
+        "start": 3,
+        "size": 3,
+        "units": "metres",
+        "absoluteGoal": 1e-08
+      },
+      {
+        "name": "csRest",
+        "varying": "vCSRest",
+        "start": 6,
+        "size": 3,
+        "units": "metres",
+        "absoluteGoal": 1e-08
+      },
+      {
+        "name": "csRegion",
+        "varying": "vCSRegion",
+        "start": 9,
+        "size": 4,
+        "units": "dimensionless",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "csExtra",
+        "varying": "vCSExtra",
+        "start": 13,
+        "size": 4,
+        "units": "dimensionless",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "l19State",
+        "varying": "vL19State",
+        "start": 17,
+        "size": 4,
+        "units": "dimensionless",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "l19Detail",
+        "varying": "vL19Detail",
+        "start": 21,
+        "size": 4,
+        "units": "dimensionless",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "eTissue",
+        "varying": "vETissue",
+        "start": 25,
+        "size": 4,
+        "units": "source tissue units",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "fA",
+        "varying": "vFA",
+        "start": 29,
+        "size": 4,
+        "units": "dimensionless",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "fB",
+        "varying": "vFB",
+        "start": 33,
+        "size": 4,
+        "units": "dimensionless",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "fEye",
+        "varying": "vFEye",
+        "start": 37,
+        "size": 4,
+        "units": "source eye units",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "color",
+        "varying": "vColor",
+        "start": 41,
+        "size": 3,
+        "units": "linear source colour",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "e6Transfer",
+        "varying": "vE6DirectDeep",
+        "start": 44,
+        "size": 6,
+        "units": "fixed original light transport",
+        "absoluteGoal": 1e-05
+      },
+      {
+        "name": "lidMarginField",
+        "varying": "vLidMargin",
+        "start": 50,
+        "size": 4,
+        "units": "original lid distance and gates",
+        "absoluteGoal": 1e-05
+      }
+    ],
+    "bytes": 634751136,
+    "sha256": "b385aeda1d8130292b92b2456fc5c2296d5893b067061f64c0c10dccae04e217",
+    "sourceDerived": true,
+    "sourceVertexArrays": false,
+    "sourceConnectivity": false,
+    "runtimeBindingAccepted": false,
+    "sourceFidelityAccepted": false,
+    "url": "/src/layers/snapshots/native-material-shared-b385aeda1d813029.bin",
+    "storageFormat": "identical-channel-coefficients/1",
+    "storedChannels": 45,
+    "originalUnpackedSHA256": "fb165008886226133870ded439fd478613617ce8d0161f73d9f2a4ec2dfe983d"
+  },
+  "acceleration": {
+    "url": "/src/layers/snapshots/source-native-geometry-bvh-0-ab1946077a461d03.bin",
+    "bytes": 10122884,
+    "sha256": "ab1946077a461d036b731fab760063ab4dcb6f65551334890971c5ee25997042",
+    "fieldSHA256": "8b61f3c306c10ba7cdb4516ac36f27fdfce73d03f6429f3d8514f487a98c8e97",
+    "nativeGeometrySHA256": "c28cf521971e43f2f4abb09e00e39384771f64bc207b6745002bfb04f544ba7e"
+  },
+  "visibility": {
+    "sourceMaterialSide": 0,
+    "meaning": "Original FrontSide: accept only original geometric winding facing the ray. Does not delete or merge source surfaces.",
+    "evidence": "qa/system-20261026-1423/original-visibility-policy.json"
+  },
+  "additionalComponents": [
+    {
+      "component": 1,
+      "profile": {
+        "schema": "human.source-native-surface/1",
+        "bounds": {
+          "min": [
+            17.36783620674898,
+            289.2136181884836,
+            83.67971873505299
+          ],
+          "max": [
+            46.190802082022465,
+            318.2271101832494,
+            115.08631929035988
+          ]
+        },
+        "sourceFidelityAccepted": false,
+        "runtimeBindingAccepted": false,
+        "sourceDerived": true,
+        "defaultLoaded": false,
+        "compactPlanes": true,
+        "visibility": {
+          "sourceMaterialSide": 0,
+          "evidence": "qa/system-20261026-1423/original-visibility-policy.json"
+        },
+        "field": {
+          "url": "/src/layers/snapshots/native-source-functions-1-b0dcb99b72f23a30.bin",
+          "bytes": 5799980,
+          "sha256": "b0dcb99b72f23a300e0fd66fd9f3fb973af7fbe2bc540ea8a9a3744518b8f4ce",
+          "format": "original-coordinate-affine-functions/1"
+        },
+        "trim": {
+          "url": "/src/layers/snapshots/research-native-component-1-trim-f48efd81931adb89.bin",
+          "bytes": 1592216,
+          "sha256": "f48efd81931adb896e8e62a5fad9e8d6cf1cdfba3e530fe565651b0e5bba5cd4"
+        },
+        "materialInputs": {
+          "schema": "human.native-material-input-functions/1",
+          "url": "/src/layers/snapshots/native-material-component-1-shared-fb4019d18212a572.bin",
+          "bytes": 6979840,
+          "sha256": "fb4019d18212a5723b08cce219a7643802eeea6be10f6d2d27ff56e33998f8a4",
+          "fieldSHA256": "b0dcb99b72f23a300e0fd66fd9f3fb973af7fbe2bc540ea8a9a3744518b8f4ce",
+          "functions": 12288,
+          "channels": 52,
+          "fields": [
+            {
+              "name": "existingEyeUV",
+              "start": 0,
+              "size": 2,
+              "units": "original eye coordinates",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "position",
+              "start": 2,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "fRest",
+              "start": 5,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "csRest",
+              "start": 8,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "csRegion",
+              "start": 11,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "csExtra",
+              "start": 15,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "l19State",
+              "start": 19,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "l19Detail",
+              "start": 23,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "eTissue",
+              "start": 27,
+              "size": 4,
+              "units": "source tissue units",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fA",
+              "start": 31,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fB",
+              "start": 35,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fEye",
+              "start": 39,
+              "size": 4,
+              "units": "source eye units",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "color",
+              "start": 43,
+              "size": 3,
+              "units": "linear source colour",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "e6Transfer",
+              "start": 46,
+              "size": 6,
+              "units": "fixed original light transport",
+              "absoluteGoal": 1e-05
+            }
+          ],
+          "sourceDerived": true,
+          "sourceVertexArrays": false,
+          "sourceConnectivity": false,
+          "runtimeBindingAccepted": false,
+          "sourceFidelityAccepted": false,
+          "storageFormat": "identical-channel-coefficients/1",
+          "storedChannels": 17,
+          "originalUnpackedSHA256": "896b75d1ea4c136d19c375af8f8579c9e92f544346efeda170bf948e48ed73c0"
+        },
+        "acceleration": {
+          "url": "/src/layers/snapshots/source-native-geometry-bvh-1-cc5ad39034df0e07.bin",
+          "bytes": 311280,
+          "sha256": "cc5ad39034df0e079013bffae7c80d2cf04608fa58143afdf6950374d7ffe7cb",
+          "fieldSHA256": "b0dcb99b72f23a300e0fd66fd9f3fb973af7fbe2bc540ea8a9a3744518b8f4ce",
+          "nativeGeometrySHA256": "d87939679309134aee78a5836e9520415400c7aa65290d5642704fb5a4c32afa"
+        },
+        "scope": "Original component1 source-default surface, raw normals and native organ coordinates; source-specific polynomial partitions, not a completed compact mother.",
+        "functionSemanticsSHA256": "a21304dd88430ecb8d9ac19ed753c7aec77c1e70cc81175f8dde180a22ff784d",
+        "losslessDictionaryEvidence": "qa/system-20261026-1723/component-1/dictionary-source.bin.profile.json",
+        "rootOwnershipReuse": true,
+        "nativeGeometry": {
+          "url": "/src/layers/snapshots/source-native-geometry-1-d87939679309134a.bin",
+          "bytes": 1572880,
+          "sha256": "d87939679309134aee78a5836e9520415400c7aa65290d5642704fb5a4c32afa",
+          "fieldSHA256": "b0dcb99b72f23a300e0fd66fd9f3fb973af7fbe2bc540ea8a9a3744518b8f4ce",
+          "authority": "Original Float32 metre position functions, Float64 affine parameterization; rounded export retained only as parameter domain",
+          "sourceSpecificPartitionRetained": true
+        },
+        "experimentalFastGeometry": true
+      }
+    },
+    {
+      "component": 2,
+      "profile": {
+        "schema": "human.source-native-surface/1",
+        "bounds": {
+          "min": [
+            -46.03465503487199,
+            288.7681622666845,
+            82.87811215470356
+          ],
+          "max": [
+            -16.170546905931328,
+            317.9061103285094,
+            114.45234734617749
+          ]
+        },
+        "sourceFidelityAccepted": false,
+        "runtimeBindingAccepted": false,
+        "sourceDerived": true,
+        "defaultLoaded": false,
+        "compactPlanes": true,
+        "visibility": {
+          "sourceMaterialSide": 0,
+          "evidence": "qa/system-20261026-1423/original-visibility-policy.json"
+        },
+        "field": {
+          "url": "/src/layers/snapshots/native-source-functions-2-007383c4b865a693.bin",
+          "bytes": 5799980,
+          "sha256": "007383c4b865a693a819e2637521e605b6599dae19b0f61419ac428de7dab6dd",
+          "format": "original-coordinate-affine-functions/1"
+        },
+        "trim": {
+          "url": "/src/layers/snapshots/research-native-component-2-trim-495905ed056ec88f.bin",
+          "bytes": 1592964,
+          "sha256": "495905ed056ec88f170591ed1fdde04347368a53358d6e376b0d05769abaca29"
+        },
+        "materialInputs": {
+          "schema": "human.native-material-input-functions/1",
+          "url": "/src/layers/snapshots/native-material-component-2-shared-bd6a68d8623575ee.bin",
+          "bytes": 6979840,
+          "sha256": "bd6a68d8623575eeea9419dc37cf591e803e41a526fb9701ab77347cad967bc3",
+          "fieldSHA256": "007383c4b865a693a819e2637521e605b6599dae19b0f61419ac428de7dab6dd",
+          "functions": 12288,
+          "channels": 52,
+          "fields": [
+            {
+              "name": "existingEyeUV",
+              "start": 0,
+              "size": 2,
+              "units": "original eye coordinates",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "position",
+              "start": 2,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "fRest",
+              "start": 5,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "csRest",
+              "start": 8,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "csRegion",
+              "start": 11,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "csExtra",
+              "start": 15,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "l19State",
+              "start": 19,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "l19Detail",
+              "start": 23,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "eTissue",
+              "start": 27,
+              "size": 4,
+              "units": "source tissue units",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fA",
+              "start": 31,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fB",
+              "start": 35,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fEye",
+              "start": 39,
+              "size": 4,
+              "units": "source eye units",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "color",
+              "start": 43,
+              "size": 3,
+              "units": "linear source colour",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "e6Transfer",
+              "start": 46,
+              "size": 6,
+              "units": "fixed original light transport",
+              "absoluteGoal": 1e-05
+            }
+          ],
+          "sourceDerived": true,
+          "sourceVertexArrays": false,
+          "sourceConnectivity": false,
+          "runtimeBindingAccepted": false,
+          "sourceFidelityAccepted": false,
+          "storageFormat": "identical-channel-coefficients/1",
+          "storedChannels": 17,
+          "originalUnpackedSHA256": "563448d9dc1206bbfe0c858bb6326c3ea565981265e5f148c4fea19bbf5b00db"
+        },
+        "acceleration": {
+          "url": "/src/layers/snapshots/source-native-geometry-bvh-2-a12ab31d8be87141.bin",
+          "bytes": 311280,
+          "sha256": "a12ab31d8be87141f1d0bffa334f706fd99fa5efb582bdb46898ce0cccc7ce14",
+          "fieldSHA256": "007383c4b865a693a819e2637521e605b6599dae19b0f61419ac428de7dab6dd",
+          "nativeGeometrySHA256": "c01cc1d6341329312e7f32e97f172e542cb4a4a4376243adc64c9a936283b77a"
+        },
+        "scope": "Original component2 source-default surface, raw normals and native organ coordinates; source-specific polynomial partitions, not a completed compact mother.",
+        "functionSemanticsSHA256": "00578487ad27d82f06da7b614726822f9bf90e45432d78ab36f6aacb1efaf174",
+        "losslessDictionaryEvidence": "qa/system-20261026-1723/component-2/dictionary-source.bin.profile.json",
+        "rootOwnershipReuse": true,
+        "nativeGeometry": {
+          "url": "/src/layers/snapshots/source-native-geometry-2-c01cc1d634132931.bin",
+          "bytes": 1572880,
+          "sha256": "c01cc1d6341329312e7f32e97f172e542cb4a4a4376243adc64c9a936283b77a",
+          "fieldSHA256": "007383c4b865a693a819e2637521e605b6599dae19b0f61419ac428de7dab6dd",
+          "authority": "Original Float32 metre position functions, Float64 affine parameterization; rounded export retained only as parameter domain",
+          "sourceSpecificPartitionRetained": true
+        },
+        "experimentalFastGeometry": true
+      }
+    },
+    {
+      "component": 3,
+      "profile": {
+        "schema": "human.source-native-surface/1",
+        "bounds": {
+          "min": [
+            17.46827453835953,
+            289.3141160129652,
+            92.3786882958941
+          ],
+          "max": [
+            46.092249629846265,
+            318.1267346059642,
+            112.29914346205365
+          ]
+        },
+        "sourceFidelityAccepted": false,
+        "runtimeBindingAccepted": false,
+        "sourceDerived": true,
+        "defaultLoaded": false,
+        "compactPlanes": true,
+        "visibility": {
+          "sourceMaterialSide": 0,
+          "evidence": "qa/system-20261026-1423/original-visibility-policy.json"
+        },
+        "field": {
+          "url": "/src/layers/snapshots/native-source-functions-3-8227068f7a6a7c58.bin",
+          "bytes": 5618732,
+          "sha256": "8227068f7a6a7c58f3076ce836fc85b02bfdc932bc8e880cc7d9d67c0c23463d",
+          "format": "original-coordinate-affine-functions/1"
+        },
+        "trim": {
+          "url": "/src/layers/snapshots/research-native-component-3-trim-c47dc5fe21e61276.bin",
+          "bytes": 1541068,
+          "sha256": "c47dc5fe21e61276f13aa0ccfa0a7ea29943efc1d8236ee8f069ca8489e74a15"
+        },
+        "materialInputs": {
+          "schema": "human.native-material-input-functions/1",
+          "url": "/src/layers/snapshots/native-material-component-3-shared-f837242603f0598b.bin",
+          "bytes": 6761728,
+          "sha256": "f837242603f0598b4076fd24c7e5822d7985589705c87b664bcc8b8ada021c4f",
+          "fieldSHA256": "8227068f7a6a7c58f3076ce836fc85b02bfdc932bc8e880cc7d9d67c0c23463d",
+          "functions": 11904,
+          "channels": 52,
+          "fields": [
+            {
+              "name": "existingEyeUV",
+              "start": 0,
+              "size": 2,
+              "units": "original eye coordinates",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "position",
+              "start": 2,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "fRest",
+              "start": 5,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "csRest",
+              "start": 8,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "csRegion",
+              "start": 11,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "csExtra",
+              "start": 15,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "l19State",
+              "start": 19,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "l19Detail",
+              "start": 23,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "eTissue",
+              "start": 27,
+              "size": 4,
+              "units": "source tissue units",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fA",
+              "start": 31,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fB",
+              "start": 35,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fEye",
+              "start": 39,
+              "size": 4,
+              "units": "source eye units",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "color",
+              "start": 43,
+              "size": 3,
+              "units": "linear source colour",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "e6Transfer",
+              "start": 46,
+              "size": 6,
+              "units": "fixed original light transport",
+              "absoluteGoal": 1e-05
+            }
+          ],
+          "sourceDerived": true,
+          "sourceVertexArrays": false,
+          "sourceConnectivity": false,
+          "runtimeBindingAccepted": false,
+          "sourceFidelityAccepted": false,
+          "storageFormat": "identical-channel-coefficients/1",
+          "storedChannels": 17,
+          "originalUnpackedSHA256": "74741b77d508557a2e956216388c66b7a5c8f76199bc453f9124daacbf84a5b8"
+        },
+        "acceleration": {
+          "url": "/src/layers/snapshots/source-native-geometry-bvh-3-997e1c9b61319b04.bin",
+          "bytes": 309744,
+          "sha256": "997e1c9b61319b0415f6cd3e007e692d0df245b1e37918246d067ddaa7f67251",
+          "fieldSHA256": "8227068f7a6a7c58f3076ce836fc85b02bfdc932bc8e880cc7d9d67c0c23463d",
+          "nativeGeometrySHA256": "624f60fe0a93977daaf0790158f33b9c111f39c09cbb449ab830cf4b789313e1"
+        },
+        "scope": "Original component3 source-default surface, raw normals and native organ coordinates; source-specific polynomial partitions, not a completed compact mother.",
+        "functionSemanticsSHA256": "6960c71b912b953ad349d9e936d1c480556d30c43d03d6c6cc7a57d67f40384f",
+        "losslessDictionaryEvidence": "qa/system-20261026-1723/component-3/dictionary-source.bin.profile.json",
+        "rootOwnershipReuse": true,
+        "nativeGeometry": {
+          "url": "/src/layers/snapshots/source-native-geometry-3-624f60fe0a93977d.bin",
+          "bytes": 1523728,
+          "sha256": "624f60fe0a93977daaf0790158f33b9c111f39c09cbb449ab830cf4b789313e1",
+          "fieldSHA256": "8227068f7a6a7c58f3076ce836fc85b02bfdc932bc8e880cc7d9d67c0c23463d",
+          "authority": "Original Float32 metre position functions, Float64 affine parameterization; rounded export retained only as parameter domain",
+          "sourceSpecificPartitionRetained": true
+        },
+        "experimentalFastGeometry": true
+      }
+    },
+    {
+      "component": 4,
+      "profile": {
+        "schema": "human.source-native-surface/1",
+        "bounds": {
+          "min": [
+            -45.93293351867775,
+            288.86901491585314,
+            91.74202478471352
+          ],
+          "max": [
+            -16.273236957107382,
+            317.8066853380891,
+            111.75337588760668
+          ]
+        },
+        "sourceFidelityAccepted": false,
+        "runtimeBindingAccepted": false,
+        "sourceDerived": true,
+        "defaultLoaded": false,
+        "compactPlanes": true,
+        "visibility": {
+          "sourceMaterialSide": 0,
+          "evidence": "qa/system-20261026-1423/original-visibility-policy.json"
+        },
+        "field": {
+          "url": "/src/layers/snapshots/native-source-functions-4-eda2a2508a3cfa67.bin",
+          "bytes": 5618732,
+          "sha256": "eda2a2508a3cfa670ae748d54e3879e53bed8c64266e685ccd0b6eb840566fb6",
+          "format": "original-coordinate-affine-functions/1"
+        },
+        "trim": {
+          "url": "/src/layers/snapshots/research-native-component-4-trim-5f2a83288dc07d59.bin",
+          "bytes": 1541028,
+          "sha256": "5f2a83288dc07d59f983129c650f19596eab116c16a3dda7387b3e401b164d60"
+        },
+        "materialInputs": {
+          "schema": "human.native-material-input-functions/1",
+          "url": "/src/layers/snapshots/native-material-component-4-shared-5486174307b33f98.bin",
+          "bytes": 6761728,
+          "sha256": "5486174307b33f98b406a728253e42483ff94280807e8bf9a655ac32d789005e",
+          "fieldSHA256": "eda2a2508a3cfa670ae748d54e3879e53bed8c64266e685ccd0b6eb840566fb6",
+          "functions": 11904,
+          "channels": 52,
+          "fields": [
+            {
+              "name": "existingEyeUV",
+              "start": 0,
+              "size": 2,
+              "units": "original eye coordinates",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "position",
+              "start": 2,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "fRest",
+              "start": 5,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "csRest",
+              "start": 8,
+              "size": 3,
+              "units": "metres",
+              "absoluteGoal": 1e-08
+            },
+            {
+              "name": "csRegion",
+              "start": 11,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "csExtra",
+              "start": 15,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "l19State",
+              "start": 19,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "l19Detail",
+              "start": 23,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "eTissue",
+              "start": 27,
+              "size": 4,
+              "units": "source tissue units",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fA",
+              "start": 31,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fB",
+              "start": 35,
+              "size": 4,
+              "units": "dimensionless",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "fEye",
+              "start": 39,
+              "size": 4,
+              "units": "source eye units",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "color",
+              "start": 43,
+              "size": 3,
+              "units": "linear source colour",
+              "absoluteGoal": 1e-05
+            },
+            {
+              "name": "e6Transfer",
+              "start": 46,
+              "size": 6,
+              "units": "fixed original light transport",
+              "absoluteGoal": 1e-05
+            }
+          ],
+          "sourceDerived": true,
+          "sourceVertexArrays": false,
+          "sourceConnectivity": false,
+          "runtimeBindingAccepted": false,
+          "sourceFidelityAccepted": false,
+          "storageFormat": "identical-channel-coefficients/1",
+          "storedChannels": 17,
+          "originalUnpackedSHA256": "2180f41209245e3fa2dbf9f5730a3632746d76e896c041148bccfe19b6600224"
+        },
+        "acceleration": {
+          "url": "/src/layers/snapshots/source-native-geometry-bvh-4-72d03c2c69428ef9.bin",
+          "bytes": 309744,
+          "sha256": "72d03c2c69428ef96336b94c7f1c0fb7e8c91cecd41ce9942edbeaee121915ca",
+          "fieldSHA256": "eda2a2508a3cfa670ae748d54e3879e53bed8c64266e685ccd0b6eb840566fb6",
+          "nativeGeometrySHA256": "b3face6640ec9cd21dd80e60b0050afe0c6b04f234f4363a4a1c3d6491de5b28"
+        },
+        "scope": "Original component4 source-default surface, raw normals and native organ coordinates; source-specific polynomial partitions, not a completed compact mother.",
+        "functionSemanticsSHA256": "7dc3272d61798ad4da2e6f75acc2b32e7d5bd5d68c8e975dc4976d68d93bc137",
+        "losslessDictionaryEvidence": "qa/system-20261026-1723/component-4/dictionary-source.bin.profile.json",
+        "rootOwnershipReuse": true,
+        "nativeGeometry": {
+          "url": "/src/layers/snapshots/source-native-geometry-4-b3face6640ec9cd2.bin",
+          "bytes": 1523728,
+          "sha256": "b3face6640ec9cd21dd80e60b0050afe0c6b04f234f4363a4a1c3d6491de5b28",
+          "fieldSHA256": "eda2a2508a3cfa670ae748d54e3879e53bed8c64266e685ccd0b6eb840566fb6",
+          "authority": "Original Float32 metre position functions, Float64 affine parameterization; rounded export retained only as parameter domain",
+          "sourceSpecificPartitionRetained": true
+        },
+        "experimentalFastGeometry": true
+      }
+    },
+    {
+      "component": 5,
+      "profile": {
+        "schema": "human.source-native-surface/1",
+        "bounds": {
+          "min": [
+            -44.269534289228666,
+            211.07880378989893,
+            61.280739826434456
+          ],
+          "max": [
+            43.66984086357314,
+            232.29163781174233,
+            123.22344944331856
+          ]
+        },
+        "sourceFidelityAccepted": false,
+        "runtimeBindingAccepted": false,
+        "sourceDerived": true,
+        "defaultLoaded": false,
+        "compactPlanes": true,
+        "visibility": {
+          "sourceMaterialSide": 0,
+          "evidence": "qa/system-20261026-1423/original-visibility-policy.json"
+        },
+        "field": {
+          "url": "/src/layers/snapshots/native-source-functions-5-25cd26e6d7be0446.bin",
+          "bytes": 5339308,
+          "sha256": "25cd26e6d7be0446aefb5a27dbf056be00dedf607904672731bd0299f67b5956",
+          "format": "original-coordinate-affine-functions/1"
+        },
+        "trim": {
+          "url": "/src/layers/snapshots/research-native-component-5-trim-78a290f9e9de70de.bin",
+          "bytes": 1474832,
+          "sha256": "78a290f9e9de70de03215b723b2e2d00db2aea7b17fb8274162560448f72c66a"
+        },
+        "materialInputs": {
+          "url": "/src/layers/snapshots/research-native-component-5-organ-inputs-f36efd4036fe0023.bin",
+          "bytes": 995500,
+          "sha256": "f36efd4036fe0023297e5f172bd42c0d5856d8685f091d74051b7f4badfce0f9",
+          "schema": "human.native-material-input-functions/1",
+          "fieldSHA256": "25cd26e6d7be0446aefb5a27dbf056be00dedf607904672731bd0299f67b5956",
+          "functions": 11312,
+          "channels": 2,
+          "fields": [
+            {
+              "name": "originalOralTypeDepth",
+              "start": 0,
+              "size": 2,
+              "absoluteGoal": 1e-05,
+              "units": "original type and depth metres"
+            }
+          ],
+          "sourceDerived": true,
+          "sourceVertexArrays": false,
+          "sourceConnectivity": false,
+          "runtimeBindingAccepted": false,
+          "sourceFidelityAccepted": false
+        },
+        "acceleration": {
+          "url": "/src/layers/snapshots/source-native-geometry-bvh-5-b8744d701c19ec5e.bin",
+          "bytes": 307376,
+          "sha256": "b8744d701c19ec5ea4c213d48eadaa655c55c91e2dd777bf8ed4040e518942c7",
+          "fieldSHA256": "25cd26e6d7be0446aefb5a27dbf056be00dedf607904672731bd0299f67b5956",
+          "nativeGeometrySHA256": "ec4b948feff7050d8bbc3ce7fdfff1c98155f37e09c4b29cc83c7f1bf5b413ea"
+        },
+        "scope": "Original component5 source-default surface, raw normals and native organ coordinates; source-specific polynomial partitions, not a completed compact mother.",
+        "functionSemanticsSHA256": "70fba62c1eb04a10d32d11c88023bf01cdbfc50dd9d36933a131e990ceb86207",
+        "losslessDictionaryEvidence": "qa/system-20261026-1723/component-5/dictionary-source.bin.profile.json",
+        "rootOwnershipReuse": true,
+        "nativeGeometry": {
+          "url": "/src/layers/snapshots/source-native-geometry-5-ec4b948feff7050d.bin",
+          "bytes": 1447952,
+          "sha256": "ec4b948feff7050d8bbc3ce7fdfff1c98155f37e09c4b29cc83c7f1bf5b413ea",
+          "fieldSHA256": "25cd26e6d7be0446aefb5a27dbf056be00dedf607904672731bd0299f67b5956",
+          "authority": "Original Float32 metre position functions, Float64 affine parameterization; rounded export retained only as parameter domain",
+          "sourceSpecificPartitionRetained": true
+        },
+        "experimentalFastGeometry": true
+      }
+    },
+    {
+      "component": 6,
+      "profile": {
+        "schema": "human.source-native-surface/1",
+        "bounds": {
+          "min": [
+            -34.10132434137183,
+            227.58704364804947,
+            55.61555434909042
+          ],
+          "max": [
+            34.61191428177608,
+            251.6551987415257,
+            124.6229066418916
+          ]
+        },
+        "sourceFidelityAccepted": false,
+        "runtimeBindingAccepted": false,
+        "sourceDerived": true,
+        "defaultLoaded": false,
+        "compactPlanes": true,
+        "visibility": {
+          "sourceMaterialSide": 0,
+          "evidence": "qa/system-20261026-1423/original-visibility-policy.json"
+        },
+        "field": {
+          "url": "/src/layers/snapshots/native-source-functions-6-77e2f84579b0bd88.bin",
+          "bytes": 5339308,
+          "sha256": "77e2f84579b0bd881aeb7e1fc94221011c2ccf1306b621a1940be22376da646e",
+          "format": "original-coordinate-affine-functions/1"
+        },
+        "trim": {
+          "url": "/src/layers/snapshots/research-native-component-6-trim-a7dad1009ebf061e.bin",
+          "bytes": 1474036,
+          "sha256": "a7dad1009ebf061ec0e1a16163511050a2f1ff164d9f8d4643b5274df19d44f9"
+        },
+        "materialInputs": {
+          "url": "/src/layers/snapshots/research-native-component-6-organ-inputs-8dacbb003de151f9.bin",
+          "bytes": 995500,
+          "sha256": "8dacbb003de151f91ab3178eae3d10c5f560a991d24b5feb489525457ad3344e",
+          "schema": "human.native-material-input-functions/1",
+          "fieldSHA256": "77e2f84579b0bd881aeb7e1fc94221011c2ccf1306b621a1940be22376da646e",
+          "functions": 11312,
+          "channels": 2,
+          "fields": [
+            {
+              "name": "originalOralTypeDepth",
+              "start": 0,
+              "size": 2,
+              "absoluteGoal": 1e-05,
+              "units": "original type and depth metres"
+            }
+          ],
+          "sourceDerived": true,
+          "sourceVertexArrays": false,
+          "sourceConnectivity": false,
+          "runtimeBindingAccepted": false,
+          "sourceFidelityAccepted": false
+        },
+        "acceleration": {
+          "url": "/src/layers/snapshots/source-native-geometry-bvh-6-4c2382ca097abc12.bin",
+          "bytes": 307376,
+          "sha256": "4c2382ca097abc129ce1185af9366b0c1210d87c5fdff8ea975f46387b08dc00",
+          "fieldSHA256": "77e2f84579b0bd881aeb7e1fc94221011c2ccf1306b621a1940be22376da646e",
+          "nativeGeometrySHA256": "2810bd00adfe46eb45a7a71db91f7eb989faecc8e1735bf8988e115f45726908"
+        },
+        "scope": "Original component6 source-default surface, raw normals and native organ coordinates; source-specific polynomial partitions, not a completed compact mother.",
+        "functionSemanticsSHA256": "8336889371e1f26cc03371e2eeed602af190b79859d535a2688f96334571fb42",
+        "losslessDictionaryEvidence": "qa/system-20261026-1723/component-6/dictionary-source.bin.profile.json",
+        "rootOwnershipReuse": true,
+        "nativeGeometry": {
+          "url": "/src/layers/snapshots/source-native-geometry-6-2810bd00adfe46eb.bin",
+          "bytes": 1447952,
+          "sha256": "2810bd00adfe46eb45a7a71db91f7eb989faecc8e1735bf8988e115f45726908",
+          "fieldSHA256": "77e2f84579b0bd881aeb7e1fc94221011c2ccf1306b621a1940be22376da646e",
+          "authority": "Original Float32 metre position functions, Float64 affine parameterization; rounded export retained only as parameter domain",
+          "sourceSpecificPartitionRetained": true
+        },
+        "experimentalFastGeometry": true
+      }
+    },
+    {
+      "component": 7,
+      "profile": {
+        "schema": "human.source-native-surface/1",
+        "bounds": {
+          "min": [
+            -22.746683999106178,
+            213.27743651745,
+            41.45752739985325
+          ],
+          "max": [
+            23.79470744839994,
+            237.72036819148454,
+            114.59697977700549
+          ]
+        },
+        "sourceFidelityAccepted": false,
+        "runtimeBindingAccepted": false,
+        "sourceDerived": true,
+        "defaultLoaded": false,
+        "compactPlanes": true,
+        "visibility": {
+          "sourceMaterialSide": 0,
+          "evidence": "qa/system-20261026-1423/original-visibility-policy.json"
+        },
+        "field": {
+          "url": "/src/layers/snapshots/native-source-functions-7-e9286c2731792f63.bin",
+          "bytes": 3443756,
+          "sha256": "e9286c2731792f63048b7f85ff1f297df61c59239c30c9fc0fe093646ff7f462",
+          "format": "original-coordinate-affine-functions/1"
+        },
+        "trim": {
+          "url": "/src/layers/snapshots/research-native-component-7-trim-c7a22c76578f7a99.bin",
+          "bytes": 948664,
+          "sha256": "c7a22c76578f7a991c23741bef55864cec096799df767e0e64baf47fdaf11bc5"
+        },
+        "materialInputs": {
+          "url": "/src/layers/snapshots/research-native-component-7-organ-inputs-ee3555ac15faae9d.bin",
+          "bytes": 642092,
+          "sha256": "ee3555ac15faae9dee57296ec9d2685f6f135d5e9e380f00c46fbe71909b9253",
+          "schema": "human.native-material-input-functions/1",
+          "fieldSHA256": "e9286c2731792f63048b7f85ff1f297df61c59239c30c9fc0fe093646ff7f462",
+          "functions": 7296,
+          "channels": 2,
+          "fields": [
+            {
+              "name": "originalOralTypeDepth",
+              "start": 0,
+              "size": 2,
+              "absoluteGoal": 1e-05,
+              "units": "original type and depth metres"
+            }
+          ],
+          "sourceDerived": true,
+          "sourceVertexArrays": false,
+          "sourceConnectivity": false,
+          "runtimeBindingAccepted": false,
+          "sourceFidelityAccepted": false
+        },
+        "acceleration": {
+          "url": "/src/layers/snapshots/source-native-geometry-bvh-7-28ed76c8f8f6be06.bin",
+          "bytes": 160240,
+          "sha256": "28ed76c8f8f6be066ab196433fb954435cca065cd69a8315cd6d3cfd783c4044",
+          "fieldSHA256": "e9286c2731792f63048b7f85ff1f297df61c59239c30c9fc0fe093646ff7f462",
+          "nativeGeometrySHA256": "f20019cf31192edd41a1840ad3f86debbfd42ecb546c28cb3a3ab1a6f14a7942"
+        },
+        "scope": "Original component7 source-default surface, raw normals and native organ coordinates; source-specific polynomial partitions, not a completed compact mother.",
+        "functionSemanticsSHA256": "fbae0afdad4082a1f1ba70397362223ba815791636cf85718179d4064b5a92dd",
+        "losslessDictionaryEvidence": "qa/system-20261026-1723/component-7/dictionary-source.bin.profile.json",
+        "rootOwnershipReuse": true,
+        "nativeGeometry": {
+          "url": "/src/layers/snapshots/source-native-geometry-7-f20019cf31192edd.bin",
+          "bytes": 933904,
+          "sha256": "f20019cf31192edd41a1840ad3f86debbfd42ecb546c28cb3a3ab1a6f14a7942",
+          "fieldSHA256": "e9286c2731792f63048b7f85ff1f297df61c59239c30c9fc0fe093646ff7f462",
+          "authority": "Original Float32 metre position functions, Float64 affine parameterization; rounded export retained only as parameter domain",
+          "sourceSpecificPartitionRetained": true
+        },
+        "experimentalFastGeometry": true
+      }
+    }
+  ],
+  "functionSemanticsSHA256": "4b387af97ca9213a6075e86cefafa27a76c42d26325970ac86f5643c42675d37",
+  "losslessDictionaryEvidence": "qa/system-20261026-1723/dictionary-skin.bin.profile.json",
+  "queryPolicy": {
+    "componentStrategy": "bounded",
+    "yieldPolicy": "scheduler"
+  },
+  "rootOwnershipReuse": true,
+  "functionSetSemanticsSHA256": "477ec2ffd41e63469b51b22130d870acc7a959c83d84f7efa4f78f425cb2c916",
+  "functionSetSemanticsMembers": [
+    {
+      "id": 0,
+      "field": "8b61f3c306c10ba7cdb4516ac36f27fdfce73d03f6429f3d8514f487a98c8e97",
+      "trim": "e237cae705f3a32939917466ddf2b8d5fe0eea05082a9e6d6fadf161a7d4b06c",
+      "native": "b385aeda1d8130292b92b2456fc5c2296d5893b067061f64c0c10dccae04e217",
+      "geometry": "c28cf521971e43f2f4abb09e00e39384771f64bc207b6745002bfb04f544ba7e",
+      "side": 0
+    },
+    {
+      "id": 1,
+      "field": "b0dcb99b72f23a300e0fd66fd9f3fb973af7fbe2bc540ea8a9a3744518b8f4ce",
+      "trim": "f48efd81931adb896e8e62a5fad9e8d6cf1cdfba3e530fe565651b0e5bba5cd4",
+      "native": "fb4019d18212a5723b08cce219a7643802eeea6be10f6d2d27ff56e33998f8a4",
+      "geometry": "d87939679309134aee78a5836e9520415400c7aa65290d5642704fb5a4c32afa",
+      "side": 0
+    },
+    {
+      "id": 2,
+      "field": "007383c4b865a693a819e2637521e605b6599dae19b0f61419ac428de7dab6dd",
+      "trim": "495905ed056ec88f170591ed1fdde04347368a53358d6e376b0d05769abaca29",
+      "native": "bd6a68d8623575eeea9419dc37cf591e803e41a526fb9701ab77347cad967bc3",
+      "geometry": "c01cc1d6341329312e7f32e97f172e542cb4a4a4376243adc64c9a936283b77a",
+      "side": 0
+    },
+    {
+      "id": 3,
+      "field": "8227068f7a6a7c58f3076ce836fc85b02bfdc932bc8e880cc7d9d67c0c23463d",
+      "trim": "c47dc5fe21e61276f13aa0ccfa0a7ea29943efc1d8236ee8f069ca8489e74a15",
+      "native": "f837242603f0598b4076fd24c7e5822d7985589705c87b664bcc8b8ada021c4f",
+      "geometry": "624f60fe0a93977daaf0790158f33b9c111f39c09cbb449ab830cf4b789313e1",
+      "side": 0
+    },
+    {
+      "id": 4,
+      "field": "eda2a2508a3cfa670ae748d54e3879e53bed8c64266e685ccd0b6eb840566fb6",
+      "trim": "5f2a83288dc07d59f983129c650f19596eab116c16a3dda7387b3e401b164d60",
+      "native": "5486174307b33f98b406a728253e42483ff94280807e8bf9a655ac32d789005e",
+      "geometry": "b3face6640ec9cd21dd80e60b0050afe0c6b04f234f4363a4a1c3d6491de5b28",
+      "side": 0
+    },
+    {
+      "id": 5,
+      "field": "25cd26e6d7be0446aefb5a27dbf056be00dedf607904672731bd0299f67b5956",
+      "trim": "78a290f9e9de70de03215b723b2e2d00db2aea7b17fb8274162560448f72c66a",
+      "native": "f36efd4036fe0023297e5f172bd42c0d5856d8685f091d74051b7f4badfce0f9",
+      "geometry": "ec4b948feff7050d8bbc3ce7fdfff1c98155f37e09c4b29cc83c7f1bf5b413ea",
+      "side": 0
+    },
+    {
+      "id": 6,
+      "field": "77e2f84579b0bd881aeb7e1fc94221011c2ccf1306b621a1940be22376da646e",
+      "trim": "a7dad1009ebf061ec0e1a16163511050a2f1ff164d9f8d4643b5274df19d44f9",
+      "native": "8dacbb003de151f91ab3178eae3d10c5f560a991d24b5feb489525457ad3344e",
+      "geometry": "2810bd00adfe46eb45a7a71db91f7eb989faecc8e1735bf8988e115f45726908",
+      "side": 0
+    },
+    {
+      "id": 7,
+      "field": "e9286c2731792f63048b7f85ff1f297df61c59239c30c9fc0fe093646ff7f462",
+      "trim": "c7a22c76578f7a991c23741bef55864cec096799df767e0e64baf47fdaf11bc5",
+      "native": "ee3555ac15faae9dee57296ec9d2685f6f135d5e9e380f00c46fbe71909b9253",
+      "geometry": "f20019cf31192edd41a1840ad3f86debbfd42ecb546c28cb3a3ab1a6f14a7942",
+      "side": 0
+    }
+  ],
+  "nativeGeometry": {
+    "url": "/src/layers/snapshots/source-native-geometry-0-c28cf521971e43f2.bin",
+    "bytes": 55497360,
+    "sha256": "c28cf521971e43f2f4abb09e00e39384771f64bc207b6745002bfb04f544ba7e",
+    "fieldSHA256": "8b61f3c306c10ba7cdb4516ac36f27fdfce73d03f6429f3d8514f487a98c8e97",
+    "authority": "Original Float32 metre position functions, Float64 affine parameterization; rounded export retained only as parameter domain",
+    "sourceSpecificPartitionRetained": true
+  },
+  "previousFunctionSetSemanticsSHA256": "42ccc0bd0f2830fb3af0e567083a590dfdc3999e6c8bd10ca9c38570cc231d6b",
+  "geometryAuthority": "original-native-position-functions",
+  "archiveCompatibilitySemanticsSHA256": [
+    "42ccc0bd0f2830fb3af0e567083a590dfdc3999e6c8bd10ca9c38570cc231d6b",
+    "2564025ab81fce9c55f7de289e9136698e647e2ec6a908c55c36791557468622",
+    "b76243d1ea20fd7a7763db4e51449ffcae383b9bedd83422ba0cb3ce9c4e9502",
+    "0df5081f689b23dc81e56ea9e35deadd26fd5e44205fcebb3a9c36e5ad19bfab"
+  ],
+  "archiveCompatibilityEvidence": "qa/system-20261027-0654-skin-off/all-head-material-sharing-proof.json",
+  "experimentalOriginalEyeOff": true,
+  "experimentalOriginalEyeOffAccepted": false,
+  "experimentalNativeFunctionShadows": true,
+  "experimentalNativeFunctionShadowsAccepted": false,
+  "experimentalFunctionMSAA": true,
+  "experimentalFunctionMSAAAccepted": false,
+  "experimentalIdenticalMaterialChannels": true,
+  "experimentalIdenticalMaterialChannelsAccepted": false,
+  "experimentalFastGeometry": true,
+  "fastGeometryScope": "Experimental source-identical direct intersection; early original face culling, pending multi-view equivalence and speed validation."
+}

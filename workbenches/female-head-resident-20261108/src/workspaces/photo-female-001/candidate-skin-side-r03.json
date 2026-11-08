@@ -1,0 +1,97 @@
+{
+  "schema": "human.photo-female-001.procedural-skin/1",
+  "accepted": false,
+  "reference": "Vitaly Gariev, Pexels 36763373",
+  "referenceSHA256": "0b76772023ecb6e67f63b1542bcea77cf046cc21d201eef63789adbc67c7d488",
+  "generatedHairRemovalSHA256": "d629a4533a9da8063045378b9296c38cd27f351611dd91ea9d45bf28d8a1c312",
+  "shapeAtFit": {
+    "cheekNegative": -2,
+    "cheekPositive": -2,
+    "jawNegative": -5,
+    "jawPositive": -5,
+    "chinLength": -0.6,
+    "chinWidth": -15,
+    "chinDrop": 1.2,
+    "upperLidNegative": 2,
+    "upperLidPositive": 2,
+    "lowerLidNegative": 1,
+    "lowerLidPositive": 1,
+    "eyeWidthNegative": 1.4,
+    "eyeWidthPositive": 1.4,
+    "eyeSizeNegative": 4,
+    "eyeSizePositive": 4,
+    "noseBridgeWidth": -4,
+    "noseAlarWidth": 2,
+    "mouthWidth": 7,
+    "upperLipEdge": 1.8,
+    "lowerLipEdge": -1.8
+  },
+  "coefficientProvenance": "Original 384 front functions preserved as separate group; 512 side functions fitted conservatively to chromaticity of r13 rendered images from two generated side guesses. No side photo from the actual person; luminance not fitted.",
+  "field": "Two independently normalized sets of normal-gated compact Gaussian scalar fields in source skin coordinates. No image lookup in function mode.",
+  "centresCount": 896,
+  "groups": {
+    "front": 384,
+    "generatedSide": 512
+  },
+  "grid": {
+    "minimum": [
+      -96.0,
+      200.0,
+      -48.0
+    ],
+    "stepMM": 8.0,
+    "dimensions": [
+      23,
+      25,
+      25
+    ],
+    "maximumCandidates": 65
+  },
+  "files": {
+    "parameters": {
+      "file": "female-skin-side-r03-kernels.f32",
+      "bytes": 43008,
+      "sha256": "fc2e42a5d71625a315a4316afaccff698cdf9727fb215978c5a642f77e73ddaa"
+    },
+    "cells": {
+      "file": "female-skin-side-r03-cells.f32",
+      "bytes": 115000,
+      "sha256": "ce32cf63edbe9e004ed47d668983ad126f6fa104942997d5d241f08374b64ccc"
+    },
+    "indices": {
+      "file": "female-skin-side-r03-index.f32",
+      "bytes": 669512,
+      "sha256": "e233c8ea4bde5c852e053583f6cd7b36a8ce570e8403ae9026e9fe669d536742"
+    }
+  },
+  "fit": {
+    "eligiblePixelsByView": {
+      "75": 19152,
+      "-75": 11286
+    },
+    "samples": 25286,
+    "trainSamples": 21072,
+    "heldoutSamples": 4214,
+    "heldoutLogChromaResidual": {
+      "median": 0.013964747078716755,
+      "p95": 0.04014579951763153,
+      "max": 0.08944641053676605
+    },
+    "trainingLogChromaResidual": {
+      "median": 0.014116661623120308,
+      "p95": 0.039631497114896774,
+      "max": 0.2127644419670105
+    },
+    "coefficientRange": [
+      -0.1626972258090973,
+      0.10856016725301743
+    ],
+    "heldoutMeaning": "Random pixels from the same generated-side projections, not independent photographs"
+  },
+  "limitations": [
+    "Side views are synthesized estimates from a single front photo",
+    "Only local chromaticity was fitted; specular, luminance and true albedo remain unmeasured",
+    "Small-scale procedural relief and pigmentation are not matching the projection one for one",
+    "No geometry, eye or ear correspondence acceptance"
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "schema": "human.function-noise-variable-contract/1",
+  "authority": "Explicit user direction on 2026-10-23; applies to the intended whole character system",
+  "status": "Binding architecture; user broadly accepts form, current candidate strict source fidelity remains pending",
+  "threeElements": {
+    "functions": "Shared mother system: continuous surfaces, anatomical relationships, deformation, expression, motion, attachment and material response are evaluated by mathematical functions.",
+    "variables": "A person is an instance of the shared functions with different parameters. Identity, proportions, feature shape, skin properties, variation seeds, pose, expression, time and state are variables, rather than a separately authored character mesh or image set.",
+    "noise": "Procedural multiscale variation supplies surface texture, grain and material variation, controlled by variables and constrained by the anatomical/material functions."
+  },
+  "conceptualEvaluation": "Person = MotherFunctions(position or chart coordinates, personVariables, proceduralNoise(coordinates, seed), time/state)",
+  "shapeAndRendering": {
+    "authoritativeShape": "Continuous parameterized or implicit surface functions and their variables",
+    "surfaceVisibility": "Direct numerical ray/surface intersection; do not convert the character surface into triangle or quad tessellation as the final rendering route",
+    "parameterSurfacesAllowed": true,
+    "implicitSurfacesAllowed": true,
+    "sdfMandatory": false,
+    "noClosedFormPromise": "Numerical iteration and tolerances are compatible with mathematical functions; do not promise exact closed-form intersections for the whole character.",
+    "engineBoundary": "Display-engine scheduling, screen-sized dispatch carriers, temporary acceleration bounds and caches are implementation mechanisms. They must not become an authoritative polygonal character shape."
+  },
+  "materialAndNoise": {
+    "generation": "Pigment variation, skin grain, pores, roughness/oil variation and related surface qualities are procedural function/noise evaluations with parameters, rather than character-specific imported image textures.",
+    "anatomicalConstraint": "Noise does not replace skull, facial features, ears, cavities or larger anatomical structure. Their shape and relationships belong to the mother functions and variables.",
+    "separateResponses": "Pigment, geometric relief, roughness/oil and scattering retain separate function/variable responsibilities.",
+    "stability": "Use deterministic seeds and stable surface/material coordinates so variation remains attached during pose and expression changes.",
+    "currentLimitations": "Analytical shading direction only; no microdisplaced silhouette or self-occlusion; Screen-space approximation; not full volumetric/random-walk scattering"
+  },
+  "fittingAndMigration": {
+    "offlineReference": "Existing models and images may be inspected or sampled as reconstruction references under the user's earlier instruction.",
+    "fittedVariables": "Spline coefficients and other genuine surface-function parameters can be variables; their source derivation remains recorded.",
+    "noDisguisedMesh": "Do not relabel inherited per-vertex XYZ arrays and face connectivity as variables and claim this completes the function-only architecture.",
+    "controlPreservation": "Preserve current parameter values, meanings and observable effects during migration; no silent loss of saved adjustments.",
+    "quality": "Function/noise/variable structure does not itself certify matching shape, realistic appearance, stable intersections or acceptable speed. Verify each with real rendering.",
+    "originalDataOneForOneRequired": true,
+    "noAutonomousApproximation": "No unapproved simplification, smoothing, layer merging, thickening, hole filling, guessed primitive substitution, structure deletion or tolerance relaxation. Reproduce source one for one first; only then apply person parameter logic.",
+    "acceptanceOrder": "Freeze source and state; preserve layered surface and boundaries; express functions from source data; validate positions, normals, curvature and first-hit visibility in matched views; then enable parameter variation.",
+    "authoritativeRule": "../AGENTS.md and RECONSTRUCTION-RULES.md; explicit user direction 2026-10-23"
+  },
+  "scopeOfThisWindow": "Head reconstruction; body work remains assigned to the other window",
+  "supersedes": "The earlier HEAD-PLAN.json proposal to generate disposable display tessellation from the character surface",
+  "currentCandidate": {
+    "name": "R04",
+    "originalFormAccepted": false,
+    "sourceDerived": true,
+    "representation": "Original eight connected surfaces evaluated through separate source-derived polynomial branches; original neck boundary constrained directly; remaining local open-edge differences explicitly unaccepted; direct numerical intersection with no source vertex/index runtime data",
+    "artistPrimitiveSubstitutions": 0,
+    "smoothing": 0,
+    "sourceRuntimeVertexData": false,
+    "sourceRuntimeConnectivity": false,
+    "controlMigrationComplete": false,
+    "functionCharts": 58,
+    "sourceOriginalComponents": 8,
+    "sourceFidelityAccepted": false,
+    "materialStage": "Thirteen-region procedural skin; source eye and oral coordinates/functions; restored original EB1 scene; full source optical transport incomplete",
+    "personVariableSchema": "human.function-person/2",
+    "liveShapeVariationEnabled": false,
+    "sourceControlBindingValidated": false,
+    "sourceDefaultPreset": "P01",
+    "portedPureHeadControlFunctions": 38,
+    "scope": "Saved published R04 main; research candidate below has separate code and numerical caches"
+  },
+  "currentImplementationEvidence": "DELIVERY.json",
+  "lastHeadIteration": {
+    "dateUTC": "2026-10-27T05:15:34.396523+00:00",
+    "record": "qa\\system-20261027-0219-eye-off\\RUN.json",
+    "architectureUnchanged": "functions + variables + procedural noise; direct mathematical intersection",
+    "characterTriangles": 0,
+    "sourceDerivedResearch": true,
+    "sourceSpecificPartitionRetained": true,
+    "independentCompactSharedMotherAccepted": false,
+    "sourceFidelityAccepted": false,
+    "liveNativeShapeControls": false,
+    "originalEyeOFFImplementedInIsolatedCandidate": true,
+    "originalEyeOFFVisualAcceptance": false,
+    "headOnlyFunctionShadowsExperimental": true,
+    "eyeRegionMultisamplingExperimental": true,
+    "remainingMajorBlocks": 7
+  },
+  "researchNativeCandidate": {
+    "build": "BUILD-NATIVE-CANDIDATE.json",
+    "url": "http://127.0.0.1:8911/",
+    "sourceDefaultPreset": "P01",
+    "sourceComponents": 8,
+    "sourceSpecificPolynomialModels": 511877,
+    "sourceProvenancePreserved": true,
+    "originalNativePositionGeometry": true,
+    "originalHeadSkinFragment": true,
+    "shapeVariableGate": false,
+    "sourceFidelityAccepted": false,
+    "sharedCompactMotherAccepted": false,
+    "experimentalEyeOFF": "http://127.0.0.1:8911/?eyeOff=msaa-research"
+  }
+}
