@@ -105,3 +105,7 @@ Canonical policy: `haihao0307/guilin-dem-pipeline@48254a81b95d1f28b0d85740668f3f
 
 ### Reference-First / First-Look Gate
 所有可见对象的第一轮工作台必须 reference 与 candidate 同屏；identity / 大轮廓 / 比例没有通过以前，不得进入微观细节。Production Mother 不负责重新规划，只执行 Coordinator 冻结的 reference + task。用户默认只看当前 standalone HTML 和 reference-vs-candidate 结果。Canonical R4.2: `haihao0307/guilin-dem-pipeline@48254a81b95d1f28b0d85740668f3f94cebda1b8:knowledge/MOTHER_PARALLEL_COVERAGE_EXECUTION_R4_ZH.md`。
+
+## 2026-11-08 用户版本保留要求
+
+当前分支的海鸥工作台只保留 R014 当前版和 R013 一个历史对照版。更早完整交付目录及专用工作流不再驻留；当前人物、Animal Atlas 功能与必需源码/数据依赖保留。此要求覆盖此前完整历史副本保留约定；旧内容可从 Git 提交历史查询。

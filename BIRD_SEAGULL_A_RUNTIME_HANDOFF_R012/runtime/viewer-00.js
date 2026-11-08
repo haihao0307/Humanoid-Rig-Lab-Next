@@ -1,1 +1,0 @@
-document.write('<script src="./runtime/viewer-chunk-00.js"></script><script src="./runtime/viewer-chunk-01.js"></script><script src="./runtime/viewer-chunk-02.js"></script><script src="./runtime/viewer-chunk-03.js"></script>');
