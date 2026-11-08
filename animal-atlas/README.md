@@ -115,7 +115,7 @@ runtime.resume();
 - [guilin-dem-pipeline](https://github.com/haihao0307/guilin-dem-pipeline/tree/work/kaopu-mammal-r06-cat-dog-integration-20260930)：K5 哺乳动物与 K4 四足动物谱，固定提交 `748f8793ea7ca84c30a2c441b6a63ce5c95ce13a`。
 - 本机 FiveSpecies Full Project 最新独立工作台快照：猪 V3.5、田园犬 V3.3、狸花猫 / 斑鸠 V3.6、鲨鱼。对应 `assets/life-*.html`。
 
-具体原始与适配后 SHA256、来源说明、构建时间和成品指纹保存在 `SOURCE_MANIFEST.json`。原动物文件的作者、参考模型、许可和声明均保留在各自完整 HTML 中；集成不会改变它们。`assets/chicken-r91.html` 是探索阶段保存的旧快照，不参加构建，实际使用的是 R9.8.4。
+具体原始与适配后 SHA256、来源说明、构建时间和成品指纹保存在 `SOURCE_MANIFEST.json`。原动物文件的作者、参考模型、许可和声明均保留在各自完整 HTML 中；集成不会改变它们。2026-11-08 清理了不参加构建的探索旧快照 `assets/chicken-r91.html`；原字节仍可从提交 `fda12bf2fe0262e4d02f1b08508128d17959e0c8` 恢复。当前实际使用的 R9.8.4（`assets/chicken.html`）和构建输入保持不变。
 
 `vendor/three*.js` 为 Three.js r180（MIT）；测试用 GLTFLoader 与 BufferGeometryUtils 来自 [Three.js 官方 r180](https://github.com/mrdoob/three.js/tree/r180/examples/jsm)。其余 `vendor/mammal` / `vendor/quad` 是上述提交的原始动物引擎和谱。没有为平台额外下载第三方动物模型。
 
