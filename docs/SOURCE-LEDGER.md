@@ -71,7 +71,7 @@ BodyFieldPagesR22 仅省去缺省值完全同位的砖块，保留所有非缺�
 
 ## R23：无损载体和原皮纹函数
 
-来源几何和身体数值系数未改。原貌函数包从内嵌 base64 改为当前状态字段；完整参数包改为原 gzip 字节，压缩及解压后均校验。源码、字段和 shader 等价检查见 qa/fidelity-r23/release-integrity.json。
+来源几何和身体数值系数未改。原貌函数包从内嵌 base64 改为当前状态字段；完整参数包改为原 gzip 字节，压缩及解压后均校验。源码、字段和 shader 等价检查见 https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/7a823ce9f59bfabe4d82ba9f444deb09617fae77/qa/fidelity-r23/release-integrity.json。
 
 原项目 SkinGraphKernel.js 的冻结副本保存在 src/source-r23/BodySkinGraphKernel.js，哈希与原 R07 一致；seed=731 等变量见 data/body-skin-recipe-r23.json。三个完整 RGBA 场及凹陷 R 通道的 12 级字段逐字节重建通过。凹陷缓存其余 GBA 原附加内容未声称独立再生。缓存可重建不代表身体来源分区、形态与绑定数据已经自主。
 

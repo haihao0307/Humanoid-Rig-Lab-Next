@@ -22,7 +22,7 @@
 
 研究页另接入原 A 驱动的躯干和左上臂两个旋转控制。三组不同胖瘦、肌肉和动作的原版样本在所选身体分区的位置与显示法线逐位一致，见 [torso-posed-native.json](../qa/p1-torso/torso-posed-native.json)。这只覆盖所测组合，不代表所有动作、关节连接或动作自然度通过。
 
-中间选区将手部截成独立碎片；扩大到当前范围后，原人物选区的来源连接由三个部分变为一个，见 [torso-scope-connectivity.json](../qa/p1-torso/torso-scope-connectivity.json)。这只说明进入人物的选区连接，不代表动作连接已验收。颈部处理、范围外身体、皮肤、完整控制与档案尚未接入。先前使用几何法线的候选出现明显棱面，未被选用，保留在 [研究快照](../qa/p1-torso/research-snapshots/torso-study-flat-8b36fdc94e52.html.gz)。当前候选仍需更多参数、边界和首交核对，以及同机位视觉验收，不能由样本算术一致推断整身或一比一验收通过。
+中间选区将手部截成独立碎片；扩大到当前范围后，原人物选区的来源连接由三个部分变为一个，见 [torso-scope-connectivity.json](../qa/p1-torso/torso-scope-connectivity.json)。这只说明进入人物的选区连接，不代表动作连接已验收。颈部处理、范围外身体、皮肤、完整控制与档案尚未接入。先前使用几何法线的候选出现明显棱面，未被选用，保留在 [研究快照](https://github.com/haihao0307/Humanoid-Rig-Lab-Next/blob/7a823ce9f59bfabe4d82ba9f444deb09617fae77/qa/p1-torso/research-snapshots/torso-study-flat-8b36fdc94e52.html.gz)。当前候选仍需更多参数、边界和首交核对，以及同机位视觉验收，不能由样本算术一致推断整身或一比一验收通过。
 
 下一步颈口缺口已有具体范围：基准原身体的 18416 个来源分区中，当前选区之外有 874 个；其中 446 个显示法线输出涉及颈部修正或头侧依赖，另外 428 个没有观察到这些法线依赖。这个分类只用于定位依赖，不代表后者的位置、边界或外观已经通过，见 [neck-dependency-gap.json](../qa/p1-torso/neck-dependency-gap.json)。
 

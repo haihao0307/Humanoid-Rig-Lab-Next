@@ -4,35 +4,22 @@
   "currentBuild": "BUILD.json",
   "delivery": "DELIVERY.json",
   "route": "EXECUTION-ROUTE.md",
-  "status": "R40 已接入皮肤样式和动作中调节，并优化皮肤数据复用及阴影检查；更多设备、动作与整体平台仍未完成。",
+  "status": "R41 已接入平地接触、行走及有限胶囊避让；项目及视觉整体验收仍未完成。",
   "hardStopUTC": "2026-10-29T05:03:56Z",
   "headBoardUntouched": true,
   "noCharacterTriangles": true,
   "latestCheckpointUTC": "2026-10-29T03:43:40.918Z",
-  "stage": "P4 皮肤与实际性能",
-  "stageStatus": "皮肤控件、样式往返及保守性能优化已完成本轮检查；实际外观和其他设备仍需观察。",
+  "stage": "P2.4 动作与接地",
+  "stageStatus": "当前交付范围以 DELIVERY.json 和 BODY-ROADMAP.json 为准。",
   "projectComplete": false,
   "latestAuditUTC": "2026-10-29T03:43:40.918Z",
-  "latestAudit": "docs/SURFACE-R40.md",
+  "latestAudit": "docs/BODY-R41.md",
   "nextPriority": "继续按固定 P1～P5 路线处理极端体型动作、旧档细节和平台联动；根据实际设备表现继续优化性能。",
   "latestAuditChangedProduct": true,
-  "previousPhaseHardStopUTC": "2026-10-23T08:21:00Z",
   "stageStartedUTC": "2026-10-29T02:03:56Z",
-  "previousR24Task": {
-    "stageStartedUTC": "2026-10-25T02:21:04Z",
-    "hardStopUTC": "2026-10-25T05:21:04Z",
-    "closedUTC": "2026-10-25T05:15:00Z",
-    "synchronizedCommit": "7be63a50e7a0247f204cdcba94a1bf3dacc0b501",
-    "projectComplete": false
-  },
-  "workingBuild": "BUILD-SOURCE-R40.json",
-  "workingViewer": "http://127.0.0.1:8914/workbench?v=R40-5695d6dc",
-  "previousTask": {
-    "stageStartedUTC": "2026-10-24T09:00:50Z",
-    "hardStopUTC": "2026-10-24T12:00:50Z",
-    "status": "R23 checked working candidate; source fidelity and whole body reconstruction remain incomplete"
-  },
-  "companionBuild": "BUILD-R40.json",
+  "workingBuild": "BUILD-SOURCE-R41.json",
+  "workingViewer": "http://127.0.0.1:8914/workbench",
+  "companionBuild": "BUILD-R41.json",
   "remaining": [
     {
       "id": "P1",
@@ -60,131 +47,25 @@
       "task": "头身接口、附件与平台整合"
     }
   ],
-  "previousSelectedBuild": "BUILD-SOURCE-R22.json",
-  "previousCheckpointUTC": "2026-10-24T11:04:58.167Z",
   "lastVerifiedCodeCommit": null,
   "currentIterationProjectComplete": false,
   "githubSyncBranch": "body/reconstruction-r18-20261023",
-  "previousR25Task": {
-    "stageStartedUTC": "2026-10-25T05:18:45Z",
-    "hardStopUTC": "2026-10-25T08:18:45Z",
-    "synchronizedCommit": "fa443d27b2f8837cc8c6cb41120022098fa10ef8",
-    "projectComplete": false
-  },
-  "previousR26Task": {
-    "stageStartedUTC": "2026-10-25T08:52:05Z",
-    "hardStopUTC": "2026-10-25T11:52:05Z",
-    "synchronizedCommit": "352b64d94a79286fe3ad2cfffe682f25dbd03c67",
-    "projectComplete": false
-  },
-  "previousR27Task": {
-    "stageStartedUTC": "2026-10-25T11:43:16Z",
-    "hardStopUTC": "2026-10-25T14:43:16Z",
-    "synchronizedCommit": "c17211a3232018dbb14a7285ff3a89971d849d64",
-    "projectComplete": false
-  },
   "researchBuild": "BUILD-POSE-R29.json",
-  "previousR28Task": {
-    "stageStartedUTC": "2026-10-26T14:28:09Z",
-    "hardStopUTC": "2026-10-26T17:28:09Z",
-    "synchronizedCommit": "eded232b066e7d410b518641e3ff9517a2152434",
-    "projectComplete": false
-  },
-  "historicalDeliveryRemainingR29": [
-    {
-      "priority": 0,
-      "status": "partial",
-      "task": "任意连续体型、颈头变量和 B 开启原姿态修正的连续响应未完成；原连续皮肤、动态阴影及完整来源/视觉验收未完成。"
-    },
-    {
-      "priority": 1,
-      "status": "partial",
-      "task": "胸肩、腰腹、骨盆整体体量、中性校准和骨架/软组织分离未完成；原胖瘦与骨架参数耦合仍保留。"
-    },
-    {
-      "priority": 2,
-      "status": "partial",
-      "task": "严格模板的四肢及根关节/脊柱连续原响应已接入；全范围关节、手足细节及全部极端和组合变形仍未验收。"
-    },
-    {
-      "priority": 3,
-      "status": "incomplete",
-      "task": "自主母体及形态、绑定逐区替换未完成；来源分区、函数校准和边界支撑关系仍保留。"
-    },
-    {
-      "priority": 4,
-      "status": "partial",
-      "task": "已缩减新路径核心系数、接通后台整帧核对；全系统局部更新、全部显存/缓存优化、完整散射与跨场景验收未完成。"
-    },
-    {
-      "priority": 5,
-      "status": "partial",
-      "task": "完整人物和未知字段保留，已知头侧不匹配状态明确退出严格路径；任意头部提供方、附件与总平台整合未完成。独立头部项目未修改。"
-    }
-  ],
   "roadmap": "BODY-ROADMAP.json",
-  "currentMainTask": "P4",
-  "currentSubtask": "P4.2",
-  "routeReview": {
-    "date": "2026-10-27",
-    "file": "docs/ROUTE-REVIEW-R29.md",
-    "documentationOnly": true,
-    "productVersionUnchanged": "R29",
-    "mainTasksAccepted": 0
-  },
-  "previousR29Task": {
-    "stageStartedUTC": "2026-10-26T17:17:52Z",
-    "hardStopUTC": "2026-10-26T20:17:52Z",
-    "synchronizedCommit": "de9c6939b88fdda931076b2d0c72f48bfa40d2e2",
-    "projectComplete": false
-  },
+  "currentMainTask": "P2",
+  "currentSubtask": "P2.4",
   "supportStudyBuild": "BUILD-SUPPORT-P1.json",
   "torsoStudyBuild": "BUILD-TORSO-P1.json",
-  "previousR30Task": {
-    "stageStartedUTC": "2026-10-27T02:29:24Z",
-    "hardStopUTC": "2026-10-27T05:29:24Z",
-    "projectComplete": false
-  },
-  "lastVerifiedBuildHash": "5695d6dc3dab2d8a09d459e4a77c0e91d7a6004aa388bea9972a74aed41e6c5f",
-  "previousR33Task": {
-    "stageStartedUTC": "2026-10-28T02:53:51Z",
-    "hardStopUTC": "2026-10-28T05:53:51Z",
-    "currentMainTask": "P2",
-    "currentSubtask": "P2.edge",
-    "lastVerifiedBuildHash": "d27ef85f88b43dcf4b46056b085df10f74947feb58bc8ee783341bc61d0a29bb"
-  },
-  "previousR35Task": {
-    "stageStartedUTC": "2026-10-28T03:40:32Z",
-    "hardStopUTC": "2026-10-28T06:40:32Z",
-    "latestCheckpointUTC": "2026-10-28T04:40:48.148Z",
-    "workingViewer": "http://127.0.0.1:8914/workbench?v=R35-64b5967b"
-  },
+  "lastVerifiedBuildHash": "18e148e056f56ff98e755c2e720920a06fd726204b468c09682b4fc68596fd1f",
   "remainingSpecific": [
     "P1：胸肩、腰腹和骨盆的体型响应，以及骨架支撑与软组织的分离仍需完善",
-    "P2：A、B 极端体型下的髋部及其他关节自然变形、脚部接地、步态和碰撞尚未完成",
-    "P3：旧档专用手指、脚部细节及旧档改形与新腰腹柔化的叠加尚未完成",
-    "P4：重复绘制的少量像素波动尚未定位；更多体型、动作、设备和场景、加载与播放性能、完整物理体积散射仍需推进",
+    "P2：R41 已接入平地接触、行走及有限胶囊避让；完整软组织接触、复杂地形、跳跑转弯和任意场景碰撞未完成",
+    "P3：旧档专用手指、脚部细节及旧档改形与腰腹柔化的完整叠加仍需适配",
+    "P4：更多体型、动作、设备和场景的实际外形及性能，以及完整物理体积散射仍需推进",
     "P5：独立头部、附件跟随和完整人物总平台尚未实际联调"
   ],
-  "previousR37Task": {
-    "stageStartedUTC": "2026-10-28T06:41:00Z",
-    "hardStopUTC": "2026-10-28T09:41:00Z",
-    "latestCheckpointUTC": "2026-10-28T08:20:11.788Z",
-    "workingViewer": "http://127.0.0.1:8914/workbench?v=R37-875e7891",
-    "lastVerifiedBuildHash": "875e78912e2c59198a9c3ad5a86f29ec2b96d4c3dfb7f3381753a5c14b71e3c1"
-  },
-  "previousR38Task": {
-    "stageStartedUTC": "2026-10-28T08:26:33Z",
-    "hardStopUTC": "2026-10-28T11:26:33Z",
-    "latestCheckpointUTC": "2026-10-28T10:12:58.814Z",
-    "workingViewer": "http://127.0.0.1:8914/workbench?v=R38-e76a96a8",
-    "lastVerifiedBuildHash": "e76a96a838c0b4a256a410f9726d842dd93e5141a25550f9940671c7ddaaf74a"
-  },
-  "previousR39Task": {
-    "stageStartedUTC": "2026-10-28T10:20:13Z",
-    "hardStopUTC": "2026-10-28T13:20:13Z",
-    "latestCheckpointUTC": "2026-10-28T11:29:18.931Z",
-    "workingViewer": "http://127.0.0.1:8914/workbench?v=R39-0f02990f",
-    "lastVerifiedBuildHash": "0f02990fe7254dd83bfb4a663ea1cd2dc46456cb31aa0c5e0d4ed2b17f862bf4"
+  "retainedVersions": {
+    "current": "R41",
+    "comparison": "R40"
   }
 }

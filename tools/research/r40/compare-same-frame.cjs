@@ -4,7 +4,7 @@
 const fs=require('fs'),{replace}=require('../r32/render-integration.cjs'),{patch}=require('./patch-skin-mrt.cjs');
 const {chromium}=require(process.env.BODY_PLAYWRIGHT_PATH||'C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 const ready=p=>p.waitForFunction(()=>bodyImplicitR02?.report().ready&&!bodyImplicitR02.report().busy,null,{timeout:300000});
-let dynamic=patch(fs.readFileSync(JSON.parse(fs.readFileSync('BUILD-STUDY-R39.json','utf8')).file,'utf8'));
+let dynamic=patch(fs.readFileSync(JSON.parse(fs.readFileSync('build-inputs/r40/BUILD-STUDY-R39.json','utf8')).file,'utf8'));
 let hook=`testMaterialsR40(){
  if(!mrtEnabled||!surface||!lastCamera)throw Error('皮肤对照尚未就绪');
  const keep=skin,legacy=program(vertex,makeFragment(pack.fragment)),savedPrecise=lastPrecise;

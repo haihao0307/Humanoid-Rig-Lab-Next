@@ -1,9 +1,9 @@
 'use strict';
 // R40 candidates are isolated from the active R39 page until validated.
 const fs=require('fs'),path=require('path'),crypto=require('crypto'),{replace}=require('../r32/render-integration.cjs'),{patch}=require('./patch-skin-mrt.cjs'),boot=require('./patch-boot-handoff.cjs'),read=f=>fs.readFileSync(f,'utf8'),json=f=>JSON.parse(read(f)),hash=s=>crypto.createHash('sha256').update(s).digest('hex');
-const sourceBase=json('BUILD-SOURCE-R39.json'),skinFields=read('src/BodySkinFieldsR24.js'),sharedSkinFields=read('src/research/r40/BodySkinFieldsR40.js');
+const sourceBase=json('build-inputs/r40/BUILD-SOURCE-R39.json'),skinFields=read('src/BodySkinFieldsR24.js'),sharedSkinFields=read('src/research/r40/BodySkinFieldsR40.js');
 let source=replace(read(sourceBase.file),skinFields,sharedSkinFields);source=replace(source,'<title>身体 R35','<title>身体 R40');const sourceFile='delivery/身体_R40_固定皮肤候选.html';fs.writeFileSync(sourceFile,source);
-let dynamic=read(json('BUILD-STUDY-R39.json').file);
+let dynamic=read(json('build-inputs/r40/BUILD-STUDY-R39.json').file);
 // This shader experiment is kept isolated: it currently differs from the
 // retained material in some same-frame pixel and layer comparisons.
 if(process.env.BODY_R40_EXPERIMENTAL_MRT==='1')dynamic=patch(dynamic);
@@ -15,7 +15,7 @@ dynamic=replace(dynamic,read('src/research/r37/BodyShadowValidationR37.js'),read
 dynamic=replace(dynamic,"let motionValidation=null;if(kind==='motion-r37')try{motionValidation=BodyShadowValidationR37.create(gl);","let motionValidation=null;try{motionValidation=BodyShadowValidationR37.create(gl);");
 dynamic=replace(dynamic,"validationMethod:motionValidation?'gpu-reduction':'full-readback',dimensions","validationMethod:motionValidation?'gpu-reduction':'full-readback',validationReadbacks:motionValidation?.report?.().lastReadbacks??null,dimensions");
 dynamic=replace(dynamic,'<title>身体 R39','<title>身体 R40');const dynamicFile='delivery/身体_R40_皮肤候选.html';fs.writeFileSync(dynamicFile,dynamic);
-let work=read(json('BUILD-R39.json').file);work=replace(work,'身体_R39_动作与连续变形.html','身体_R40_皮肤候选.html',2);work=replace(work,path.basename(sourceBase.file),path.basename(sourceFile),3);work=replace(work,sourceBase.sha256,hash(source));work=replace(work,'<title>人物身体 R39','<title>人物身体 R40');work=work.replace('BODY STUDY / R39','BODY STUDY / R40');
+let work=read(json('build-inputs/r40/BUILD-R39.json').file);work=replace(work,'身体_R39_动作与连续变形.html','身体_R40_皮肤候选.html',2);work=replace(work,path.basename(sourceBase.file),path.basename(sourceFile),3);work=replace(work,sourceBase.sha256,hash(source));work=replace(work,'<title>人物身体 R39','<title>人物身体 R40');work=work.replace('BODY STUDY / R39','BODY STUDY / R40');
 work=boot.workbench(work);
 work=replace(work,'body.body-motion-active-r37 aside>*:not(#body-motion-player),body.body-motion-active-r37 header .top-actions','.body-skin-value-r40{float:right;color:#536d59;font-variant-numeric:tabular-nums}body.body-motion-active-r37:not(.body-motion-skin-ready-r40) #body-skin-panel-r40{pointer-events:none;opacity:.55}body.body-motion-active-r37 aside>*:not(#body-motion-player):not(#body-skin-panel-r40),body.body-motion-active-r37 header .top-actions');
 work=replace(work,'else e.value=a[e.dataset.appearance];});}','else e.value=a[e.dataset.appearance];});window.__BODY_SKIN_REFRESH_VALUES_R40__?.();}');
