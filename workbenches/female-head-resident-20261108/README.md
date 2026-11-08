@@ -11,7 +11,9 @@ $env:GIT_LFS_SKIP_SMUDGE = '1'
 git clone --depth=1 --filter=blob:none --sparse https://github.com/haihao0307/Humanoid-Rig-Lab-Next.git
 Set-Location Humanoid-Rig-Lab-Next
 git sparse-checkout set workbenches/female-head-resident-20261108
-git lfs pull --include='workbenches/female-head-resident-20261108/**'
+$env:GIT_NO_LAZY_FETCH = '1'
+git -c remote.origin.promisor=false lfs pull --include='workbenches/female-head-resident-20261108/**'
+Remove-Item Env:GIT_NO_LAZY_FETCH
 Remove-Item Env:GIT_LFS_SKIP_SMUDGE
 Set-Location workbenches/female-head-resident-20261108
 node server.cjs
