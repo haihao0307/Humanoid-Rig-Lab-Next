@@ -1,15 +1,24 @@
 # 女士头部三维工作台 · 独立运行候选
 
-这是从现有头部研究工作台提取的独立运行版本。包含当前页面、其运行时直接使用的函数与材质、眼部数据、GPU 数值资源和必要缓存；不包含原项目所有研究工作台及历史实验。头部几何和材质来自源工作台；没有以多边形网格替代函数表面。本候选未通过全视角一比一验收。
+此目录从头部研究工作台提取，包含当前页面、运行所需函数与材质、眼部数据和 GPU 数值缓存。其他研究工作台及历史实验保留在原项目中。头部采用原工作台的函数表面；此候选尚未通过全视角一比一验收。
 
-## 启动
+## 获取与启动
 
-1. 安装 Node.js 和 Git LFS；检出仓库后运行 `git lfs pull`，确保大文件不是 LFS 指针文本。
-2. 在此目录运行 `node server.cjs`。
-3. 浏览器打开 <http://127.0.0.1:18732/>。首次编译及准备时间较长，完成后拖动旋转、滚轮缩放。仅监听本机。
+需要 Node.js、Git 和 Git LFS。以下 Windows PowerShell 示例只检出本工作台，避免下载整个人物仓库的其他大文件：
 
-支持现代浏览器的 WebGL 2 和浮点颜色缓冲。转动期间默认384，停止后768，可选择固定768。GPU 性能与首次加载时间依设备变化。材质由照片拟合参数与模型先验构成，并不是个人组织参数的直接测量；少量几何首交边界仍未通过验收。
+```powershell
+$env:GIT_LFS_SKIP_SMUDGE = '1'
+git clone --depth=1 --filter=blob:none --sparse https://github.com/haihao0307/Humanoid-Rig-Lab-Next.git
+Set-Location Humanoid-Rig-Lab-Next
+git sparse-checkout set workbenches/female-head-resident-20261108
+git lfs pull --include='workbenches/female-head-resident-20261108/**'
+Remove-Item Env:GIT_LFS_SKIP_SMUDGE
+Set-Location workbenches/female-head-resident-20261108
+node server.cjs
+```
 
-## 内容来源与检查范围
+浏览器打开 <http://127.0.0.1:18732/>。首次编译及准备时间较长，完成后拖动旋转、滚轮缩放。服务器仅监听本机。
 
-源目录 `Human-Function-Head-R04-20261023`；通过运行源页面收集其实际文件，再以独立目录复验。`docs/` 中记录了资源常驻、相机交互与皮肤研究边界。历史对照和原始照片工作流保留在原项目，不随此精简版导出。文件身份与校验见 `runtime-files.json`。
+需要支持 WebGL 2 和浮点颜色缓冲的浏览器。转动时默认384，停止后768，也可选择固定768。性能及首次加载时间依设备变化。材质由照片拟合参数与模型先验构成，不能称为本人实测组织参数；少量几何首交边界仍未通过验收。
+
+源目录为 `Human-Function-Head-R04-20261023`。`QA.md` 是本次独立验证，`runtime-files.json` 是文件 SHA-256 清单，`docs/` 记录资源常驻和皮肤研究边界。
