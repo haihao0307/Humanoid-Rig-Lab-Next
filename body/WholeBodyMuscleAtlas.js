@@ -57,8 +57,8 @@ function wbmaPoseDrivers(human,side,frames){
  const chest= get('T1')||get('T3'),pelvis=get('L5')||get('hips');
  const trunkFlex=chest&&pelvis?wbmaClamp(Math.abs(chest[2]-pelvis[2])/.18,0,1):0;
  const shoulderElevation=wbmaClamp((Math.abs(armDir[1])-Math.abs(restArm[1]))*.9,0,1);
- const wristFlex=wbmaClamp(Math.abs(wbmaAngle(foreDir,wbmaNorm(wbmaSub(hand,elbow)))-Math.PI/2),0,1);
- const ankleFlex=wbmaClamp(Math.abs(shinDir[1]-restShin[1]),0,1);
+ const wristFlex=wbmaClamp(wbmaAngle(foreDir,restFore)/1.2,0,1);
+ const ankleFlex=wbmaClamp(wbmaAngle(shinDir,restShin)/1.0,0,1);
  return {elbowFlex,kneeFlex,trunkFlex,shoulderElevation,wristFlex,ankleFlex};
 }
 function wbmaDriverValue(driver,d){
@@ -80,13 +80,13 @@ function buildWholeBodyMuscleRuntime(human,frames=null){
  for(const group of WHOLE_BODY_MUSCLE_ATLAS.groups){
   const sides=group.pair?['left','right']:[''];
   for(const side of sides){
-   const from=side?side+'_'+group.from:group.from,to=side?side+'_'+group.to:group.to;
+   const resolveAnchor=id=>side&&human.sourceBind.has(side+'_'+id)?side+'_'+id:id;\n   const from=resolveAnchor(group.from),to=resolveAnchor(group.to);
    const a=human.sourceBind.get(from)?.p,b=human.sourceBind.get(to)?.p;
    const currentA=wbmaWorldFrame(human,from,frames)?.p,currentB=wbmaWorldFrame(human,to,frames)?.p;
    if(!a||!b||!currentA||!currentB)continue;
    const axis=wbmaNorm(wbmaSub(b,a)),length=wbmaLength(wbmaSub(b,a));
    const drivers=side?wbmaPoseDrivers(human,side,frames):wbmaPoseDrivers(human,'left',frames);
-   const activation=wbmaDriverValue(group.driver,drivers||{});
+   const activation=wbmaDriverValue(group.driver,drivers||{elbowFlex:0,kneeFlex:0,trunkFlex:0,shoulderElevation:0,wristFlex:0,ankleFlex:0});
    instances.push({id:group.id+(side?'-'+side:''),group:group.id,label:group.label,region:group.region,side:side||'center',
     origin:a.slice(),axis,length,radius:group.radius,strain:group.strain,activation,
     currentOrigin:currentA.slice(),currentInsertion:currentB.slice(),
