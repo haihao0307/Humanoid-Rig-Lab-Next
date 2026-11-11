@@ -66,7 +66,8 @@ function r2PackAxillaAttribute(mesh){
  }
  return packed;
 }
-function r2DeformTissuePoint(point,influences,transforms,muscles,stature=1,axillaDelta=null){
+function r2DeformTissuePoint(point,influences,transforms,muscles,stature=1,axillaDelta=null,wholeBodyRuntime=null){
+ if(wholeBodyRuntime)point=deformWholeBodyMusclePoint(point,wholeBodyRuntime);
  point=r2AxillaPoint(point,axillaDelta,muscles);
  const weight=r2ShoulderLbsWeight(point,stature),p=r2MusclePoint(point,muscles),dq=r2DeformPoint(p,influences,transforms);
  if(weight===0)return dq;
@@ -79,8 +80,30 @@ uniform vec4 compactMuscleOrigin[2],compactMuscleAxis[2];
 uniform vec2 compactMuscleStrain[2];
 uniform vec2 compactAxillaWeight;
 uniform float compactMuscleEnabled;
+const int WHOLE_MUSCLE_MAX=40;
+uniform vec4 wholeMuscleOriginRadius[WHOLE_MUSCLE_MAX];
+uniform vec4 wholeMuscleAxisLength[WHOLE_MUSCLE_MAX];
+uniform vec4 wholeMuscleParameters[WHOLE_MUSCLE_MAX];
+uniform int wholeMuscleCount;
 float compactShoulderLbsWeight(vec3 p){
  p/=compactStatureScale;return .8*smoothstep(1.08,1.16,p.y)*(1.-smoothstep(1.35,1.42,p.y))*smoothstep(.07,.11,abs(p.x))*(1.-smoothstep(.25,.30,abs(p.x)));
+}
+vec3 wholeMusclePoint(vec3 p){
+ for(int i=0;i<WHOLE_MUSCLE_MAX;i++){
+  if(i>=wholeMuscleCount)break;
+  vec4 originData=wholeMuscleOriginRadius[i],axisData=wholeMuscleAxisLength[i],parameters=wholeMuscleParameters[i];
+  float activation=parameters.x,strain=parameters.y,L=axisData.w,radius=originData.w;
+  if(activation<.005||L<1e-5||radius<1e-5)continue;
+  vec3 axis=axisData.xyz,rel=p-originData.xyz;float along=dot(rel,axis),t=along/L;
+  if(t<.08||t>.92)continue;
+  vec3 radial=rel-axis*along;float r=length(radial);if(r>radius)continue;
+  float endFade=smoothstep(.08,.22,t)*(1.-smoothstep(.78,.92,t));
+  float radialFade=1.-smoothstep(radius*.68,radius,r);
+  float bell=16.*t*t*(1.-t)*(1.-t);
+  float compression=clamp(strain*activation*bell*endFade*radialFade,0.,.18);
+  p+=radial*(inversesqrt(1.-compression)-1.);
+ }
+ return p;
 }
 vec3 compactMusclePoint(vec3 p){
  if(compactMuscleEnabled<.5)return p;
@@ -108,10 +131,10 @@ vec3 compactMusclePoint(vec3 p){
 }
 void compactMuscles(inout vec3 p,inout vec3 n){
  if(compactMuscleEnabled<.5)return;
- vec3 result=compactMusclePoint(p);if(distance(result,p)<1e-10)return;
+ vec3 result=wholeMusclePoint(compactMusclePoint(p));if(distance(result,p)<1e-10)return;
  float e=.00002*compactStatureScale;
- vec3 a=(compactMusclePoint(p+vec3(e,0.,0.))-compactMusclePoint(p-vec3(e,0.,0.)))/(2.*e);
- vec3 b=(compactMusclePoint(p+vec3(0.,e,0.))-compactMusclePoint(p-vec3(0.,e,0.)))/(2.*e);
- vec3 c=(compactMusclePoint(p+vec3(0.,0.,e))-compactMusclePoint(p-vec3(0.,0.,e)))/(2.*e);
+ vec3 a=(wholeMusclePoint(compactMusclePoint(p+vec3(e,0.,0.)))-wholeMusclePoint(compactMusclePoint(p-vec3(e,0.,0.))))/(2.*e);
+ vec3 b=(wholeMusclePoint(compactMusclePoint(p+vec3(0.,e,0.)))-wholeMusclePoint(compactMusclePoint(p-vec3(0.,e,0.))))/(2.*e);
+ vec3 c=(wholeMusclePoint(compactMusclePoint(p+vec3(0.,0.,e)))-wholeMusclePoint(compactMusclePoint(p-vec3(0.,0.,e))))/(2.*e);
  n=normalize(mat3(cross(b,c),cross(c,a),cross(a,b))*n);p=result;
 }`;

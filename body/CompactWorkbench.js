@@ -210,12 +210,12 @@ function compactFragmentSource(){
 class CompactSurfaceRenderer{
   constructor(lab,data){
     this.lab=lab;this.boundHuman=lab.human;this.renderer=lab.renderer;this.gl=lab.renderer.gl;this.rig=compactSourceRig(lab.human,lab.tissue);this.enabled=true;this.chunks=[];this.quality=data.report.quality;this.report=data.report;
-    this.controlBind=lab.human.sourceBind;this.supportProbes=[];this.shape={...lab.human.characterPreset.shape};this.statureScale=lab.human.bodyMetrics.statureScale;
+    this.controlBind=lab.human.sourceBind;this.supportProbes=[];this.wholeMuscleOriginRadius=new Float32Array(160);this.wholeMuscleAxisLength=new Float32Array(160);this.wholeMuscleParameters=new Float32Array(160);this.shape={...lab.human.characterPreset.shape};this.statureScale=lab.human.bodyMetrics.statureScale;
     try{
     this.main=program(this.gl,COMPACT_VERTEX,compactFragmentSource());
     // Transparent cornea does not cast an opaque pupil-shaped shadow.
     this.depth=program(this.gl,COMPACT_VERTEX,`#version 300 es\nprecision highp float;in vec3 R;uniform float compactFeature;${COMPACT_EYE_COORDINATES}\n${compactEyeSocketSource()}\n${compactFaceSurfaceShader()}\nvoid main(){compactEyeSocket(R);compactFaceSurfaceMask(R);${COMPACT_SCLERA_APERTURE}if(compactFeature>.5&&compactFeature<1.5)discard;}`);
-    for(const p of [this.main,this.depth])for(const key of ['compactMuscleOrigin[0]','compactMuscleAxis[0]','compactMuscleStrain[0]','compactMuscleEnabled','compactAxillaWeight'])p.u[key]=this.gl.getUniformLocation(p.p,key);
+    for(const p of [this.main,this.depth])for(const key of ['compactMuscleOrigin[0]','compactMuscleAxis[0]','compactMuscleStrain[0]','compactMuscleEnabled','compactAxillaWeight','wholeMuscleOriginRadius[0]','wholeMuscleAxisLength[0]','wholeMuscleParameters[0]','wholeMuscleCount'])p.u[key]=this.gl.getUniformLocation(p.p,key);
     for(const p of [this.main,this.depth])for(const key of ['compactEarClearance','compactPalette','compactOrigin','compactExtent','compactColor','compactKind','compactRegions','compactStatureScale','compactEyeCentre','compactEyeU','compactEyeV','compactFeature','skinControlled','skinSurface','skinDetail','skinSeedOffset','skinExposure'])p.u[key]=this.gl.getUniformLocation(p.p,key);
     for(const p of [this.main,this.depth])for(const key of ['faceOffsets[0]','faceEnabled','faceEligible','faceHeatmap','faceSelected','compactLipOpen','compactJawOpen'])p.u[key]=this.gl.getUniformLocation(p.p,key);
     for(const p of [this.main,this.depth])for(const key of ['faceMuscles[0]','compactCanthusDepth','compactFaceSkinMode','compactSkinSocket','compactSocketRadii[0]','compactEyeGlobe','compactSourceEye','compactEyeNormal','compactEyeLid','compactEyeSide','compactLidState[0]'])p.u[key]=this.gl.getUniformLocation(p.p,key);
@@ -289,8 +289,8 @@ class CompactSurfaceRenderer{
   }
   minimumSupportY(frames=null){
     const transforms=this.lab.human.joints.map(j=>{const f=frames?frames.get(j.id):j.world,source=this.controlBind.get(j.id),q=qnorm(qm(f.q,inv(source.q))),t=sub(f.p,rotate(q,source.p));return {q,d:mul(qm([...t,0],q),.5)};});
-    const muscles=r2MuscleFrames(this.lab.human,frames);
-    let y=Infinity,boneId=null;for(const probe of this.supportProbes){const p=r2DeformTissuePoint(probe.p,probe.influences,transforms,muscles,this.statureScale,probe.axillaDelta);if(p[1]<y){y=p[1];boneId=this.lab.human.joints[probe.influences[0][0]].id;}}
+    const muscles=r2MuscleFrames(this.lab.human,frames),wholeBody=buildWholeBodyMuscleRuntime(this.lab.human,frames);
+    let y=Infinity,boneId=null;for(const probe of this.supportProbes){const p=r2DeformTissuePoint(probe.p,probe.influences,transforms,muscles,this.statureScale,probe.axillaDelta,wholeBody);if(p[1]<y){y=p[1];boneId=this.lab.human.joints[probe.influences[0][0]].id;}}
     return {y,boneId,sampled:true,sampleCount:this.supportProbes.length,fullCollisionCertificate:false};
   }
   prepare(items){
@@ -303,7 +303,7 @@ class CompactSurfaceRenderer{
   }
   updatePalette(){
     const h=this.lab.human;
-    this.muscleFrames=r2MuscleFrames(h);
+    this.muscleFrames=r2MuscleFrames(h);this.wholeBodyMuscleRuntime=buildWholeBodyMuscleRuntime(h);
     for(let i=0;i<h.joints.length;i++){const j=h.joints[i],source=this.controlBind.get(j.id),q=qnorm(qm(j.world.q,inv(source.q))),t=sub(j.world.p,rotate(q,source.p));if(j.id==='head')this.headTransform={p:t,q};this.palette.set(q,i*8);this.palette.set(mul(qm([...t,0],q),.5),i*8+4);}
     const gl=this.gl;gl.activeTexture(gl.TEXTURE0+COMPACT_PALETTE_UNIT);gl.bindTexture(gl.TEXTURE_2D,this.texture);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,2,h.joints.length,gl.RGBA,gl.FLOAT,this.palette);gl.activeTexture(gl.TEXTURE0);
   }
@@ -315,6 +315,11 @@ class CompactSurfaceRenderer{
     gl.uniformMatrix4fv(p.u.viewProjection,false,depth?r.lightVP:r.vp);gl.uniformMatrix4fv(p.u.lightVP,false,r.lightVP);gl.uniform1i(p.u.compactPalette,COMPACT_PALETTE_UNIT);gl.uniform1f(p.u.compactStatureScale,this.statureScale);
     gl.uniform4fv(p.u['compactMuscleOrigin[0]'],this.muscleFrames.flatMap(f=>[...f.origin,f.length]));gl.uniform4fv(p.u['compactMuscleAxis[0]'],this.muscleFrames.flatMap(f=>[...f.axis,0]));gl.uniform2fv(p.u['compactMuscleStrain[0]'],this.muscleFrames.flatMap(f=>[f.armStrain,f.deltoidStrain]));
     gl.uniform2fv(p.u.compactAxillaWeight,this.muscleFrames.map(f=>f.axillaWeight));
+    const whole=this.wholeBodyMuscleRuntime?.instances||[],originRadius=this.wholeMuscleOriginRadius,axisLength=this.wholeMuscleAxisLength,parameters=this.wholeMuscleParameters;
+    originRadius.fill(0);axisLength.fill(0);parameters.fill(0);let count=0;
+    for(const m of whole){if(m.activation<=.005||count>=40)continue;const o=count++*4,scale=this.statureScale;originRadius.set([-m.origin[0]*scale,m.origin[1]*scale,m.origin[2]*scale,m.radius*scale],o);axisLength.set([-m.axis[0],m.axis[1],m.axis[2],m.length*scale],o);parameters.set([m.activation,m.strain,0,0],o);}
+    gl.uniform4fv(p.u['wholeMuscleOriginRadius[0]'],originRadius);gl.uniform4fv(p.u['wholeMuscleAxisLength[0]'],axisLength);
+    gl.uniform4fv(p.u['wholeMuscleParameters[0]'],parameters);gl.uniform1i(p.u.wholeMuscleCount,count);
     if(!depth){gl.uniform3fv(p.u.eye,r.eye);gl.uniform1i(p.u.shadow,1);gl.uniform1f(p.u.shadowsEnabled,r.quality==='shadow'&&r.shadowAvailable?1:0);gl.uniform1f(p.u.studioMode,r.studioMode?1:0);}
     const skin=this.lab.human.tissue.skinMaterial;
     // Face recipe offsets retain their authored physical millimetres. Its
