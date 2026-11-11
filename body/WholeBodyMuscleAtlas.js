@@ -55,11 +55,13 @@ function wbmaPoseDrivers(human,side,frames){
  const elbowFlex=wbmaClamp((wbmaAngle(armDir,foreDir)-wbmaAngle(restArm,restFore))/1.9,0,1);
  const kneeFlex=wbmaClamp((wbmaAngle(legDir,shinDir)-wbmaAngle(restLeg,restShin))/1.9,0,1);
  const chest= get('T1')||get('T3'),pelvis=get('L5')||get('hips');
- const trunkFlex=chest&&pelvis?wbmaClamp(Math.abs(chest[2]-pelvis[2])/.18,0,1):0;
- const shoulderElevation=wbmaClamp((Math.abs(armDir[1])-Math.abs(restArm[1]))*.9,0,1);
+ const restChest=rest('T1'),restPelvis=rest('L5');
+ const trunkFlex=chest&&pelvis&&restChest&&restPelvis?wbmaClamp(Math.abs((chest[2]-pelvis[2])-(restChest[2]-restPelvis[2]))/.12,0,1):0;
+ const shoulderElevation=wbmaClamp((Math.abs(restArm[1])-Math.abs(armDir[1]))/.9,0,1);
+ const hipFlex=wbmaClamp(wbmaAngle(legDir,restLeg)/1.2,0,1),hipAbduction=wbmaClamp(Math.abs(legDir[0]-restLeg[0])/.8,0,1);
  const wristFlex=wbmaClamp(wbmaAngle(foreDir,restFore)/1.2,0,1);
  const ankleFlex=wbmaClamp(wbmaAngle(shinDir,restShin)/1.0,0,1);
- return {elbowFlex,kneeFlex,trunkFlex,shoulderElevation,wristFlex,ankleFlex};
+ return {elbowFlex,kneeFlex,trunkFlex,shoulderElevation,wristFlex,ankleFlex,hipFlex,hipAbduction};
 }
 function wbmaDriverValue(driver,d){
  switch(driver){
@@ -70,7 +72,8 @@ function wbmaDriverValue(driver,d){
   case 'trunkExtension': return 1-d.trunkFlex;
   case 'wristFlexion': case 'wristExtension': return d.wristFlex;
   case 'anklePlantarFlexion': case 'ankleDorsiflexion': return d.ankleFlex;
-  case 'hipExtension': case 'hipAbduction': case 'hipAdduction': return d.kneeFlex*.35;
+  case 'hipExtension': case 'hipAdduction': return d.hipFlex||0;
+  case 'hipAbduction': return d.hipAbduction||0;
   default: return 0;
  }
 }
@@ -86,7 +89,7 @@ function buildWholeBodyMuscleRuntime(human,frames=null){
    if(!a||!b||!currentA||!currentB)continue;
    const axis=wbmaNorm(wbmaSub(b,a)),length=wbmaLength(wbmaSub(b,a));
    const drivers=side?wbmaPoseDrivers(human,side,frames):wbmaPoseDrivers(human,'left',frames);
-   const activation=wbmaDriverValue(group.driver,drivers||{elbowFlex:0,kneeFlex:0,trunkFlex:0,shoulderElevation:0,wristFlex:0,ankleFlex:0});
+   const activation=wbmaDriverValue(group.driver,drivers||{elbowFlex:0,kneeFlex:0,trunkFlex:0,shoulderElevation:0,wristFlex:0,ankleFlex:0,hipFlex:0,hipAbduction:0});
    instances.push({id:group.id+(side?'-'+side:''),group:group.id,label:group.label,region:group.region,side:side||'center',
     origin:a.slice(),axis,length,radius:group.radius,strain:group.strain,activation,
     currentOrigin:currentA.slice(),currentInsertion:currentB.slice(),
