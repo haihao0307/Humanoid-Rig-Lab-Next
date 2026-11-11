@@ -66,10 +66,11 @@ function wbmaPoseDrivers(human,side,frames){
 function wbmaDriverValue(driver,d){
  switch(driver){
   case 'elbowFlexion': case 'kneeFlexion': return driver==='elbowFlexion'?d.elbowFlex:d.kneeFlex;
-  case 'elbowExtension': case 'kneeExtension': return 1-(driver==='elbowExtension'?d.elbowFlex:d.kneeFlex);
+  case 'elbowExtension': return d.elbowFlex*.25;
+  case 'kneeExtension': return d.kneeFlex*.25;
   case 'shoulderElevation': case 'shoulderAdduction': case 'shoulderExtension': return d.shoulderElevation;
   case 'trunkFlexion': case 'trunkRotation': return d.trunkFlex;
-  case 'trunkExtension': return 1-d.trunkFlex;
+  case 'trunkExtension': return d.trunkFlex*.2;
   case 'wristFlexion': case 'wristExtension': return d.wristFlex;
   case 'anklePlantarFlexion': case 'ankleDorsiflexion': return d.ankleFlex;
   case 'hipExtension': case 'hipAdduction': return d.hipFlex||0;
