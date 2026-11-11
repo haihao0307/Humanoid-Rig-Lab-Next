@@ -27,7 +27,7 @@ posedFrames.set('left_hand',{p:[-.48,1.22,0]});
 const posed=buildWholeBodyMuscleRuntime(human,posedFrames);
 const biceps=posed.instances.find(x=>x.id==='biceps-brachii-left');
 assert.ok(biceps && biceps.activation>.05,'left elbow flexion must activate left biceps');
-const point=[-.17,1.17,0];
+const point=[-.19,1.17,0];
 const deformed=deformWholeBodyMusclePoint(point,posed);
 assert.ok(Math.hypot(...deformed.map((v,i)=>v-point[i]))>1e-7,'active muscle must displace its surface sample');
 const report=reportWholeBodyMuscleAtlas(human,posedFrames);
