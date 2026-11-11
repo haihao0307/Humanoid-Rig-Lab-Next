@@ -317,7 +317,7 @@ class CompactSurfaceRenderer{
     gl.uniform2fv(p.u.compactAxillaWeight,this.muscleFrames.map(f=>f.axillaWeight));
     const whole=this.wholeBodyMuscleRuntime?.instances||[],count=Math.min(40,whole.length);
     const originRadius=new Float32Array(160),axisLength=new Float32Array(160),parameters=new Float32Array(160);
-    for(let i=0;i<count;i++){const m=whole[i],o=i*4;originRadius.set([...m.origin,m.radius],o);axisLength.set([...m.axis,m.length],o);parameters.set([m.activation,m.strain,0,0],o);}
+    for(let i=0;i<count;i++){const m=whole[i],o=i*4,scale=this.statureScale;originRadius.set([-m.origin[0]*scale,m.origin[1]*scale,m.origin[2]*scale,m.radius*scale],o);axisLength.set([-m.axis[0],m.axis[1],m.axis[2],m.length*scale],o);parameters.set([m.activation,m.strain,0,0],o);}
     gl.uniform4fv(p.u['wholeMuscleOriginRadius[0]'],originRadius);gl.uniform4fv(p.u['wholeMuscleAxisLength[0]'],axisLength);
     gl.uniform4fv(p.u['wholeMuscleParameters[0]'],parameters);gl.uniform1i(p.u.wholeMuscleCount,count);
     if(!depth){gl.uniform3fv(p.u.eye,r.eye);gl.uniform1i(p.u.shadow,1);gl.uniform1f(p.u.shadowsEnabled,r.quality==='shadow'&&r.shadowAvailable?1:0);gl.uniform1f(p.u.studioMode,r.studioMode?1:0);}
