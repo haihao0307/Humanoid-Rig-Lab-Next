@@ -83,7 +83,8 @@ function buildWholeBodyMuscleRuntime(human,frames=null){
  for(const group of WHOLE_BODY_MUSCLE_ATLAS.groups){
   const sides=group.pair?['left','right']:[''];
   for(const side of sides){
-   const resolveAnchor=id=>side&&human.sourceBind.has(side+'_'+id)?side+'_'+id:id;\n   const from=resolveAnchor(group.from),to=resolveAnchor(group.to);
+   const resolveAnchor=id=>side&&human.sourceBind.has(side+'_'+id)?side+'_'+id:id;
+   const from=resolveAnchor(group.from),to=resolveAnchor(group.to);
    const a=human.sourceBind.get(from)?.p,b=human.sourceBind.get(to)?.p;
    const currentA=wbmaWorldFrame(human,from,frames)?.p,currentB=wbmaWorldFrame(human,to,frames)?.p;
    if(!a||!b||!currentA||!currentB)continue;
