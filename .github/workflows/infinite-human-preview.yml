@@ -1,0 +1,38 @@
+name: Infinite Human WebGPU Preview
+
+on:
+  push:
+    branches:
+      - feature/infinite-human-webgpu-lab-v1
+    paths:
+      - "infinite-human-preview/**"
+      - ".github/workflows/infinite-human-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: infinite-human-preview
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload isolated preview
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: infinite-human-preview
+      - name: Deploy preview
+        id: deployment
+        uses: actions/deploy-pages@v4
