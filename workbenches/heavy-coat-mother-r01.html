@@ -678,7 +678,7 @@ window.HRLTailorShop={get definition(){return def},get state(){return {...curren
 'use strict';
 const shop=window.HRLTailorShop;
 if(!shop||!shop.viewer||!shop.viewer.gl){document.body.insertAdjacentHTML('beforeend','<p style="color:#f77">厚外套交互无法启动：需要原始裁缝工作台与 WebGL2。</p>');return;}
-const viewer=shop.viewer,gl=viewer.gl,ref=window.__KAOPU_R2_RIG__||{},body={shape:'reference',pose:'idle',amp:0,show:true,mat:'canvas',paused:false,frame:0,simMs:0,contacts:0,maxPen:.0};
+const viewer=shop.viewer,gl=viewer.gl,ref=window.__KAOPU_R2_RIG__||{},body={shape:'reference',pose:'idle',amp:0,show:false,mat:'canvas',paused:false,frame:0,simMs:0,contacts:0,maxPen:.0};
 const material={canvas:{density:620,soft:.43,thickness:.0055,loft:.006,color:[.37,.34,.28],grain:.75,label:'中厚帆布'},wool:{density:850,soft:.26,thickness:.0075,loft:.009,color:[.28,.32,.35],grain:.25,label:'厚呢'},padded:{density:480,soft:.15,thickness:.009,loft:.014,color:[.35,.40,.39],grain:.11,label:'夹棉面层'}};
 const shape={reference:[1,1,1],broad:[1.12,1.06,1.09],fuller:[1.04,1.20,1.19]};
 const h='<div id="coat-lab"><strong>厚工装外套 Mother R01</strong><small> · 源自 C3P4-C 实际裁片三角网格｜单个模拟对象</small>'+
@@ -686,7 +686,7 @@ const h='<div id="coat-lab"><strong>厚工装外套 Mother R01</strong><small> �
 '<label>R2 体型 <select id="coat-b"><option value="reference">参考</option><option value="broad">宽肩</option><option value="fuller">丰满</option></select></label>'+
 '<label>动作 <select id="coat-p"><option value="idle">站立</option><option value="raise">抬双臂</option><option value="elbow">屈肘</option><option value="twist">转身</option></select></label>'+
 '<label>幅度 <input type="range" id="coat-a" min="0" max="1" value="0" step=".01"></label>'+
-'<button id="coat-stop">暂停</button><button id="coat-reset">重置</button><label>人体代理 <input type="checkbox" id="coat-outer" checked></label></div>'+
+'<button id="coat-stop">暂停</button><button id="coat-reset">重置</button><label>人体代理 <input type="checkbox" id="coat-outer"></label></div>'+
 '<div id="coat-metrics">正在建立源网格约束…</div><div class="coat-limit">研发候选：该外套源自旧版静态成形，不是已完成实体缝制验收的成衣。仅有 R2 人体碰撞代理，没有加载完整 R2 表皮；CPU 约束求解＋WebGL2 渲染，不宣称 WebGPU、精确 CCD、自碰撞或生产验收通过。</div></div>';
 shop.switchTab('assembly');document.getElementById('assembly').insertAdjacentHTML('afterbegin',h);
 const $=id=>document.getElementById(id),isShell=id=>['front.shell','back.shell','sleeve.shell'].includes(id);
@@ -776,7 +776,13 @@ function update(){
    const a=delta*wp/sum,b=delta*wq/sum;
    p.x+=dx*a;p.y+=dy*a;p.z+=dz*a;q.x-=dx*b;q.y-=dy*b;q.z-=dz*b;
   }
-  for(const p of verts){if(p.pin>.1){const t=poseRest(p),k=.09*p.pin;p.x+=(t[0]-p.x)*k;p.y+=(t[1]-p.y)*k;p.z+=(t[2]-p.z)*k;}for(const c of colliders)contact(p,c,mode.thickness*.5)}
+  for(const p of verts){
+    const t=poseRest(p);
+    const shapeMemory=body.mat==='padded'?.14:body.mat==='wool'?.115:.085;
+    const k=Math.min(.25,.09*p.pin+shapeMemory*(1-p.pin));
+    p.x+=(t[0]-p.x)*k;p.y+=(t[1]-p.y)*k;p.z+=(t[2]-p.z)*k;
+    for(const c of colliders)contact(p,c,mode.thickness*.5);
+   }
  }
  const invalid=verts.findIndex(p=>![p.x,p.y,p.z].every(Number.isFinite));
  if(invalid>=0){body.paused=true;const p=verts[invalid];$('coat-metrics').textContent='非有限位置冻结：第'+body.frame+'帧，顶点'+invalid+'，衣片'+p.piece+'，原位置'+JSON.stringify(p.rest)+'，当前'+JSON.stringify([p.x,p.y,p.z]);console.error('COAT_INVALID_VERTEX',{frame:body.frame,index:invalid,piece:p.piece,rest:p.rest,actual:[p.x,p.y,p.z]});return}
