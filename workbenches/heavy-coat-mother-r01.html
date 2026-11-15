@@ -778,7 +778,8 @@ function update(){
   }
   for(const p of verts){if(p.pin>.1){const t=poseRest(p),k=.09*p.pin;p.x+=(t[0]-p.x)*k;p.y+=(t[1]-p.y)*k;p.z+=(t[2]-p.z)*k;}for(const c of colliders)contact(p,c,mode.thickness*.5)}
  }
- if(verts.some(p=>![p.x,p.y,p.z].every(Number.isFinite))){body.paused=true;$('coat-metrics').textContent='检测到非有限位置：模拟冻结';return}
+ const invalid=verts.findIndex(p=>![p.x,p.y,p.z].every(Number.isFinite));
+ if(invalid>=0){body.paused=true;const p=verts[invalid];$('coat-metrics').textContent='非有限位置冻结：第'+body.frame+'帧，顶点'+invalid+'，衣片'+p.piece+'，原位置'+JSON.stringify(p.rest)+'，当前'+JSON.stringify([p.x,p.y,p.z]);console.error('COAT_INVALID_VERTEX',{frame:body.frame,index:invalid,piece:p.piece,rest:p.rest,actual:[p.x,p.y,p.z]});return}
  for(const s of source){const m=s.m;for(let i=0;i<s.count;i++){const p=verts[s.offset+i];m.V[i*3]=p.x;m.V[i*3+1]=p.y;m.V[i*3+2]=p.z;}
   m.N=viewer.normal(m.V,m.I);
   gl.bindBuffer(gl.ARRAY_BUFFER,m.buffers[0]);gl.bufferSubData(gl.ARRAY_BUFFER,0,m.V);
