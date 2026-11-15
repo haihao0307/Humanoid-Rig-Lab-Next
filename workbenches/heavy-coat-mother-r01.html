@@ -1,0 +1,819 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KAOPU 厚外套接触 Mother R01 · 自有原版裁片</title><style>
+:root{--bg:#0c151b;--p:#14212a;--p2:#192932;--line:#2b414b;--ink:#ecebe1;--dim:#a7b6bd;--accent:#afd4c3;--gold:#e4c68d;--red:#ffaaa0;--paper:#f1efe6}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,"Microsoft YaHei",sans-serif}button,input,select{font:inherit}button,select{background:#1d3039;border:1px solid #3d555f;color:var(--ink);border-radius:7px;padding:8px 11px;cursor:pointer}button:hover{border-color:var(--accent)}button.on{background:#35594e}button:focus-visible{outline:2px solid var(--gold)}header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;gap:18px;align-items:center;background:#101c23}h1{font-size:19px;margin:0}.sub{font-size:11px;color:var(--dim)}.badges{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}.badge{font-size:10px;padding:4px 8px;border:1px solid #476253;border-radius:30px;color:var(--accent)}.badge.hold{border-color:#735f35;color:var(--gold)}.layout{display:grid;grid-template-columns:270px minmax(0,1fr)}aside{padding:14px;border-right:1px solid var(--line);background:#0e1920}.group{padding:11px 0;border-bottom:1px solid var(--line)}.group:first-child{padding-top:0}.group strong{font-size:13px;display:block;margin-bottom:8px}.row{margin:8px 0}.row label{display:flex;justify-content:space-between;color:var(--dim);font-size:11px}.row input[type=range]{width:100%;accent-color:var(--accent)}.pair{display:flex;gap:5px;flex-wrap:wrap}.note{font-size:11px;color:var(--dim)}.warn{color:var(--gold)}.danger{color:var(--red)}main{min-width:0}nav{display:flex;gap:2px;padding:0 12px;border-bottom:1px solid var(--line);overflow:auto}nav button{border:0;border-radius:0;background:transparent;color:var(--dim);padding:13px 13px;white-space:nowrap}nav button.active{color:var(--accent);border-bottom:2px solid var(--accent)}.pane{display:none;padding:14px}.pane.active{display:block}.viewGrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}.viewBox,.card{border:1px solid var(--line);border-radius:10px;background:var(--p);overflow:hidden}.viewHead{padding:9px 13px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;color:var(--dim);font-size:11px}canvas{display:block;width:100%;height:650px;touch-action:none;cursor:grab}.viewFoot{padding:9px 12px;border-top:1px solid var(--line);font-size:11px;color:var(--dim)}.card{padding:14px;margin-bottom:12px}.card h2{font-size:15px;margin:0 0 9px}.card h3{font-size:13px;margin:10px 0 5px}.inspector dl{display:grid;grid-template-columns:90px 1fr;gap:7px;font-size:11px}.inspector dt{color:var(--dim)}.inspector dd{margin:0}.tag{display:inline-block;padding:3px 6px;border:1px solid var(--line);border-radius:5px;font-size:10px;margin:2px}.tag.good{color:var(--accent)}.tag.hold{color:var(--gold)}.sheet{border:1px solid #bcc3bd;background:var(--paper);padding:10px;overflow:auto;border-radius:10px}.sheet svg{min-width:760px;width:100%;height:auto;display:block}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stageCard{background:var(--p2);border:1px solid var(--line);border-radius:9px;padding:12px;min-height:105px}.stageCard b{display:block;color:var(--accent);font-size:12px}.stageCard p{font-size:11px;color:var(--dim);margin:6px 0}.stageCard.hold b{color:var(--gold)}.tableWrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:9px 7px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--accent)}code{font-size:10px}.relation{padding:8px 0;border-bottom:1px solid var(--line);font-size:11px}.relation b{color:var(--accent)}.ops{counter-reset:s}.op{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.op:before{counter-increment:s;content:counter(s);width:28px;height:28px;border:1px solid #48665a;color:var(--accent);border-radius:50%;display:grid;place-items:center}.op p{margin:3px 0;color:var(--dim);font-size:11px}.gate{display:grid;grid-template-columns:1fr auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:11px}.gate span:last-child{color:var(--accent)}.gate.hold span:last-child{color:var(--gold)}.source a{color:var(--accent)}#error{display:none;padding:10px 14px;color:#ffd7d2;background:#4a292c}.foot{font-size:10px;color:#75878e;padding:10px 14px;border-top:1px solid var(--line)}
+@media(max-width:1120px){.viewGrid{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}canvas{height:590px}}@media(max-width:740px){header{display:block;padding:10px}.badges{margin:8px 0 0}.layout{display:block}aside{border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 10px;padding:9px;min-width:0}.group,.group details,.group .row,#params{min-width:0;max-width:100%}.row input[type=range]{max-width:100%}aside select{width:100%;max-width:100%;min-width:0}.pair{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}.pair button{min-width:0;padding:7px 4px}.group.parameters{grid-column:1/-1}.pane{padding:8px}.grid2,.grid3{grid-template-columns:1fr}canvas{height:520px}nav{padding:0}nav button{font-size:11px;padding:11px 9px}.sheet svg{min-width:720px}.viewGrid{gap:8px}}
+</style><style>
+#coat-lab{background:#16272d;border:1px solid #63837f;border-radius:10px;margin:0 0 13px;padding:12px;color:#dae8e0}
+#coat-lab strong{font-size:17px;color:#f2d5aa}#coat-lab small{color:#a3b4b4}
+.coat-tools{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:9px}
+.coat-tools label{background:#233942;padding:5px 8px;border-radius:6px;font-size:12px}
+.coat-tools select{font-size:12px;padding:5px}
+.coat-tools input{width:105px;vertical-align:middle}
+.coat-tools button{padding:6px;font-size:12px}
+#coat-metrics{margin-top:9px;font:12px/1.6 ui-monospace,monospace;color:#b5dccb}
+.coat-limit{font-size:11px;margin-top:9px;border-left:2px solid #c7a36f;padding:5px 10px;color:#d0bf9d}
+</style></head><body><header><div><h1>HRL-M04 裁缝铺母体 <span class="sub">C3P4-C</span></h1><div class="sub">量体票 → 基础版几何 → 可执行款式操作 → 工作纸样 → 白坯裁剪 → 试身修版 → 批准生产纸样</div></div><div class="badges"><span class="badge">内核收敛 C3P4-C</span><span class="badge">40 个裁片实例</span><span class="badge">59 缝合＋8 粘合关系</span><span class="badge hold">批准生产纸样为空</span></div></header><div id="error"></div><div class="layout"><aside>
+<div class="group"><strong>工作票</strong><select id="jobSelect"><option value="control">控制样架：全衬工装外套</option></select><p class="note">当前没有客户身份或人物 revision。任何正式生产必须建立独立 FitInstance 与试身记录。</p></div>
+<div class="group"><strong>观察模式</strong><select id="inspection"><option value="complete">整衣外观</option><option value="shell">仅面层与部件</option><option value="lining">贴边、里布与衬料</option><option value="pockets">双侧立体袋</option><option value="selected">仅选中纸样</option></select><div class="pair"><button data-camera="front">正面</button><button data-camera="threequarter">斜侧</button><button data-camera="back">背面</button><button data-camera="inside">内侧</button><button data-camera="collar">领口</button><button data-camera="pocket">袋口</button></div></div>
+<div class="group"><strong>结构状态</strong><label class="note"><input type="checkbox" id="frontClosed" checked> 前中闭合</label><label class="note"><input type="checkbox" id="leftPocketClosed" checked> 左袋盖扣合</label><label class="note"><input type="checkbox" id="rightPocketClosed" checked> 右袋盖扣合</label><label class="note"><input type="checkbox" id="liningInstalled" checked> 面里已装配</label><div class="row"><label>分层展开 <output id="explodeValue">0%</output></label><input id="explode" type="range" min="0" max="1" step=".05" value="0"></div><button id="layerColors">裁片分色</button></div>
+<div class="group"><strong>裁片身份</strong><select id="pieceSelect"></select><button id="resetView">恢复整衣观察</button></div>
+<div class="group parameters"><details><summary>量体与款式参数</summary><div id="params"></div><p class="note">这组数值只是控制样架。真正给人物穿时重新生成 FitInstance，不修改母版身份。</p></details></div>
+<div class="group"><button id="saveRecipe">保存工单配方</button><button id="loadRecipe">载入工单配方</button><input type="file" accept="application/json,.json" hidden id="recipeFile"><button id="saveShot">截取当前画面</button><button id="resetAll">重置控制样架</button></div>
+</aside><main><nav><button class="active" data-tab="order">裁缝铺工单</button><button data-tab="kernel">内核收敛</button><button data-tab="assembly">结构装配</button><button data-tab="patterns">工作纸样</button><button data-tab="cutting">白坯裁剪</button><button data-tab="relations">关系与层级</button><button data-tab="process">白坯工序</button><button data-tab="qa">质量门</button></nav>
+<section class="pane active" id="order"><div class="card"><h2>裁缝铺阶段链：工作版与生产版严格分开</h2><p class="note">当前只允许生成工作纸样和白坯裁剪票。指定人物、白坯、修版和批准记录缺失时，正式面料裁剪与生产装配保持阻断。</p><div class="grid3" id="stageCards"></div></div><div class="grid2"><div class="card"><h2>控制量体票</h2><div id="measureTable"></div></div><div class="card"><h2>款式身份与 revision</h2><div id="styleSummary"></div></div></div></section>
+<section class="pane" id="kernel"><div class="grid2"><div class="card"><h2>01 基础版几何与款式操作</h2><div id="kernelStages"></div></div><div class="card"><h2>02 正式 Schema 合同</h2><div id="schemaTable"></div></div></div><div class="card"><h2>03 裁片类型 → 实际裁片实例</h2><div class="tableWrap"><table><thead><tr><th>实例 ID</th><th>纸样类型</th><th>角色</th><th>材料／层</th><th>状态</th></tr></thead><tbody id="instanceTable"></tbody></table></div></div><div class="grid2"><div class="card"><h2>04 完整装配图</h2><div id="graphSummary"></div></div><div class="card"><h2>05 生产放行边界</h2><div id="releaseTable"></div></div></div></section>
+<section class="pane" id="assembly"><div class="viewGrid"><div class="viewBox"><div class="viewHead"><span id="viewLabel">完整全衬工装外套 · 静态结构装配</span><span id="backend"></span></div><canvas id="scene"></canvas><div class="viewFoot">拖动旋转 · 滚轮缩放 · 点击选择。当前几何只检查部件和层次，不表示真实垂坠、材料厚度或合体。</div></div><div class="inspector"><div class="card"><h2>选中纸样</h2><div id="inspect"></div></div><div class="card"><h2>结构统计</h2><div id="summary"></div></div><div class="card"><h2>当前边界</h2><p class="note">工作纸样、裁片实例与完整装配图已建立；批准生产纸样、正式裁剪票、指定人物试身、物理与纹理均未建立。</p></div></div></div></section>
+<section class="pane" id="patterns"><div class="card"><h2>工作纸样：缝线域、裁剪线、布纹和裁剪数量</h2><p class="note">这是白坯前工作纸样，不是批准生产纸样。黑线为缝线域，青线为裁剪线，绿色为布纹；折线、袋口和内部安装线单独记录。</p><button id="exportSVG">导出完整 SVG</button> <button id="exportDefinition">导出服装定义</button></div><div class="sheet" id="patternSVG"></div></section>
+<section class="pane" id="cutting"><div class="card"><h2>白坯裁剪空间与材料票</h2><select id="markerMaterial"><option value="shell_fabric">面布</option><option value="lining_fabric">里布</option><option value="interfacing">衬料</option><option value="undercollar_fabric">底领布</option></select><p class="note">当前只生成白坯裁剪票；正式面料裁剪票为空。145 cm 排料用于数量、镜像、对折裁和布纹检查，不宣称最省布。</p></div><div class="sheet" id="markerSVG"></div><div class="card"><div id="cutTicket"></div></div></section>
+<section class="pane" id="relations"><div class="grid2" id="relationCards"></div></section>
+<section class="pane" id="process"><div class="card"><h2>白坯装配与试身工序</h2><div class="ops" id="ops"></div></div><div class="card source"><h2>资料与适用边界</h2><div id="sourceList"></div></div></section>
+<section class="pane" id="qa"><div class="grid2"><div class="card"><h2>阶段质量门</h2><div id="gates"></div></div><div class="card"><h2>当前结论</h2><div id="qaSummary"></div></div></div><div class="card"><h2>接缝与配长</h2><div class="tableWrap"><table><thead><tr><th>关系</th><th>两侧</th><th>差值</th><th>规则</th><th>状态</th></tr></thead><tbody id="seamTable"></tbody></table></div></div><div class="card"><h2>错误反例</h2><button data-negative="reverse">反向装袖</button> <button data-negative="seal">误封袋口</button> <button data-negative="grain">删除布纹</button> <button data-negative="cycle">制造层序循环</button> <button data-negative="promote">无试身直接放行</button> <button data-negative="instance">删除裁片实例</button> <button data-negative="bond">破坏粘合关系</button><p id="negativeResult" class="note">所有错误只注入临时副本。</p></div></section>
+<div class="foot">C3P4-C · 结构母版 / 无物理 / 无纹理 / 未绑定人物 / 白坯试身未完成 / productionReady=false</div></main></div>
+<script>/* Geometry utilities retained from user C3P-2; centimetres, generated buffers only. */
+(function(root){
+const V=(x,y)=>[x,y], mix=(a,b,t)=>a.map((x,i)=>x+(b[i]-x)*t), dist=(a,b)=>Math.hypot(...a.map((x,i)=>x-b[i])), clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+function cubic(a,b,c,d,t){const u=1-t;return a.map((v,i)=>u*u*u*v+3*u*u*t*b[i]+3*u*t*t*c[i]+t*t*t*d[i]);}
+function segment(id,a,b,c,d,sa=1){return {id,a,b,c,d,sa,point(t){return this.c?cubic(this.a,this.b,this.c,this.d,t):mix(this.a,this.b,t)},sample(n=48){return Array.from({length:n+1},(_,i)=>this.point(i/n))},length(){return plen(this.sample(180))}};}
+const line=(id,a,b,sa=1)=>segment(id,a,b,null,null,sa), curve=(id,a,b,c,d,sa=1)=>segment(id,a,b,c,d,sa);
+function plen(a){return a.slice(1).reduce((s,p,i)=>s+dist(p,a[i]),0)}
+function arctable(points){let cum=[0];for(let i=1;i<points.length;i++)cum.push(cum[i-1]+dist(points[i],points[i-1]));return {points,cum,length:cum.at(-1),at(s){let x=clamp(s)*this.length,lo=0,hi=this.cum.length-1;while(hi-lo>1){let m=(lo+hi)>>1;if(this.cum[m]<x)lo=m;else hi=m}let t=(x-this.cum[lo])/(this.cum[hi]-this.cum[lo]||1);return mix(this.points[lo],this.points[hi],t)}}}
+function area(poly){return poly.reduce((s,p,i)=>{let q=poly[(i+1)%poly.length];return s+p[0]*q[1]-q[0]*p[1]},0)/2}
+function bounds(p){let xs=p.map(v=>v[0]),ys=p.map(v=>v[1]);return {minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys),width:Math.max(...xs)-Math.min(...xs),height:Math.max(...ys)-Math.min(...ys)}}
+function offset(poly,amounts){ // piecewise offset. Bounded joins; validate externally before production.
+ let sign=Math.sign(area(poly))||1,out=[];
+ for(let i=0;i<poly.length;i++){let a=poly[(i-1+poly.length)%poly.length],b=poly[i],c=poly[(i+1)%poly.length],d0=amounts[(i-1+poly.length)%poly.length],d1=amounts[i],v=[b[0]-a[0],b[1]-a[1]],w=[c[0]-b[0],c[1]-b[1]],lv=Math.hypot(...v)||1,lw=Math.hypot(...w)||1;
+ let p=[b[0]+sign*v[1]/lv*d0,b[1]-sign*v[0]/lv*d0],q=[b[0]+sign*w[1]/lw*d1,b[1]-sign*w[0]/lw*d1],den=v[0]*w[1]-v[1]*w[0];
+ let r;if(Math.abs(den)>1e-9){let t=((q[0]-p[0])*w[1]-(q[1]-p[1])*w[0])/den;r=[p[0]+v[0]*t,p[1]+v[1]*t];if(dist(r,b)>Math.max(d0,d1,.01)*8)r=mix(p,q,.5)}else r=mix(p,q,.5);out.push(r)}return trimOffsetLoops(out);
+}
+// Trim small self-intersecting offset loops created by concave joins.
+// Retain the outer component; source seam never changes. External containment QA remains mandatory.
+function trimOffsetLoops(poly){
+ let q=poly.slice();for(let pass=0;pass<100;pass++){let found=false;
+ for(let i=0;i<q.length&&!found;i++)for(let j=i+2;j<q.length;j++){
+  if(i===0&&j===q.length-1)continue;
+  let a=q[i],b=q[(i+1)%q.length],c=q[j],d=q[(j+1)%q.length],v=[b[0]-a[0],b[1]-a[1]],w=[d[0]-c[0],d[1]-c[1]],den=v[0]*w[1]-v[1]*w[0];
+  if(Math.abs(den)<1e-10)continue;let ca=[c[0]-a[0],c[1]-a[1]],t=(ca[0]*w[1]-ca[1]*w[0])/den,u=(ca[0]*v[1]-ca[1]*v[0])/den;
+  if(t>1e-8&&t<1-1e-8&&u>1e-8&&u<1-1e-8){let X=mix(a,b,t),one=[X,...q.slice(i+1,j+1)],two=[X,...q.slice(j+1),...q.slice(0,i+1)];q=Math.abs(area(one))>Math.abs(area(two))?one:two;found=true;break;}
+ }
+ if(!found)return q;
+ }throw Error('OFFSET_LOOP_UNRESOLVED');
+}
+function clean(poly){let out=[];for(let p of poly)if(!out.length||dist(p,out.at(-1))>1e-6)out.push(p);if(dist(out[0],out.at(-1))<1e-6)out.pop();return out}
+function earclip(poly){const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]),inside=(p,a,b,c)=>cross(a,b,p)>-1e-8&&cross(b,c,p)>-1e-8&&cross(c,a,p)>-1e-8;
+ let ids=Array.from({length:poly.length},(_,i)=>i);if(area(poly)<0)ids.reverse();let tris=[],guard=0;
+ while(ids.length>3&&guard++<poly.length*poly.length){let found=false;for(let k=0;k<ids.length;k++){let ai=ids[(k-1+ids.length)%ids.length],bi=ids[k],ci=ids[(k+1)%ids.length],a=poly[ai],b=poly[bi],c=poly[ci];if(cross(a,b,c)<1e-8)continue;let block=ids.some(j=>j!==ai&&j!==bi&&j!==ci&&inside(poly[j],a,b,c));if(block)continue;tris.push(ai,bi,ci);ids.splice(k,1);found=true;break}if(!found)break}
+ if(ids.length===3)tris.push(...ids);if(ids.length>3)throw Error('TRIANGULATION_FAILED');return tris;
+}
+function refine(uv,idx,level=2){uv=uv.map(x=>x.slice());for(let l=0;l<level;l++){let map=new Map(),ni=[];const mid=(a,b)=>{let key=a<b?a+':'+b:b+':'+a;if(!map.has(key)){map.set(key,uv.length);uv.push(mix(uv[a],uv[b],.5))}return map.get(key)};for(let k=0;k<idx.length;k+=3){let a=idx[k],b=idx[k+1],c=idx[k+2],ab=mid(a,b),bc=mid(b,c),ca=mid(c,a);ni.push(a,ab,ca,ab,b,bc,ca,bc,c,ab,bc,ca)}idx=ni}return {uv,indices:idx}}
+function adapt(uv,idx,maxEdge=3.8){uv=uv.map(p=>p.slice());for(let it=0;it<7;it++){let mids=new Map(),next=[],any=false;const mid=(a,b)=>{if(dist(uv[a],uv[b])<=maxEdge)return -1;let key=a<b?a+':'+b:b+':'+a;if(!mids.has(key)){mids.set(key,uv.length);uv.push(mix(uv[a],uv[b],.5))}any=true;return mids.get(key)};for(let k=0;k<idx.length;k+=3){let a=idx[k],b=idx[k+1],c=idx[k+2],ab=mid(a,b),bc=mid(b,c),ca=mid(c,a),n=(ab>=0)+(bc>=0)+(ca>=0);if(n===0)next.push(a,b,c);else if(n===3)next.push(a,ab,ca,ab,b,bc,ca,bc,c,ab,bc,ca);else if(n===1){if(ab>=0)next.push(a,ab,c,ab,b,c);else if(bc>=0)next.push(b,bc,a,bc,c,a);else next.push(c,ca,b,ca,a,b)}else{if(ab<0){next.push(c,ca,bc,b,bc,a,bc,ca,a)}else if(bc<0){next.push(a,ab,ca,c,ca,b,ca,ab,b)}else{next.push(b,bc,ab,a,ab,c,ab,bc,c)}}}idx=next;if(!any)break}return {uv,indices:idx}}
+
+function improveTriangles(mesh){
+ const uv=mesh.uv,I=mesh.indices.slice(),cr=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+ const ds=(a,b)=>(a[0]-b[0])**2+(a[1]-b[1])**2; const quality=(a,b,c)=>Math.abs(cr(uv[a],uv[b],uv[c]))/(ds(uv[a],uv[b])+ds(uv[b],uv[c])+ds(uv[c],uv[a])||1);
+ for(let iteration=0;iteration<6;iteration++){
+  const adjacent=new Map(),used=new Set();let changed=0;
+  for(let t=0;t<I.length;t+=3)for(let k=0;k<3;k++){let a=I[t+k],b=I[t+(k+1)%3],c=I[t+(k+2)%3],key=a<b?a+':'+b:b+':'+a;if(!adjacent.has(key))adjacent.set(key,[{t,a,b,c}]);else adjacent.get(key).push({t,a,b,c})}
+  for(let pair of adjacent.values()){
+   if(pair.length!==2)continue;const [e,f]=pair;if(used.has(e.t)||used.has(f.t))continue;
+   const {a,b,c}=e,d=f.c;if(c===d)continue;
+   if(cr(uv[c],uv[d],uv[a])*cr(uv[c],uv[d],uv[b])>=-1e-12)continue;
+   const old=Math.min(quality(a,b,c),quality(a,b,d)),neu=Math.min(quality(c,d,a),quality(c,d,b));if(neu<=old+1e-9)continue;
+   const put=(t,x,y,z)=>{if(cr(uv[x],uv[y],uv[z])<0)[y,z]=[z,y];I[t]=x;I[t+1]=y;I[t+2]=z};
+   put(e.t,c,d,a);put(f.t,d,c,b);used.add(e.t);used.add(f.t);changed++;
+  }
+  if(!changed)break;
+ }
+ return {uv,indices:I};
+}
+function rectMesh(w,h,folds=[]){let xs=[0,...folds,w].sort((a,b)=>a-b),uv=[],ids=[];let ny=Math.ceil(h/4);for(let j=0;j<=ny;j++)for(let x of xs)uv.push([x,h*j/ny]);for(let j=0;j<ny;j++)for(let i=0;i<xs.length-1;i++){let a=j*xs.length+i,b=a+1,c=a+xs.length,d=c+1;ids.push(a,b,c,b,d,c)}return adapt(uv,ids)}
+function splitAtLines(mesh,lines){
+ let uv=mesh.uv.map(v=>v.slice()),tris=mesh.indices.slice(),registry=new Map(uv.map((v,i)=>[v.map(x=>x.toFixed(9)).join(','),i]));
+ const index=v=>{let key=v.map(x=>x.toFixed(9)).join(',');if(!registry.has(key)){registry.set(key,uv.length);uv.push(v)}return registry.get(key)};
+ for(let [a,b] of lines){const side=v=>(b[0]-a[0])*(v[1]-a[1])-(b[1]-a[1])*(v[0]-a[0]);let out=[];
+  for(let t=0;t<tris.length;t+=3){let ids=tris.slice(t,t+3),poly=ids.map(i=>uv[i]),s=poly.map(side);
+   if(Math.min(...s)>=-1e-8||Math.max(...s)<=1e-8){out.push(...ids);continue}
+   for(let sign of [-1,1]){let clipped=[];for(let i=0;i<3;i++){let p=poly[i],q=poly[(i+1)%3],dp=side(p)*sign,dq=side(q)*sign;if(dp>=-1e-9)clipped.push(p);if((dp>1e-9&&dq< -1e-9)||(dp< -1e-9&&dq>1e-9))clipped.push(mix(p,q,dp/(dp-dq)))}
+    clipped=clean(clipped);if(clipped.length<3)continue;let ix=clipped.map(index);for(let j=1;j<ix.length-1;j++){const ar=Math.abs(area([uv[ix[0]],uv[ix[j]],uv[ix[j+1]]]));if(ar>1e-10)out.push(ix[0],ix[j],ix[j+1])}
+   }
+  }tris=out;
+ }return {uv,indices:tris};
+}
+function piece(id,name,edges,meta={}){let poly=[],amounts=[];for(let e of edges){let pts=e.sample(e.c?16:Math.max(1,Math.ceil(dist(e.a,e.b)/12)));for(let i=0;i<pts.length-1;i++){poly.push(pts[i]);amounts.push(e.sa)}}let cut=offset(poly,amounts),tri=improveTriangles(adapt(poly,earclip(poly)));return {id,name,edges,poly,cut,bounds:bounds(cut),mesh:tri,grain:[0,1],marks:[],quantity:1,interfacing:0,constructionStatus:'candidate',...meta}}
+function polygonPiece(id,name,poly,meta={}){return piece(id,name,poly.map((v,i)=>line('edge'+i,v,poly[(i+1)%poly.length],meta.sa??1)),meta)}
+function hash(obj){let s=JSON.stringify(obj),h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,'0')}
+root.HRLGeometry={V,mix,dist,clamp,cubic,segment,line,curve,plen,arctable,area,bounds,offset,clean,earclip,refine,adapt,improveTriangles,rectMesh,splitAtLines,piece,polygonPiece,hash};
+})(typeof window!=="undefined"?window:globalThis);
+</script><script>/* HRL-M04 C3P4-C · Tailor shop authority chain and one complete lined work-jacket sample.
+ * Units: centimetres. This module separates measurement ticket, base block, style draft,
+ * working pattern, toile cutting ticket, assembly graph, fitting and release records.
+ * It does not claim a production fit before a named person, toile and fitting record exist.
+ */
+(function(root){'use strict';
+const G=root.HRLGeometry;if(!G)throw Error('HRLGeometry must be loaded first');
+const defaults={
+ chest:100,waist:88,hip:100,neck:40,shoulder:44,shoulderSlope:4,
+ backWaist:45,garmentLength:72,sleeveLength:62,biceps:34,wrist:18,
+ chestEase:16,waistEase:18,hipEase:14,bicepsEase:10,wristEase:6,
+ armholeDepth:25,frontOverlap:3,facingWidth:6,liningHemOffset:2.5,
+ collarStandHeight:3.6,collarFall:7.2,cuffHeight:6,pocketWidth:17,
+ pocketHeight:20,pocketDepth:2.2,flapDepth:8,sa:1
+};
+const limits={
+ chest:[78,128],waist:[64,126],hip:[80,134],neck:[32,49],shoulder:[36,54],shoulderSlope:[1.5,7],
+ backWaist:[38,56],garmentLength:[58,86],sleeveLength:[52,72],biceps:[26,48],wrist:[14,25],
+ chestEase:[8,26],waistEase:[8,30],hipEase:[8,28],bicepsEase:[6,18],wristEase:[3,11],
+ armholeDepth:[21,31],frontOverlap:[2,5],facingWidth:[4.5,9],liningHemOffset:[1,5],
+ collarStandHeight:[2.8,4.8],collarFall:[5,10],cuffHeight:[4,8],pocketWidth:[13,22],
+ pocketHeight:[15,25],pocketDepth:[1,4],flapDepth:[6,11],sa:[.6,1.5]
+};
+const initialState={frontClosed:true,leftPocketClosed:true,rightPocketClosed:true,liningInstalled:true,inspection:'complete'};
+const clone=o=>JSON.parse(JSON.stringify(o));
+function parameters(input={}){let p={...defaults};for(const k of Object.keys(input)){if(!(k in limits))throw Error('UNKNOWN_PARAMETER:'+k);const v=input[k];if(!Number.isFinite(v)||v<limits[k][0]||v>limits[k][1])throw Error('PARAMETER_RANGE:'+k);p[k]=v;}
+ if(p.shoulder/2<=p.neck/5+5)throw Error('SHOULDER_TOO_SHORT_FOR_NECK');
+ if(p.pocketWidth+p.facingWidth+6>(p.chest+p.chestEase)/4+2)throw Error('POCKET_TOO_WIDE_FOR_FRONT');
+ if(p.pocketDepth>p.flapDepth*.58)throw Error('FLAP_DEPTH_INSUFFICIENT');
+ return p;}
+function state(input={}){for(const k of Object.keys(input))if(!(k in initialState))throw Error('UNKNOWN_STATE:'+k);let s={...initialState,...input};for(const k of ['frontClosed','leftPocketClosed','rightPocketClosed','liningInstalled'])if(typeof s[k]!=='boolean')throw Error('STATE_TYPE:'+k);if(!['complete','shell','lining','pockets','selected'].includes(s.inspection))throw Error('INSPECTION_STATE');return s;}
+const sample=(e,n=48)=>e.sample(e.c?n:Math.max(2,Math.ceil(e.length()/2)));
+const joinSamples=(...arrs)=>{let out=[];for(const a0 of arrs){let a=Array.isArray(a0[0])?a0:sample(a0);if(out.length&&G.dist(out.at(-1),a[0])<1e-6)a=a.slice(1);out.push(...a);}return out;};
+function edgeBy(q,id){let e=q.edges.find(e=>e.id===id);if(!e)throw Error('EDGE_NOT_FOUND:'+q.id+':'+id);return e;}
+function iface(q,id,points,kind='material_edge',extra={}){q.interfaces[id]={id,points:points.map(v=>v.slice()),kind,units:'centimetre',length:G.plen(points),...extra};return q.interfaces[id];}
+function ifaceEdges(q,id,ids,kind='material_edge',extra={}){return iface(q,id,joinSamples(...ids.map(k=>edgeBy(q,k))),kind,extra);}
+function piece(id,name,edges,p,meta={}){let q=G.piece(id,name,edges,{sa:p.sa,quantity:1,layerRole:'shell',materialClass:'shell_fabric',...meta});q.interfaces={};q.notches=[];q.boundaryIndices=Array.from({length:q.poly.length},(_,i)=>i);q.grain=[0,1];q.grainLine=[[q.bounds.minX+q.bounds.width*.32,q.bounds.minY+q.bounds.height*.18],[q.bounds.minX+q.bounds.width*.32,q.bounds.minY+q.bounds.height*.80]];q.cutMethod=meta.cutMethod||'single_layer';q.allowancePolicy=meta.allowancePolicy||'seam_allowance';q.mirror=!!meta.mirror;q.onFold=!!meta.onFold;q.sourceStage='style_draft';return q;}
+function polygonPiece(id,name,poly,p,meta={}){let q=G.polygonPiece(id,name,poly,{sa:p.sa,quantity:1,layerRole:'shell',materialClass:'shell_fabric',...meta});q.interfaces={};q.notches=[];q.boundaryIndices=Array.from({length:q.poly.length},(_,i)=>i);q.grain=[0,1];q.grainLine=[[q.bounds.minX+q.bounds.width*.32,q.bounds.minY+q.bounds.height*.18],[q.bounds.minX+q.bounds.width*.32,q.bounds.minY+q.bounds.height*.80]];q.cutMethod=meta.cutMethod||'single_layer';q.allowancePolicy=meta.allowancePolicy||'seam_allowance';q.mirror=!!meta.mirror;q.onFold=!!meta.onFold;q.sourceStage='style_draft';return q;}
+function rectPiece(id,name,w,h,p,meta={}){return polygonPiece(id,name,[[0,0],[w,0],[w,h],[0,h]],p,meta);}
+function solveSleeveCap(frontTarget,backTarget,width,sleeveLength){let best=null;
+ const test=(r,h)=>{let apex=[width*r,sleeveLength+h],left=[0,sleeveLength],right=[width,sleeveLength];let f=G.curve('capFront',left,[width*.10,sleeveLength+h*.20],[apex[0]*.70,sleeveLength+h*.97],apex),b=G.curve('capBack',apex,[apex[0]+(width-apex[0])*.30,sleeveLength+h*.98],[width*.91,sleeveLength+h*.20],right);let err=Math.abs(f.length()-frontTarget)+Math.abs(b.length()-backTarget);if(!best||err<best.err)best={err,r,h,front:f,back:b,apex};};
+ for(let r=.36;r<=.64;r+=.004)for(let h=6;h<=26;h+=.12)test(r,h);
+ for(const [dr,dh] of [[.006,.18],[.0015,.045],[.00035,.012]]){let c={...best};for(let r=c.r-dr;r<=c.r+dr+1e-9;r+=dr/12)for(let h=c.h-dh;h<=c.h+dh+1e-9;h+=dh/12)test(r,h);}
+ if(!best||best.err>.08)throw Error('SLEEVE_CAP_SOLVE_FAILED:'+best?.err);return best;}
+
+const INSTANCE_ROLES={
+ 'front.shell':['left','right'],'back.shell':['folded'],'sleeve.shell':['left','right'],
+ 'front.facing':['left','right'],'front.lining':['left','right'],'back.lining':['folded'],'sleeve.lining':['left','right'],
+ 'stand.outer':['single'],'stand.inner':['single'],'collar.outer':['single'],'collar.under':['single'],
+ 'cuff.outer':['left','right'],'cuff.inner':['left','right'],'pocket.face':['left','right'],
+ 'pocket.gusset.side':['left.inboard','left.outboard','right.inboard','right.outboard'],
+ 'pocket.gusset.bottom':['left','right'],'flap.outer':['left','right'],'flap.inner':['left','right'],
+ 'interfacing.facing':['left','right'],'interfacing.stand':['single'],'interfacing.collar':['single'],
+ 'interfacing.cuff':['left','right'],'interfacing.flap':['left','right']
+};
+const iid=(pieceId,role)=>pieceId+'::'+role;
+function makeCutPieceInstances(panels){let out=[];for(const q of panels){let roles=INSTANCE_ROLES[q.id]||Array.from({length:q.quantity},(_,i)=>'cut'+(i+1));if(roles.length!==q.quantity)throw Error('INSTANCE_ROLE_COUNT:'+q.id);roles.forEach((role,i)=>out.push({schema:'hrl_m04/cut_piece_instance@1',id:iid(q.id,role),patternPieceId:q.id,role,side:role.startsWith('left')?'left':role.startsWith('right')?'right':null,cutIndex:i+1,materialClass:q.materialClass,layerRole:q.layerRole,mirrorApplied:q.mirror&&role!=='left',onFold:q.onFold,replicas:q.onFold?['left','right']:[],status:'planned_for_toile'}));}return out;}
+function baseGeometryPiece(q,id){return {id,name:q.name,units:'centimetre',seamLine:q.poly.map(v=>v.slice()),interfaces:Object.fromEntries(Object.entries(q.interfaces).filter(([k])=>['hem','side','armhole','shoulder','neckline','centerBackFold','centerFront','capFront','capBack','underFront','underBack'].includes(k)).map(([k,v])=>[k,{kind:v.kind,points:v.points.map(x=>x.slice()),lengthCm:v.length}]))};}
+function styleOperations(p){return [
+ {id:'op.ease.body',type:'set_region_ease',inputs:['measurement.chest','measurement.waist','measurement.hip'],parameters:{chestEaseCm:p.chestEase,waistEaseCm:p.waistEase,hipEaseCm:p.hipEase},outputs:['front.shell','back.shell']},
+ {id:'op.front.opening',type:'add_center_front_opening_and_overlap',inputs:['front.shell'],parameters:{overlapCm:p.frontOverlap},outputs:['front.shell','front.facing']},
+ {id:'op.armhole.sleeve',type:'solve_set_in_sleeve_cap',inputs:['front.shell.armhole','back.shell.armhole'],parameters:{bicepsEaseCm:p.bicepsEase,capEaseCm:1.4},outputs:['sleeve.shell']},
+ {id:'op.lining.derive',type:'derive_lining_from_shell',inputs:['front.shell','back.shell','sleeve.shell','front.facing'],parameters:{hemOffsetCm:p.liningHemOffset},outputs:['front.lining','back.lining','sleeve.lining']},
+ {id:'op.collar.add',type:'add_collar_stand_and_fall',inputs:['front.shell.neckline','back.shell.neckline'],parameters:{standHeightCm:p.collarStandHeight,fallCm:p.collarFall,overlapCm:p.frontOverlap},outputs:['stand.outer','stand.inner','collar.outer','collar.under']},
+ {id:'op.cuff.add',type:'add_two_layer_cuff',inputs:['sleeve.shell.hem'],parameters:{heightCm:p.cuffHeight,overlapCm:p.frontOverlap},outputs:['cuff.outer','cuff.inner']},
+ {id:'op.pocket.add',type:'add_bellows_pocket_module',inputs:['front.shell'],parameters:{widthCm:p.pocketWidth,heightCm:p.pocketHeight,depthCm:p.pocketDepth,flapDepthCm:p.flapDepth},outputs:['pocket.face','pocket.gusset.side','pocket.gusset.bottom','flap.outer','flap.inner']},
+ {id:'op.interfacing.derive',type:'derive_net_interfacing',inputs:['front.facing','stand.outer','collar.outer','cuff.outer','flap.outer'],parameters:{seamAllowanceCm:0},outputs:['interfacing.facing','interfacing.stand','interfacing.collar','interfacing.cuff','interfacing.flap']}
+ ];}
+function makeAssemblyGraph(panels,instances){const relations=[],bonds=[],boundaries=[];const member=(piece,role,interfaceId,extra={})=>({instanceId:iid(piece,role),patternPieceId:piece,interfaceId,...extra});const add=(id,type,members,stage='toile_assembly',extra={})=>relations.push({id,kind:'seam',type,members,stage,status:'working_candidate',...extra});const bond=(id,sourcePiece,sourceRole,targetPiece,targetRole,region)=>bonds.push({id,kind:'bond',method:'fusible_candidate_material_lot_unset',source:member(sourcePiece,sourceRole,'surface'),target:member(targetPiece,targetRole,'surface'),region,status:'working_candidate'});const boundary=(id,piece,role,interfaceId,disposition,extra={})=>boundaries.push({id,instanceId:iid(piece,role),patternPieceId:piece,interfaceId,disposition,...extra});
+ for(const side of ['left','right']){const rep={replica:side};
+  add('shell.side.'+side,'one_to_one',[member('front.shell',side,'side'),member('back.shell','folded','side',rep)]);
+  add('shell.shoulder.'+side,'one_to_one',[member('front.shell',side,'shoulder'),member('back.shell','folded','shoulder',rep)]);
+  add('shell.armhole.front.'+side,'distributed_ease',[member('front.shell',side,'armhole'),member('sleeve.shell',side,'capFront')],'toile_assembly',{plannedEaseCm:.588});
+  add('shell.armhole.back.'+side,'distributed_ease',[member('back.shell','folded','armhole',rep),member('sleeve.shell',side,'capBack')],'toile_assembly',{plannedEaseCm:.812});
+  add('sleeve.underarm.'+side,'one_to_one',[member('sleeve.shell',side,'underFront'),member('sleeve.shell',side,'underBack')]);
+  add('front.facing.center.'+side,'bagging',[member('front.shell',side,'centerFront'),member('front.facing',side,'centerFront')]);
+  add('front.facing.neck.'+side,'bagging',[member('front.shell',side,'neckline'),member('front.facing',side,'neckline')]);
+  add('facing.lining.'+side,'one_to_one',[member('front.facing',side,'liningJoin'),member('front.lining',side,'facingJoin')]);
+  add('lining.side.'+side,'one_to_one',[member('front.lining',side,'side'),member('back.lining','folded','side',rep)]);
+  add('lining.shoulder.'+side,'one_to_one',[member('front.lining',side,'shoulder'),member('back.lining','folded','shoulder',rep)]);
+  add('lining.armhole.front.'+side,'distributed_ease',[member('front.lining',side,'armhole'),member('sleeve.lining',side,'capFront')],'toile_assembly',{plannedEaseCm:.588});
+  add('lining.armhole.back.'+side,'distributed_ease',[member('back.lining','folded','armhole',rep),member('sleeve.lining',side,'capBack')],'toile_assembly',{plannedEaseCm:.812});
+  add('lining.sleeve.underarm.'+side,'one_to_one',[member('sleeve.lining',side,'underFront'),member('sleeve.lining',side,'underBack')]);
+  add('cuff.shell.'+side,'one_to_one',[member('cuff.outer',side,'sleeveJoin'),member('sleeve.shell',side,'hem')]);
+  add('cuff.lining.'+side,'one_to_one',[member('cuff.inner',side,'sleeveJoin'),member('sleeve.lining',side,'hem')]);
+  add('cuff.layers.'+side,'bagging',[member('cuff.outer',side,'freeEdge'),member('cuff.inner',side,'freeEdge')]);
+  const inboard=side+'.inboard',outboard=side+'.outboard';
+  add('pocket.face.inboard.'+side,'one_to_one',[member('pocket.face',side,'left'),member('pocket.gusset.side',inboard,'face')]);
+  add('pocket.face.outboard.'+side,'one_to_one',[member('pocket.face',side,'right'),member('pocket.gusset.side',outboard,'face')]);
+  add('pocket.face.bottom.'+side,'one_to_one',[member('pocket.face',side,'bottom'),member('pocket.gusset.bottom',side,'face')]);
+  add('pocket.corner.inboard.'+side,'one_to_one',[member('pocket.gusset.side',inboard,'bottom'),member('pocket.gusset.bottom',side,'left')]);
+  add('pocket.corner.outboard.'+side,'one_to_one',[member('pocket.gusset.side',outboard,'bottom'),member('pocket.gusset.bottom',side,'right')]);
+  add('pocket.host.inboard.'+side,'attachment_path',[member('pocket.gusset.side',inboard,'host'),member('front.shell',side,'pocketHostLeft')]);
+  add('pocket.host.outboard.'+side,'attachment_path',[member('pocket.gusset.side',outboard,'host'),member('front.shell',side,'pocketHostRight')]);
+  add('pocket.host.bottom.'+side,'attachment_path',[member('pocket.gusset.bottom',side,'host'),member('front.shell',side,'pocketHostBottom')]);
+  add('flap.layers.'+side,'bagging',[member('flap.outer',side,'perimeter'),member('flap.inner',side,'perimeter')]);
+  add('flap.attach.'+side,'attachment_path',[member('flap.outer',side,'hinge'),member('front.shell',side,'flapHost')]);
+  bond('bond.facing.'+side,'interfacing.facing',side,'front.facing',side,'front_opening_facing');
+  bond('bond.cuff.'+side,'interfacing.cuff',side,'cuff.outer',side,'cuff_outer');
+  bond('bond.flap.'+side,'interfacing.flap',side,'flap.outer',side,'flap_outer');
+  boundary('opening.front.'+side,'front.shell',side,'centerFront','releasable_opening');
+  boundary('hem.shell.front.'+side,'front.shell',side,'hem','finished_hem');
+  boundary('hem.lining.front.'+side,'front.lining',side,'hem','finished_lining_hem');
+  boundary('opening.pocket.face.'+side,'pocket.face',side,'mouth','pocket_mouth_open');
+  boundary('opening.pocket.gusset.inboard.'+side,'pocket.gusset.side',inboard,'mouth','pocket_mouth_open');
+  boundary('opening.pocket.gusset.outboard.'+side,'pocket.gusset.side',outboard,'mouth','pocket_mouth_open');
+ }
+ add('collar.stand.outer.neckline','aggregate_seam',[member('stand.outer','single','necklineJoin'),member('front.shell','left','neckline'),member('back.shell','folded','neckline',{replica:'left'}),member('back.shell','folded','neckline',{replica:'right'}),member('front.shell','right','neckline')]);
+ add('collar.stand.inner.neckline','aggregate_finish',[member('stand.inner','single','necklineJoin'),member('front.facing','left','neckline'),member('back.lining','folded','neckline',{replica:'left'}),member('back.lining','folded','neckline',{replica:'right'}),member('front.facing','right','neckline')]);
+ add('collar.stand.end.left','bagging',[member('stand.outer','single','endLeft'),member('stand.inner','single','endLeft')]);
+ add('collar.stand.end.right','bagging',[member('stand.outer','single','endRight'),member('stand.inner','single','endRight')]);
+ add('collar.under.to.stand','one_to_one',[member('collar.under','single','standJoin'),member('stand.outer','single','collarJoin')]);
+ add('collar.outer.to.stand','one_to_one',[member('collar.outer','single','standJoin'),member('stand.inner','single','collarJoin')]);
+ add('collar.layers','bagging',[member('collar.outer','single','outerEdge'),member('collar.under','single','outerEdge')]);
+ bond('bond.stand','interfacing.stand','single','stand.outer','single','collar_stand_outer');
+ bond('bond.collar','interfacing.collar','single','collar.outer','single','collar_outer');
+ boundary('fold.back.shell','back.shell','folded','centerBackFold','cut_on_fold');
+ boundary('hem.back.shell','back.shell','folded','hem','finished_hem');
+ boundary('fold.back.lining','back.lining','folded','centerBackFold','cut_on_fold');
+ boundary('hem.back.lining','back.lining','folded','hem','finished_lining_hem');
+ const referenced=new Set();for(const r of relations)for(const m of r.members)referenced.add(m.instanceId);for(const b of bonds){referenced.add(b.source.instanceId);referenced.add(b.target.instanceId);}for(const b of boundaries)referenced.add(b.instanceId);const missing=instances.map(x=>x.id).filter(id=>!referenced.has(id));
+ return {schema:'hrl_m04/assembly_graph@1',nodes:instances.map(x=>({id:x.id,patternPieceId:x.patternPieceId,role:x.role,status:x.status})),relations,bondRelations:bonds,boundaryDispositions:boundaries,completeness:{allCutPieceInstancesCovered:missing.length===0,uncoveredInstanceIds:missing,relationCount:relations.length,bondCount:bonds.length,boundaryCount:boundaries.length,status:missing.length?'incomplete':'complete_working_graph'}};
+}
+
+function makeDefinition(input={}){const p=parameters(input),H=p.garmentLength,waistY=H-p.backWaist,armY=H-p.armholeDepth;
+ const chestGar=p.chest+p.chestEase,waistGar=p.waist+p.waistEase,hipGar=p.hip+p.hipEase;
+ const frontChest=chestGar/4+1,backChest=chestGar/4-1,frontWaist=waistGar/4+1,backWaist=waistGar/4-1,frontHip=hipGar/4+1,backHip=hipGar/4-1;
+ const neckW=Math.max(7,p.neck/5+.15),frontNeckD=p.neck*.20+1,backNeckD=2.5,shoulderLen=p.shoulder/2-neckW,shoulderX=neckW+shoulderLen,shoulderY=H-p.shoulderSlope;
+ const panels=[];
+ // Front shell: center front -> hem -> side -> armhole -> shoulder -> neckline.
+ let fe=[
+  G.line('frontHem',[0,0],[frontHip,0],p.sa),
+  G.curve('frontSideLower',[frontHip,0],[frontHip,waistY*.42],[frontWaist,waistY*.78],[frontWaist,waistY],p.sa),
+  G.curve('frontSideUpper',[frontWaist,waistY],[frontWaist,waistY+(armY-waistY)*.38],[frontChest,waistY+(armY-waistY)*.78],[frontChest,armY],p.sa),
+  G.curve('frontArmhole',[frontChest,armY],[frontChest+.6,armY+7],[shoulderX+1.5,shoulderY-6],[shoulderX,shoulderY],p.sa),
+  G.line('frontShoulder',[shoulderX,shoulderY],[neckW,H],p.sa),
+  G.curve('frontNeck',[neckW,H],[neckW*.38,H],[0,H-frontNeckD*.28],[0,H-frontNeckD],p.sa),
+  G.line('centerFront',[0,H-frontNeckD],[0,0],p.sa)
+ ];
+ const front=piece('front.shell','外套前身片',fe,p,{quantity:2,mirror:true,layerRole:'shell',materialClass:'shell_fabric'});panels.push(front);
+ ifaceEdges(front,'hem',['frontHem']);ifaceEdges(front,'side',['frontSideLower','frontSideUpper']);ifaceEdges(front,'armhole',['frontArmhole']);ifaceEdges(front,'shoulder',['frontShoulder']);ifaceEdges(front,'neckline',['frontNeck']);ifaceEdges(front,'centerFront',['centerFront'],'opening_edge');
+ // Back half on fold. Relative side-seam shaping matches front exactly.
+ let be=[
+  G.line('backHem',[0,0],[backHip,0],p.sa),
+  G.curve('backSideLower',[backHip,0],[backHip,waistY*.42],[backWaist,waistY*.78],[backWaist,waistY],p.sa),
+  G.curve('backSideUpper',[backWaist,waistY],[backWaist,waistY+(armY-waistY)*.38],[backChest,waistY+(armY-waistY)*.78],[backChest,armY],p.sa),
+  G.curve('backArmhole',[backChest,armY],[backChest+.3,armY+8],[shoulderX+.8,shoulderY-5],[shoulderX,shoulderY],p.sa),
+  G.line('backShoulder',[shoulderX,shoulderY],[neckW,H],p.sa),
+  G.curve('backNeck',[neckW,H],[neckW*.55,H],[0,H-backNeckD*.25],[0,H-backNeckD],p.sa),
+  G.line('centerBackFold',[0,H-backNeckD],[0,0],0)
+ ];
+ const back=piece('back.shell','外套后身半片（对折裁）',be,p,{quantity:1,onFold:true,layerRole:'shell',materialClass:'shell_fabric'});panels.push(back);
+ ifaceEdges(back,'hem',['backHem']);ifaceEdges(back,'side',['backSideLower','backSideUpper']);ifaceEdges(back,'armhole',['backArmhole']);ifaceEdges(back,'shoulder',['backShoulder']);ifaceEdges(back,'neckline',['backNeck']);ifaceEdges(back,'centerBackFold',['centerBackFold'],'fold_edge');
+ // Sleeve cap is solved from the actual front/back armhole lengths plus bounded design ease.
+ const frontArm=front.interfaces.armhole.length,backArm=back.interfaces.armhole.length,capEase=1.4;
+ const sleeveWidth=p.biceps+p.bicepsEase,hemWidth=p.wrist+p.wristEase,cap=solveSleeveCap(frontArm+capEase*.42,backArm+capEase*.58,sleeveWidth,p.sleeveLength);
+ const cuffInset=(sleeveWidth-hemWidth)/2;
+ const capBackRev=G.curve('capBack',cap.back.d,cap.back.c,cap.back.b,cap.back.a,p.sa);
+ const capFrontRev=G.curve('capFront',cap.front.d,cap.front.c,cap.front.b,cap.front.a,p.sa);
+ let se=[
+  G.line('sleeveHem',[cuffInset,0],[cuffInset+hemWidth,0],p.sa),
+  // The two underarm seams are mirrored from one construction curve so their
+  // material lengths are exactly equal before any fitting alteration.
+  G.curve('sleeveBackSeam',[cuffInset+hemWidth,0],[sleeveWidth-cuffInset*.55,p.sleeveLength*.35],[sleeveWidth,p.sleeveLength*.70],[sleeveWidth,p.sleeveLength],p.sa),
+  capBackRev,
+  capFrontRev,
+  G.curve('sleeveFrontSeam',[0,p.sleeveLength],[0,p.sleeveLength*.70],[cuffInset*.55,p.sleeveLength*.35],[cuffInset,0],p.sa)
+ ];
+ const sleeve=piece('sleeve.shell','一片式装袖',se,p,{quantity:2,mirror:true,layerRole:'shell',materialClass:'shell_fabric'});panels.push(sleeve);
+ ifaceEdges(sleeve,'hem',['sleeveHem']);ifaceEdges(sleeve,'underBack',['sleeveBackSeam']);ifaceEdges(sleeve,'capBack',['capBack']);ifaceEdges(sleeve,'capFront',['capFront']);ifaceEdges(sleeve,'underFront',['sleeveFrontSeam']);
+ sleeve.notches.push({interfaceId:'capFront',s:.48,type:'single',purpose:'front_pitch'},{interfaceId:'capBack',s:.42,type:'double',purpose:'back_pitch'},{interfaceId:'capFront',s:1,type:'single',purpose:'sleeve_crown'});
+ // Front facing uses the exact center-front and neckline curves from the shell, with an internal lining boundary.
+ const FW=p.facingWidth,joinTop=[neckW+2,H-1.2],joinMid=[FW,H-frontNeckD+4],joinBot=[FW,p.liningHemOffset];
+ let fce=[G.line('facingHem',[0,0],[FW,0],p.sa),G.curve('facingJoinLower',[FW,0],[FW,p.liningHemOffset*.5],[FW,p.liningHemOffset*.8],joinBot,p.sa),G.curve('facingJoinUpper',joinBot,[FW,H*.55],[joinTop[0]-2,H-7],joinTop,p.sa),G.line('facingShoulder',joinTop,[neckW,H],p.sa),G.curve('facingNeck',[neckW,H],[neckW*.38,H],[0,H-frontNeckD*.28],[0,H-frontNeckD],p.sa),G.line('facingCF',[0,H-frontNeckD],[0,0],p.sa)];
+ const facing=piece('front.facing','前开口贴边',fce,p,{quantity:2,mirror:true,layerRole:'facing',materialClass:'shell_fabric'});panels.push(facing);
+ ifaceEdges(facing,'liningJoin',['facingJoinLower','facingJoinUpper']);ifaceEdges(facing,'neckline',['facingNeck']);ifaceEdges(facing,'centerFront',['facingCF']);ifaceEdges(facing,'hem',['facingHem']);
+ // Front lining keeps the shell side/armhole/shoulder envelope and the exact facing boundary.
+ const fj=joinSamples(edgeBy(facing,'facingJoinLower'),edgeBy(facing,'facingJoinUpper'));
+ let frontLPoly=[joinBot,[frontHip,p.liningHemOffset],[frontWaist,waistY],[frontChest,armY],[shoulderX,shoulderY],joinTop,joinMid];
+ const frontL=polygonPiece('front.lining','前片里布',frontLPoly,p,{quantity:2,mirror:true,layerRole:'lining',materialClass:'lining_fabric'});panels.push(frontL);
+ iface(frontL,'facingJoin',fj);
+ iface(frontL,'hem',[joinBot,[frontHip,p.liningHemOffset]],'finished_edge');
+ iface(frontL,'side',front.interfaces.side.points);iface(frontL,'armhole',front.interfaces.armhole.points);iface(frontL,'shoulder',front.interfaces.shoulder.points);
+ // Back lining duplicates the structural back half; a center-back ease pleat is an internal mark, not a seam.
+ const backL=polygonPiece('back.lining','后片里布半片（对折裁）',back.poly,p,{quantity:1,onFold:true,layerRole:'lining',materialClass:'lining_fabric'});panels.push(backL);
+ for(const [k,v] of Object.entries(back.interfaces))iface(backL,k,v.points,v.kind);backL.internalMarks=[{id:'centerBackEasePleat',type:'pleat',allowanceCm:2.5,from:[0,H*.18],to:[0,H-backNeckD]}];
+ // Sleeve lining uses the same seam identity, shortened at cuff by 1 cm for turn-up management.
+ const sleeveL=polygonPiece('sleeve.lining','袖里',sleeve.poly.map(([x,y])=>[x,Math.max(1,y)]),p,{quantity:2,mirror:true,layerRole:'lining',materialClass:'lining_fabric'});panels.push(sleeveL);
+ for(const [k,v] of Object.entries(sleeve.interfaces))iface(sleeveL,k,v.points.map(([x,y])=>[x,Math.max(1,y)]),v.kind);
+ // Collar stand: neckline join excludes the overlap extensions; collar join is the upper material edge.
+ const fullNeck=2*front.interfaces.neckline.length+2*back.interfaces.neckline.length,standFull=fullNeck+p.frontOverlap;
+ const standPoly=[[0,0],[standFull,0],[standFull-.4,p.collarStandHeight],[.4,p.collarStandHeight]];
+ const standOuter=polygonPiece('stand.outer','领座面',standPoly,p,{quantity:1,layerRole:'collar',materialClass:'shell_fabric'}),standInner=polygonPiece('stand.inner','领座里',standPoly,p,{quantity:1,layerRole:'collar',materialClass:'shell_fabric'});panels.push(standOuter,standInner);
+ for(const q of [standOuter,standInner]){iface(q,'necklineJoin',[[p.frontOverlap/2,0],[standFull-p.frontOverlap/2,0]]);iface(q,'collarJoin',[[.4,p.collarStandHeight],[standFull-.4,p.collarStandHeight]]);iface(q,'endLeft',[[0,0],[.4,p.collarStandHeight]]);iface(q,'endRight',[[standFull-.4,p.collarStandHeight],[standFull,0]]);iface(q,'perimeter',q.poly);q.grainLine=[[standFull*.3,p.collarStandHeight*.5],[standFull*.7,p.collarStandHeight*.5]];}
+ const collarLen=standOuter.interfaces.collarJoin.length,collarPoly=[[0,0],[collarLen,0],[collarLen-2.2,p.collarFall],[2.2,p.collarFall]];
+ const collarOuter=polygonPiece('collar.outer','翻领面',collarPoly,p,{quantity:1,layerRole:'collar',materialClass:'shell_fabric'}),collarUnder=polygonPiece('collar.under','底领',collarPoly,p,{quantity:1,layerRole:'collar',materialClass:'undercollar_fabric'});panels.push(collarOuter,collarUnder);
+ for(const q of [collarOuter,collarUnder]){iface(q,'standJoin',[[0,0],[collarLen,0]]);iface(q,'outerEdge',[[0,0],[2.2,p.collarFall],[collarLen-2.2,p.collarFall],[collarLen,0]]);iface(q,'perimeter',q.poly);q.grainLine=[[collarLen*.28,p.collarFall*.45],[collarLen*.72,p.collarFall*.45]];}
+ // Cuffs: seam join excludes the overlap extension and exactly matches sleeve hem.
+ const cuffJoin=sleeve.interfaces.hem.length,cuffFull=cuffJoin+p.frontOverlap,cuffPoly=[[0,0],[cuffFull,0],[cuffFull,p.cuffHeight],[0,p.cuffHeight]];
+ const cuffOuter=polygonPiece('cuff.outer','袖口面',cuffPoly,p,{quantity:2,layerRole:'cuff',materialClass:'shell_fabric'}),cuffInner=polygonPiece('cuff.inner','袖口里',cuffPoly,p,{quantity:2,layerRole:'cuff',materialClass:'shell_fabric'});panels.push(cuffOuter,cuffInner);
+ for(const q of [cuffOuter,cuffInner]){iface(q,'sleeveJoin',[[p.frontOverlap/2,0],[cuffFull-p.frontOverlap/2,0]]);iface(q,'freeEdge',[[0,0],[0,p.cuffHeight],[cuffFull,p.cuffHeight],[cuffFull,0]]);iface(q,'perimeter',q.poly);q.grainLine=[[cuffFull*.3,p.cuffHeight*.5],[cuffFull*.7,p.cuffHeight*.5]];}
+ // Two mirrored bellows pockets and flaps; the opening remains topologically open when the flap is closed.
+ const PW=p.pocketWidth,PH=p.pocketHeight,D=p.pocketDepth;
+ const pocketFace=rectPiece('pocket.face','立体袋面',PW,PH,p,{quantity:2,layerRole:'pocket',materialClass:'shell_fabric'}),gussetSide=rectPiece('pocket.gusset.side','袋侧围',D,PH,p,{quantity:4,layerRole:'pocket',materialClass:'shell_fabric'}),gussetBottom=rectPiece('pocket.gusset.bottom','袋底围',PW,D,p,{quantity:2,layerRole:'pocket',materialClass:'shell_fabric'});panels.push(pocketFace,gussetSide,gussetBottom);
+ iface(pocketFace,'left',[[0,0],[0,PH]]);iface(pocketFace,'right',[[PW,0],[PW,PH]]);iface(pocketFace,'bottom',[[0,0],[PW,0]]);iface(pocketFace,'mouth',[[0,PH],[PW,PH]],'opening_edge');
+ iface(gussetSide,'host',[[0,0],[0,PH]]);iface(gussetSide,'face',[[D,0],[D,PH]]);iface(gussetSide,'bottom',[[0,0],[D,0]]);iface(gussetSide,'mouth',[[0,PH],[D,PH]],'opening_edge');
+ iface(gussetBottom,'host',[[0,0],[PW,0]]);iface(gussetBottom,'face',[[0,D],[PW,D]]);iface(gussetBottom,'left',[[0,0],[0,D]]);iface(gussetBottom,'right',[[PW,0],[PW,D]]);
+ const pocketHostX=frontHip*.22,pocketHostY=H*.23;iface(front,'pocketHostLeft',[[pocketHostX,pocketHostY],[pocketHostX,pocketHostY+PH]],'surface_path');iface(front,'pocketHostRight',[[pocketHostX+PW,pocketHostY],[pocketHostX+PW,pocketHostY+PH]],'surface_path');iface(front,'pocketHostBottom',[[pocketHostX,pocketHostY],[pocketHostX+PW,pocketHostY]],'surface_path');iface(front,'flapHost',[[pocketHostX-.5,pocketHostY+PH+.6],[pocketHostX+PW+.5,pocketHostY+PH+.6]],'surface_path');
+ const flapPoly=[[0,0],[PW+1,0],[PW+1,p.flapDepth-1],[PW,p.flapDepth],[1,p.flapDepth],[0,p.flapDepth-1]];
+ const flapOuter=polygonPiece('flap.outer','袋盖面',flapPoly,p,{quantity:2,layerRole:'pocket',materialClass:'shell_fabric'}),flapInner=polygonPiece('flap.inner','袋盖里',flapPoly,p,{quantity:2,layerRole:'pocket',materialClass:'shell_fabric'});panels.push(flapOuter,flapInner);
+ for(const q of [flapOuter,flapInner]){iface(q,'hinge',[[0,0],[PW+1,0]]);iface(q,'perimeter',flapPoly.slice(1).concat([flapPoly[0]]));}
+ // Interfacing pieces are explicit and have no seam allowance.
+ const facingInter=polygonPiece('interfacing.facing','贴边衬',facing.poly,p,{quantity:2,mirror:true,layerRole:'interfacing',materialClass:'interfacing',sa:0,cutMethod:'net_cut_no_seam_allowance',allowancePolicy:'zero'});
+ const standInter=polygonPiece('interfacing.stand','领座衬',standPoly,p,{quantity:1,layerRole:'interfacing',materialClass:'interfacing',sa:0,cutMethod:'net_cut_no_seam_allowance',allowancePolicy:'zero'});
+ const collarInter=polygonPiece('interfacing.collar','翻领衬',collarPoly,p,{quantity:1,layerRole:'interfacing',materialClass:'interfacing',sa:0,cutMethod:'net_cut_no_seam_allowance',allowancePolicy:'zero'});
+ const cuffInter=polygonPiece('interfacing.cuff','袖口衬',cuffPoly,p,{quantity:2,layerRole:'interfacing',materialClass:'interfacing',sa:0,cutMethod:'net_cut_no_seam_allowance',allowancePolicy:'zero'});
+ const flapInter=polygonPiece('interfacing.flap','袋盖衬',flapPoly,p,{quantity:2,layerRole:'interfacing',materialClass:'interfacing',sa:0,cutMethod:'net_cut_no_seam_allowance',allowancePolicy:'zero'});
+ for(const q of [facingInter,standInter,collarInter,cuffInter,flapInter]){q.cut=q.poly.map(v=>v.slice());q.grainLine=q.grainLine||[[0,0],[1,0]];panels.push(q);}
+ // Add stable notches to core joining interfaces.
+ for(const q of [front,back])q.notches.push({interfaceId:'shoulder',s:.5,type:'single',purpose:'shoulder_alignment'});
+ front.notches.push({interfaceId:'armhole',s:.56,type:'single',purpose:'front_pitch'});back.notches.push({interfaceId:'armhole',s:.46,type:'double',purpose:'back_pitch'});
+ // Seam relation builder. Orientation is material arclength direction, never inferred from screen adjacency.
+ let seams=[],seq=0;const pair=(id,a,ia,b,ib,type='one_to_one',opt={})=>seams.push({id:id||'join.'+String(++seq).padStart(2,'0'),type,a:{panelId:a,interfaceId:ia,range:[0,1]},b:{panelId:b,interfaceId:ib,range:[0,1]},mapping:{basis:'normalized_material_arclength',orientation:opt.orientation??1,controlPairs:opt.controlPairs||[[0,0],[.5,.5],[1,1]]},toleranceCm:opt.toleranceCm??.08,plannedEaseCm:opt.plannedEaseCm??0,multiplicity:opt.multiplicity??1,stage:opt.stage||'assembly',activeWhen:opt.activeWhen||null,evidenceStatus:'hrl_candidate'});
+ pair('shell.side',front.id,'side',back.id,'side','one_to_one',{multiplicity:2});
+ pair('shell.shoulder',front.id,'shoulder',back.id,'shoulder','one_to_one',{multiplicity:2});
+ pair('shell.armhole.front',front.id,'armhole',sleeve.id,'capFront','distributed_ease',{multiplicity:2,plannedEaseCm:capEase*.42,toleranceCm:.12});
+ pair('shell.armhole.back',back.id,'armhole',sleeve.id,'capBack','distributed_ease',{multiplicity:2,plannedEaseCm:capEase*.58,toleranceCm:.12});
+ pair('sleeve.underarm',sleeve.id,'underFront',sleeve.id,'underBack','one_to_one',{multiplicity:2});
+ pair('front.facing.center',front.id,'centerFront',facing.id,'centerFront','bagging',{multiplicity:2,orientation:1});
+ pair('front.facing.neck',front.id,'neckline',facing.id,'neckline','bagging',{multiplicity:2});
+ pair('facing.lining',facing.id,'liningJoin',frontL.id,'facingJoin','one_to_one',{multiplicity:2,activeWhen:'liningInstalled'});
+ // Lining internal joins reuse shell identities. Front lining side is sampled from its outer polygon in QA, not promoted to production seam here.
+ pair('collar.stand.shell',standOuter.id,'necklineJoin',front.id,'neckline','neckline_aggregate',{multiplicity:2});
+ pair('collar.stand.back',standOuter.id,'necklineJoin',back.id,'neckline','neckline_aggregate',{multiplicity:2});
+ pair('collar.fall',standOuter.id,'collarJoin',collarUnder.id,'standJoin','one_to_one',{multiplicity:1});
+ pair('cuff.sleeve',cuffOuter.id,'sleeveJoin',sleeve.id,'hem','one_to_one',{multiplicity:2});
+ pair('pocket.face.left',pocketFace.id,'left',gussetSide.id,'face','one_to_one',{multiplicity:2});
+ pair('pocket.face.right',pocketFace.id,'right',gussetSide.id,'face','one_to_one',{multiplicity:2});
+ pair('pocket.face.bottom',pocketFace.id,'bottom',gussetBottom.id,'face','one_to_one',{multiplicity:2});
+ pair('flap.layers',flapOuter.id,'perimeter',flapInner.id,'perimeter','one_to_one',{multiplicity:2});
+ pair('lining.side',frontL.id,'side',backL.id,'side','one_to_one',{multiplicity:2});
+ pair('lining.shoulder',frontL.id,'shoulder',backL.id,'shoulder','one_to_one',{multiplicity:2});
+ pair('lining.armhole.front',frontL.id,'armhole',sleeveL.id,'capFront','distributed_ease',{multiplicity:2,plannedEaseCm:capEase*.42,toleranceCm:.12});
+ pair('lining.armhole.back',backL.id,'armhole',sleeveL.id,'capBack','distributed_ease',{multiplicity:2,plannedEaseCm:capEase*.58,toleranceCm:.12});
+ pair('lining.sleeve.underarm',sleeveL.id,'underFront',sleeveL.id,'underBack','one_to_one',{multiplicity:2});
+ pair('collar.stand.inner.front',standInner.id,'necklineJoin',facing.id,'neckline','neckline_aggregate',{multiplicity:2});
+ pair('collar.stand.inner.back',standInner.id,'necklineJoin',backL.id,'neckline','neckline_aggregate',{multiplicity:2});
+ pair('collar.stand.end.left',standOuter.id,'endLeft',standInner.id,'endLeft','one_to_one');
+ pair('collar.stand.end.right',standOuter.id,'endRight',standInner.id,'endRight','one_to_one');
+ pair('collar.outer.stand',standInner.id,'collarJoin',collarOuter.id,'standJoin','one_to_one');
+ pair('collar.layers',collarOuter.id,'outerEdge',collarUnder.id,'outerEdge','one_to_one');
+ pair('cuff.lining',cuffInner.id,'sleeveJoin',sleeveL.id,'hem','one_to_one',{multiplicity:2});
+ pair('cuff.layers',cuffOuter.id,'freeEdge',cuffInner.id,'freeEdge','one_to_one',{multiplicity:2});
+ pair('pocket.corner.left',gussetSide.id,'bottom',gussetBottom.id,'left','one_to_one',{multiplicity:2});
+ pair('pocket.corner.right',gussetSide.id,'bottom',gussetBottom.id,'right','one_to_one',{multiplicity:2});
+ pair('pocket.host.left',gussetSide.id,'host',front.id,'pocketHostLeft','one_to_one',{multiplicity:2});
+ pair('pocket.host.right',gussetSide.id,'host',front.id,'pocketHostRight','one_to_one',{multiplicity:2});
+ pair('pocket.host.bottom',gussetBottom.id,'host',front.id,'pocketHostBottom','one_to_one',{multiplicity:2});
+ pair('flap.attach',flapOuter.id,'hinge',front.id,'flapHost','one_to_one',{multiplicity:2});
+ // Work order chain: working/toile artifacts are not production artifacts.
+ const measurementTicket={schema:'hrl_m04/measurement_ticket@2',id:'CONTROL_FIGURE_OUTERWEAR_001',subjectId:null,source:'control_figure_not_named_client',units:'centimetre',measurements:Object.fromEntries(['chest','waist','hip','neck','shoulder','shoulderSlope','backWaist','sleeveLength','biceps','wrist'].map(k=>[k,p[k]])),measurementDefinitions:'ISO_8559_style_measurement_dictionary_required_for_named_client',status:'demonstration_only'};
+ measurementTicket.revision=G.hash({schema:measurementTicket.schema,id:measurementTicket.id,measurements:measurementTicket.measurements,source:measurementTicket.source});
+ const baseBlock={schema:'hrl_m04/base_block@2',id:'outerwear-block-one-piece-sleeve',inputTicket:measurementTicket.id,inputTicketRevision:measurementTicket.revision,units:'centimetre',geometry:{pieces:[baseGeometryPiece(front,'base.front'),baseGeometryPiece(back,'base.back'),baseGeometryPiece(sleeve,'base.sleeve')]},measurementDependencies:{front:['chest','waist','hip','neck','shoulder','shoulderSlope','backWaist'],back:['chest','waist','hip','neck','shoulder','shoulderSlope','backWaist'],sleeve:['sleeveLength','biceps','wrist']},status:'geometry_present_candidate_not_fitted'};
+ baseBlock.revision=G.hash({schema:baseBlock.schema,id:baseBlock.id,inputTicketRevision:baseBlock.inputTicketRevision,geometry:baseBlock.geometry});
+ const styleDraft={schema:'hrl_m04/style_draft@2',id:'lined-work-jacket-neutral',baseBlock:baseBlock.id,baseBlockRevision:baseBlock.revision,features:['center_front_opening','collar_and_stand','one_piece_set_in_sleeve','cuffs','front_facing','full_lining','two_bellows_pockets'],operations:styleOperations(p),historicalIdentity:null,status:'executable_operations_candidate'};
+ styleDraft.revision=G.hash({schema:styleDraft.schema,id:styleDraft.id,baseBlockRevision:styleDraft.baseBlockRevision,operations:styleDraft.operations});
+ const cutPieceInstances=makeCutPieceInstances(panels);
+ const assemblyGraph=makeAssemblyGraph(panels,cutPieceInstances);
+ const workingPattern={schema:'hrl_m04/working_pattern@1',id:'WORK-C3P4C-001',styleDraft:styleDraft.id,styleDraftRevision:styleDraft.revision,units:'centimetre',patternPieceTypeIds:panels.map(q=>q.id),cutPieceInstanceIds:cutPieceInstances.map(x=>x.id),patternSeamIds:seams.map(j=>j.id),assemblyGraphRevision:G.hash(assemblyGraph),status:'geometry_checked_requires_toile'};
+ workingPattern.revision=G.hash({schema:workingPattern.schema,id:workingPattern.id,styleDraftRevision:workingPattern.styleDraftRevision,patternPieceTypeIds:workingPattern.patternPieceTypeIds,patternSeamIds:workingPattern.patternSeamIds,assemblyGraphRevision:workingPattern.assemblyGraphRevision,p});
+ const toileCuttingTicket={schema:'hrl_m04/cutting_ticket@2',kind:'toile',id:'TOILE-CUT-C3P4C-001',workingPattern:workingPattern.id,workingPatternRevision:workingPattern.revision,groups:[
+  {material:'shell_fabric',pieces:panels.filter(q=>q.materialClass==='shell_fabric').map(q=>({id:q.id,quantity:q.quantity,mirror:q.mirror,onFold:q.onFold,grain:q.grain}))},
+  {material:'lining_fabric',pieces:panels.filter(q=>q.materialClass==='lining_fabric').map(q=>({id:q.id,quantity:q.quantity,mirror:q.mirror,onFold:q.onFold,grain:q.grain}))},
+  {material:'interfacing',pieces:panels.filter(q=>q.materialClass==='interfacing').map(q=>({id:q.id,quantity:q.quantity,mirror:q.mirror,onFold:q.onFold,grain:q.grain}))},
+  {material:'undercollar_fabric',pieces:panels.filter(q=>q.materialClass==='undercollar_fabric').map(q=>({id:q.id,quantity:q.quantity,mirror:q.mirror,onFold:q.onFold,grain:q.grain}))}
+ ],markerStatus:'valid_conservative_layout_not_yield_optimized',releaseScope:'toile_only'};
+ toileCuttingTicket.revision=G.hash({schema:toileCuttingTicket.schema,id:toileCuttingTicket.id,workingPatternRevision:toileCuttingTicket.workingPatternRevision,groups:toileCuttingTicket.groups});
+ const toileAssemblyPlan=[
+  {step:1,id:'prep',title:'核对量体票、工作版 revision、裁片实例数量与布纹',gate:'measurement_working_pattern_match'},
+  {step:2,id:'interfacing',title:'按 bond graph 贴合贴边、领座、翻领、袖口与袋盖局部衬',gate:'bond_graph_complete'},
+  {step:3,id:'pockets',title:'制作左右袋体、闭合袋围转角并将袋体与袋盖装到指定前身实例',gate:'pocket_instance_graph_complete'},
+  {step:4,id:'shell-body',title:'按左右实例合肩缝与侧缝，形成外层衣身',gate:'shell_instance_pairs_complete'},
+  {step:5,id:'sleeves',title:'分别合左右袖底，按前后剪口安装袖山并分配计划吃势',gate:'sleeve_instance_orientation_and_ease'},
+  {step:6,id:'collar',title:'分别制作领座面里、翻领面底并按聚合领圈安装',gate:'collar_layer_and_aggregate_complete'},
+  {step:7,id:'cuffs',title:'制作左右双层袖口，分别连接面袖与袖里',gate:'cuff_shell_lining_complete'},
+  {step:8,id:'lining',title:'闭合前后里布与袖里，保留后中松量',gate:'lining_graph_complete'},
+  {step:9,id:'bagging',title:'沿贴边、领口与袖口连接面里，保留指定返口',gate:'no_global_weld'},
+  {step:10,id:'closures',title:'安装前中和袋盖可解除闭合；闭合不改变开口拓扑',gate:'closure_not_seam'},
+  {step:11,id:'press',title:'整烫、方向、左右实例与部件归属复核',gate:'instance_traceability'},
+  {step:12,id:'toile',title:'制作白坯，建立指定人物 FitSession 与 AlterationSet',gate:'named_fit_session_required'}
+ ];
+ const toileAssemblyPlanRevision=G.hash({schema:'hrl_m04/assembly_plan@2',workingPatternRevision:workingPattern.revision,steps:toileAssemblyPlan});
+ const ownership=[{id:'garment.work-jacket',parentId:null,kind:'garment'},{id:'shell',parentId:'garment.work-jacket',kind:'layer'},{id:'lining',parentId:'garment.work-jacket',kind:'layer'},{id:'interfacing',parentId:'garment.work-jacket',kind:'layer'},{id:'collarModule',parentId:'garment.work-jacket',kind:'component'},{id:'pocketModule',parentId:'garment.work-jacket',kind:'component'}];
+ for(const q of panels){let parent=q.layerRole==='lining'?'lining':q.layerRole==='interfacing'?'interfacing':q.layerRole==='collar'?'collarModule':q.layerRole==='pocket'?'pocketModule':'shell';ownership.push({id:q.id,parentId:parent,kind:'pattern_piece_type'});}
+ const layers=[
+  {id:'layer.torso',region:'torso',inside:'front.lining',outside:'front.shell'},
+  {id:'layer.back',region:'back',inside:'back.lining',outside:'back.shell'},
+  {id:'layer.sleeve',region:'sleeve',inside:'sleeve.lining',outside:'sleeve.shell'},
+  {id:'layer.facing',region:'frontOpening',inside:'front.facing',outside:'front.shell'},
+  {id:'layer.facingInter',region:'frontOpening',inside:'interfacing.facing',outside:'front.facing'},
+  {id:'layer.pocket',region:'frontPocket',inside:'front.shell',outside:'pocket.face'},
+  {id:'layer.flap',region:'frontPocket',inside:'pocket.face',outside:'flap.outer',when:'pocketClosed'}
+ ];
+ const closures=[
+  {id:'closure.front',type:'releasable_buttons_or_snaps',stateKey:'frontClosed',members:['front.shell'],topology:'front_opening_remains_defined'},
+  {id:'closure.pocket.left',type:'releasable_snap',stateKey:'leftPocketClosed',members:['flap.outer','pocket.face'],topology:'pocket_mouth_remains_open'},
+  {id:'closure.pocket.right',type:'releasable_snap',stateKey:'rightPocketClosed',members:['flap.outer','pocket.face'],topology:'pocket_mouth_remains_open'}
+ ];
+ const openings=[{id:'opening.front',kind:'garment_opening',members:[{panelId:'front.shell',interfaceId:'centerFront'}]},{id:'opening.pocket',kind:'pocket_mouth',members:[{panelId:'pocket.face',interfaceId:'mouth'},{panelId:'pocket.gusset.side',interfaceId:'mouth'}]}];
+ const fitSessionTemplate={schema:'hrl_m04/fit_session@2',id:null,subjectId:null,bodyRevision:null,toileId:null,workingPatternRevision:workingPattern.revision,observations:[],status:'required_before_pattern_approval'};
+ const alterationSetTemplate={schema:'hrl_m04/alteration_set@1',id:null,fitSessionId:null,baseWorkingPatternRevision:workingPattern.revision,operations:[],status:'not_started'};
+ const releaseGate={schema:'hrl_m04/release_gate@1',state:'working_pattern_only',allowToileCut:true,allowProductionPatternApproval:false,allowProductionCut:false,allowProductionAssembly:false,requirements:[
+  {id:'schema_validation',status:'pass_candidate'},{id:'assembly_graph_complete',status:assemblyGraph.completeness.allCutPieceInstancesCovered?'pass':'hold'},
+  {id:'named_subject',status:'hold'},{id:'toile_constructed',status:'hold'},{id:'fit_observations_resolved',status:'hold'},
+  {id:'alterations_applied',status:'hold'},{id:'approved_production_pattern',status:'hold'},{id:'material_lot',status:'hold'}
+ ]};
+ const definition={schema:'hrl_m04/tailor_shop_garment@2',id:'neutral-lined-work-jacket',version:'C3P4-C',units:'centimetre',classification:'kernel_converged_working_pattern_candidate',parameters:p,measurementTicket,baseBlock,styleDraft,workingPattern,approvedProductionPattern:null,panels,cutPieceInstances,seams,assemblyGraph,bondRelations:assemblyGraph.bondRelations,ownership:{nodes:ownership},layers,closures,openings,toileCuttingTicket,productionCuttingTicket:null,toileAssemblyPlan,toileAssemblyPlanRevision,productionAssemblyPlan:null,fitSessionTemplate,alterationSetTemplate,releaseGate,legacyAliases:{productionPattern:'deprecated_working_pattern_alias',cuttingTicket:'deprecated_toile_cutting_ticket_alias',assemblyPlan:'deprecated_toile_assembly_plan_alias'},derived:{chestGarment:chestGar,waistGarment:waistGar,hipGarment:hipGar,frontArmholeCm:frontArm,backArmholeCm:backArm,sleeveCapEaseCm:capEase,necklineCm:fullNeck,sleeveHemCm:cuffJoin,frontWidths:{chest:frontChest,waist:frontWaist,hip:frontHip},backWidths:{chest:backChest,waist:backWaist,hip:backHip}},status:{measurementDefinitionsPresent:true,baseBlockGeometryPresent:true,styleOperationsPresent:true,workingPatternReady:true,assemblyGraphComplete:assemblyGraph.completeness.allCutPieceInstancesCovered,toileCutReady:true,approvedProductionPattern:false,namedPersonFit:false,toileVerified:false,productionReady:false,physicalSimulation:false,texture:false}};
+ // Compatibility aliases are read-only and explicitly not production approval.
+ definition.productionPattern={...workingPattern,schema:'hrl_m04/working_pattern_alias@1',deprecated:true,status:'deprecated_alias_not_approved'};
+ definition.cuttingTicket=toileCuttingTicket;definition.assemblyPlan=toileAssemblyPlan;definition.assemblyPlanRevision=toileAssemblyPlanRevision;definition.fitRecord=fitSessionTemplate;
+ definition.revision=G.hash({id:definition.id,p,stage:'C3P4-C',workingPatternRevision:workingPattern.revision,assemblyGraphRevision:workingPattern.assemblyGraphRevision});return definition;}
+
+function active(j,s){return !j.activeWhen||s[j.activeWhen]!==false;}
+function panelMap(d){return new Map(d.panels.map(q=>[q.id,q]));}
+ function validate(d,s0={}){const s=state(s0),errors=[],warnings=[],P=panelMap(d),error=(code,detail)=>errors.push({code,detail});
+ if(d.units!=='centimetre')error('UNIT_MISMATCH',d.units);if(d.schema!=='hrl_m04/tailor_shop_garment@2')error('SCHEMA',d.schema);
+ if(!d.measurementTicket||!d.baseBlock||!d.styleDraft||!d.workingPattern||!d.toileCuttingTicket||!d.toileAssemblyPlan||!d.assemblyGraph)error('TAILOR_CHAIN_INCOMPLETE','working/toile chain');
+ if(d.baseBlock?.inputTicketRevision!==d.measurementTicket?.revision)error('REVISION_CHAIN','baseBlock.measurementTicket');if(d.styleDraft?.baseBlockRevision!==d.baseBlock?.revision)error('REVISION_CHAIN','styleDraft.baseBlock');if(d.workingPattern?.styleDraftRevision!==d.styleDraft?.revision)error('REVISION_CHAIN','workingPattern.styleDraft');if(d.toileCuttingTicket?.workingPatternRevision!==d.workingPattern?.revision)error('REVISION_CHAIN','toileCuttingTicket.workingPattern');if(d.fitSessionTemplate?.workingPatternRevision!==d.workingPattern?.revision)error('REVISION_CHAIN','fitSession.workingPattern');if(d.alterationSetTemplate?.baseWorkingPatternRevision!==d.workingPattern?.revision)error('REVISION_CHAIN','alterationSet.workingPattern');
+ if(d.approvedProductionPattern!==null)error('UNAUTHORIZED_PRODUCTION_PATTERN','toile/fit approval required');if(d.productionCuttingTicket!==null)error('UNAUTHORIZED_PRODUCTION_CUT','approved production pattern required');if(d.productionAssemblyPlan!==null)error('UNAUTHORIZED_PRODUCTION_ASSEMBLY','approved production pattern required');
+ if(d.fitSessionTemplate.status!=='required_before_pattern_approval')error('FIT_GATE_MISSING',d.fitSessionTemplate.status);
+ const ids=new Set();for(const q of d.panels){if(ids.has(q.id))error('DUPLICATE_PANEL',q.id);ids.add(q.id);if(!q.poly?.length||Math.abs(G.area(q.poly))<1e-6)error('INVALID_PATTERN',q.id);if(!q.cut||q.cut.length<3)error('CUTLINE_MISSING',q.id);let seamArea=Math.abs(G.area(q.poly)),cutArea=Math.abs(G.area(q.cut));if(q.allowancePolicy==='zero'){if(Math.abs(cutArea-seamArea)>1e-5)error('ZERO_ALLOWANCE_MISMATCH',q.id);}else if(cutArea<=seamArea+1e-5)error('SEAM_ALLOWANCE_MISSING',q.id);if(!q.grainLine||q.grainLine.length!==2)error('GRAINLINE_MISSING',q.id);if(!Number.isInteger(q.quantity)||q.quantity<1)error('CUT_QUANTITY',q.id);}
+ const instIds=new Set();for(const i of d.cutPieceInstances||[]){if(instIds.has(i.id))error('DUPLICATE_INSTANCE',i.id);instIds.add(i.id);if(!P.has(i.patternPieceId))error('INSTANCE_PATTERN_MISSING',i.id+':'+i.patternPieceId);}const expected=d.panels.reduce((n,q)=>n+q.quantity,0);if(instIds.size!==expected)error('INSTANCE_COUNT',instIds.size+':'+expected);
+ const seamReports=[];for(const j of d.seams){const pa=P.get(j.a.panelId),pb=P.get(j.b.panelId),a=pa?.interfaces[j.a.interfaceId],b=pb?.interfaces[j.b.interfaceId];if(!a||!b){error('INTERFACE_MISSING',j.id);continue;}if((a.kind==='opening_edge'||b.kind==='opening_edge')&&!['bagging','closure_attachment'].includes(j.type))error('OPENING_SEALED',j.id);if(j.mapping.orientation!==1)error('ENDPOINT_ORIENTATION',j.id);let la=G.plen(a.points),lb=G.plen(b.points),delta=lb-la;let ok=true;if(['one_to_one','bagging','attachment_path'].includes(j.type))ok=Math.abs(delta)<=j.toleranceCm;else if(j.type==='distributed_ease')ok=Math.abs(delta-j.plannedEaseCm)<=j.toleranceCm;else if(j.type==='neckline_aggregate')ok=true;if(!ok)error('SEAM_LENGTH_CONTRACT',j.id+':'+delta.toFixed(3));seamReports.push({id:j.id,type:j.type,a:pa.name+'.'+a.id,b:pb.name+'.'+b.id,aCm:la,bCm:lb,deltaCm:delta,plannedEaseCm:j.plannedEaseCm,multiplicity:j.multiplicity,active:active(j,s),ok});}
+ const stand=P.get('stand.outer').interfaces.necklineJoin.length,neck=2*P.get('front.shell').interfaces.neckline.length+2*P.get('back.shell').interfaces.neckline.length;if(Math.abs(stand-neck)>.08)error('COLLAR_STAND_NECKLINE_TOTAL',stand-neck);
+ const nodes=d.ownership.nodes,N=new Map(nodes.map(n=>[n.id,n]));for(const n of nodes){if(n.parentId&&!N.has(n.parentId))error('OWNERSHIP_PARENT',n.id);let seen=new Set(),a=n;while(a){if(seen.has(a.id)){error('OWNERSHIP_CYCLE',n.id);break;}seen.add(a.id);a=N.get(a.parentId);}}
+ const region=new Map();for(const r of d.layers){if(!P.has(r.inside)||!P.has(r.outside))error('LAYER_MEMBER',r.id);let g=region.get(r.region)||new Map();if(!g.has(r.inside))g.set(r.inside,[]);g.get(r.inside).push(r.outside);region.set(r.region,g);}for(const [name,g] of region){let done=new Set(),stack=new Set();const walk=n=>{if(stack.has(n)){error('LAYER_CYCLE',name+':'+n);return;}if(done.has(n))return;stack.add(n);for(const x of g.get(n)||[])walk(x);stack.delete(n);done.add(n);};for(const n of g.keys())walk(n);}
+ for(const c of d.closures)for(const id of c.members)if(!P.has(id))error('CLOSURE_MEMBER',c.id+':'+id);
+ const A=d.assemblyGraph||{},Aids=new Set((A.nodes||[]).map(n=>n.id));for(const r of A.relations||[])for(const m of r.members||[]){if(!Aids.has(m.instanceId))error('ASSEMBLY_INSTANCE_MISSING',r.id+':'+m.instanceId);let q=P.get(m.patternPieceId);if(!q?.interfaces[m.interfaceId])error('ASSEMBLY_INTERFACE_MISSING',r.id+':'+m.patternPieceId+'.'+m.interfaceId);}for(const b of A.bondRelations||[]){for(const m of [b.source,b.target])if(!Aids.has(m.instanceId))error('BOND_INSTANCE_MISSING',b.id+':'+m.instanceId);}if(!A.completeness?.allCutPieceInstancesCovered||A.completeness?.uncoveredInstanceIds?.length)error('ASSEMBLY_GRAPH_INCOMPLETE',(A.completeness?.uncoveredInstanceIds||[]).join(','));
+ if(d.releaseGate?.allowProductionPatternApproval||d.releaseGate?.allowProductionCut||d.releaseGate?.allowProductionAssembly)error('PREMATURE_RELEASE_GATE','production gates must remain closed');if(d.status.productionReady)error('PREMATURE_PRODUCTION_READY','fitting required');
+ warnings.push('当前只有工作纸样与白坯裁剪票；没有批准生产纸样','控制样架没有绑定具体人物；尺寸只用于验证裁缝铺内核','三维装配是结构映射，不是等距展开、布料物理或真人合体','完整生产放行需要指定人物、白坯、试身、修版、批准纸样和材料批次');
+ return {passed:errors.length===0,errors,warnings,seamReports,counts:{patternTypes:d.panels.length,cutPieceInstances:d.cutPieceInstances.length,patternSeamRelations:d.seams.length,assemblyInstanceRelations:d.assemblyGraph.relations.length,bondRelations:d.assemblyGraph.bondRelations.length,layerRelations:d.layers.length,closureRelations:d.closures.length,toileAssemblySteps:d.toileAssemblyPlan.length},gates:{measurementTicket:!!d.measurementTicket,baseBlockGeometry:!!d.baseBlock?.geometry?.pieces?.length,styleOperations:!!d.styleDraft?.operations?.length,workingPattern:!!d.workingPattern&&errors.filter(e=>['INVALID_PATTERN','CUTLINE_MISSING','GRAINLINE_MISSING','CUT_QUANTITY'].includes(e.code)).length===0,cutPieceInstances:instIds.size===expected,assemblyGraph:!errors.some(e=>e.code.startsWith('ASSEMBLY_')||e.code.startsWith('BOND_')),toileCuttingTicket:!!d.toileCuttingTicket,toileAssemblyPlan:!!d.toileAssemblyPlan,namedFitSession:false,toileVerified:false,approvedProductionPattern:false,productionReady:false}};}
+
+function intersectionsAtY(poly,y){let xs=[];for(let i=0;i<poly.length;i++){let a=poly[i],b=poly[(i+1)%poly.length];if((y-a[1])*(y-b[1])<=0&&Math.abs(b[1]-a[1])>1e-8){let t=(y-a[1])/(b[1]-a[1]);if(t>=-1e-8&&t<=1+1e-8)xs.push(a[0]+(b[0]-a[0])*t);}}return xs.sort((a,b)=>a-b);}
+function xRange(q,y){let xs=intersectionsAtY(q.poly,y);if(xs.length<2)return [q.bounds.minX,q.bounds.maxX];return [xs[0],xs.at(-1)];}
+function assemble(d,s0={}){const s=state(s0),p=d.parameters,P=panelMap(d),H=p.garmentLength,front=P.get('front.shell'),back=P.get('back.shell'),armY=H-p.armholeDepth,frontNeckD=p.neck*.20+1;
+ const frontW=y=>xRange(front,Math.max(0,Math.min(H-.01,y)))[1],backW=y=>xRange(back,Math.max(0,Math.min(H-.01,y)))[1];
+ const torso=(q,side,isFront,bias=0)=>(x,y)=>{let f=frontW(y),b=backW(y),rx=(f+b)/Math.PI,rz=rx*.72,u=G.clamp(x/Math.max(.001,isFront?f:b));let ang=u*Math.PI/2,X=side*rx*Math.sin(ang),Z=(isFront?1:-1)*rz*Math.cos(ang);let nx=X/(rx*rx||1),nz=Z/(rz*rz||1),nl=Math.hypot(nx,nz)||1;X+=nx/nl*bias;Z+=nz/nl*bias;if(isFront&&!s.frontClosed){let px=side*rx,pz=0,a=-side*.42,dx=X-px,dz=Z-pz;X=px+dx*Math.cos(a)-dz*Math.sin(a);Z=pz+dx*Math.sin(a)+dz*Math.cos(a);}return [X,y,Z];};
+ const maps={},instances=[];const add=(id,pieceId,map,explode,layer,extra={})=>instances.push({id,pieceId,map,explode,layer,mesh:P.get(pieceId).mesh,...extra});
+ for(const side of [-1,1]){let tag=side<0?'L':'R';add('front.shell.'+tag,'front.shell',torso(front,side,true,0),[side*12,0,6],'outer',{side});add('front.facing.'+tag,'front.facing',torso(P.get('front.facing'),side,true,-.18),[side*18,0,-8],'facing',{side});add('front.lining.'+tag,'front.lining',torso(P.get('front.lining'),side,true,-.34-(s.liningInstalled?0:12)),[side*13,0,-22],'lining',{side});add('interfacing.facing.'+tag,'interfacing.facing',torso(P.get('interfacing.facing'),side,true,-.10),[side*20,0,-14],'interfacing',{side});}
+ for(const side of [-1,1]){let tag=side<0?'L':'R';add('back.shell.'+tag,'back.shell',torso(back,side,false,0),[side*10,0,-4],'outer',{side});add('back.lining.'+tag,'back.lining',torso(P.get('back.lining'),side,false,-.32-(s.liningInstalled?0:12)),[side*12,0,-20],'lining',{side});}
+ const sleeve=P.get('sleeve.shell'),sleeveL=P.get('sleeve.lining'),capH=sleeve.bounds.maxY-p.sleeveLength;
+ function sleeveMap(side,inside=false){return (x,y)=>{let [xmin,xmax]=xRange(sleeve,Math.min(p.sleeveLength-.01,Math.max(.01,y))),u=G.clamp((x-xmin)/Math.max(.001,xmax-xmin)),theta=u*Math.PI*2,capT=G.clamp((y-p.sleeveLength)/Math.max(.001,capH)),armR=(p.biceps+p.bicepsEase)/(2*Math.PI)*(1-.35*capT),frontAt=frontW(armY),backAt=backW(armY),torsoR=(frontAt+backAt)/Math.PI,centerX=side*(torsoR+armR*.72-armR*.55*capT),centerZ=.4*Math.sin((u-.5)*Math.PI)*(1-capT),cuffY=H-p.shoulderSlope-p.sleeveLength;return [centerX+side*armR*Math.cos(theta)+(inside?-side*.14:0),cuffY+Math.min(y,p.sleeveLength)+capT*1.2,centerZ+armR*.82*Math.sin(theta)+(inside?-.12:0)];};}
+ for(const side of [-1,1]){let tag=side<0?'L':'R';add('sleeve.shell.'+tag,'sleeve.shell',sleeveMap(side,false),[side*24,0,4],'outer',{side});add('sleeve.lining.'+tag,'sleeve.lining',sleeveMap(side,true),[side*27,0,-18],'lining',{side});}
+ // Collar/cuff strips wrap around the corresponding openings. These are static assembly maps.
+ function ringMap(rx,rz,y0,h,bias=0,start=-Math.PI/2){return (x,y)=>{let L=xRange({poly:[[0,0],[1,0],[1,1],[0,1]],bounds:{minX:0,maxX:1}},.5);let pieceLen=1;return [0,0,0]};}
+ function stripRing(pieceId,rx,rz,y0,bias=0){let q=P.get(pieceId),L=q.bounds.width;return (x,y)=>{let a=-Math.PI/2+(x/L)*Math.PI*2;return [(rx+bias)*Math.cos(a),y0+y,(rz+bias)*Math.sin(a)];};}
+ add('stand.outer','stand.outer',stripRing('stand.outer',7.0,5.4,H-.8,.22),[0,8,12],'collar');add('stand.inner','stand.inner',stripRing('stand.inner',6.85,5.25,H-.8,0),[0,9,-10],'collar');
+ add('collar.outer','collar.outer',stripRing('collar.outer',8.5,6.7,H+p.collarStandHeight-1.1,.18),[0,16,18],'collar');add('collar.under','collar.under',stripRing('collar.under',8.3,6.5,H+p.collarStandHeight-1.2,0),[0,14,-14],'collar');
+ add('interfacing.stand','interfacing.stand',stripRing('interfacing.stand',6.92,5.32,H-.8,.08),[0,10,-18],'interfacing');add('interfacing.collar','interfacing.collar',stripRing('interfacing.collar',8.4,6.6,H+p.collarStandHeight-1.15,.08),[0,15,-20],'interfacing');
+ function cuffMap(side,inside=false){let q=P.get('cuff.outer'),L=q.bounds.width,centerX=side*((frontW(armY)+backW(armY))/Math.PI+(p.wrist+p.wristEase)/(2*Math.PI)*.7),y0=H-p.shoulderSlope-p.sleeveLength;return (x,y)=>{let a=(x/L)*Math.PI*2,r=(p.wrist+p.wristEase)/(2*Math.PI)+(inside?-.12:0);return [centerX+side*r*Math.cos(a),y0+y,r*.82*Math.sin(a)];};}
+ for(const side of [-1,1]){let tag=side<0?'L':'R';add('cuff.outer.'+tag,'cuff.outer',cuffMap(side,false),[side*32,-8,6],'cuff',{side});add('cuff.inner.'+tag,'cuff.inner',cuffMap(side,true),[side*34,-8,-12],'cuff',{side});add('interfacing.cuff.'+tag,'interfacing.cuff',cuffMap(side,true),[side*36,-8,-18],'interfacing',{side});}
+ // Pockets and flaps on both fronts.
+ const pocketY=H*.23;for(const side of [-1,1]){let tag=side<0?'L':'R',hostX=d.derived.frontWidths.hip*.22;const host=(x,y,off=0)=>{let base=torso(front,side,true,0)(hostX+x,pocketY+y),f=frontW(pocketY+y),b=backW(pocketY+y),rx=(f+b)/Math.PI,rz=rx*.72,n=[base[0]/(rx*rx||1),0,base[2]/(rz*rz||1)],nl=Math.hypot(n[0],n[2])||1;return [base[0]+n[0]/nl*off,base[1],base[2]+n[2]/nl*off];};
+  add('pocket.face.'+tag,'pocket.face',(x,y)=>host(x,y,p.pocketDepth),[side*18,0,18],'pocket',{side});
+  add('pocket.gusset.left.'+tag,'pocket.gusset.side',(x,y)=>host(0,y,x),[side*22,0,12],'pocket',{side});
+  add('pocket.gusset.right.'+tag,'pocket.gusset.side',(x,y)=>host(p.pocketWidth,y,x),[side*26,0,12],'pocket',{side});
+  add('pocket.gusset.bottom.'+tag,'pocket.gusset.bottom',(x,y)=>host(x,0,y),[side*24,-10,12],'pocket',{side});
+  let closed=side<0?s.leftPocketClosed:s.rightPocketClosed,angle=(closed?0:105)*Math.PI/180;
+  const flap=(x,y,off=0)=>{let hinge=host(x-.5,p.pocketHeight+.6,.18),yy=y,fold=Math.min(yy,p.pocketDepth+.1),free=Math.max(0,yy-p.pocketDepth-.1),rise=fold*Math.sin(Math.PI/2+angle*.45)+free*Math.sin(angle),drop=fold*Math.cos(Math.PI/2+angle*.45)+free*Math.cos(angle);return [hinge[0],hinge[1]-drop,hinge[2]+rise+off];};
+  add('flap.outer.'+tag,'flap.outer',(x,y)=>flap(x,y,.08),[side*20,8,24],'pocket',{side});add('flap.inner.'+tag,'flap.inner',(x,y)=>flap(x,y,0),[side*22,5,19],'pocket',{side});add('interfacing.flap.'+tag,'interfacing.flap',(x,y)=>flap(x,y,.035),[side*24,6,15],'interfacing',{side});
+ }
+ // Notions are point records, not welded pattern edges.
+ let notions=[];for(let side of [-1,1]){let tag=side<0?'L':'R';for(let i=0;i<5;i++)notions.push({id:'front.button.'+tag+'.'+i,instance:'front.shell.'+tag,uv:[0,H-frontNeckD-8-i*11],kind:'button'});notions.push({id:'cuff.button.'+tag,instance:'cuff.outer.'+tag,uv:[p.frontOverlap*.55,p.cuffHeight*.5],kind:'button'});}
+ const qa=validate(d,s);return {definition:d,parameters:p,pieces:d.panels,instances,notions,state:s,qa,coordinates:{unit:'centimetre',frame:'garment_local'},status:{workingPatternStructuralCandidate:true,assemblyGraphComplete:d.status.assemblyGraphComplete,physicalSimulation:false,fitVerified:false,approvedProductionPattern:false,productionReady:false}};}
+function markerPlan(d,material){let pieces=d.toileCuttingTicket.groups.find(g=>g.material===material)?.pieces||[],expanded=[];for(const it of pieces)for(let i=0;i<it.quantity;i++){let q=d.panels.find(p=>p.id===it.id);expanded.push({id:it.id,index:i,bounds:q.bounds,rotated:false});}
+ const width=145,gap=3;let x=gap,y=gap,rowH=0,items=[];for(const a of expanded){let w=a.bounds.width,h=a.bounds.height;if(x+w+gap>width){x=gap;y+=rowH+gap;rowH=0;}items.push({...a,x:x-a.bounds.minX,y:y-a.bounds.minY});x+=w+gap;rowH=Math.max(rowH,h);}return {material,widthCm:width,lengthCm:y+rowH+gap,items,status:'conservative_nonoptimized'};}
+function serializeDefinition(d){return {...d,panels:d.panels.map(q=>({id:q.id,name:q.name,quantity:q.quantity,mirror:q.mirror,onFold:q.onFold,layerRole:q.layerRole,materialClass:q.materialClass,poly:q.poly,cut:q.cut,grain:q.grain,grainLine:q.grainLine,interfaces:q.interfaces,notches:q.notches,internalMarks:q.internalMarks||[],cutMethod:q.cutMethod,allowancePolicy:q.allowancePolicy,sourceStage:q.sourceStage}))};}
+function recipe(d,s){return {schema:'hrl_m04/tailor_shop_recipe@2',generator:'hrl-tailor-shop@2',garmentId:d.id,definitionRevision:d.revision,workingPatternRevision:d.workingPattern.revision,parameters:clone(d.parameters),state:{schema:'hrl_m04/garment_state@1',...state(s)},fitInstance:null,approvedProductionPatternId:null,units:'centimetre'};}
+function loadRecipe(r){if(!r||!['hrl_m04/tailor_shop_recipe@1','hrl_m04/tailor_shop_recipe@2'].includes(r.schema)||!['hrl-tailor-shop@1','hrl-tailor-shop@2'].includes(r.generator)||r.garmentId!=='neutral-lined-work-jacket'||r.units!=='centimetre')throw Error('RECIPE_SCHEMA');if(r.fitInstance!==null)throw Error('NAMED_FIT_INSTANCE_NOT_IMPLEMENTED');if(r.approvedProductionPatternId!=null)throw Error('UNAUTHORIZED_PRODUCTION_PATTERN');let d=makeDefinition(r.parameters);if(r.schema==='hrl_m04/tailor_shop_recipe@2'&&r.workingPatternRevision&&r.workingPatternRevision!==d.workingPattern.revision)throw Error('STALE_WORKING_PATTERN_REVISION');let st={...(r.state||{})};delete st.schema;return {definition:d,state:state(st),migratedFrom:r.schema==='hrl_m04/tailor_shop_recipe@1'?r.schema:null};}
+const api={defaults,limits,initialState,parameters,state,makeDefinition,validate,assemble,markerPlan,serializeDefinition,recipe,loadRecipe};root.HRLTailor=api;root.HRLPattern={clamp:G.clamp};if(typeof module!=='undefined')module.exports=api;
+})(typeof window!=='undefined'?window:globalThis);
+</script><script>
+function materialNormals(inst){const result=new Float32Array(inst.mesh.uv.length*3),e=.002;for(let j=0;j<inst.mesh.uv.length;j++){let [x,y]=inst.mesh.uv[j],p=inst.map(x+e,y),q=inst.map(x-e,y),r=inst.map(x,y+e),s=inst.map(x,y-e),a=p.map((v,i)=>v-q[i]),b=r.map((v,i)=>v-s[i]),n=[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],l=Math.hypot(...n)||1;for(let k=0;k<3;k++)result[j*3+k]=n[k]/l}return result}
+/* Native WebGL2 preview. Matrix and typed-buffer conventions retained from C3C-3,
+ * without its payload, simulation, baked actions, surface texture or wave deformation.
+ */
+class StructureViewer{
+ constructor(canvas,onSelect){this.canvas=canvas;this.onSelect=onSelect;this.gl=canvas.getContext('webgl2',{antialias:true,preserveDrawingBuffer:true});if(!this.gl)throw Error('需要 WebGL2');this.meshes=[];this.yaw=.20;this.pitch=.03;this.distance=1.72;this.target=[0,.37,0];this.explode=0;this.colors=false;this.edges=true;this.inner=false;this.selected='front';this.scope='all';this.flatCuff=false;this.setup();this.events();}
+ setup(){let gl=this.gl;const vs=`#version 300 es
+precision highp float;
+layout(location=0)in vec3 p;
+layout(location=1)in vec3 n;
+uniform mat4 proj,view;
+uniform float uLoft;
+out vec3 N,W;
+void main(){N=n;W=p;gl_Position=proj*view*vec4(p+normalize(n)*uLoft,1.);}`;const fs=`#version 300 es
+precision highp float;
+in vec3 N,W;
+uniform vec3 color,eye;
+uniform int flatMode;
+uniform float uFabricGrain;
+out vec4 outColor;
+void main(){
+ if(flatMode==1){outColor=vec4(color,1.);return;}
+ vec3 n=normalize(N);
+ if(!gl_FrontFacing)n=-n;
+ float key=max(dot(n,normalize(vec3(-.50,.85,.68))),0.);
+ float fill=max(dot(n,normalize(vec3(.75,.3,-.5))),0.);
+ float weave=sin(W.x*1420.+.4*sin(W.z*810.))*sin(W.y*1220.+.3*sin(W.x*730.));
+ float upper=.5+.5*n.y;
+ vec3 shade=color*(.35+.5*key+.14*fill+.05*upper)*(1.+uFabricGrain*.085*weave);
+ outColor=vec4(pow(max(shade,vec3(.001)),vec3(.88)),1.);
+}`;
+ const sh=(type,text)=>{let s=gl.createShader(type);gl.shaderSource(s,text);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s};this.prog=gl.createProgram();gl.attachShader(this.prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(this.prog,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(this.prog);if(!gl.getProgramParameter(this.prog,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(this.prog));this.loc={};for(let n of ['proj','view','color','eye','flatMode'])this.loc[n]=gl.getUniformLocation(this.prog,n);}
+ normal(v,I){let n=new Float32Array(v.length);for(let k=0;k<I.length;k+=3){let a=I[k]*3,b=I[k+1]*3,c=I[k+2]*3,u=[v[b]-v[a],v[b+1]-v[a+1],v[b+2]-v[a+2]],w=[v[c]-v[a],v[c+1]-v[a+1],v[c+2]-v[a+2]],t=[u[1]*w[2]-u[2]*w[1],u[2]*w[0]-u[0]*w[2],u[0]*w[1]-u[1]*w[0]];for(let j of [a,b,c])for(let i=0;i<3;i++)n[j+i]+=t[i]}for(let i=0;i<n.length;i+=3){let l=Math.hypot(n[i],n[i+1],n[i+2])||1;n[i]/=l;n[i+1]/=l;n[i+2]/=l}return n}
+ upload(inst,points,indices,lineIndices=[]){let gl=this.gl,vao=gl.createVertexArray(),V=new Float32Array(points.flat().map(x=>x*.01)),I=new Uint32Array(indices),N=inst.mesh&&!this.flatCuff?materialNormals(inst):this.normal(V,I);gl.bindVertexArray(vao);let buffers=[];for(let [loc,a] of [[0,V],[1,N]]){let b=gl.createBuffer();buffers.push(b);gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,a,gl.STATIC_DRAW);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0)}let ib=gl.createBuffer();buffers.push(ib);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,I,gl.STATIC_DRAW);gl.bindVertexArray(null);let lb=gl.createBuffer();buffers.push(lb);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,lb);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(lineIndices),gl.STATIC_DRAW);return {inst,vao,V,I,N,ib,lb,lineCount:lineIndices.length,buffers};}
+ setPattern(d){this.data=d;this.refreshGeometry()}
+ refreshGeometry(){let gl=this.gl;for(let m of this.meshes){gl.deleteVertexArray(m.vao);m.buffers.forEach(b=>gl.deleteBuffer(b))}this.meshes=[];let d=this.data,by=Object.fromEntries(d.pieces.map(q=>[q.id,q]));
+ for(let inst of d.instances){let q=by[inst.pieceId],P=inst.mesh.uv.map(uv=>(this.flatCuff&&inst.flatMap?inst.flatMap(...uv):inst.map(...uv)).map((v,i)=>v+inst.explode[i]*this.explode)),edges=[];for(let i=0;i<q.poly.length;i++)edges.push(q.boundaryIndices[i],q.boundaryIndices[(i+1)%q.poly.length]);if(inst.pieceId.includes('Placket'))edges=[];let m=this.upload(inst,P,inst.mesh.indices,edges);this.meshes.push(m)}
+ // Buttons are discrete closures, not edges welded together.
+ for(const n of this.data.notions||[]){const inst=this.data.instances.find(i=>i.id===n.instance);if(!inst)continue;
+ const q=n.uv,pos=(this.flatCuff&&inst.flatMap?inst.flatMap(...q):inst.map(...q)).map((v,i)=>v+inst.explode[i]*this.explode),e=.01;
+ const a=inst.map(q[0]+e,q[1]).map((v,i)=>v-inst.map(...q)[i]),b=inst.map(q[0],q[1]+e).map((v,i)=>v-inst.map(...q)[i]),al=Math.hypot(...a)||1,bl=Math.hypot(...b)||1;
+ const normal=[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],nl=Math.hypot(...normal)||1;
+ let P=[pos.map((v,i)=>v+normal[i]/nl*(inst.pieceId==='cuff'?-.12:.08))],I=[];for(let j=0;j<20;j++){let t=j/20*2*Math.PI;P.push(P[0].map((v,i)=>v+.32*(Math.cos(t)*a[i]/al+Math.sin(t)*b[i]/bl)))}for(let j=0;j<20;j++)I.push(0,j+1,(j+1)%20+1);
+ this.meshes.push(this.upload({id:n.id,pieceId:'notion',ownerPiece:inst.pieceId,layer:'outer'},P,I));}
+
+ this.draw();}
+ persp(fovy,aspect,near,far){let f=1/Math.tan(fovy/2),o=new Float32Array(16);o[0]=f/aspect;o[5]=f;o[10]=(far+near)/(near-far);o[11]=-1;o[14]=2*far*near/(near-far);return o}
+ look(eye,target){let norm=a=>{let l=Math.hypot(...a);return a.map(x=>x/l)},cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0),z=norm(eye.map((v,i)=>v-target[i])),x=norm(cross([0,1,0],z)),y=cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,eye),-dot(y,eye),-dot(z,eye),1])}
+ draw(pick=false){let gl=this.gl,c=this.canvas,box=c.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,1.7);if(c.width!==Math.round(box.width*dpr)||c.height!==Math.round(box.height*dpr)){c.width=Math.round(box.width*dpr);c.height=Math.round(box.height*dpr)}if(!c.height||!c.width)return;gl.viewport(0,0,c.width,c.height);gl.clearColor(...(pick?[0,0,0,1]:[.102,.143,.165,1]));gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.useProgram(this.prog);let eye=[Math.sin(this.yaw)*Math.cos(this.pitch)*this.distance+this.target[0],Math.sin(this.pitch)*this.distance+this.target[1],Math.cos(this.yaw)*Math.cos(this.pitch)*this.distance+this.target[2]];this.projection=this.persp(.58,c.width/c.height,.01,50);this.view=this.look(eye,this.target);gl.uniformMatrix4fv(this.loc.proj,false,this.projection);gl.uniformMatrix4fv(this.loc.view,false,this.view);gl.uniform3fv(this.loc.eye,eye);
+ let palette=[[.83,.86,.87],[.71,.79,.82],[.72,.78,.70],[.80,.72,.62],[.88,.85,.76],[.74,.70,.83]];
+ for(let i=0;i<this.meshes.length;i++){let m=this.meshes[i];if(!this.isVisible(m.inst))continue;if(m.inst.pieceId==='notion'&&this.scope==='cuff'&&m.inst.ownerPiece!=='cuff')continue;if(m.inst.pieceId==='notion'&&this.scope==='neck'&&m.inst.ownerPiece!=='stand')continue;if(this.scope==='cuff'&&!['sleeve','cuff','slitUnder','slitOver','notion'].includes(m.inst.pieceId))continue;if(this.scope==='neck'&&!['stand','collar','undercollar','notion'].includes(m.inst.pieceId))continue;if(this.scope==='placket'&&!m.inst.pieceId.includes('Placket')&&m.inst.pieceId!=='notion')continue;if(m.inst.layer==='inner'&&(!this.inner||this.explode<.02))continue;let k=this.data.pieces.findIndex(q=>q.id===m.inst.pieceId);let col=m.inst.pieceId==='notion'?[.52,.56,.53]:this.colors?palette[k%palette.length]:[.91,.90,.84];if(!pick&&window.__COAT_COLOR__&&m.inst.pieceId!=='notion')col=window.__COAT_COLOR__;if(pick)col=[(i+1)/255,0,0];gl.uniform3fv(this.loc.color,col);gl.uniform1i(this.loc.flatMode,pick?1:0);gl.bindVertexArray(m.vao);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,m.ib);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);gl.drawElements(gl.TRIANGLES,m.I.length,gl.UNSIGNED_INT,0);gl.disable(gl.POLYGON_OFFSET_FILL);
+ if(!pick&&this.edges&&m.lineCount){let selected=m.inst.pieceId===this.selected;gl.uniform3fv(this.loc.color,selected?[.61,.44,.23]:[.32,.37,.38]);gl.uniform1i(this.loc.flatMode,1);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,m.lb);gl.drawElements(gl.LINES,m.lineCount,gl.UNSIGNED_INT,0)}}gl.bindVertexArray(null);}
+ camera(v){this.target=[0,.37,0];this.distance=this.canvas.clientWidth<600?Math.max(2.1,1.18/(2*Math.tan(.29)*(this.canvas.clientWidth/this.canvas.clientHeight))*1.12):1.85;this.pitch=.02;this.yaw=0;if(v==='back')this.yaw=Math.PI;if(v==='side')this.yaw=Math.PI/2;if(v==='threequarter')this.yaw=.55;if(v==='collar'){this.target=[0,this.data.parameters.length*.01-.035,.01];this.distance=.65;this.yaw=.36;this.pitch=.15}if(v==='cuff'){let d=this.data.construction.dimensions,pt=this.data.boundary3D.cuffPoint(0,3);this.target=pt.map(x=>x*.01);this.target[0]-=.025;this.target[1]+=.035;this.distance=.61;this.yaw=2.45;this.pitch=.12}if(this.explode>.2&&v!=='collar'&&v!=='cuff')this.distance*=1.45;this.draw()}
+ events(){let c=this.canvas,moved=0,last;const down=e=>{last=[e.clientX,e.clientY];moved=0;c.setPointerCapture(e.pointerId)};c.addEventListener('pointerdown',down);c.addEventListener('pointermove',e=>{if(!last)return;let dx=e.clientX-last[0],dy=e.clientY-last[1];moved+=Math.abs(dx)+Math.abs(dy);this.yaw-=dx*.008;this.pitch=HRLPattern.clamp(this.pitch+dy*.005,-1.35,1.35);last=[e.clientX,e.clientY];this.draw()});c.addEventListener('pointerup',e=>{if(moved<5){this.draw(true);let b=c.getBoundingClientRect(),x=Math.floor((e.clientX-b.left)/b.width*c.width),y=Math.floor((b.bottom-e.clientY)/b.height*c.height),px=new Uint8Array(4);this.gl.readPixels(x,y,1,1,this.gl.RGBA,this.gl.UNSIGNED_BYTE,px);let m=this.meshes[px[0]-1];if(m&&m.inst.pieceId!=='notion')this.onSelect(m.inst.pieceId);this.draw()}last=null});c.addEventListener('pointercancel',()=>last=null);c.addEventListener('wheel',e=>{e.preventDefault();this.distance=HRLPattern.clamp(this.distance*Math.exp(e.deltaY*.001),.30,5);this.draw()},{passive:false});new ResizeObserver(()=>this.draw()).observe(c);}
+ screenshot(){this.draw();return this.canvas.toDataURL('image/png')}
+}
+/* Deterministic CPU rasterizer fallback: actual 3D triangle positions + z buffer.
+ * Used when WebGL2 is unavailable. It is not an illustration or substitute model.
+ */
+class SoftwareStructureViewer {
+ constructor(canvas,onSelect){this.canvas=canvas;this.ctx=canvas.getContext('2d');if(!this.ctx)throw Error('浏览器无法创建绘图上下文');this.onSelect=onSelect;this.backend='CPU 3D / Z-buffer';this.meshes=[];this.yaw=.2;this.pitch=.03;this.distance=1.72;this.target=[0,.37,0];this.explode=0;this.colors=false;this.edges=true;this.inner=false;this.selected='front';this.scope='all';this.flatCuff=false;this.events()}
+ normal(...a){return StructureViewer.prototype.normal.apply(this,a)}persp(...a){return StructureViewer.prototype.persp.apply(this,a)}look(...a){return StructureViewer.prototype.look.apply(this,a)}camera(...a){return StructureViewer.prototype.camera.apply(this,a)}screenshot(){this.draw();return this.canvas.toDataURL('image/png')}
+ setPattern(d){this.data=d;this.refreshGeometry()}
+ refreshGeometry(){this.meshes=[];let by=Object.fromEntries(this.data.pieces.map(q=>[q.id,q]));for(let inst of this.data.instances){let q=by[inst.pieceId],V=new Float32Array(inst.mesh.uv.flatMap(uv=>(this.flatCuff&&inst.flatMap?inst.flatMap(...uv):inst.map(...uv)).map((v,i)=>(v+inst.explode[i]*this.explode)*.01))),I=new Uint32Array(inst.mesh.indices),edge=[];if(!inst.pieceId.includes('Placket'))for(let i=0;i<q.poly.length;i++)edge.push(q.boundaryIndices[i],q.boundaryIndices[(i+1)%q.poly.length]);this.meshes.push({inst,V,I,N:this.flatCuff?this.normal(V,I):materialNormals(inst),edges:edge})}
+ for(const n of this.data.notions||[]){const inst=this.data.instances.find(i=>i.id===n.instance);if(!inst)continue;const q=n.uv;
+ const mp=(x,y)=>(this.flatCuff&&inst.flatMap?inst.flatMap(x,y):inst.map(x,y));
+ let pos=mp(...q).map((v,i)=>v+inst.explode[i]*this.explode),e=.01,a=mp(q[0]+e,q[1]).map((v,i)=>v-mp(...q)[i]),b=mp(q[0],q[1]+e).map((v,i)=>v-mp(...q)[i]),al=Math.hypot(...a)||1,bl=Math.hypot(...b)||1;
+ let normal=[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],nl=Math.hypot(...normal)||1,P=[pos.map((v,i)=>v+normal[i]/nl*(inst.pieceId==='cuff'?-.12:.08))],I=[];
+ for(let j=0;j<20;j++){let t=j/20*Math.PI*2;P.push(P[0].map((v,i)=>v+.32*(Math.cos(t)*a[i]/al+Math.sin(t)*b[i]/bl)))}for(let j=0;j<20;j++)I.push(0,j+1,(j+1)%20+1);
+ let V=new Float32Array(P.flat().map(x=>x*.01));this.meshes.push({inst:{id:n.id,pieceId:'notion',ownerPiece:inst.pieceId,layer:'outer'},V,I:new Uint32Array(I),N:this.normal(V,I),edges:[]});}
+
+ this.draw()}
+ draw(){if(!this.data)return;let canvas=this.canvas,b=canvas.getBoundingClientRect();if(!b.width||!b.height)return;let scale=Math.min(1,1100/b.width,900/b.height),W=Math.round(b.width*scale),H=Math.round(b.height*scale);canvas.width=W;canvas.height=H;
+ let image=this.ctx.createImageData(W,H),pix=image.data,Z=new Float32Array(W*H).fill(Infinity),ID=new Uint16Array(W*H);this.pickBuffer=ID;this.zBuffer=Z;
+ for(let y=0;y<H;y++){let g=y/H;for(let x=0;x<W;x++){let r=Math.hypot((x-W*.5)/W,(y-H*.4)/H),k=(y*W+x)*4;pix[k]=Math.round(30-r*13);pix[k+1]=Math.round(43-r*17);pix[k+2]=Math.round(49-r*18);pix[k+3]=255}}
+ let eye=[Math.sin(this.yaw)*Math.cos(this.pitch)*this.distance+this.target[0],Math.sin(this.pitch)*this.distance+this.target[1],Math.cos(this.yaw)*Math.cos(this.pitch)*this.distance+this.target[2]],view=this.look(eye,this.target),proj=this.persp(.58,W/H,.01,50);
+ const tf=(m,v)=>[m[0]*v[0]+m[4]*v[1]+m[8]*v[2]+m[12]*(v[3]??1),m[1]*v[0]+m[5]*v[1]+m[9]*v[2]+m[13]*(v[3]??1),m[2]*v[0]+m[6]*v[1]+m[10]*v[2]+m[14]*(v[3]??1),m[3]*v[0]+m[7]*v[1]+m[11]*v[2]+m[15]*(v[3]??1)];
+ let palette=[[.83,.86,.87],[.71,.79,.82],[.72,.78,.70],[.80,.72,.62],[.88,.85,.76],[.74,.70,.83]],lineJobs=[];
+ for(let mi=0;mi<this.meshes.length;mi++){let m=this.meshes[mi];if(!this.isVisible(m.inst))continue;if(m.inst.pieceId==='notion'&&this.scope==='cuff'&&m.inst.ownerPiece!=='cuff')continue;if(m.inst.pieceId==='notion'&&this.scope==='neck'&&m.inst.ownerPiece!=='stand')continue;if(this.scope==='cuff'&&!['sleeve','cuff','slitUnder','slitOver','notion'].includes(m.inst.pieceId))continue;if(this.scope==='neck'&&!['stand','collar','undercollar','notion'].includes(m.inst.pieceId))continue;if(this.scope==='placket'&&!m.inst.pieceId.includes('Placket')&&m.inst.pieceId!=='notion')continue;if(m.inst.layer==='inner'&&(!this.inner||this.explode<.02))continue;let k=this.data.pieces.findIndex(q=>q.id===m.inst.pieceId),col=m.inst.pieceId==='notion'?[.53,.57,.56]:this.colors?palette[k%palette.length]:[.91,.90,.84],sv=[],lightF=[],lightB=[];
+ for(let j=0;j<m.V.length;j+=3){let v=[m.V[j],m.V[j+1],m.V[j+2]],c=tf(proj,tf(view,v));sv.push([(c[0]/c[3]+1)*W/2,(1-c[1]/c[3])*H/2,c[2]/c[3],c[3]]);let nx=m.N[j],ny=m.N[j+1],nz=m.N[j+2];for(let [sgn,a] of [[1,lightF],[-1,lightB]]){let key=Math.max(0,sgn*(-.417*nx+.709*ny+.567*nz)),fill=Math.max(0,sgn*(.789*nx+.316*ny-.526*nz));a.push(.34+.52*key+.15*fill+.05*(.5+.5*ny*sgn))}}
+ let I=m.I;for(let j=0;j<I.length;j+=3){let ia=I[j],ib=I[j+1],ic=I[j+2],a=sv[ia],bb=sv[ib],c=sv[ic];if(a[3]<=0||bb[3]<=0||c[3]<=0)continue;let det=(bb[1]-c[1])*(a[0]-c[0])+(c[0]-bb[0])*(a[1]-c[1]);if(Math.abs(det)<1e-9)continue;let lights=det<0?lightF:lightB;let la=lights[ia],lb=lights[ib],lc=lights[ic],xmin=Math.max(0,Math.floor(Math.min(a[0],bb[0],c[0]))),xmax=Math.min(W-1,Math.ceil(Math.max(a[0],bb[0],c[0]))),ymin=Math.max(0,Math.floor(Math.min(a[1],bb[1],c[1]))),ymax=Math.min(H-1,Math.ceil(Math.max(a[1],bb[1],c[1])));
+ for(let yy=ymin;yy<=ymax;yy++)for(let xx=xmin;xx<=xmax;xx++){let u=((bb[1]-c[1])*(xx+.5-c[0])+(c[0]-bb[0])*(yy+.5-c[1]))/det;if(u<-.00001||u>1.00001)continue;let v=((c[1]-a[1])*(xx+.5-c[0])+(a[0]-c[0])*(yy+.5-c[1]))/det,w=1-u-v;if(v<-.00001||w<-.00001)continue;let depth=u*a[2]+v*bb[2]+w*c[2],idx=yy*W+xx;if(depth>Z[idx])continue;Z[idx]=depth;ID[idx]=mi+1;let lum=u*la+v*lb+w*lc;for(let t=0;t<3;t++)pix[idx*4+t]=Math.min(255,255*Math.pow(col[t]*lum,.88))}}
+ if(this.edges&&m.edges.length)lineJobs.push({sv,edge:m.edges,selected:m.inst.pieceId===this.selected});}
+ // Lines are depth tested, so a rear seam is not painted through a front panel.
+ for(let job of lineJobs){for(let j=0;j<job.edge.length;j+=2){let a=job.sv[job.edge[j]],b=job.sv[job.edge[j+1]],num=Math.max(1,Math.ceil(Math.hypot(a[0]-b[0],a[1]-b[1])));for(let i=0;i<=num;i++){let t=i/num,x=Math.round(a[0]+(b[0]-a[0])*t),y=Math.round(a[1]+(b[1]-a[1])*t);if(x<0||x>=W||y<0||y>=H)continue;let z=a[2]+(b[2]-a[2])*t,index=y*W+x;if(z>Z[index]+.000001)continue;let color=job.selected?[156,119,71]:[99,111,111];for(let q=0;q<3;q++)pix[index*4+q]=color[q]}}}
+ this.ctx.putImageData(image,0,0);this.lastRenderMs=performance.now();}
+ events(){let c=this.canvas,last=null,moved=0;c.addEventListener('pointerdown',e=>{last=[e.clientX,e.clientY];moved=0;c.setPointerCapture(e.pointerId)});c.addEventListener('pointermove',e=>{if(!last)return;let dx=e.clientX-last[0],dy=e.clientY-last[1];moved+=Math.abs(dx)+Math.abs(dy);this.yaw-=dx*.008;this.pitch=HRLPattern.clamp(this.pitch+dy*.005,-1.3,1.3);last=[e.clientX,e.clientY];this.draw()});c.addEventListener('pointerup',e=>{if(moved<5&&this.pickBuffer){let b=c.getBoundingClientRect(),x=Math.floor((e.clientX-b.left)/b.width*c.width),y=Math.floor((e.clientY-b.top)/b.height*c.height),m=this.meshes[this.pickBuffer[y*c.width+x]-1];if(m&&m.inst.pieceId!=='notion')this.onSelect(m.inst.pieceId)}last=null});c.addEventListener('pointercancel',()=>last=null);c.addEventListener('wheel',e=>{e.preventDefault();this.distance=HRLPattern.clamp(this.distance*Math.exp(e.deltaY*.001),.3,5);this.draw()},{passive:false});new ResizeObserver(()=>this.draw()).observe(c)}
+}
+
+/* C3P4-B tailor shop view adapter. View state never changes pattern or work-order data. */
+function tailorVisibility(inst){
+ const id=inst.pieceId==='notion'?inst.ownerPiece:inst.pieceId,layer=inst.layer;
+ if(this.inspection==='selected')return id===this.selected;
+ if(this.inspection==='shell')return ['outer','collar','cuff','pocket'].includes(layer)||inst.pieceId==='notion';
+ if(this.inspection==='lining')return ['lining','facing','interfacing'].includes(layer);
+ if(this.inspection==='pockets')return layer==='pocket'||(inst.pieceId==='notion'&&String(inst.ownerPiece).startsWith('flap'));
+ if(this.inspection==='complete'&&this.explode<.02&&['lining','facing','interfacing'].includes(layer))return false;
+ return true;
+}
+function tailorCamera(v){
+ const H=this.data.parameters.garmentLength*.01,aspect=this.canvas.clientWidth/Math.max(1,this.canvas.clientHeight);
+ this.target=[0,H*.50,0];this.pitch=.05;this.yaw=.42;this.distance=Math.max(1.65,1.20/(2*Math.tan(.29)*Math.max(.65,aspect)));
+ if(v==='front')this.yaw=0;
+ if(v==='back')this.yaw=Math.PI;
+ if(v==='side')this.yaw=Math.PI/2;
+ if(v==='threequarter'){this.yaw=.58;this.pitch=.10;}
+ if(v==='inside'){this.yaw=2.55;this.pitch=.08;this.distance*=1.08;}
+ if(v==='collar'){this.target=[0,H+.015,0];this.distance=.60;this.yaw=.38;this.pitch=.18;}
+ if(v==='cuff'){this.target=[.30,H-this.data.parameters.sleeveLength*.01-.02,0];this.distance=.62;this.yaw=1.9;this.pitch=.10;}
+ if(v==='pocket'){this.target=[.12,H*.39,.10];this.distance=.70;this.yaw=.42;this.pitch=.12;}
+ if(this.explode>.08)this.distance*=1.42;
+ this.draw();
+}
+for(const C of [StructureViewer,SoftwareStructureViewer]){C.prototype.isVisible=tailorVisibility;C.prototype.camera=tailorCamera;}
+</script><script>(function(){'use strict';
+const K=window.HRLTailor,G=window.HRLGeometry,$=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sources=[
+ {id:'ISO-8559-1:2017',name:'服装人体测量定义',url:'https://www.iso.org/standard/61686.html',supports:'量体项目必须有统一测点和定义；本工作台不把款式松量写成人体尺寸。'},
+ {id:'FreeSewing-Bent',name:'两片袖外套基础块方法',url:'https://freesewing.eu/docs/designs/bent/',supports:'支持“基础块与款式纸样分离”以及外套需独立袖型基础；本版目前仍使用一片式装袖。'},
+ {id:'FreeSewing-Jaeger',name:'完整夹克裁片、贴边、里布与衬料分类',url:'https://freesewing.eu/docs/designs/jaeger/',supports:'支持面布、里布、贴边、领、袖和局部衬必须分别建档；本版不是 Jaeger 官方纸样。'},
+ {id:'FreeSewing-Jett',name:'外层、里布、开口与多层门襟工序',url:'https://freesewing.eu/docs/designs/jett/instructions/',supports:'支持开口、贴边、里布和局部叠层需按工序区分；本版不复制 Jett 款式。'}
+];
+let def=K.makeDefinition(),currentState={...K.initialState},data,viewer,tab='order',docRevision=1;
+const label={chest:'胸围',waist:'腰围',hip:'臀围',neck:'领围',shoulder:'肩宽',shoulderSlope:'肩斜落差',backWaist:'后颈点至腰',garmentLength:'成衣长',sleeveLength:'袖长',biceps:'上臂围',wrist:'腕围',chestEase:'胸围款式松量',waistEase:'腰围款式松量',hipEase:'臀围款式松量',bicepsEase:'上臂松量',wristEase:'腕口松量',armholeDepth:'袖窿深',frontOverlap:'前中搭量',facingWidth:'贴边宽',liningHemOffset:'里布下摆错位',collarStandHeight:'领座高',collarFall:'翻领宽',cuffHeight:'袖口高',pocketWidth:'袋宽',pocketHeight:'袋高',pocketDepth:'袋围深',flapDepth:'袋盖深',sa:'通用缝份'};
+const measurementKeys=['chest','waist','hip','neck','shoulder','shoulderSlope','backWaist','sleeveLength','biceps','wrist'];
+const styleKeys=['garmentLength','chestEase','waistEase','hipEase','bicepsEase','wristEase','armholeDepth','frontOverlap','facingWidth','liningHemOffset','collarStandHeight','collarFall','cuffHeight','pocketWidth','pocketHeight','pocketDepth','flapDepth','sa'];
+function warn(e){$('error').style.display='block';$('error').textContent='未应用修改：'+(e?.message||e);setTimeout(()=>$('error').style.display='none',6500);}
+function makeViewer(){try{viewer=new StructureViewer($('scene'),selectPiece);$('backend').textContent='WebGL2';}catch(e){viewer=new SoftwareStructureViewer($('scene'),selectPiece);$('backend').textContent='CPU 3D / Z-buffer';}viewer.inspection=currentState.inspection;viewer.selected='front.shell';viewer.colors=false;viewer.explode=0;}
+function rebuild(){data=K.assemble(def,currentState);viewer.inspection=currentState.inspection;viewer.setPattern(data);renderAll();}
+function updateDefinition(patch){try{def=K.makeDefinition({...def.parameters,...patch});docRevision++;rebuild();}catch(e){warn(e);renderParams();}}
+function updateState(patch){try{currentState=K.state({...currentState,...patch});docRevision++;rebuild();}catch(e){warn(e);}}
+function renderParams(){let groups=[['量体票',measurementKeys],['款式与生产纸样',styleKeys]],html='';for(const [title,keys] of groups){html+=`<h4 style="margin:10px 0 4px;font-size:11px;color:#afd4c3">${title}</h4>`;for(const k of keys){let [mn,mx]=K.limits[k],step=(mx-mn)>40?1:(mx-mn)>10?.5:(mx-mn)>3?.1:.05;html+=`<div class="row"><label>${label[k]} <output id="out_${k}">${def.parameters[k].toFixed(step<.1?2:step<1?1:0)} cm</output></label><input id="param_${k}" data-key="${k}" type="range" min="${mn}" max="${mx}" step="${step}" value="${def.parameters[k]}"></div>`;}}$('params').innerHTML=html;document.querySelectorAll('#params input').forEach(e=>e.addEventListener('change',ev=>updateDefinition({[ev.target.dataset.key]:+ev.target.value})));}
+function renderStageCards(){let q=data.qa,d=def;const stages=[
+ ['01 量体票',d.measurementTicket.status==='demonstration_only'?'控制样架':'已绑定客户','测点、单位、来源与 revision 独立保存。',q.gates.measurementTicket],
+ ['02 基础版几何',d.baseBlock.status,'三块基础几何真实存在，不再只有名称。',q.gates.baseBlockGeometry],
+ ['03 款式操作',d.styleDraft.status,'8 个可追溯操作从基础版派生外套结构。',q.gates.styleOperations],
+ ['04 工作纸样',q.gates.workingPattern?'几何检查通过':'阻断','未经试身，不得称为批准生产纸样。',q.gates.workingPattern],
+ ['05 裁片实例',q.gates.cutPieceInstances?d.cutPieceInstances.length+' 个实例':'阻断','左右、对折和每一片实裁对象均有稳定 ID。',q.gates.cutPieceInstances],
+ ['06 完整装配图',q.gates.assemblyGraph?'闭合':'阻断',d.assemblyGraph.relations.length+' 缝合／装配 + '+d.assemblyGraph.bondRelations.length+' 粘合关系。',q.gates.assemblyGraph],
+ ['07 白坯裁剪票',q.gates.toileCuttingTicket?'允许':'阻断','仅允许白坯；正式面料裁剪票仍为空。',q.gates.toileCuttingTicket],
+ ['08 试身与修版','尚未建立','必须绑定人物、白坯和 AlterationSet。',false],
+ ['09 批准生产纸样','不存在','需要完成试身与修版后另建 revision。',false],
+ ['10 正式生产','禁止','productionReady=false。',false]
+ ];$('stageCards').innerHTML=stages.map(x=>`<article class="stageCard ${x[3]?'':'hold'}"><b>${x[0]} · ${esc(x[1])}</b><p>${x[2]}</p></article>`).join('');}
+function renderOrder(){let m=def.measurementTicket.measurements;$('measureTable').innerHTML='<table><tbody>'+Object.entries(m).map(([k,v])=>`<tr><th>${label[k]||k}</th><td>${v.toFixed(1)} cm</td><td>control_figure</td></tr>`).join('')+'</tbody></table><p class="note">量体票是事实输入；款式松量和构造操作属于 StyleDraft。指定人物时另建 MeasurementTicket 与 FitSession。</p>';
+ $('styleSummary').innerHTML=`<dl><dt>款式 ID</dt><dd>${def.styleDraft.id}</dd><dt>基础版</dt><dd>${def.baseBlock.id}</dd><dt>可执行操作</dt><dd>${def.styleDraft.operations.length} 项</dd><dt>历史身份</dt><dd>未指定</dd><dt>量体票 revision</dt><dd>${def.measurementTicket.revision}</dd><dt>基础版 revision</dt><dd>${def.baseBlock.revision}</dd><dt>款式版 revision</dt><dd>${def.styleDraft.revision}</dd><dt>工作纸样 revision</dt><dd>${def.workingPattern.revision}</dd><dt>装配图 revision</dt><dd>${def.workingPattern.assemblyGraphRevision}</dd><dt>批准生产纸样</dt><dd class="warn">null</dd><dt>服装定义 revision</dt><dd>${def.revision}</dd><dt>页面工单 revision</dt><dd>${docRevision}</dd></dl><p class="note">当前可做白坯，但不能裁正式面料，也不能将工作纸样冒充生产纸样。</p>`;}
+function renderKernel(){
+ const bg=def.baseBlock.geometry.pieces.map(x=>`<div class="relation"><b>${x.id}</b><br>${x.name} · ${x.seamLine.length} 个缝线采样点 · ${Object.keys(x.interfaces).length} 个接口</div>`).join('');
+ const ops=def.styleDraft.operations.map(x=>`<div class="relation"><b>${x.id}</b><br>${x.type}<br><span class="note">${x.outputs.join(' · ')}</span></div>`).join('');
+ $('kernelStages').innerHTML='<h3>基础版几何</h3>'+bg+'<h3>款式转换</h3>'+ops;
+ const schemas=['measurement-ticket','base-block','style-draft','working-pattern','cut-piece-instance','cutting-ticket','assembly-graph','fit-session','alteration-set','release-gate','garment-definition','garment-state'];
+ $('schemaTable').innerHTML=schemas.map(x=>`<div class="relation"><b>${x}.schema.json</b><br><span class="note">Draft 2020-12 · package /schemas</span></div>`).join('');
+ $('instanceTable').innerHTML=def.cutPieceInstances.map(x=>`<tr><td><code>${x.id}</code></td><td>${x.patternPieceId}</td><td>${x.role}${x.replicas.length?' / replicas '+x.replicas.join(','):''}</td><td>${x.materialClass}<br>${x.layerRole}</td><td>${x.status}</td></tr>`).join('');
+ const a=def.assemblyGraph;$('graphSummary').innerHTML=`<span class="tag ${a.completeness.allCutPieceInstancesCovered?'good':'hold'}">裁片实例覆盖 ${a.completeness.allCutPieceInstancesCovered?'完整':'不完整'}</span><span class="tag good">${a.relations.length} 条实例装配关系</span><span class="tag good">${a.bondRelations.length} 条粘合关系</span><span class="tag good">${a.boundaryDispositions.length} 条开口／折边处置</span><p class="note">未覆盖实例：${a.completeness.uncoveredInstanceIds.join('、')||'无'}。关系端点引用实际裁片实例，不再仅靠纸样类型和 multiplicity 猜测左右。</p>`;
+ $('releaseTable').innerHTML=def.releaseGate.requirements.map(x=>`<div class="gate ${x.status.startsWith('pass')?'':'hold'}"><span>${x.id}</span><span>${x.status.toUpperCase()}</span></div>`).join('')+`<p class="note">白坯裁剪：${def.releaseGate.allowToileCut?'允许':'禁止'}；生产纸样批准：禁止；正式裁剪：禁止；正式装配：禁止。</p>`;
+}
+function pieceById(id){return def.panels.find(q=>q.id===id);}
+function renderPieces(){let old=$('pieceSelect').value;$('pieceSelect').innerHTML=def.panels.map(q=>`<option value="${q.id}">${esc(q.name)} ×${q.quantity}</option>`).join('');$('pieceSelect').value=pieceById(old)?old:(viewer.selected||'front.shell');}
+function selectPiece(id){if(!pieceById(id))return;viewer.selected=id;$('pieceSelect').value=id;renderInspect();viewer.draw();}
+function renderInspect(){let q=pieceById(viewer.selected)||def.panels[0],related=def.seams.filter(j=>j.a.panelId===q.id||j.b.panelId===q.id);$('inspect').innerHTML=`<dl><dt>名称</dt><dd>${esc(q.name)}</dd><dt>ID</dt><dd><code>${q.id}</code></dd><dt>裁剪</dt><dd>${q.quantity} 片${q.mirror?' · 左右镜像':''}${q.onFold?' · 对折裁':''}</dd><dt>层级</dt><dd>${q.layerRole} / ${q.materialClass}</dd><dt>布纹</dt><dd>${q.grain.join(', ')}</dd><dt>裁剪法</dt><dd>${q.cutMethod}</dd><dt>缝份政策</dt><dd>${q.allowancePolicy==='zero'?'净裁／0 缝份':'由缝线域派生'}</dd><dt>面积</dt><dd>${Math.abs(G.area(q.poly)).toFixed(1)} cm²（缝线域）</dd><dt>关系</dt><dd>${related.length} 条</dd></dl>`;}
+function renderSummary(){let c=data.qa.counts;$('summary').innerHTML=`<span class="tag good">${c.patternTypes} 类纸样</span><span class="tag good">${c.cutPieceInstances} 个实际裁片实例</span><span class="tag good">${c.patternSeamRelations} 条纸样级关系</span><span class="tag good">${c.assemblyInstanceRelations} 条实例装配关系</span><span class="tag good">${c.bondRelations} 条粘合关系</span><span class="tag hold">0 次人物试身</span><p class="note">胸/腰/臀成衣目标：${def.derived.chestGarment.toFixed(1)} / ${def.derived.waistGarment.toFixed(1)} / ${def.derived.hipGarment.toFixed(1)} cm。当前只是控制样架与工作纸样。</p>`;}
+function path(poly){return poly.map((p,i)=>(i?'L':'M')+p[0].toFixed(3)+' '+p[1].toFixed(3)).join(' ')+' Z';}
+function layoutPieces(){let width=150,x=4,y=7,row=0,items=[];for(const q of def.panels){let b=q.bounds;if(x+b.width+5>width){x=4;y+=row+10;row=0;}items.push({q,x:x-b.minX,y:y-b.minY});x+=b.width+6;row=Math.max(row,b.height);}return {width,height:y+row+8,items};}
+function patternSVG(physical=false){let L=layoutPieces(),out=`<svg xmlns="http://www.w3.org/2000/svg" width="${L.width*10}mm" height="${L.height*10}mm" viewBox="0 0 ${L.width} ${L.height}"><rect width="100%" height="100%" fill="#f2f0e8"/><text x="4" y="3" font-size="1.5" fill="#334b42">HRL C3P4-C · tailor shop WORKING pattern · NOT production approved · cm geometry / mm export · NOT fitted or production approved</text>`;for(const {q,x,y} of L.items){let fill=q.materialClass==='lining_fabric'?'#d7e2df':q.materialClass==='interfacing'?'#e2d9e3':q.materialClass==='undercollar_fabric'?'#e4d4c9':'#e8e5da';out+=`<g data-piece="${q.id}" transform="translate(${x} ${y})"><path d="${path(q.cut)}" fill="none" stroke="#3a8a8d" stroke-width=".13"/><path d="${path(q.poly)}" fill="${fill}" stroke="#3d4540" stroke-width=".13"/>`;
+ for(const f of Object.values(q.interfaces)){let color=f.kind==='opening_edge'?'#ad684d':f.kind==='fold_edge'?'#a5864d':'#786e5a';if(['opening_edge','fold_edge','surface_path'].includes(f.kind))out+=`<polyline points="${f.points.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${color}" stroke-width=".18" stroke-dasharray=".6 .45"/>`;}
+ for(const mark of q.internalMarks||[])if(mark.from&&mark.to)out+=`<line x1="${mark.from[0]}" y1="${mark.from[1]}" x2="${mark.to[0]}" y2="${mark.to[1]}" stroke="#987a50" stroke-width=".18" stroke-dasharray=".6 .45"/>`;
+ let gl=q.grainLine;out+=`<path d="M${gl[0]} L${gl[1]} m-.45,-.8 l.45,.8 l.45,-.8" fill="none" stroke="#597c68" stroke-width=".17"/>`;
+ for(const n of q.notches||[]){let f=q.interfaces[n.interfaceId];if(!f)continue;let pt=G.arctable(f.points).at(n.s);out+=`<circle cx="${pt[0]}" cy="${pt[1]}" r=".18" fill="#a85f49"/>`;}
+ out+=`<text x="${q.bounds.minX}" y="${q.bounds.maxY+2}" font-size="1.35" fill="#26372f">${esc(q.name)} ×${q.quantity}${q.mirror?' / mirror':''}${q.onFold?' / on fold':''}</text><text x="${q.bounds.minX}" y="${q.bounds.maxY+3.45}" font-size=".9" fill="#59665f">${q.id} · ${q.materialClass}</text></g>`;}return out+'</svg>';}
+function renderPattern(){$('patternSVG').innerHTML=patternSVG();$('patternSVG').querySelectorAll('[data-piece]').forEach(e=>{e.style.cursor='pointer';e.onclick=()=>selectPiece(e.dataset.piece)});}
+function markerSVG(material){let plan=K.markerPlan(def,material),out=`<svg xmlns="http://www.w3.org/2000/svg" width="${plan.widthCm*10}mm" height="${plan.lengthCm*10}mm" viewBox="0 0 ${plan.widthCm} ${plan.lengthCm}"><rect width="100%" height="100%" fill="#eeeade"/><path d="M0 0 V${plan.lengthCm} M${plan.widthCm} 0 V${plan.lengthCm}" stroke="#526960" stroke-width=".25"/><text x="3" y="3" font-size="1.7" fill="#31463f">${material} · usable width ${plan.widthCm} cm · conservative single-layer layout</text>`;for(const it of plan.items){let q=pieceById(it.id);out+=`<g transform="translate(${it.x} ${it.y})"><path d="${path(q.cut)}" fill="#e3e2d8" stroke="#3b5550" stroke-width=".16"/><path d="M${q.grainLine[0]} L${q.grainLine[1]}" stroke="#5d806b" stroke-width=".22"/><text x="${q.bounds.minX}" y="${q.bounds.maxY+1.7}" font-size="1.05" fill="#31463f">${esc(q.name)} ${it.index+1}</text></g>`;}return out+'</svg>';}
+function renderMarker(){let material=$('markerMaterial').value,plan=K.markerPlan(def,material);$('markerSVG').innerHTML=markerSVG(material);let g=def.toileCuttingTicket.groups.find(x=>x.material===material);$('cutTicket').innerHTML=`<h2>${material} 白坯裁剪票</h2><table><thead><tr><th>纸样</th><th>数量</th><th>规则</th></tr></thead><tbody>${(g?.pieces||[]).map(x=>{let q=pieceById(x.id);return `<tr><td>${esc(q.name)}<br><code>${q.id}</code></td><td>${x.quantity}</td><td>${x.mirror?'左右镜像 ':''}${x.onFold?'对折裁 ':''}布纹 ${x.grain.join(',')} · ${q.allowancePolicy==='zero'?'净裁 0 缝份':'按工作纸样缝份裁剪'}</td></tr>`}).join('')}</tbody></table><p class="note">白坯候选用布长度 ${plan.lengthCm.toFixed(1)} cm；正式面料裁剪票为 null。</p>`;}
+function renderRelations(){let own=def.ownership.nodes.filter(n=>n.kind==='component'||n.kind==='layer').map(n=>`<div class="relation"><b>${n.id}</b><br>${def.ownership.nodes.filter(x=>x.parentId===n.id).map(x=>pieceById(x.id)?.name||x.id).join(' · ')||'—'}</div>`).join('');let layers=def.layers.map(x=>`<div class="relation"><b>${x.region}</b><br>${pieceById(x.inside)?.name||x.inside} → ${pieceById(x.outside)?.name||x.outside}${x.when?' · 条件 '+x.when:''}</div>`).join('');let close=def.closures.map(x=>`<div class="relation"><b>${x.id}</b><br>${x.type} · ${x.topology}</div>`).join('');let opens=def.openings.map(x=>`<div class="relation"><b>${x.id}</b><br>${x.kind} · ${x.members.map(m=>m.panelId+'.'+m.interfaceId).join(' / ')}</div>`).join('');let graph=`<div class="relation"><b>实例级装配图</b><br>${def.assemblyGraph.relations.length} seam/attachment relations · ${def.assemblyGraph.completeness.status}</div>`+def.assemblyGraph.relations.slice(0,12).map(x=>`<div class="relation"><b>${x.id}</b><br>${x.members.map(m=>m.instanceId+'.'+m.interfaceId).join(' ↔ ')}</div>`).join('')+'<p class="note">页面仅展示前 12 条，完整图随定义 JSON 导出。</p>';let bonds=def.assemblyGraph.bondRelations.map(x=>`<div class="relation"><b>${x.id}</b><br>${x.source.instanceId} → ${x.target.instanceId}<br><span class="note">${x.method}</span></div>`).join('');$('relationCards').innerHTML=`<div class="card"><h2>01 部件归属</h2>${own}</div><div class="card"><h2>02 区域层序</h2>${layers}</div><div class="card"><h2>03 可解除闭合</h2>${close}</div><div class="card"><h2>04 开口身份</h2>${opens}<p class="note">相邻、覆盖、扣合与缝合分别保存。</p></div><div class="card"><h2>05 实例装配图</h2>${graph}</div><div class="card"><h2>06 衬料粘合图</h2>${bonds}</div>`;}
+function renderProcess(){$('ops').innerHTML=def.toileAssemblyPlan.map(x=>`<div class="op"><div><b>${x.title}</b><p>工序 ID：${x.id} · 质量门：${x.gate}</p></div></div>`).join('');$('sourceList').innerHTML=sources.map(x=>`<p><a href="${x.url}" target="_blank" rel="noopener">${x.id} · ${x.name}</a><br><span class="note">${x.supports}</span></p>`).join('')+'<p class="warn">当前工序只覆盖白坯与试身前链路。批准生产纸样和正式面料工序尚不存在。</p>';}
+function renderQA(){let q=data.qa,g=q.gates;const rows=[['量体票',g.measurementTicket],['基础版几何',g.baseBlockGeometry],['款式操作',g.styleOperations],['工作纸样',g.workingPattern],['裁片实例',g.cutPieceInstances],['完整装配图',g.assemblyGraph],['白坯裁剪票',g.toileCuttingTicket],['白坯装配工序',g.toileAssemblyPlan],['指定人物 FitSession',g.namedFitSession],['白坯试身',g.toileVerified],['批准生产纸样',g.approvedProductionPattern],['生产放行',g.productionReady]];$('gates').innerHTML=rows.map(x=>`<div class="gate ${x[1]?'':'hold'}"><span>${x[0]}</span><span>${x[1]?'PASS':'HOLD'}</span></div>`).join('');$('qaSummary').innerHTML=`<span class="tag ${q.passed?'good':'hold'}">内核契约 ${q.passed?'通过':'阻断'}</span><span class="tag good">装配图 ${def.assemblyGraph.completeness.status}</span><span class="tag hold">批准生产纸样 null</span><span class="tag hold">productionReady=false</span><p class="note">PASS 只表示工作纸样、裁片实例、装配关系和 release gate 内部一致，不证明真人合体或正式生产可用。</p>${q.errors.length?'<p class="danger">'+q.errors.map(e=>e.code+': '+e.detail).join('<br>')+'</p>':''}`;
+ $('seamTable').innerHTML=q.seamReports.map(r=>`<tr><td><code>${r.id}</code><br>${r.type} ×${r.multiplicity}</td><td>${esc(r.a)}<br>↔ ${esc(r.b)}</td><td>${r.type==='neckline_aggregate'?'—（参与总量）':(r.deltaCm*10).toFixed(2)+' mm'}</td><td>${r.type==='distributed_ease'?'计划吃势 '+(r.plannedEaseCm*10).toFixed(1)+' mm':r.type==='neckline_aggregate'?'完整领圈总量核对':'1:1 / 装配路径'}</td><td class="${r.ok?'good':'danger'}">${r.ok?'通过':'阻断'}</td></tr>`).join('');}
+function negative(kind){let d=K.makeDefinition(def.parameters);if(kind==='reverse')d.seams.find(x=>x.id==='shell.armhole.front').mapping.orientation=-1;if(kind==='seal')d.seams.push({id:'invalid.seal',type:'one_to_one',a:{panelId:'pocket.face',interfaceId:'mouth',range:[0,1]},b:{panelId:'flap.outer',interfaceId:'hinge',range:[0,1]},mapping:{basis:'normalized_material_arclength',orientation:1,controlPairs:[[0,0],[1,1]]},toleranceCm:.1,plannedEaseCm:0,multiplicity:2});if(kind==='grain')delete d.panels.find(q=>q.id==='front.shell').grainLine;if(kind==='cycle')d.layers.push({id:'invalid.cycle',region:'torso',inside:'front.shell',outside:'front.lining'});if(kind==='promote')d.status.productionReady=true;if(kind==='instance')d.cutPieceInstances.pop();if(kind==='bond')d.assemblyGraph.bondRelations[0].target.instanceId='missing::instance';let r=K.validate(d,currentState);$('negativeResult').textContent='临时错误已被识别：'+(r.errors.map(e=>e.code).join(' / ')||'未识别（需要修复测试）');return r;}
+function download(text,name,type='application/json'){let u=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+function switchTab(id){if(!['order','kernel','assembly','patterns','cutting','relations','process','qa'].includes(id))throw Error('TAB');tab=id;document.querySelectorAll('.pane').forEach(e=>e.classList.toggle('active',e.id===id));document.querySelectorAll('nav [data-tab]').forEach(e=>e.classList.toggle('active',e.dataset.tab===id));if(id==='assembly')requestAnimationFrame(()=>viewer.draw());}
+function renderAll(){renderParams();renderStageCards();renderOrder();renderKernel();renderPieces();renderInspect();renderSummary();renderPattern();renderMarker();renderRelations();renderProcess();renderQA();$('frontClosed').checked=currentState.frontClosed;$('leftPocketClosed').checked=currentState.leftPocketClosed;$('rightPocketClosed').checked=currentState.rightPocketClosed;$('liningInstalled').checked=currentState.liningInstalled;$('inspection').value=currentState.inspection;viewer.inspection=currentState.inspection;viewer.draw();}
+function resetView(){viewer.explode=0;$('explode').value=0;$('explodeValue').textContent='0%';viewer.colors=false;$('layerColors').classList.remove('on');currentState={...currentState,inspection:'complete'};viewer.inspection='complete';$('inspection').value='complete';selectPiece('front.shell');viewer.camera('threequarter');}
+makeViewer();rebuild();viewer.camera('threequarter');
+$('inspection').onchange=e=>updateState({inspection:e.target.value});$('frontClosed').onchange=e=>updateState({frontClosed:e.target.checked});$('leftPocketClosed').onchange=e=>updateState({leftPocketClosed:e.target.checked});$('rightPocketClosed').onchange=e=>updateState({rightPocketClosed:e.target.checked});$('liningInstalled').onchange=e=>updateState({liningInstalled:e.target.checked});
+$('explode').oninput=e=>{viewer.explode=+e.target.value;$('explodeValue').textContent=Math.round(viewer.explode*100)+'%';viewer.refreshGeometry();};$('layerColors').onclick=()=>{viewer.colors=!viewer.colors;$('layerColors').classList.toggle('on',viewer.colors);viewer.draw();};$('pieceSelect').onchange=e=>selectPiece(e.target.value);$('resetView').onclick=resetView;$('markerMaterial').onchange=renderMarker;
+for(const b of document.querySelectorAll('[data-camera]'))b.onclick=()=>viewer.camera(b.dataset.camera);for(const b of document.querySelectorAll('[data-tab]'))b.onclick=()=>switchTab(b.dataset.tab);for(const b of document.querySelectorAll('[data-negative]'))b.onclick=()=>negative(b.dataset.negative);
+$('saveRecipe').onclick=()=>download(JSON.stringify(K.recipe(def,currentState),null,2),'HRL_M04_C3P4C_TAILOR_JOB_RECIPE.json');$('loadRecipe').onclick=()=>$('recipeFile').click();$('recipeFile').onchange=async e=>{try{let f=e.target.files[0];if(!f)return;if(f.size>1e6)throw Error('RECIPE_TOO_LARGE');let r=K.loadRecipe(JSON.parse(await f.text()));def=r.definition;currentState=r.state;docRevision++;rebuild();}catch(ex){warn(ex)}finally{e.target.value='';}};
+$('saveShot').onclick=()=>{let a=document.createElement('a');a.href=viewer.screenshot();a.download='HRL_M04_C3P4C_TAILOR_VIEW.png';a.click();};$('resetAll').onclick=()=>{def=K.makeDefinition();currentState={...K.initialState};docRevision++;rebuild();resetView();};$('exportSVG').onclick=()=>download(patternSVG(true),'HRL_M04_C3P4C_WORKING_PATTERNS.svg','image/svg+xml');$('exportDefinition').onclick=()=>download(JSON.stringify(K.serializeDefinition(def),null,2),'HRL_M04_C3P4C_GARMENT_DEFINITION.json');
+window.HRLTailorShop={get definition(){return def},get state(){return {...currentState}},get data(){return data},viewer,setParameters:updateDefinition,setState:updateState,switchTab,selectPiece,patternSVG,markerSVG,negative,getRecipe:()=>K.recipe(def,currentState),getDefinition:()=>K.serializeDefinition(def),getSnapshot:()=>({definition:K.serializeDefinition(def),state:{...currentState},docRevision})};
+})();
+</script><script>window.__KAOPU_R2_RIG__={"hips":[-0.000078,0.8112635,0.0789258],"sternum":[-0.0005709,1.2390856,0.1846129],"T1":[0.001955,1.3625453,0.0714407],"head":[-0.0001502,1.4778314,0.0733527],"left_upperArm":[-0.1645913,1.3147382,0.0757354],"right_upperArm":[0.1645565,1.3150116,0.0755326],"left_forearm":[-0.2171145,1.0374719,0.0690745],"right_forearm":[0.2168872,1.0376095,0.068719],"left_hand":[-0.2498158,0.8135775,0.1144345],"right_hand":[0.2507209,0.8134666,0.1146839]};</script><script>
+(function(){
+'use strict';
+const shop=window.HRLTailorShop;
+if(!shop||!shop.viewer||!shop.viewer.gl){document.body.insertAdjacentHTML('beforeend','<p style="color:#f77">厚外套交互无法启动：需要原始裁缝工作台与 WebGL2。</p>');return;}
+const viewer=shop.viewer,gl=viewer.gl,ref=window.__KAOPU_R2_RIG__||{},body={shape:'reference',pose:'idle',amp:0,show:true,mat:'canvas',paused:false,frame:0,simMs:0,contacts:0,maxPen:.0};
+const material={canvas:{density:620,soft:.43,thickness:.0055,loft:.006,color:[.37,.34,.28],grain:.75,label:'中厚帆布'},wool:{density:850,soft:.26,thickness:.0075,loft:.009,color:[.28,.32,.35],grain:.25,label:'厚呢'},padded:{density:480,soft:.15,thickness:.009,loft:.014,color:[.35,.40,.39],grain:.11,label:'夹棉面层'}};
+const shape={reference:[1,1,1],broad:[1.12,1.06,1.09],fuller:[1.04,1.20,1.19]};
+const h='<div id="coat-lab"><strong>厚工装外套 Mother R01</strong><small> · 源自 C3P4-C 实际裁片三角网格｜单个模拟对象</small>'+
+'<div class="coat-tools"><label>面料 <select id="coat-m"><option value="canvas">中厚帆布</option><option value="wool">厚呢</option><option value="padded">夹棉面层</option></select></label>'+
+'<label>R2 体型 <select id="coat-b"><option value="reference">参考</option><option value="broad">宽肩</option><option value="fuller">丰满</option></select></label>'+
+'<label>动作 <select id="coat-p"><option value="idle">站立</option><option value="raise">抬双臂</option><option value="elbow">屈肘</option><option value="twist">转身</option></select></label>'+
+'<label>幅度 <input type="range" id="coat-a" min="0" max="1" value="0" step=".01"></label>'+
+'<button id="coat-stop">暂停</button><button id="coat-reset">重置</button><label>人体代理 <input type="checkbox" id="coat-outer" checked></label></div>'+
+'<div id="coat-metrics">正在建立源网格约束…</div><div class="coat-limit">研发候选：该外套源自旧版静态成形，不是已完成实体缝制验收的成衣。仅有 R2 人体碰撞代理，没有加载完整 R2 表皮；CPU 约束求解＋WebGL2 渲染，不宣称 WebGPU、精确 CCD、自碰撞或生产验收通过。</div></div>';
+shop.switchTab('assembly');document.getElementById('assembly').insertAdjacentHTML('afterbegin',h);
+const $=id=>document.getElementById(id),isShell=id=>['front.shell','back.shell','sleeve.shell'].includes(id);
+shop.setState({inspection:'shell',liningInstalled:false});
+let source=[],verts=[],edges=[],seams=0,proxies=[];
+function build(){
+ const old=viewer.meshes.filter(m=>isShell(m.inst.pieceId));
+ viewer.isVisible=inst=>isShell(inst.pieceId)||['stand.outer','collar.outer','cuff.outer'].includes(inst.pieceId)||(inst.pieceId==='notion'&&inst.ownerPiece==='r2-proxy'&&body.show);
+ viewer.edges=false;viewer.inner=false;viewer.scope='all';viewer.explode=0;
+ source=[];verts=[];edges=[];seams=0;proxies=[];
+ for(const m of old){
+  const offset=verts.length;
+  for(let j=0;j<m.V.length;j+=3){const x=m.V[j],y=m.V[j+1],z=m.V[j+2],p={x,y,z,px:x,py:y,pin:y>.55?.93:y>.40?.52:.02,rest:[x,y,z],side:m.inst.side||Math.sign(x),piece:m.inst.pieceId};verts.push(p)}
+  source.push({m,offset,count:m.V.length/3});
+  const set=new Set(),I=m.I;
+  for(let t=0;t<I.length;t+=3){const tr=[I[t],I[t+1],I[t+2]];
+   for(let k=0;k<3;k++){const a=Math.min(tr[k],tr[(k+1)%3]),b=Math.max(tr[k],tr[(k+1)%3]);const key=a+':'+b;if(set.has(key))continue;set.add(key);
+    const p=verts[offset+a],q=verts[offset+b],d=Math.hypot(p.x-q.x,p.y-q.y,p.z-q.z);if(d>1e-7)edges.push({a:offset+a,b:offset+b,d,type:0});
+   }
+  }
+ }
+ const byPiece={};
+ for(const s of source)(byPiece[s.m.inst.pieceId]??=[]).push(s);
+ for(const rel of shop.definition.seams||[]){
+  if(!isShell(rel.a.panelId)||!isShell(rel.b.panelId))continue;
+  for(const A of byPiece[rel.a.panelId]||[])for(const B of byPiece[rel.b.panelId]||[]){
+   if(A===B)continue;if(A.m.inst.side&&B.m.inst.side&&A.m.inst.side!==B.m.inst.side)continue;
+   const step=Math.max(1,Math.floor(A.count/80)),nB=Math.min(B.count,400);
+   for(let j=0;j<A.count;j+=step){const p=verts[A.offset+j];let nearest=-1,min=.012;
+    for(let k=0;k<nB;k++){const q=verts[B.offset+k],d=Math.hypot(p.x-q.x,p.y-q.y,p.z-q.z);if(d<min){min=d;nearest=k}}
+    if(nearest>=0){edges.push({a:A.offset+j,b:B.offset+nearest,d:Math.max(min*.65,.001),type:1});seams++;}
+   }
+  }
+ }
+ setMaterial(body.mat);
+ makeProxies();
+ viewer.camera('threequarter');
+}
+function r2(id){const p=ref[id];return p?[p[0],p[1]-.68,p[2]]:[0,0,0]}
+function poseRest(p){
+ let [x,y,z]=p.rest,a=body.amp,side=p.side||Math.sign(x)||1;
+ if(body.pose==='raise'&&p.piece==='sleeve.shell'){const cx=side*.22,cy=.59,dx=x-cx,dy=y-cy,t=-side*a*.82;x=cx+dx*Math.cos(t)-dy*Math.sin(t);y=cy+dx*Math.sin(t)+dy*Math.cos(t)}
+ if(body.pose==='elbow'&&p.piece==='sleeve.shell'){let k=Math.max(0,Math.min(1,(.42-y)/.3));y+=.12*a*k;z+=.15*a*k}
+ if(body.pose==='twist'){let t=.32*a*Math.max(0,Math.min(1,(y-.18)/.37));const nx=x*Math.cos(t)-z*Math.sin(t);z=x*Math.sin(t)+z*Math.cos(t);x=nx}
+ return [x,y,z];
+}
+function getColliders(){
+ const s=shape[body.shape],a=body.amp;
+ const result=[
+  {kind:'ellipsoid',c:[0,.50,.077],r:[.173*s[0],.27,.12*s[2]]},
+  {kind:'ellipsoid',c:[0,.20,.08],r:[.163*s[1],.155,.13*s[2]]}
+ ];
+ for(const sign of [-1,1]){const side=sign<0?'left':'right';
+  let sh=r2(side+'_upperArm'),el=r2(side+'_forearm'),hand=r2(side+'_hand');
+  if(body.pose==='raise'){el=[sign*(.215+.18*a),.36+.28*a,.075];hand=[sign*(.25+.24*a),.15+.48*a,.12]}
+  if(body.pose==='elbow'){hand=[sign*.25,.15+.31*a,.12+.16*a]}
+  result.push({kind:'capsule',a:sh,b:el,r:.062*s[0]},{kind:'capsule',a:el,b:hand,r:.048*s[0]});
+ }
+ return result;
+}
+function contact(v,c,thick){
+ let cx,cy,cz,rx,ry,rz;
+ if(c.kind==='capsule'){const v3=[c.b[0]-c.a[0],c.b[1]-c.a[1],c.b[2]-c.a[2]],q=[v.x-c.a[0],v.y-c.a[1],v.z-c.a[2]],len=v3.reduce((s,k)=>s+k*k,0)||1;
+ const u=Math.max(0,Math.min(1,q.reduce((s,k,i)=>s+k*v3[i],0)/len));cx=c.a[0]+v3[0]*u;cy=c.a[1]+v3[1]*u;cz=c.a[2]+v3[2]*u;rx=ry=rz=c.r;
+ }else{[cx,cy,cz]=c.c;[rx,ry,rz]=c.r}
+ const dx=(v.x-cx)/(rx+thick),dy=(v.y-cy)/(ry+thick),dz=(v.z-cz)/(rz+thick),dist=Math.hypot(dx,dy,dz);
+ if(dist>=1)return;
+ const nx=dx/Math.max(dist,.001),ny=dy/Math.max(dist,.001),nz=dz/Math.max(dist,.001);
+ const pen=(1-dist)*Math.min(rx,ry,rz),step=Math.min(.014,pen+.001);
+ v.x+=nx*step;v.y+=ny*step;v.z+=nz*step;body.contacts++;body.maxPen=Math.max(body.maxPen,pen);
+}
+function update(){
+ const dt=1/90,mode=material[body.mat],old=verts.map(p=>[p.x,p.y,p.z]);body.contacts=0;body.maxPen=0;
+ const colliders=getColliders();
+ for(const p of verts){
+  let vx=(p.x-p.px)*.987,vy=(p.y-p.py)*.987,vz=(p.z-p.pz)*.987;
+  p.px=p.x;p.py=p.y;p.pz=p.z;
+  if(p.pin>.9){const target=poseRest(p);p.x=target[0];p.y=target[1];p.z=target[2]}
+  else{p.x+=vx;p.y+=vy-9.81*dt*dt*(620/mode.density);p.z+=vz}
+ }
+ for(let k=0;k<3;k++){
+  for(const e of edges){const p=verts[e.a],q=verts[e.b],dx=q.x-p.x,dy=q.y-p.y,dz=q.z-p.z,d=Math.hypot(dx,dy,dz);
+   if(d<1e-9)continue;
+   const delta=(d-e.d)/d*(e.type===1?.84:mode.soft),wp=1-p.pin,wq=1-q.pin,sum=wp+wq;
+   if(sum<1e-6)continue;
+   const a=delta*wp/sum,b=delta*wq/sum;
+   p.x+=dx*a;p.y+=dy*a;p.z+=dz*a;q.x-=dx*b;q.y-=dy*b;q.z-=dz*b;
+  }
+  for(const p of verts){if(p.pin>.1){const t=poseRest(p),k=.09*p.pin;p.x+=(t[0]-p.x)*k;p.y+=(t[1]-p.y)*k;p.z+=(t[2]-p.z)*k;}for(const c of colliders)contact(p,c,mode.thickness*.5)}
+ }
+ if(verts.some(p=>![p.x,p.y,p.z].every(Number.isFinite))){body.paused=true;$('coat-metrics').textContent='检测到非有限位置：模拟冻结';return}
+ for(const s of source){const m=s.m;for(let i=0;i<s.count;i++){const p=verts[s.offset+i];m.V[i*3]=p.x;m.V[i*3+1]=p.y;m.V[i*3+2]=p.z;}
+  m.N=viewer.normal(m.V,m.I);
+  gl.bindBuffer(gl.ARRAY_BUFFER,m.buffers[0]);gl.bufferSubData(gl.ARRAY_BUFFER,0,m.V);
+  gl.bindBuffer(gl.ARRAY_BUFFER,m.buffers[1]);gl.bufferSubData(gl.ARRAY_BUFFER,0,m.N);
+ }
+}
+function setMaterial(id){body.mat=id;const m=material[id];window.__COAT_COLOR__=m.color;
+ gl.useProgram(viewer.prog);
+ for(const [n,v] of [['uLoft',m.loft],['uFabricGrain',m.grain]]){const loc=gl.getUniformLocation(viewer.prog,n);if(loc)gl.uniform1f(loc,v)}
+ viewer.draw();
+}
+function makeProxies(){
+ // R2 body probe is intentionally not full human skin.
+ const caps=getColliders();
+ for(let i=0;i<caps.length;i++){const c=caps[i],v=[],I=[],segments=10,rings=9;
+  const origin=c.kind==='capsule'?c.a:c.c,axis=c.kind==='capsule'?[c.b[0]-c.a[0],c.b[1]-c.a[1],c.b[2]-c.a[2]]:[0,.001,0],length=Math.hypot(...axis)||1,dir=axis.map(v=>v/length);
+  const guide=Math.abs(dir[1])>.9?[1,0,0]:[0,1,0],u=[dir[1]*guide[2]-dir[2]*guide[1],dir[2]*guide[0]-dir[0]*guide[2],dir[0]*guide[1]-dir[1]*guide[0]],un=Math.hypot(...u)||1;u.forEach((q,i)=>u[i]=q/un);
+  const w=[dir[1]*u[2]-dir[2]*u[1],dir[2]*u[0]-dir[0]*u[2],dir[0]*u[1]-dir[1]*u[0]];
+  for(let y=0;y<=rings;y++){let t=y/rings,a=origin.map((x,i)=>x+axis[i]*t);for(let z=0;z<=segments;z++){const ang=2*Math.PI*z/segments,rad=c.kind==='capsule'?[c.r,c.r,c.r]:c.r;v.push([a[0]+rad[0]*Math.cos(ang)*u[0]+rad[0]*Math.sin(ang)*w[0],a[1]+rad[1]*Math.cos(ang)*u[1]+rad[1]*Math.sin(ang)*w[1],a[2]+rad[2]*Math.cos(ang)*u[2]+rad[2]*Math.sin(ang)*w[2]])}}
+  for(let j=0;j<rings;j++)for(let k=0;k<segments;k++){let a=j*(segments+1)+k,b=a+segments+1;I.push(a,b,a+1,b,b+1,a+1)}
+  const mesh=viewer.upload({id:'R2proxy'+i,pieceId:'notion',ownerPiece:'r2-proxy',layer:'outer'},v.map(p=>p.map(k=>k*100)),I,[]);
+  viewer.meshes.push(mesh);proxies.push(mesh);
+ }
+}
+function renderStats(){const m=material[body.mat];$('coat-metrics').textContent='布片 '+source.length+' ｜顶点 '+verts.length+' ｜约束 '+edges.length+' ｜接缝候选 '+seams+' ｜接触点 '+body.contacts+' ｜最大修正 '+(body.maxPen*1e3).toFixed(2)+' mm ｜模拟 '+body.simMs.toFixed(1)+' ms ｜厚度候选 '+(m.thickness*1e3).toFixed(1)+' mm';}
+function frame(){
+ if(!body.paused){const t=performance.now();update();body.simMs=performance.now()-t;viewer.draw();body.frame++;if(body.frame%8===0)renderStats()}
+ requestAnimationFrame(frame);
+}
+$('coat-m').onchange=e=>setMaterial(e.target.value);
+$('coat-b').onchange=e=>{body.shape=e.target.value;build();};
+$('coat-p').onchange=e=>{body.pose=e.target.value;};
+$('coat-a').oninput=e=>{body.amp=+e.target.value;};
+$('coat-stop').onclick=()=>{body.paused=!body.paused;$('coat-stop').textContent=body.paused?'继续':'暂停'};
+$('coat-reset').onclick=()=>{shop.setState({inspection:'shell',liningInstalled:false});build();};
+$('coat-outer').onchange=e=>{body.show=e.target.checked;viewer.draw();};
+try{build();renderStats();requestAnimationFrame(frame);}catch(e){console.error(e);$('coat-metrics').textContent='初始化失败：'+e.message}
+window.KAOPUHeavyCoat={get state(){return {...body}},get source(){return source.map(s=>({id:s.m.inst.id,part:s.m.inst.pieceId,vertices:s.count}))},reset:build};
+})();</script></body></html>
