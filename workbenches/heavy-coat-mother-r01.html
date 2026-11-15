@@ -700,7 +700,7 @@ function build(){
  source=[];verts=[];edges=[];seams=0;proxies=[];
  for(const m of old){
   const offset=verts.length;
-  for(let j=0;j<m.V.length;j+=3){const x=m.V[j],y=m.V[j+1],z=m.V[j+2],p={x,y,z,px:x,py:y,pin:y>.55?.93:y>.40?.52:.02,rest:[x,y,z],side:m.inst.side||Math.sign(x),piece:m.inst.pieceId};verts.push(p)}
+  for(let j=0;j<m.V.length;j+=3){const x=m.V[j],y=m.V[j+1],z=m.V[j+2],p={x,y,z,px:x,py:y,pz:z,pin:y>.55?.93:y>.40?.52:.02,rest:[x,y,z],side:m.inst.side||Math.sign(x),piece:m.inst.pieceId};verts.push(p)}
   source.push({m,offset,count:m.V.length/3});
   const set=new Set(),I=m.I;
   for(let t=0;t<I.length;t+=3){const tr=[I[t],I[t+1],I[t+2]];
@@ -754,19 +754,19 @@ function contact(v,c,thick){
  const u=Math.max(0,Math.min(1,q.reduce((s,k,i)=>s+k*v3[i],0)/len));cx=c.a[0]+v3[0]*u;cy=c.a[1]+v3[1]*u;cz=c.a[2]+v3[2]*u;rx=ry=rz=c.r;
  }else{[cx,cy,cz]=c.c;[rx,ry,rz]=c.r}
  const dx=(v.x-cx)/(rx+thick),dy=(v.y-cy)/(ry+thick),dz=(v.z-cz)/(rz+thick),dist=Math.hypot(dx,dy,dz);
- if(dist>=1)return;
+ if(!Number.isFinite(dist)||dist>=1)return;
  const nx=dx/Math.max(dist,.001),ny=dy/Math.max(dist,.001),nz=dz/Math.max(dist,.001);
  const pen=(1-dist)*Math.min(rx,ry,rz),step=Math.min(.014,pen+.001);
  v.x+=nx*step;v.y+=ny*step;v.z+=nz*step;body.contacts++;body.maxPen=Math.max(body.maxPen,pen);
 }
 function update(){
- const dt=1/90,mode=material[body.mat],old=verts.map(p=>[p.x,p.y,p.z]);body.contacts=0;body.maxPen=0;
+ const dt=1/120,mode=material[body.mat];body.contacts=0;body.maxPen=0;
  const colliders=getColliders();
  for(const p of verts){
   let vx=(p.x-p.px)*.987,vy=(p.y-p.py)*.987,vz=(p.z-p.pz)*.987;
   p.px=p.x;p.py=p.y;p.pz=p.z;
   if(p.pin>.9){const target=poseRest(p);p.x=target[0];p.y=target[1];p.z=target[2]}
-  else{p.x+=vx;p.y+=vy-9.81*dt*dt*(620/mode.density);p.z+=vz}
+  else{p.x+=vx;p.y+=vy-9.81*dt*dt;p.z+=vz}
  }
  for(let k=0;k<3;k++){
   for(const e of edges){const p=verts[e.a],q=verts[e.b],dx=q.x-p.x,dy=q.y-p.y,dz=q.z-p.z,d=Math.hypot(dx,dy,dz);
