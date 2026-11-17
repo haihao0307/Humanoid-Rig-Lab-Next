@@ -145,6 +145,17 @@ for (const [token, value] of Object.entries(replacements)) {
   html = html.replace(token, value);
 }
 if (Object.keys(replacements).some(token => html.includes(token))) throw new Error('Unexpanded standalone payload placeholder.');
+const inlineScripts = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)];
+for (const [index, match] of inlineScripts.entries()) {
+  if (/\\btype\\s*=\\s*["']application\\/json["']/i.test(match[1])) continue;
+  const source = match[2].trim();
+  if (!source) continue;
+  try {
+    execFileSync(process.execPath, ['--check', '--input-type=module'], { input: source, encoding: 'utf8' });
+  } catch (error) {
+    throw new Error('Generated standalone inline script '+index+' failed syntax validation: '+(error.stderr||error.message));
+  }
+}
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, 'index.html'), html);
 writeFileSync(join(outDir, 'BUILD_MANIFEST.json'), manifestJson + '\n');
