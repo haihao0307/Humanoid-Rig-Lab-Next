@@ -1,0 +1,105 @@
+{
+  "schema": "kaopu/r2-gpu-motion-preview-build@1",
+  "sourceCommit": "678fbd8f40d695d26bc93a924c6fc2fc967052c7",
+  "rootIndexSHA256": "b464986bd9f059d9fd2f6401643e4c2e30f1e5de6929590b3f8c4147065db6b3",
+  "jointCount": 128,
+  "influenceCount": 8,
+  "skinning": "GPU dual-quaternion skinning (DQS), two vec4 joint/weight lanes",
+  "actionRuntime": "formal R2 MotionLab / JarvisEmbodimentLab command interface",
+  "actionExamples": [
+    "walk",
+    "sit",
+    "lie",
+    "stand",
+    "wave",
+    "salute"
+  ],
+  "workerModules": {
+    "reconstruction/worker.mjs": "8b7a4322bb2805425dc693564779c7565f5f06cdfe0be1ef6154c9b943ccacd2",
+    "reconstruction/assembly.mjs": "49cd5f341becdd18081d580d969d3f2c2d9d095d1083ba5e1e6c2e04beaa0693",
+    "reconstruction/codec.mjs": "0be92d770a8cf0fe7ff4e5c9a10729088406bc450cd87d6471b94c2326d99644",
+    "reconstruction/mesher.mjs": "074fe61b75cedb9d343fccddcc478967e1124b2d25867f9aee75de1a1988e819",
+    "reconstruction/vendor/earcut.js": "16b9da88d31f192fc8f5db09b08a337ce7694fae37fe36e9afaa9e7294fea9b0",
+    "reconstruction/surface-kernel.mjs": "cbdf6cde755e0d71adabd0ab82937739308bee7d0b00a09ad71a7d7fbd8f5231",
+    "reconstruction/radial-kernel.mjs": "b04ef11effe4c70a58d23471a6b14ecd97ae7a0ae4586113704a647dcade3e13",
+    "reconstruction/topology.mjs": "482f71f056f16db6542dc70291850644b276a0995e1fe4be95c56a16b9e67514",
+    "reconstruction/anatomy-rules.mjs": "606535ab96ae5eab9c72aa6af93136578e2f08a98e61ff72ad5b3839c09721fb",
+    "reconstruction/trim-quality.mjs": "485f08711845cf0be4ae16de57bc34dcf3ce68a741c53c06b0d58c5619ded82b",
+    "reconstruction/normal-field.mjs": "6336bc763b25cbed2d750fa699db96fe9671a6e0136d9ecfaec1c7f538872ec4",
+    "reconstruction/hair.mjs": "0bbc4e76b96cee1bebda3bb858916c8a4731b6e5e757eb9f15916e8f83e1a0c5",
+    "reconstruction/hair-rules-r2.mjs": "f8d231fcbc04ac62a0d43f0a509a62d61d9729fba779368578f3043371f2b1d9",
+    "reconstruction/hair-zones.mjs": "c80c32943fbeeda1bd176353047e10377448e0e618786b584bbcfd6c32c9644e",
+    "reconstruction/hair-profile.mjs": "d893ca382f1f5d535d31e6d40844c3b2ae6cf71315bc6a708e613b5986a46d8d",
+    "reconstruction/hair-styles.mjs": "21f3ede76f43e7d923a558a20b7a3e1b51d9ff2b543e4f6c0b2203c94c519bc2",
+    "reconstruction/toe-separation.mjs": "5e94e08dcac6fc6ae3362a4c53734eca38fd94710e39e619e47b72c7d8f3e48b",
+    "reconstruction/axilla-shape.mjs": "59d64f5744c2996de05de512e98011cbd1e8398febf030be8f415cd2b6b4f557",
+    "reconstruction/binding.mjs": "97ad546524be348ba71c2d3a956536ca8f96b6c6b037ef4519f27c3e06998ba6",
+    "reconstruction/stature-transform.mjs": "b92a2dcb8203c05139cc3dbe1cba8096a960ec7f561b050ae55ec2b6cc66e9ef",
+    "reconstruction/shape-contract.mjs": "d2fdcc871ac6ddac653723c95bfe3014f089386a346ca770397241abc90c8392",
+    "reconstruction/shape-deform.mjs": "6e0c6586d421532d8462359635099f8aac0af949d499cc55ecd6abf8cc24536b"
+  },
+  "assets": {
+    "binding-schema.json": {
+      "bytes": 2446,
+      "sha256": "c9907aac208dbb9a08084c2fe9e4a8b0195a1cd1ef7e994b046cee21d240ff5c"
+    },
+    "rig-reference.json": {
+      "bytes": 40086,
+      "sha256": "ff56c7585e92f5f60a23f2a6aefef9f964a39bea5f6401469197fd24e7b9214e"
+    },
+    "interfaces.chf.gz": {
+      "bytes": 7521,
+      "sha256": "66ac20950f645ca438070d1639e56e482c59495ed778c272c3a60e5009e12494"
+    },
+    "normal-field.chf.gz": {
+      "bytes": 2624871,
+      "sha256": "74255a427baec6793b87de9289f538ba5a64e9cee9ca03f04c0b82576ec468f8"
+    },
+    "body.chf.gz": {
+      "bytes": 3310045,
+      "sha256": "045a4136e47492989d485cc3f9feae64bb3c747ad4e282f04aeb68c53149a26e"
+    },
+    "left.chf.gz": {
+      "bytes": 859911,
+      "sha256": "1858e4a08e48a4db1e77b89579cdfbc4d82903ccb0ca35f332328021498e0dcc"
+    },
+    "detail.chf.gz": {
+      "bytes": 3368776,
+      "sha256": "0b75bb8da656014d344a11335a21f886cef8d0a94fd853fb0cf995b569b10530"
+    },
+    "features.chf.gz": {
+      "bytes": 2776072,
+      "sha256": "322d6fdf87726d34a089a6eff6b19f0cca5733b01b2b84c4c5e277700f677891"
+    },
+    "collar.chf.gz": {
+      "bytes": 80753,
+      "sha256": "e515f51c2d305d84d781581e7386fead18ce1ba3d90afedb8e99ca94a6f56dbf"
+    },
+    "appearance.json": {
+      "bytes": 2844,
+      "sha256": "9b79d3c592410049c666e9f17969b2296e4e57a3e7ee89118e874d3f3931cc15"
+    },
+    "hair-rules-r2.json": {
+      "bytes": 592,
+      "sha256": "18a7031107cb1f4ad65454ab3aa4f363c2268b7e68c57871a8086c0074903b9b"
+    },
+    "hair-scalp-radius-r2.json": {
+      "bytes": 198903,
+      "sha256": "2ee533078a097d09318029c057155423cb0af13b2733f49aaefd55b83f900010"
+    },
+    "hair-domains-r2.json": {
+      "bytes": 112199,
+      "sha256": "ac4c0963a6d85283216102f668966f31cbfcdd4f5693e991340f9529b2c65cca"
+    },
+    "hair-presets.json": {
+      "bytes": 5744,
+      "sha256": "7907f3bdb4e73e4f3730aacab1419af447d2687c5c8f2300da0155d5af85392a"
+    }
+  },
+  "assetPayloadBytes": 13390763,
+  "parameterOnlyGeometry": true,
+  "externalNetworkRequiredForBody": false,
+  "visualAcceptance": false,
+  "knownBlocker": "R7 shoulder/axilla posed-surface folding remains open; this preview does not certify production skin acceptance.",
+  "grayAtlasRetarget": "Not included in this first preview. The 104-joint gray research candidate is not surface-bound to the 128-joint R2 rig."
+}
