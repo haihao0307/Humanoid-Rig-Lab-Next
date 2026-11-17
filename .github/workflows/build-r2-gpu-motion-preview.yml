@@ -1,0 +1,64 @@
+name: Build R2 GPU Motion Preview
+
+on:
+  push:
+    branches:
+      - feature/r2-gpu-motion-preview-20261117
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r2-gpu-motion-preview-build
+  cancel-in-progress: true
+
+jobs:
+  build-and-browser-smoke:
+    if: \${{ !contains(github.event.head_commit.message, '[r2-preview-build]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify formal R2 generated entrypoint
+        run: node tools/build-pure.mjs --check
+      - name: Build self-contained R2 preview
+        run: node tools/build-r2-gpu-motion-preview.mjs
+      - name: Install real browser test dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --no-cache-dir selenium==4.27.1
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          command -v google-chrome || command -v google-chrome-stable || command -v chromium
+      - name: Run real R2 browser smoke
+        id: browser
+        continue-on-error: true
+        run: |
+          python tools/test-r2-gpu-motion-preview.py \
+            --html experiments/r2-gpu-motion-preview-20261117/index.html \
+            --output r2-gpu-preview-evidence
+      - name: Upload browser evidence
+        if: always() && hashFiles('r2-gpu-preview-evidence/browser-report.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-gpu-motion-preview-browser-evidence
+          path: r2-gpu-preview-evidence
+          if-no-files-found: error
+          retention-days: 30
+      - name: Commit generated standalone HTML
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/r2-gpu-motion-preview-20261117/index.html \
+                  experiments/r2-gpu-motion-preview-20261117/BUILD_MANIFEST.json
+          if ! git diff --cached --quiet; then
+            git commit -m "build: generate standalone R2 GPU motion preview [r2-preview-build]"
+            git push origin HEAD:feature/r2-gpu-motion-preview-20261117
+          fi
