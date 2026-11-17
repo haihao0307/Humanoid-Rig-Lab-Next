@@ -18,11 +18,16 @@ const populationBranch = [
 if (normalizedBody.split(populationBranch).length !== 2) {
   throw new Error('Formal R2 population startup anchor changed; refusing to build a six-character preview.');
 }
-const previewBody = normalizedBody.replace(populationBranch, [
+let previewBody = normalizedBody.replace(populationBranch, [
   " installNPCPopulation(window.HumanLab);",
   " window.HumanLab.review={mode:'motion-preview',singleActor:true,populationSkipped:true,hairSkipped:false};",
   " logMessage('动作预览模式：保留正式 R2 当前人物与头发，跳过额外母体复制体和四个对照 NPC。');"
 ].join('\n'));
+const shadowQualityAnchor = "lab.renderer.setQuality('shadow');if(!lab.hair?.inStudio())lab.focus('body');";
+if (previewBody.split(shadowQualityAnchor).length !== 2) {
+  throw new Error('Formal R2 shadow-quality startup anchor changed.');
+}
+previewBody = previewBody.replace(shadowQualityAnchor, "lab.renderer.setQuality('fast');if(!lab.hair?.inStudio())lab.focus('body');");
 const bodyPayloadMatches = assembledIndex.match(/const BODY_PAYLOAD='[^']+';/g) || [];
 if (bodyPayloadMatches.length !== 1) throw new Error('Expected exactly one formal R2 body payload in the entrypoint.');
 const previewBodyPayload = gzipSync(Buffer.from(previewBody, 'utf8'), { level: 9, mtime: 0 }).toString('base64');
@@ -114,7 +119,7 @@ const manifest = {
   baseSourceIndexSHA256: sha256(Buffer.from(assembledIndex, 'utf8')),
   previewBodyRuntimeSHA256: sha256(Buffer.from(previewBody, 'utf8')),
   previewMode: 'single actor; retain hair; skip mother-pair and four comparison NPCs',
-  populationActors: 1,
+  populationActors: 1,\n  defaultRenderQuality: 'fast; shadows are user-toggleable in the character panel',
   jointCount,
   influenceCount: 8,
   skinning: 'GPU dual-quaternion skinning (DQS), two vec4 joint/weight lanes',

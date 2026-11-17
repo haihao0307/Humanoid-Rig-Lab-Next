@@ -50,6 +50,8 @@ def main():
     options.add_argument("--use-gl=angle")
     options.add_argument("--use-angle=swiftshader")
     options.add_argument("--enable-unsafe-swiftshader")
+    options.add_argument("--disable-background-timer-throttling")
+    options.add_argument("--disable-renderer-backgrounding")
     options.add_argument("--allow-file-access-from-files")
     options.add_argument("--window-size=1680,1050")
     options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
@@ -92,7 +94,7 @@ def main():
         driver.save_screenshot(str(output / "r2-ready.png"))
         for action in ["wave", "sit", "stand", "salute"]:
             button = driver.find_element(By.CSS_SELECTOR, '[data-action="' + action + '"]')
-            button.click()
+            driver.execute_script("arguments[0].click()", button)
             wait.until(lambda d, expected=action: d.execute_script(
                 "return window.__R2PreviewStatus && "
                 "window.__R2PreviewStatus.lastAction === arguments[0] && "

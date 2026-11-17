@@ -6,6 +6,7 @@ This is a separate, self-contained HTML preview. It does not modify the formal m
 
 - One live copy of the formal R2 character is loaded. The default second mother-copy and four authored comparison NPCs are skipped in this preview only; the formal source remains unchanged.
 - Hair generation is retained. The face-review mode is not used.
+- Real-time shadows default to off for the motion preview so software and integrated renderers are not forced into an expensive second full-character pass. The existing character-panel shadow toggle remains available.
 - The formal 128-joint rig, eight uint16 skinning weights per binding root, and existing GPU dual-quaternion skinning shader (DQS) are reused.
 - The formal R2 body function parameters, topology, binding, and Worker are bundled into the standalone HTML. No baked display vertices or triangle-index cache is added.
 - Walk, sit, lie, stand, wave, and salute are submitted through the formal JarvisEmbodimentLab / MotionLab command interface.

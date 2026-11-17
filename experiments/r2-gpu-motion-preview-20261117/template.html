@@ -37,7 +37,7 @@ button:disabled{opacity:.38;cursor:not-allowed}
 <iframe id="app-frame" title="正式 R2 人物与动作工作台"></iframe>
 <details id="hud" open>
   <summary><span><span class="brand">KAOPU / R2 GPU MOTION</span><br>人物动作验证台</span><span id="ready">正在启动</span></summary>
-  <div id="spec">正式 R2 单人物 · 保留头发 · 128 关节 · 每顶点 8 权重 · GPU 双四元数蒙皮（DQS / WebGL2）</div>
+  <div id="spec">正式 R2 单人物 · 保留头发 · 128 关节 · 8 权重 · GPU DQS · 默认关闭阴影（可手动开启）</div>
   <div class="actions">
     <button data-action="walk" disabled>向前走 1 米</button>
     <button data-action="sit" disabled>坐下</button>
@@ -57,7 +57,7 @@ button:disabled{opacity:.38;cursor:not-allowed}
   </div>
   <div id="progress">正在准备正式人物运行时与参数。</div>
   <div id="action-status">动作控制尚未开放。</div>
-  <p class="note"><strong>验收边界：</strong>本版只保留一个正式 R2 人物，跳过默认母体复制体和四个对照 NPC，保留原有头发生成。人物函数、三角面生成、八权重绑定和 GPU DQS 均复用正式源码，不是预烘焙顶点动画。肩腋区域仍有 R7 记录的局部折叠，不能据此冻结生产 NPC。当前动作使用正式 R2 动作接口；灰模研究版的 104 关节外部动作尚未完成到 128 关节 R2 的重定向。</p>
+  <p class="note"><strong>验收边界：</strong>本版只保留一个正式 R2 人物，跳过默认母体复制体和四个对照 NPC，保留原有头发生成。人物函数、三角面生成、八权重绑定和 GPU DQS 均复用正式源码，不是预烘焙顶点动画。默认关闭实时阴影以降低预览开销，人物面板仍可手动开启。肩腋区域仍有 R7 记录的局部折叠，不能据此冻结生产 NPC。当前动作使用正式 R2 动作接口；灰模研究版的 104 关节外部动作尚未完成到 128 关节 R2 的重定向。</p>
   <div id="build">BUILD __BUILD_LABEL__</div>
 </details>
 <script type="application/json" id="build-manifest">__BUILD_MANIFEST_JSON__</script>
