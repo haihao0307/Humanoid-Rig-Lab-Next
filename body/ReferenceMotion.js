@@ -95,7 +95,8 @@ function r2PostureClips(from,target){
   from==='lying'?['lieToSit',...(target==='standing'?['sitToStand']:[])]:target==='lying'?['sitToLie']:['sitToStand'];
 }
 const R2_SEATED_PREPARATION=Object.freeze({clip:'sitToStand',durationS:.72,revision:'support-transfer/v1'});
-// The returned origin is a 3D offset from the captured clip root, including Y.\nfunction r2ReferenceOriginForPosition(h,id,progress,position,yaw){
+// The returned origin is a 3D offset from the captured clip root, including Y.
+function r2ReferenceOriginForPosition(h,id,progress,position,yaw){
  const raw=r2SampleMotion(id,progress),scale=h.bodyMetrics.rig.femurLengthM+h.bodyMetrics.rig.tibiaLengthM;
  const offset=rotate(qy(yaw),mul(raw.rootOffset,scale));
  return [position[0]-offset[0],position[1]-h.bodyMetrics.restHipHeightM*raw.rootHeightRatio,position[2]-offset[2]];
