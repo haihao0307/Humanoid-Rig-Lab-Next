@@ -27,8 +27,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify formal R2 generated entrypoint
-        run: node tools/build-pure.mjs --check
+      - name: Verify standalone builder syntax
+        run: node --check tools/build-r2-gpu-motion-preview.mjs
       - name: Build self-contained R2 preview
         run: node tools/build-r2-gpu-motion-preview.mjs
       - name: Install real browser test dependencies

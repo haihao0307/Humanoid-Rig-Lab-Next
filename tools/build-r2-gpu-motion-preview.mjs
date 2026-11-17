@@ -3,10 +3,11 @@ import { join, posix } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { assemble } from './build-pure.mjs';
 
 const outDir = 'experiments/r2-gpu-motion-preview-20261117';
 const templatePath = join(outDir, 'template.html');
-const appHtml = readFileSync('index.html', 'utf8');
+const { index: appHtml } = assemble();
 if (!appHtml.includes('BODY_PAYLOAD') || !appHtml.includes('JarvisEmbodimentLab')) {
   throw new Error('The formal R2 application entrypoint is not the expected generated build.');
 }
