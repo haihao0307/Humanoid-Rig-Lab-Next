@@ -52,6 +52,7 @@ def main():
     options.add_argument("--enable-unsafe-swiftshader")
     options.add_argument("--disable-background-timer-throttling")
     options.add_argument("--disable-renderer-backgrounding")
+    options.add_argument("--force-device-scale-factor=0.75")
     options.add_argument("--allow-file-access-from-files")
     options.add_argument("--window-size=1680,1050")
     options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
@@ -91,7 +92,7 @@ def main():
         if not initial.get("renderer") or initial["renderer"].get("frames", 0) < 1:
             raise RuntimeError("Formal R2 renderer has not produced a frame.")
 
-        driver.save_screenshot(str(output / "r2-ready.png"))
+        time.sleep(2.0)
         for action in ["wave", "sit", "stand", "salute"]:
             button = driver.find_element(By.CSS_SELECTOR, '[data-action="' + action + '"]')
             driver.execute_script("arguments[0].click()", button)
@@ -123,7 +124,6 @@ def main():
             report["actions"].append({"id":action,"taskId":task_id,"task":task_result})
             if not task_result or task_result["status"] != "completed":
                 raise RuntimeError("R2 action did not complete: " + action + " / " + json.dumps(task_result, ensure_ascii=False))
-            driver.save_screenshot(str(output / (action + "-completed.png")))
             time.sleep(0.5)
 
         report["metrics"] = driver.execute_script("return window.__R2PreviewStatus.metrics")
