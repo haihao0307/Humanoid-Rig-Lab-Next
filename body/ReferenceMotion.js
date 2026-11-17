@@ -103,7 +103,11 @@ function r2ReferenceOriginForPosition(h,id,progress,position,yaw){
 function r2SeatedPreparationDescriptor(h,frames,feet,yaw,progress){
  if(!(frames instanceof Map)||!frames.has('hips'))throw Error('起身准备缺少已提交的坐姿骨架');
  const reference=r2SampleMotion(R2_SEATED_PREPARATION.clip,0),start=frames.get('hips').p;
- const position=[start[0],h.bodyMetrics.restHipHeightM*reference.rootHeightRatio,start[2]];
+ // The preparation blend changes posture, not pelvis height. The recorded
+ // sitToStand clip owns the actual rise. Snapping to the standing rest-height
+ // ratio here can pull captured foot anchors outside the two-bone reach envelope
+ // when a seated pose has a different foot placement.
+ const position=[start[0],start[1],start[2]];
  return {position,reference,controlledFeet:true,feet,blendFrom:frames,blendAmount:smoother(clamp(progress,0,1)),preserveFootContactsOnBlend:true,
   floorMode:true,kind:'seatedPrepare',motionSource:{kind:'engineering-transition',transition:R2_SEATED_PREPARATION.revision,
    targetClip:R2_SEATED_PREPARATION.clip,progress:clamp(progress,0,1),measuredMotion:false}};

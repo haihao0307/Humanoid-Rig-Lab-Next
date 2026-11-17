@@ -27,6 +27,8 @@ const locomotion=new api.NaturalLocomotion(a),pose=locomotion.pose;
 const seated=pose.build(api.r2ReferenceDescriptor(h,'standToSit',1,[0,bodyMetrics.standingHipHeightM,0],0));pose.validate(seated);
 const frames=seated.frames,feet=Object.fromEntries(['left','right'].map(side=>[side,{p:[...frames.get(side+'_foot').p],q:[...frames.get(side+'_foot').q],yaw:0}]));
 const first=api.r2SeatedPreparationDescriptor(h,frames,feet,0,0),last=api.r2SeatedPreparationDescriptor(h,frames,feet,0,1);
+const rootLiftM=last.position[1]-frames.get('hips').p[1];
+assert(Math.abs(rootLiftM)<1e-12,'seated preparation must not snap the pelvis upward before the recorded stand-up clip begins');
 const direct=pose.build({...last,blendFrom:null,blendAmount:1}),initialMismatch=Math.max(...h.joints.map(j=>api.dist(frames.get(j.id).p,direct.frames.get(j.id).p)));
 assert(initialMismatch>.05,'the test must contain a real sitting-to-standing source mismatch');
 let previous=frames,maxJointStepM=0,maxFootErrorM=0,maxBoneErrorM=0,samples=0,lastCandidate=null;
@@ -42,4 +44,4 @@ assert(maxBoneErrorM<1e-7);assert(maxFootErrorM<1e-8);assert(maxJointStepM<.02,'
 const endRoot=lastCandidate.frames.get('hips').p,origin=api.r2ReferenceOriginForPosition(h,'sitToStand',0,endRoot,0),clipStart=pose.build(api.r2ReferenceDescriptor(h,'sitToStand',0,origin,0));
 assert(api.dist(clipStart.frames.get('hips').p,endRoot)<1e-9,'the recorded stand-up clip must start at the prepared root position');
 for(const side of ['left','right'])assert(api.dist(lastCandidate.frames.get(side+'_foot').p,feet[side].p)<1e-9);
-console.log(JSON.stringify({schema:'human/seated_preparation_continuity@1',samples,durationS:api.R2_SEATED_PREPARATION.durationS,initialMismatchM:initialMismatch,maxJointStepM,maxFootErrorM,maxBoneErrorM,rootJoinErrorM:api.dist(clipStart.frames.get('hips').p,endRoot),browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));
+console.log(JSON.stringify({schema:'human/seated_preparation_continuity@1',samples,durationS:api.R2_SEATED_PREPARATION.durationS,initialMismatchM:initialMismatch,maxJointStepM,maxFootErrorM,maxBoneErrorM,rootLiftM,rootJoinErrorM:api.dist(clipStart.frames.get('hips').p,endRoot),browserExecuted:false,gpuExecuted:false,visualAcceptance:false}));

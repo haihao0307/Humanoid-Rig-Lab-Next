@@ -29,6 +29,8 @@ jobs:
           python-version: '3.12'
       - name: Verify standalone builder syntax
         run: node --check tools/build-r2-gpu-motion-preview.mjs
+      - name: Verify seated-to-standing support transfer
+        run: node tools/test-seated-preparation-continuity.mjs
       - name: Build self-contained R2 preview
         run: node tools/build-r2-gpu-motion-preview.mjs
       - name: Install real browser test dependencies
