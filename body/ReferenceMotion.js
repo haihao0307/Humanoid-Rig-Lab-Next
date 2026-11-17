@@ -86,7 +86,7 @@ function r2ReferenceDescriptor(h,id,t,origin,yaw,from=null,blend=1){
  const raw=r2SampleMotion(id,t),reference=from?r2BlendMotion(from,raw,blend):raw;
  const transitionHingeDegrees=from&&blend<1?Object.fromEntries(['left','right'].flatMap(side=>[['forearm','UpperArm','Forearm'],['tibia','Thigh','Shank']].map(([joint,a,b])=>[side+'_'+joint,degrees(Math.acos(clamp(dot(from[side+a],from[side+b]),-1,1)))]))):null;
  const scale=(h.bodyMetrics.rig.femurLengthM+h.bodyMetrics.rig.tibiaLengthM),offset=rotate(qy(yaw),mul(raw.rootOffset,scale));
- return {position:[origin[0]+offset[0],h.bodyMetrics.restHipHeightM*reference.rootHeightRatio,origin[2]+offset[2]],
+ return {position:[origin[0]+offset[0],origin[1]+h.bodyMetrics.restHipHeightM*reference.rootHeightRatio,origin[2]+offset[2]],
   reference,floorMode:true,kind:id,motionSource:{kind:'capture',clip:id,trial:R2_MOTION.clips[id].sourceTrial,progress:t,transitionHingeDegrees}};
 }
 function r2PostureClips(from,target){
@@ -95,10 +95,10 @@ function r2PostureClips(from,target){
   from==='lying'?['lieToSit',...(target==='standing'?['sitToStand']:[])]:target==='lying'?['sitToLie']:['sitToStand'];
 }
 const R2_SEATED_PREPARATION=Object.freeze({clip:'sitToStand',durationS:.72,revision:'support-transfer/v1'});
-function r2ReferenceOriginForPosition(h,id,progress,position,yaw){
+// The returned origin is a 3D offset from the captured clip root, including Y.\nfunction r2ReferenceOriginForPosition(h,id,progress,position,yaw){
  const raw=r2SampleMotion(id,progress),scale=h.bodyMetrics.rig.femurLengthM+h.bodyMetrics.rig.tibiaLengthM;
  const offset=rotate(qy(yaw),mul(raw.rootOffset,scale));
- return [position[0]-offset[0],position[1],position[2]-offset[2]];
+ return [position[0]-offset[0],position[1]-h.bodyMetrics.restHipHeightM*raw.rootHeightRatio,position[2]-offset[2]];
 }
 function r2SeatedPreparationDescriptor(h,frames,feet,yaw,progress){
  if(!(frames instanceof Map)||!frames.has('hips'))throw Error('起身准备缺少已提交的坐姿骨架');

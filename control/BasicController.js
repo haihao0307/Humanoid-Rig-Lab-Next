@@ -43,7 +43,7 @@ class BasicController {
  preparePoints(t){const a=this.a;t.align=false;t.from=this.capture();
   const clips=r2PostureClips(this.posture,t.target);
   t.points=clips.map(clip=>({clip,duration:R2_MOTION.clips[clip].durationS,kind:clip}));
-  t.origin=a.h.root.p.slice();t.fromMotion=r2CaptureMotion(a.h,t.yaw);
+  t.origin=r2ReferenceOriginForPosition(a.h,clips[0].clip,0,a.h.root.p,t.yaw);t.fromMotion=r2CaptureMotion(a.h,t.yaw);
   a.swing=null;a.gaitSignal=0;a.gaitBlend=0;t.elapsed=0;
   if(t.points[0]?.clip==='sitToStand')this.startSeatedPreparation(t);
   else a.enter(t.target==='standing'?'standUp':t.target==='lying'?'lieDown':'sitDown');
@@ -102,7 +102,7 @@ class BasicController {
     }
     this.lastPostureValidation={...this.lastMotionTracking,clip:current.clip,passed:true};
     this.phaseLog.push({time:a.time,kind:current.kind,minBoneY:this.lastGround.y});
-    t.from=this.capture();t.fromMotion=r2CaptureMotion(a.h,t.yaw);t.origin=a.h.root.p.slice();t.stage++;t.elapsed=0;
+    t.from=this.capture();t.fromMotion=r2CaptureMotion(a.h,t.yaw);t.stage++;t.origin=t.stage<t.points.length?r2ReferenceOriginForPosition(a.h,t.points[t.stage].clip,0,a.h.root.p,t.yaw):a.h.root.p.slice();t.elapsed=0;
     if(t.stage<t.points.length&&t.points[t.stage].clip==='sitToStand'){this.startSeatedPreparation(t);return;}
     if(t.stage>=t.points.length){
      if(t.target==='standing'){
