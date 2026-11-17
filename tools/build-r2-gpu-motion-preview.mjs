@@ -110,7 +110,11 @@ const assetsGzip = gzipSync(Buffer.from(assetsJson, 'utf8'), { level: 9, mtime: 
 const manifest = {
   schema: 'kaopu/r2-gpu-motion-preview-build@1',
   sourceCommit,
-  rootIndexSHA256: sha256(Buffer.from(appHtml, 'utf8')),\n  baseSourceIndexSHA256: sha256(Buffer.from(assembledIndex, 'utf8')),\n  previewBodyRuntimeSHA256: sha256(Buffer.from(previewBody, 'utf8')),\n  previewMode: 'single actor; retain hair; skip mother-pair and four comparison NPCs',\n  populationActors: 1,
+  rootIndexSHA256: sha256(Buffer.from(appHtml, 'utf8')),
+  baseSourceIndexSHA256: sha256(Buffer.from(assembledIndex, 'utf8')),
+  previewBodyRuntimeSHA256: sha256(Buffer.from(previewBody, 'utf8')),
+  previewMode: 'single actor; retain hair; skip mother-pair and four comparison NPCs',
+  populationActors: 1,
   jointCount,
   influenceCount: 8,
   skinning: 'GPU dual-quaternion skinning (DQS), two vec4 joint/weight lanes',
@@ -121,7 +125,8 @@ const manifest = {
   assetPayloadBytes: Object.values(assetManifest).reduce((sum, item) => sum + item.bytes, 0),
   parameterOnlyGeometry: parameters.containsDisplayVertices === false && parameters.containsTriangleIndices === false,
   externalNetworkRequiredForBody: false,
-  visualAcceptance: false,\n  browserSmokeRequired: true,
+  visualAcceptance: false,
+  browserSmokeRequired: true,
   knownBlocker: 'R7 shoulder/axilla posed-surface folding remains open; this preview does not certify production skin acceptance.',
   grayAtlasRetarget: 'Not included in this first preview. The 104-joint gray research candidate is not surface-bound to the 128-joint R2 rig.'
 };
@@ -145,7 +150,8 @@ writeFileSync(join(outDir, 'index.html'), html);
 writeFileSync(join(outDir, 'BUILD_MANIFEST.json'), manifestJson + '\n');
 console.log(JSON.stringify({
   output: join(outDir, 'index.html'),
-  outputBytes: Buffer.byteLength(html, 'utf8'),\n  previewBodyBytes: Buffer.byteLength(previewBody, 'utf8'),
+  outputBytes: Buffer.byteLength(html, 'utf8'),
+  previewBodyBytes: Buffer.byteLength(previewBody, 'utf8'),
   sourceCommit,
   workerModuleCount: Object.keys(moduleSources).length,
   jointCount,

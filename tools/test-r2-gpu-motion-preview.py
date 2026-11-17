@@ -90,9 +90,6 @@ def main():
             raise RuntimeError("Formal R2 renderer has not produced a frame.")
 
         driver.save_screenshot(str(output / "r2-ready.png"))
-        app_frame = driver.find_element(By.ID, "app-frame")
-        app_frame.switch_to if False else None
-
         for action in ["wave", "sit", "stand", "salute"]:
             button = driver.find_element(By.CSS_SELECTOR, '[data-action="' + action + '"]')
             button.click()
