@@ -2,23 +2,23 @@
 
 This is a separate, self-contained HTML preview. It does not modify the formal main runtime or replace the 2026-11-15 gray-motion research snapshot.
 
-## What this first version actually reuses
+## Preview scope
 
-- The complete formal R2 application entrypoint from the source commit recorded in BUILD_MANIFEST.json.
-- The R2 function-parameter surface inputs and source rig reference. No baked display vertices or triangle-index cache is added to the preview.
-- The formal 128-joint rig, eight uint16 skinning weights per binding root, and the existing GPU dual-quaternion skinning shader (DQS).
-- The formal JarvisEmbodimentLab / MotionLab action interface for walk, sit, lie, stand, wave, and salute.
-- The original R2 body and hair workers, packaged as Blob modules with the parameter files embedded in this single HTML. Body generation does not need remote parameter fetches.
+- One live copy of the formal R2 character is loaded. The default second mother-copy and four authored comparison NPCs are skipped in this preview only; the formal source remains unchanged.
+- Hair generation is retained. The face-review mode is not used.
+- The formal 128-joint rig, eight uint16 skinning weights per binding root, and existing GPU dual-quaternion skinning shader (DQS) are reused.
+- The formal R2 body function parameters, topology, binding, and Worker are bundled into the standalone HTML. No baked display vertices or triangle-index cache is added.
+- Walk, sit, lie, stand, wave, and salute are submitted through the formal JarvisEmbodimentLab / MotionLab command interface.
 
-## Controls and measurements
+## Measurements
 
-The floating panel submits actions through the same formal command interface as the original workbench. It reads the actual R2 runtime panel's FPS, GPU timer, render CPU, draw calls, triangles, and geometry-buffer measurements. A missing GPU timer is reported as unsupported; it is not replaced with an estimate.
+The panel reads the live R2 runtime FPS, GPU timer, render CPU, draw calls, triangle count, and geometry-buffer measurements. GPU timer unsupported states are reported as unsupported, not estimated. CI uses Chrome/SwiftShader, so its FPS is not a hardware performance benchmark.
 
-## Important boundaries
+## Acceptance boundaries
 
-- This is an integration proof using the formal R2 action interface. The gray research branch's separate 104-joint action candidate has not yet been retargeted to the 128-joint R2 rig. Its source skeleton, local-reference conventions, and finger/head tracks need a measured mapping before that can be claimed.
+- The first browser run exposed a serious preview-only loading mistake: it inherited the full default population setup (mother-copy plus four comparison NPCs). The standalone preview now bypasses those extra actors while preserving the original R2 character and hair. CI asserts the population contains exactly one actor.
+- The gray research branch's separate 104-joint candidate has not yet been retargeted to the 128-joint R2 rig. No external gray motion is claimed as integrated.
 - R7 still records shoulder/axilla posed-surface folding. This preview does not pass skin visual acceptance and must not be frozen as a production NPC.
-- The CI browser smoke uses SwiftShader and verifies loading/action dispatch only. Its FPS is not a hardware performance benchmark.
-- The standalone page is a preview artifact; the formal R2 source and generated main entrypoint remain unchanged.
+- The browser smoke must pass real body/brain startup and complete four action tasks before the generated HTML is committed. A failed browser smoke fails the workflow.
 
-Open index.html directly in a modern Chromium browser, or use the immutable public preview link from the handoff.
+Open `index.html` directly in a modern Chromium browser.

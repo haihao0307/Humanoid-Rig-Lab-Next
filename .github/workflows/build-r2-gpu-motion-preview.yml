@@ -39,7 +39,6 @@ jobs:
           command -v google-chrome || command -v google-chrome-stable || command -v chromium
       - name: Run real R2 browser smoke
         id: browser
-        continue-on-error: true
         run: |
           python tools/test-r2-gpu-motion-preview.py \
             --html experiments/r2-gpu-motion-preview-20261117/index.html \

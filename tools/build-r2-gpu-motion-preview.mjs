@@ -7,7 +7,26 @@ import { assemble } from './build-pure.mjs';
 
 const outDir = 'experiments/r2-gpu-motion-preview-20261117';
 const templatePath = join(outDir, 'template.html');
-const { index: appHtml } = assemble();
+const { index: assembledIndex, body: assembledBody } = assemble();
+const normalizedBody = assembledBody.replace(/\r\n/g, '\n');
+const populationBranch = [
+  " installNPCPopulation(window.HumanLab);",
+  " await startupStage('population','正在从同一母体生成第二个人物');",
+  " try{await window.HumanLab.population.installMotherPair();}catch(error){logMessage('母体复制体未生成：'+error.message);}",
+  " await window.HumanLab.population.installReviewCast();"
+].join('\n');
+if (normalizedBody.split(populationBranch).length !== 2) {
+  throw new Error('Formal R2 population startup anchor changed; refusing to build a six-character preview.');
+}
+const previewBody = normalizedBody.replace(populationBranch, [
+  " installNPCPopulation(window.HumanLab);",
+  " window.HumanLab.review={mode:'motion-preview',singleActor:true,populationSkipped:true,hairSkipped:false};",
+  " logMessage('动作预览模式：保留正式 R2 当前人物与头发，跳过额外母体复制体和四个对照 NPC。');"
+].join('\n'));
+const bodyPayloadMatches = assembledIndex.match(/const BODY_PAYLOAD='[^']+';/g) || [];
+if (bodyPayloadMatches.length !== 1) throw new Error('Expected exactly one formal R2 body payload in the entrypoint.');
+const previewBodyPayload = gzipSync(Buffer.from(previewBody, 'utf8'), { level: 9, mtime: 0 }).toString('base64');
+const appHtml = assembledIndex.replace(/const BODY_PAYLOAD='[^']+';/, `const BODY_PAYLOAD='${previewBodyPayload}';`);
 if (!appHtml.includes('BODY_PAYLOAD') || !appHtml.includes('JarvisEmbodimentLab')) {
   throw new Error('The formal R2 application entrypoint is not the expected generated build.');
 }
@@ -91,7 +110,7 @@ const assetsGzip = gzipSync(Buffer.from(assetsJson, 'utf8'), { level: 9, mtime: 
 const manifest = {
   schema: 'kaopu/r2-gpu-motion-preview-build@1',
   sourceCommit,
-  rootIndexSHA256: sha256(Buffer.from(appHtml, 'utf8')),
+  rootIndexSHA256: sha256(Buffer.from(appHtml, 'utf8')),\n  baseSourceIndexSHA256: sha256(Buffer.from(assembledIndex, 'utf8')),\n  previewBodyRuntimeSHA256: sha256(Buffer.from(previewBody, 'utf8')),\n  previewMode: 'single actor; retain hair; skip mother-pair and four comparison NPCs',\n  populationActors: 1,
   jointCount,
   influenceCount: 8,
   skinning: 'GPU dual-quaternion skinning (DQS), two vec4 joint/weight lanes',
@@ -102,7 +121,7 @@ const manifest = {
   assetPayloadBytes: Object.values(assetManifest).reduce((sum, item) => sum + item.bytes, 0),
   parameterOnlyGeometry: parameters.containsDisplayVertices === false && parameters.containsTriangleIndices === false,
   externalNetworkRequiredForBody: false,
-  visualAcceptance: false,
+  visualAcceptance: false,\n  browserSmokeRequired: true,
   knownBlocker: 'R7 shoulder/axilla posed-surface folding remains open; this preview does not certify production skin acceptance.',
   grayAtlasRetarget: 'Not included in this first preview. The 104-joint gray research candidate is not surface-bound to the 128-joint R2 rig.'
 };
@@ -126,7 +145,7 @@ writeFileSync(join(outDir, 'index.html'), html);
 writeFileSync(join(outDir, 'BUILD_MANIFEST.json'), manifestJson + '\n');
 console.log(JSON.stringify({
   output: join(outDir, 'index.html'),
-  outputBytes: Buffer.byteLength(html, 'utf8'),
+  outputBytes: Buffer.byteLength(html, 'utf8'),\n  previewBodyBytes: Buffer.byteLength(previewBody, 'utf8'),
   sourceCommit,
   workerModuleCount: Object.keys(moduleSources).length,
   jointCount,

@@ -37,7 +37,7 @@ button:disabled{opacity:.38;cursor:not-allowed}
 <iframe id="app-frame" title="正式 R2 人物与动作工作台"></iframe>
 <details id="hud" open>
   <summary><span><span class="brand">KAOPU / R2 GPU MOTION</span><br>人物动作验证台</span><span id="ready">正在启动</span></summary>
-  <div id="spec">正式 R2 人物表面函数 · 128 关节 · 每顶点 8 权重 · GPU 双四元数蒙皮（DQS / WebGL2）</div>
+  <div id="spec">正式 R2 单人物 · 保留头发 · 128 关节 · 每顶点 8 权重 · GPU 双四元数蒙皮（DQS / WebGL2）</div>
   <div class="actions">
     <button data-action="walk" disabled>向前走 1 米</button>
     <button data-action="sit" disabled>坐下</button>
@@ -57,7 +57,7 @@ button:disabled{opacity:.38;cursor:not-allowed}
   </div>
   <div id="progress">正在准备正式人物运行时与参数。</div>
   <div id="action-status">动作控制尚未开放。</div>
-  <p class="note"><strong>验收边界：</strong>本版复用正式 R2 人物函数、三角面生成、八权重绑定和 GPU DQS，不是预烘焙顶点动画。肩腋区域仍有 R7 记录的局部折叠，不能据此冻结生产 NPC。当前动作使用正式 R2 动作接口；灰模研究版的 104 关节外部动作尚未完成到 128 关节 R2 的重定向。</p>
+  <p class="note"><strong>验收边界：</strong>本版只保留一个正式 R2 人物，跳过默认母体复制体和四个对照 NPC，保留原有头发生成。人物函数、三角面生成、八权重绑定和 GPU DQS 均复用正式源码，不是预烘焙顶点动画。肩腋区域仍有 R7 记录的局部折叠，不能据此冻结生产 NPC。当前动作使用正式 R2 动作接口；灰模研究版的 104 关节外部动作尚未完成到 128 关节 R2 的重定向。</p>
   <div id="build">BUILD __BUILD_LABEL__</div>
 </details>
 <script type="application/json" id="build-manifest">__BUILD_MANIFEST_JSON__</script>
@@ -123,7 +123,7 @@ button:disabled{opacity:.38;cursor:not-allowed}
     const prelude=[
       '<scr'+'ipt>',
       'window.__R2_STANDALONE_ASSETS=window.parent.__R2_STANDALONE_ASSETS;',
-      'window.__R2_STANDALONE_WORKER_URL=window.parent.__R2_STANDALONE_WORKER_URL;',
+      'window.__R2_STANDALONE_WORKER_URL=window.parent.__R2_STANDALONE_WORKER_URL;',\n      'window.__R2_STANDALONE_PREVIEW_MODE="single";',
       'window.__R2_STANDALONE_PATCH_STATE={status:"armed",error:null};',
       'try{(function(){',
       'const descriptor=Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype,"srcdoc");',
@@ -155,6 +155,14 @@ button:disabled{opacity:.38;cursor:not-allowed}
       const api=app.JarvisEmbodimentLab;
       const progress=doc.getElementById('compact-progress')?.textContent||doc.getElementById('loadingText')?.textContent||'等待身体初始化…';
       $('progress').textContent=progress;
+      const bodyFrame=doc.getElementById('bodyFrame'),body=bodyFrame?.contentWindow,bodyLab=body?.HumanLab;
+      const actors=bodyLab?.population?[...bodyLab.population.values()]:null;
+      state.runtime={bodyStartup:body?.__humanStartup||null,populationCount:actors?.length??null,actorLabels:actors?.map(actor=>actor.label)??null,rendererFrames:bodyLab?.renderer?.frames??null};
+      state.diagnostic=doc.querySelector('#bodyStartupDiagnostics pre')?.textContent||null;
+      const startupFailure=api?.state?.startupFailure;
+      if(startupFailure){
+        state.state='error';state.error=startupFailure.error||'R2 身体启动失败';$('ready').textContent='启动失败';$('progress').textContent=state.error;return;
+      }
       const read=id=>doc.getElementById(id)?.textContent?.trim()||'—';
       const metrics={fps:read('compact-fps'),gpu:read('compact-gpu'),cpu:read('compact-cpu'),draw:read('compact-draw'),tri:read('compact-tri'),memory:read('compact-memory'),generation:read('compact-load')};
       state.metrics=metrics;
@@ -181,8 +189,10 @@ button:disabled{opacity:.38;cursor:not-allowed}
       state.lastAction=action;state.lastActionState='submitting';$('action-status').textContent='正在提交：'+command;
       try{
         const result=await api.command(command,'replace');
-        state.lastActionState='accepted';state.lastActionResult=result??null;
-        $('action-status').textContent='已提交：'+command+'。动作已交给正式 R2 动作接口。';
+        state.lastActionResult=result??null;
+        state.lastActionTaskId=result?.taskId||null;
+        state.lastActionState=result?.dispatched?'dispatched':result?.awaitingConfirmation?'awaiting-confirmation':'not-dispatched';
+        $('action-status').textContent=result?.dispatched?'已下发：'+command+'。等待正式 R2 任务完成。':result?.awaitingConfirmation?'计划等待确认：'+command:'未下发：'+(result?.plan?.response||result?.plan?.status||'未形成可执行动作');
       }catch(error){
         state.lastActionState='error';state.lastActionError=String(error&&error.message||error);
         $('action-status').textContent='动作提交失败：'+state.lastActionError;

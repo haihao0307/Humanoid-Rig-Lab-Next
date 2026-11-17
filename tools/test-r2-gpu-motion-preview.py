@@ -8,6 +8,28 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
+
+def snapshot(driver):
+    return driver.execute_script("""
+      const frame=document.querySelector('#app-frame');
+      const app=frame?.contentWindow,doc=frame?.contentDocument;
+      const bodyFrame=doc?.getElementById('bodyFrame'),body=bodyFrame?.contentWindow;
+      const lab=body?.HumanLab,api=app?.JarvisEmbodimentLab;
+      const actors=lab?.population?[...lab.population.values()]:null;
+      return {
+        preview:window.__R2PreviewStatus||null,
+        apiReady:api?.ready??null,
+        bodyReady:api?.state?.bodyReady??null,
+        brainReady:api?.state?.brainReady??null,
+        startupFailure:api?.state?.startupFailure??null,
+        bodyStartup:body?.__humanStartup??null,
+        populationCount:actors?.length??null,
+        actorLabels:actors?.map(actor=>actor.label)??null,
+        renderer:lab?.renderer?{frames:lab.renderer.frames,drawCalls:lab.renderer.drawCalls,triangles:lab.renderer.count}:null,
+        diagnostic:doc?.querySelector('#bodyStartupDiagnostics pre')?.textContent||null
+      };
+    """)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -37,23 +59,39 @@ def main():
         "html": str(html_path),
         "environment": "headless Chrome / SwiftShader",
         "performanceRepresentative": False,
+        "previewMode": "single actor; hair retained; comparison NPCs skipped",
         "status": "running",
         "actions": [],
         "browserErrors": []
     }
     try:
         driver.get(html_path.as_uri())
-        wait = WebDriverWait(driver, 240)
-        wait.until(lambda d: d.execute_script(
-            "return window.__R2PreviewStatus && "
-            "(window.__R2PreviewStatus.state === 'ready' || window.__R2PreviewStatus.state === 'error')"
-        ))
-        status = driver.execute_script("return window.__R2PreviewStatus")
-        report["initialStatus"] = status
-        if status.get("state") != "ready":
-            raise RuntimeError("R2 standalone startup failed: " + str(status.get("error")))
-        if status.get("patch") != "patched":
+        wait = WebDriverWait(driver, 240, poll_frequency=0.5)
+        try:
+            wait.until(lambda d: (
+                (lambda s: s["preview"] and s["preview"].get("state") in ("ready", "error"))(snapshot(d))
+            ))
+        except TimeoutException:
+            report["timeoutSnapshot"] = snapshot(driver)
+            raise RuntimeError("Timed out waiting for R2 readiness: " + json.dumps(report["timeoutSnapshot"], ensure_ascii=False))
+
+        initial = snapshot(driver)
+        report["initialStatus"] = initial
+        preview = initial.get("preview") or {}
+        if preview.get("state") != "ready":
+            raise RuntimeError("R2 standalone startup failed: " + str(preview.get("error") or initial.get("startupFailure")))
+        if preview.get("patch") != "patched":
             raise RuntimeError("Standalone Worker/asset patch did not complete.")
+        if initial.get("populationCount") != 1:
+            raise RuntimeError("Single-actor preview expected exactly one population actor: " + str(initial.get("populationCount")))
+        if not initial.get("bodyReady") or not initial.get("brainReady"):
+            raise RuntimeError("Formal R2 brain/body binding is not ready.")
+        if not initial.get("renderer") or initial["renderer"].get("frames", 0) < 1:
+            raise RuntimeError("Formal R2 renderer has not produced a frame.")
+
+        driver.save_screenshot(str(output / "r2-ready.png"))
+        app_frame = driver.find_element(By.ID, "app-frame")
+        app_frame.switch_to if False else None
 
         for action in ["wave", "sit", "stand", "salute"]:
             button = driver.find_element(By.CSS_SELECTOR, '[data-action="' + action + '"]')
@@ -65,23 +103,40 @@ def main():
                 expected
             ))
             action_status = driver.execute_script("return window.__R2PreviewStatus")
-            if action_status.get("lastActionState") == "error":
-                raise RuntimeError("Action command failed: " + action + " / " + str(action_status.get("lastActionError")))
-            report["actions"].append({
-                "id": action,
-                "state": action_status.get("lastActionState"),
-                "result": action_status.get("lastActionResult")
-            })
-            time.sleep(1.0)
-            if driver.execute_script("return window.__R2PreviewStatus.state") != "ready":
-                raise RuntimeError("R2 runtime left ready state after action: " + action)
+            result = action_status.get("lastActionResult") or {}
+            if action_status.get("lastActionState") != "dispatched" or not result.get("taskId"):
+                raise RuntimeError("Action was not dispatched: " + action + " / " + json.dumps(action_status, ensure_ascii=False))
+            task_id = result["taskId"]
+            wait.until(lambda d, tid=task_id: d.execute_script("""
+              const app=document.querySelector('#app-frame')?.contentWindow;
+              const tasks=app?.JarvisEmbodimentLab?.language?.state?.tasks||[];
+              const task=tasks.find(item=>item.id===arguments[0]);
+              return task && ['completed','failed','cancelled','failed_replanned'].includes(task.status)
+                ? {status:task.status,finished:task.finished,total:task.plan?.nodes?.length||0,error:task.error||null}
+                : false;
+            """, tid))
+            task_result = driver.execute_script("""
+              const app=document.querySelector('#app-frame')?.contentWindow;
+              const tasks=app?.JarvisEmbodimentLab?.language?.state?.tasks||[];
+              const task=tasks.find(item=>item.id===arguments[0]);
+              return task?{status:task.status,finished:task.finished,total:task.plan?.nodes?.length||0,error:task.error||null}:null;
+            """, task_id)
+            report["actions"].append({"id":action,"taskId":task_id,"task":task_result})
+            if not task_result or task_result["status"] != "completed":
+                raise RuntimeError("R2 action did not complete: " + action + " / " + json.dumps(task_result, ensure_ascii=False))
+            driver.save_screenshot(str(output / (action + "-completed.png")))
+            time.sleep(0.5)
 
         report["metrics"] = driver.execute_script("return window.__R2PreviewStatus.metrics")
-        report["finalStatus"] = driver.execute_script("return window.__R2PreviewStatus")
+        report["finalStatus"] = snapshot(driver)
         report["status"] = "passed"
     except Exception as error:
         report["status"] = "failed"
         report["error"] = str(error)
+        try:
+            report["failureSnapshot"] = snapshot(driver)
+        except Exception as snapshot_error:
+            report["snapshotError"] = str(snapshot_error)
     finally:
         try:
             report["browserErrors"] = [
