@@ -244,8 +244,8 @@ class MotionLabPose {
    hingeReserveDegrees=Math.min(hingeReserveDegrees,maximum+.5-angle);
    if(angle>maximum+.5)throw Error('关节弯曲超过动作来源或接触适配范围：'+side+'_'+b);
   }
-  const footErrorM=Math.max(0,...candidate.errors.filter(e=>/_foot$/.test(e.id)).map(e=>e.error));
-  if(footErrorM>.012)throw Error('落脚目标超出可达范围，姿态未提交');
+  const footRows=candidate.errors.filter(e=>/_foot$/.test(e.id)),footErrorM=Math.max(0,...footRows.map(e=>e.error));
+  if(footErrorM>.012)throw Error('落脚目标超出可达范围（'+footRows.map(e=>e.id+':'+(e.error*1000).toFixed(1)+'mm').join('，')+'），姿态未提交');
   const handErrorM=Math.max(0,...candidate.errors.filter(e=>/_hand$/.test(e.id)).map(e=>e.error));
   if(handErrorM>.012)throw Error('手掌目标超出可达范围，姿态未提交');
   return {boneErrorM,radialAttachmentErrorM,attachmentErrorM,attachmentJoint,footErrorM,handErrorM,hingeReserveDegrees,kinematicOnly:true};
