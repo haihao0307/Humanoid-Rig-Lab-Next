@@ -93,7 +93,7 @@ def main():
             raise RuntimeError("Formal R2 renderer has not produced a frame.")
 
         time.sleep(2.0)
-        for action in ["walk", "sit", "stand", "lie", "stand", "wave", "salute"]:
+        for action in ["sit", "stand", "lie", "stand", "walk", "wave", "salute"]:
             button = driver.find_element(By.CSS_SELECTOR, '[data-action="' + action + '"]')
             driver.execute_script("arguments[0].click()", button)
             wait.until(lambda d, expected=action: d.execute_script(
