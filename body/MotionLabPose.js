@@ -260,16 +260,23 @@ class MotionLabPose {
   // live skeleton, even when this adapter is called outside Agent.tickFixed.
   let ground=null,groundCorrectionM=0;
   if(options.groundClearance){
-   ground=h.minimumBoneY(candidate.frames);
-   if(!Number.isFinite(ground.y))throw Error('动作候选缺少有效支撑采样');
-   groundCorrectionM=Math.max(0,.0005-ground.y);
-   if(groundCorrectionM>0){
-    for(const f of candidate.frames.values())f.p[1]+=groundCorrectionM;
-    // Body-relative landmarks move with the pose; world foot/object anchors
-    // remain fixed and any resulting residual must pass the same validator.
-    for(const error of candidate.errors)if(error.targetSpace==='body')error.target[1]+=groundCorrectionM;
-    ground={...ground,y:ground.y+groundCorrectionM};
+   // Ground clearance must not translate fixed world-space feet. Raise the
+   // candidate body, then re-solve both controlled legs against their original
+   // anchors. This preserves bone lengths and contact instead of hiding a
+   // floor correction by relaxing the 12 mm effector tolerance.
+   for(let pass=0;pass<3;pass++){
+    ground=h.minimumBoneY(candidate.frames);
+    if(!Number.isFinite(ground.y))throw Error('动作候选缺少有效支撑采样');
+    const correction=Math.max(0,.0005-ground.y);
+    if(correction<=1e-6)break;
+    groundCorrectionM+=correction;
+    for(const f of candidate.frames.values())f.p[1]+=correction;
+    for(const error of candidate.errors)if(error.targetSpace==='body')error.target[1]+=correction;
+    if(candidate.controlled&&candidate.state?.feet){
+     this.reprojectControlledLegs(candidate.frames,candidate.state,candidate.state.yaw??0,candidate.frames,candidate.frames,1);
+    }
    }
+   ground=h.minimumBoneY(candidate.frames);
   }
   this.measureEffectors(candidate);const report=this.validate(candidate);
   const localFrames=h.joints.map(j=>{const f=candidate.frames.get(j.id),parent=j.parent&&candidate.frames.get(j.parent.id);return parent?compose(inverse(parent),f):frame(f.p,f.q);});
