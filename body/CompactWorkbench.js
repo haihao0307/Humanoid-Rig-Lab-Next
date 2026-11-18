@@ -366,8 +366,10 @@ function installCompactPerformance(lab){
         if(now-lastQuery>250&&pending.length<4){query=gl.createQuery();gl.beginQuery(ext.TIME_ELAPSED_EXT,query);lastQuery=now;}}
     },
     end(){const now=performance.now();if(query){gl.endQuery(ext.TIME_ELAPSED_EXT);pending.push(query);query=null;}const elapsed=now-this.started;
-      if(lastDraw!==null&&now-lastDraw>1000){windowStart=now;frames=0;cpu=0;stats.fps=null;}lastDraw=now;frames++;cpu+=elapsed;stats.renderedFrames++;stats.lastFrameTime=now;
-      if(now-windowStart>=500){stats.fps=frames*1000/(now-windowStart);stats.cpuFrameMs=cpu/frames;windowStart=now;frames=0;cpu=0;}
+      const gap=lastDraw===null?null:now-lastDraw,active=lab.character?.busy===true;
+      if(gap!==null&&gap>1000){windowStart=now;frames=1;cpu=elapsed;stats.fps=active?1000/gap:null;stats.cpuFrameMs=active?elapsed:null;}
+      else{frames++;cpu+=elapsed;if(now-windowStart>=500){stats.fps=frames*1000/(now-windowStart);stats.cpuFrameMs=cpu/frames;windowStart=now;frames=0;cpu=0;}}
+      lastDraw=now;stats.renderedFrames++;stats.lastFrameTime=now;
       const r=lab.renderer,compacts=[...new Set(r.compacts?.length?r.compacts:r.compact?[r.compact]:[])].filter(surface=>!surface.disposed),passes=1+(r.shadowDrawCalls>0?1:0);
       stats.geometryGPUBytes=(r.geometryGPUBytes||0)+(r.lineGeometryGPUBytes||0)+compacts.reduce((total,c)=>total+(c.geometryBytes||0)+(c.hair?.geometryBytes||0),0);
       stats.trianglesPerFrame=(r.count||0)/3*passes+compacts.reduce((total,c)=>total+(c.visible?(c.report.triangles+(c.skirt?.report.triangles||0))*passes:0)+(c.hair?.visible?c.hair.triangles:0),0);stats.actorCount=compacts.length;stats.visibleActorCount=compacts.filter(c=>c.visible).length;
