@@ -43,7 +43,7 @@ class BasicController {
  preparePoints(t){const a=this.a;t.align=false;t.from=this.capture();
   const clips=r2PostureClips(this.posture,t.target);
   t.points=clips.map(clip=>({clip,duration:R2_MOTION.clips[clip].durationS,kind:clip}));
-  t.origin=r2ReferenceOriginForPosition(a.h,clips[0].clip,0,a.h.root.p,t.yaw);t.fromMotion=r2CaptureMotion(a.h,t.yaw);
+  t.origin=r2ReferenceOriginForPosition(a.h,clips[0],0,a.h.root.p,t.yaw);t.fromMotion=r2CaptureMotion(a.h,t.yaw);
   a.swing=null;a.gaitSignal=0;a.gaitBlend=0;t.elapsed=0;
   if(t.points[0]?.clip==='sitToStand')this.startSeatedPreparation(t);
   else a.enter(t.target==='standing'?'standUp':t.target==='lying'?'lieDown':'sitDown');
