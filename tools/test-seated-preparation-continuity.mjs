@@ -45,6 +45,13 @@ for(let i=0;i<=count;i++){
  previous=candidate.frames;
 }
 assert(maxBoneErrorM<1e-7);assert(maxFootErrorM<1e-8);assert(maxJointStepM<.02,'preparation must not teleport a joint on a fixed step');
+const clearanceProbe={...lastCandidate,frames:new Map([...lastCandidate.frames].map(([id,f])=>[id,{p:[...f.p],q:[...f.q]}]))};
+for(const f of clearanceProbe.frames.values())f.p[1]+=.012;
+pose.reprojectControlledLegs(clearanceProbe.frames,clearanceProbe.state,clearanceProbe.state.yaw??0,clearanceProbe.frames,clearanceProbe.frames,1);
+pose.measureEffectors(clearanceProbe);
+const clearanceReport=pose.validate(clearanceProbe);
+assert(clearanceReport.footErrorM<1e-8,'ground-clearance correction must re-solve both legs against the original world foot anchors');
+for(const side of ['left','right'])assert(api.dist(clearanceProbe.frames.get(side+'_foot').p,feet[side].p)<1e-9,'ground-clearance correction must preserve '+side+' foot contact');
 const endRoot=lastCandidate.frames.get('hips').p,origin=api.r2ReferenceOriginForPosition(h,'sitToStand',0,endRoot,0),clipStart=pose.build(api.r2ReferenceDescriptor(h,'sitToStand',0,origin,0));
 assert(api.dist(clipStart.frames.get('hips').p,endRoot)<1e-9,'the recorded stand-up clip must start at the prepared root position');
 for(const side of ['left','right'])assert(api.dist(lastCandidate.frames.get(side+'_foot').p,feet[side].p)<1e-9);
