@@ -107,7 +107,13 @@ def main():
             if action_status.get("lastActionState") != "dispatched" or not result.get("taskId"):
                 raise RuntimeError("Action was not dispatched: " + action + " / " + json.dumps(action_status, ensure_ascii=False))
             task_id = result["taskId"]
-            deadline = time.monotonic() + 90
+            baseline_frames = driver.execute_script("""
+              const app=document.querySelector('#app-frame')?.contentWindow;
+              const body=app?.document?.getElementById('bodyFrame')?.contentWindow;
+              return body?.HumanLab?.renderer?.compactPerformance?.stats?.renderedFrames||0;
+            """)
+            action_started = time.monotonic()
+            deadline = action_started + 90
             perf_samples = []
             last_frame = -1
             task_result = None
@@ -137,7 +143,12 @@ def main():
             cpu_values=[row["cpuFrameMs"] for row in perf_samples if row.get("cpuFrameMs") is not None]
             gpu_values=[row["gpuMs"] for row in perf_samples if row.get("gpuMs") is not None]
             import statistics
+            elapsed_s=time.monotonic()-action_started
+            final_frames=perf_samples[-1].get("renderedFrames",baseline_frames) if perf_samples else baseline_frames
             performance={
+                "elapsedS":elapsed_s,
+                "renderedFrameDelta":max(0,final_frames-baseline_frames),
+                "renderedFps":max(0,final_frames-baseline_frames)/elapsed_s if elapsed_s>0 else None,
                 "samples":len(perf_samples),
                 "medianFps":statistics.median(fps_values) if fps_values else None,
                 "minFps":min(fps_values) if fps_values else None,
