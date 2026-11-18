@@ -24,7 +24,8 @@ h.joints=[...sourceBind.keys()].map(id=>({id,bindQ:[0,0,0,1]}));h.byId=new Map(h
 for(const side of ['left','right'])h.arms[side]={s:side==='left'?-1:1,L1:api.dist(sourceBind.get(side+'_upperArm').p,sourceBind.get(side+'_forearm').p),L2:api.dist(sourceBind.get(side+'_forearm').p,sourceBind.get(side+'_hand').p)};
 const a={h,pos:[0,0,0],yaw:0,time:0,route:[],routeIndex:0,manipulationPace:()=>1,strength:{movementFactor:()=>1},w:{objects:[],bounds:{xMin:-100,xMax:100,zMin:-100,zMax:100},collision:()=>false,get:()=>null}};
 const locomotion=new api.NaturalLocomotion(a),pose=locomotion.pose;
-const standingRoot=[0,bodyMetrics.standingHipHeightM,0],standingOrigin=api.r2ReferenceOriginForPosition(h,'standToSit',0,standingRoot,0);\nconst seated=pose.build(api.r2ReferenceDescriptor(h,'standToSit',1,standingOrigin,0));pose.validate(seated);
+const standingRoot=[0,bodyMetrics.standingHipHeightM,0],standingOrigin=api.r2ReferenceOriginForPosition(h,'standToSit',0,standingRoot,0);
+const seated=pose.build(api.r2ReferenceDescriptor(h,'standToSit',1,standingOrigin,0));pose.validate(seated);
 const frames=seated.frames,feet=Object.fromEntries(['left','right'].map(side=>[side,{p:[...frames.get(side+'_foot').p],q:[...frames.get(side+'_foot').q],yaw:0}]));
 const first=api.r2SeatedPreparationDescriptor(h,frames,feet,0,0),last=api.r2SeatedPreparationDescriptor(h,frames,feet,0,1);
 const rootLiftM=last.position[1]-frames.get('hips').p[1];
