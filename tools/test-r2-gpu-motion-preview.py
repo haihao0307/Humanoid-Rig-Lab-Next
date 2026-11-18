@@ -26,7 +26,7 @@ def snapshot(driver):
         bodyStartup:body?.__humanStartup??null,
         populationCount:actors?.length??null,
         actorLabels:actors?.map(actor=>actor.label)??null,
-        renderer:lab?.renderer?{frames:lab.renderer.frames,drawCalls:lab.renderer.drawCalls,triangles:lab.renderer.count}:null,
+        renderer:lab?.renderer?{frames:lab.renderer.frames,drawCalls:lab.renderer.drawCalls,triangles:lab.renderer.count,skin:lab.renderer.compactPerformance?.stats||null}:null,
         diagnostic:doc?.querySelector('#bodyStartupDiagnostics pre')?.textContent||null
       };
     """)
@@ -93,7 +93,7 @@ def main():
             raise RuntimeError("Formal R2 renderer has not produced a frame.")
 
         time.sleep(2.0)
-        for action in ["wave", "sit", "stand", "salute"]:
+        for action in ["walk", "sit", "stand", "lie", "stand", "wave", "salute"]:
             button = driver.find_element(By.CSS_SELECTOR, '[data-action="' + action + '"]')
             driver.execute_script("arguments[0].click()", button)
             wait.until(lambda d, expected=action: d.execute_script(
@@ -107,24 +107,49 @@ def main():
             if action_status.get("lastActionState") != "dispatched" or not result.get("taskId"):
                 raise RuntimeError("Action was not dispatched: " + action + " / " + json.dumps(action_status, ensure_ascii=False))
             task_id = result["taskId"]
-            wait.until(lambda d, tid=task_id: d.execute_script("""
-              const app=document.querySelector('#app-frame')?.contentWindow;
-              const tasks=app?.JarvisEmbodimentLab?.language?.state?.tasks||[];
-              const task=tasks.find(item=>item.id===arguments[0]);
-              return task && ['completed','failed','cancelled','failed_replanned'].includes(task.status)
-                ? {status:task.status,finished:task.finished,total:task.plan?.nodes?.length||0,error:task.error||null}
-                : false;
-            """, tid))
-            task_result = driver.execute_script("""
-              const app=document.querySelector('#app-frame')?.contentWindow;
-              const tasks=app?.JarvisEmbodimentLab?.language?.state?.tasks||[];
-              const task=tasks.find(item=>item.id===arguments[0]);
-              return task?{status:task.status,finished:task.finished,total:task.plan?.nodes?.length||0,error:task.error||null}:null;
-            """, task_id)
-            report["actions"].append({"id":action,"taskId":task_id,"task":task_result})
-            if not task_result or task_result["status"] != "completed":
+            deadline = time.monotonic() + 90
+            perf_samples = []
+            last_frame = -1
+            task_result = None
+            while time.monotonic() < deadline:
+                sample = driver.execute_script("""
+                  const app=document.querySelector('#app-frame')?.contentWindow;
+                  const body=app?.document?.getElementById('bodyFrame')?.contentWindow;
+                  const tasks=app?.JarvisEmbodimentLab?.language?.state?.tasks||[];
+                  const task=tasks.find(item=>item.id===arguments[0]);
+                  const stats=body?.HumanLab?.renderer?.compactPerformance?.stats||null;
+                  return {
+                    task:task?{status:task.status,finished:task.finished,total:task.plan?.nodes?.length||0,error:task.error||null}:null,
+                    perf:stats?{fps:stats.fps,cpuFrameMs:stats.cpuFrameMs,gpuMs:stats.gpuMs,renderedFrames:stats.renderedFrames,drawCalls:stats.drawCalls,trianglesPerFrame:stats.trianglesPerFrame,geometryGPUBytes:stats.geometryGPUBytes}:null
+                  };
+                """, task_id)
+                perf = sample.get("perf")
+                if perf and perf.get("renderedFrames", 0) > last_frame:
+                    perf_samples.append(perf)
+                    last_frame = perf.get("renderedFrames", last_frame)
+                task_result = sample.get("task")
+                if task_result and task_result["status"] in ["completed","failed","cancelled","failed_replanned"]:
+                    break
+                time.sleep(0.25)
+            if not task_result:
+                raise RuntimeError("Timed out waiting for R2 action: " + action)
+            fps_values=[row["fps"] for row in perf_samples if row.get("fps") is not None]
+            cpu_values=[row["cpuFrameMs"] for row in perf_samples if row.get("cpuFrameMs") is not None]
+            gpu_values=[row["gpuMs"] for row in perf_samples if row.get("gpuMs") is not None]
+            import statistics
+            performance={
+                "samples":len(perf_samples),
+                "medianFps":statistics.median(fps_values) if fps_values else None,
+                "minFps":min(fps_values) if fps_values else None,
+                "maxFps":max(fps_values) if fps_values else None,
+                "medianCpuFrameMs":statistics.median(cpu_values) if cpu_values else None,
+                "medianGpuMs":statistics.median(gpu_values) if gpu_values else None,
+                "last":perf_samples[-1] if perf_samples else None
+            }
+            report["actions"].append({"id":action,"taskId":task_id,"task":task_result,"performance":performance})
+            if task_result["status"] != "completed":
                 raise RuntimeError("R2 action did not complete: " + action + " / " + json.dumps(task_result, ensure_ascii=False))
-            time.sleep(0.5)
+            time.sleep(0.35)
 
         report["metrics"] = driver.execute_script("return window.__R2PreviewStatus.metrics")
         report["finalStatus"] = snapshot(driver)
